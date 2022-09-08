@@ -7,7 +7,6 @@ Deno.test({
         assertEquals(tryParseRedirectRequest('https://example.org/e/example.com/path/to/episode.mp3'), { targetUrl: `https://example.com/path/to/episode.mp3` });
         assertEquals(tryParseRedirectRequest('http://localhost:8080/e/example.com/path/to/episode.mp3'), { targetUrl: `https://example.com/path/to/episode.mp3` });
         assertEquals(tryParseRedirectRequest('https://example.org/'), undefined);
-        assertEquals(1, 0);
     }
 });
 
