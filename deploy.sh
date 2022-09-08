@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# abort on any non-zero exit code
+set -e
+
 # ensure required environment variables are defined
 if [ -z "$INSTANCE" ] || [ -z "$CF_ACCOUNT_ID" ] || [ -z "$CF_API_TOKEN" ] || [ -z "$CF_CUSTOM_DOMAIN" ] || [ -z "$CF_SCRIPT_NAME" ]; then
   echo "\$INSTANCE, \$CF_ACCOUNT_ID, \$CF_API_TOKEN, \$CF_CUSTOM_DOMAIN, and \$CF_SCRIPT_NAME are required"
@@ -23,7 +26,7 @@ if [ -n "$DEPLOY_SHA" ]; then
 fi
 
 # run unit tests as a sanity check
-NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno test --fail-fast
+NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno test
 
 # denoflare push the worker script to cloudflare
 NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno run --unstable --allow-all https://raw.githubusercontent.com/skymethod/denoflare/$DENOFLARE_VERSION/cli/cli.ts \
