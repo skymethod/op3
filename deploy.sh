@@ -15,7 +15,7 @@ curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VE
 if [ -n "$DEPLOY_SHA" ]; then
   echo "DEPLOY_SHA: $DEPLOY_SHA"
   DEPLOYED_SHA=$(echo "try { console.log(JSON.parse(await (await fetch('https://$CF_CUSTOM_DOMAIN/info.json')).text()).deploySha) } catch {}" | ./deno-$DENO_VERSION/bin/deno run --allow-net -)
-  if [ "$DEPLOY_SHA" == "$DEPLOYED_SHA" ]; then
+  if [ "$DEPLOY_SHA" = "$DEPLOYED_SHA" ]; then
     echo "already deployed on $CF_CUSTOM_DOMAIN"
     exit 0
   fi
