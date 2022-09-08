@@ -41,3 +41,18 @@ jobs:
           CF_CUSTOM_DOMAIN: op3.dev
           CF_SCRIPT_NAME: op3-dev
           INSTANCE: dev
+  deploy-prod:
+    runs-on: ubuntu-22.04
+    env:
+      DEPLOY_SHA: ee3b3d4370df15b02262f1ddf9bcd4931272c300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+      - name: Deploy to prod
+        run: ./deploy.sh
+        env:
+          CF_CUSTOM_DOMAIN: op3.st
+          CF_SCRIPT_NAME: op3-prod
+          INSTANCE: prod
