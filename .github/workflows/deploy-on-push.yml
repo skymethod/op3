@@ -25,6 +25,7 @@ jobs:
         env:
           CF_CUSTOM_DOMAIN: ci.op3.dev
           CF_SCRIPT_NAME: op3-ci
+          CF_BACKEND_DO_NAMESPACE: backend-do-ci
           INSTANCE: ci
   deploy-dev:
     runs-on: ubuntu-22.04
