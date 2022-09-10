@@ -2,12 +2,18 @@ import { BackendDOColo } from './backend_do_colo.ts';
 import { DurableObjectState } from './deps.ts';
 import { isRpcRequest, RpcResponse } from './rpc.ts';
 import { IsolateId } from './isolate_id.ts';
+import { WorkerEnv } from './worker_env.ts';
+import { RawRequestController } from './raw_request_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
+    private readonly env: WorkerEnv;
 
-    constructor(state: DurableObjectState) {
+    private rawRequestController: RawRequestController | undefined;
+
+    constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
+        this.env = env;
     }
 
     async fetch(request: Request): Promise<Response> {
@@ -26,7 +32,10 @@ export class BackendDO {
                 const obj = await request.json();
                 if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
                 if (obj.kind === 'save-raw-requests') {
-                    // TODO save raw requests to storage
+                    // save raw requests to storage
+                    if (!this.rawRequestController) this.rawRequestController = new RawRequestController(this.state.storage, colo, encryptIpAddress, hashIpAddress);
+                    await this.rawRequestController.save(obj.rawRequests);
+                    
                     const rpcResponse: RpcResponse = { kind: 'ok' };
                     return new Response(JSON.stringify(rpcResponse), { headers: { 'content-type': 'application/json' } });
                 } else {
@@ -41,4 +50,18 @@ export class BackendDO {
         }
     }
 
+}
+
+//
+
+async function encryptIpAddress(_rawIpAddress: string): Promise<string> {
+    // TODO encrypt with reversible encryption
+    await Promise.resolve();
+    return `0:(encrypted)`;
+}
+
+async function hashIpAddress(_rawIpAddress: string): Promise<string> {
+    // TODO hash with hmac
+    await Promise.resolve();
+    return `0:(hashed)`;
 }
