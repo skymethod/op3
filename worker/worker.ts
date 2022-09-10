@@ -7,6 +7,7 @@ import { computeRedirectResponse, tryParseRedirectRequest } from './redirect_epi
 import { WorkerEnv } from './worker_env.ts';
 import { SaveRawRequestsRequest } from './rpc.ts';
 import { sendRpc } from './rpc_client.ts';
+import { IsolateId } from './isolate_id.ts';
 export { BackendDO } from './backend_do.ts';
 
 export default {
@@ -23,10 +24,11 @@ export default {
             const rawRequests = pendingRawRequests.splice(0);
             context.waitUntil((async () => {
                 try {
+                    IsolateId.log();
                     if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
-                    
                     const rawIpAddress = computeRawIpAddress(request) ?? '<missing>';
-                    const other = computeOther(request);
+                    const other = computeOther(request) ?? {};
+                    other.isolateId = IsolateId.get();
                     const rawRequest = computeRawRequest(request, { time: requestTime, method, rawIpAddress, other });
                     console.log(`rawRequest: ${JSON.stringify({ ...rawRequest, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                     
@@ -44,11 +46,13 @@ export default {
                     pendingRawRequests.push(...rawRequests);
                 }
             })());
+            console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
             return computeRedirectResponse(redirectRequest);
         }
 
         // handle all other requests
         try {
+            IsolateId.log();
             const { pathname } = new URL(request.url);
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });

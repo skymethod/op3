@@ -1,6 +1,7 @@
 import { BackendDOColo } from './backend_do_colo.ts';
 import { DurableObjectState } from './deps.ts';
 import { isRpcRequest, RpcResponse } from './rpc.ts';
+import { IsolateId } from './isolate_id.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -10,6 +11,7 @@ export class BackendDO {
     }
 
     async fetch(request: Request): Promise<Response> {
+        IsolateId.log();
         console.log(request.url);
         const colo = await BackendDOColo.get();
         const durableObjectName = request.headers.get('do-name');
