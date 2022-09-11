@@ -59,8 +59,8 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
 
 export type PackedRawRequest = readonly string[]; // array of string attributes
 export type PutBatch = Record<string, PackedRawRequest>; // timestamp-nnnn -> PackedRawRequest
-export type IpAddressEncryptionFn = (rawIpAddress: string) => Promise<string>;
-export type IpAddressHashingFn = (rawIpAddress: string) => Promise<string>;
+export type IpAddressEncryptionFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
+export type IpAddressHashingFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
 
 export async function computePutBatches(rawRequests: readonly RawRequest[], attNums: AttNums, nextKey: () => string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<readonly PutBatch[]> {
     const rt: PutBatch[] = [];
@@ -86,10 +86,12 @@ export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, e
     const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, other } = rawRequest;
     const rt: string[] = [];
     if (typeof uuid === 'string') rt.push(`${attNums.get('uuid')}:${uuid}`);
-    if (typeof time === 'number') rt.push(`${attNums.get('timestamp')}:${computeTimestamp(time)}`);
+    if (typeof time !== 'number') throw new Error(`Bad rawRequest ${uuid}: no time!`);
+    const timestamp = computeTimestamp(time);
+    rt.push(`${attNums.get('timestamp')}:${timestamp}`);
     if (typeof rawIpAddress === 'string') {
-        rt.push(`${attNums.get('encryptedIpAddress')}:${await encryptIpAddress(rawIpAddress)}`);
-        rt.push(`${attNums.get('hashedIpAddress')}:${await hashIpAddress(rawIpAddress)}`);
+        rt.push(`${attNums.get('encryptedIpAddress')}:${await encryptIpAddress(rawIpAddress, { timestamp })}`);
+        rt.push(`${attNums.get('hashedIpAddress')}:${await hashIpAddress(rawIpAddress, { timestamp })}`);
     }
     if (typeof method === 'string') rt.push(`${attNums.get('method')}:${method}`);
     if (typeof url === 'string') rt.push(`${attNums.get('url')}:${url}`);
