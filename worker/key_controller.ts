@@ -1,4 +1,4 @@
-import { isStringRecord } from './check.ts';
+import { checkMatches, isStringRecord } from './check.ts';
 import { generateHmacKeyBytes, generateAesKeyBytes } from './crypto.ts';
 import { Bytes, DurableObjectStorage } from './deps.ts';
 import { KeyKind } from './rpc.ts';
@@ -22,6 +22,14 @@ export class KeyController {
         } else {
             throw new Error(`Unsupported keyKind: ${keyKind}`);
         }
+    }
+
+    async listKeys(): Promise<Record<string, unknown>[]> {
+        const map = await this.storage.list({ prefix: 'k.'});
+        return [...map.keys()].map(v => {
+            const [ _, keyKindTag, month ] = checkMatches('key', v, /^k\.(.*?)\.(.*?)$/);
+            return { keyKindTag, month };
+        });
     }
 }
 

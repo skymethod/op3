@@ -32,6 +32,9 @@ export async function computeApiResponse(request: ApiRequest, opts: { backendNam
                     if (operationKind === 'list' && targetPath === '/registry') {
                         const { listResults } = await sendRpc<AdminDataResponse>({ kind: 'admin-data', operationKind, targetPath }, 'admin-data', { doName: 'registry', backendNamespace });
                         return newJsonResponse({ listResults });
+                    } else if (operationKind === 'list' && targetPath === '/keys') {
+                        const { listResults } = await sendRpc<AdminDataResponse>({ kind: 'admin-data', operationKind, targetPath }, 'admin-data', { doName: 'key-server', backendNamespace });
+                        return newJsonResponse({ listResults });
                     } else {
                         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
                     }

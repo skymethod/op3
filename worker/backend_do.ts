@@ -76,6 +76,9 @@ export class BackendDO {
                     const { operationKind, targetPath } = obj;
                     if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
                         return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
+                    } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
+                        if (!this.keyController) this.keyController = new KeyController(storage);
+                        return newRpcResponse({ kind: 'admin-data', listResults: await this.keyController.listKeys() });
                     }
                 } else {
                     throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
