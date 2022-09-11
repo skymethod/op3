@@ -12,9 +12,11 @@ export interface SaveRawRequestsRequest {
     readonly rawRequests: readonly RawRequest[];
 }
 
+export type KeyKind = 'ip-address-hmac' | 'ip-address-aes';
+
 export interface GetKeyRequest {
     readonly kind: 'get-key';
-    readonly keyType: string; // e.g. ip-address-hmac
+    readonly keyKind: KeyKind;
     readonly keyScope: string; // e.g. 20220912
 }
 
