@@ -1,4 +1,4 @@
-import { isStringRecord } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.7/common/check.ts';
+import { isStringRecord } from './check.ts';
 import { generateHmacKeyBytes, generateAesKeyBytes } from './crypto.ts';
 import { Bytes, DurableObjectStorage } from './deps.ts';
 import { KeyKind } from './rpc.ts';

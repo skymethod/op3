@@ -1,6 +1,6 @@
 import { BackendDOColo } from './backend_do_colo.ts';
-import { Bytes, DurableObjectNamespace, DurableObjectState } from './deps.ts';
-import { GetKeyRequest, GetKeyResponse, isRpcRequest, KeyKind, RpcResponse } from './rpc.ts';
+import { Bytes, DurableObjectNamespace, DurableObjectState, DurableObjectStorage } from './deps.ts';
+import { checkDOInfo, DOInfo, GetKeyRequest, GetKeyResponse, isRpcRequest, KeyKind, RpcResponse } from './rpc.ts';
 import { IsolateId } from './isolate_id.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
@@ -13,10 +13,12 @@ export class BackendDO {
     private readonly state: DurableObjectState;
     private readonly env: WorkerEnv;
 
-    private rawRequestController: RawRequestController | undefined;
-    private keyClient: KeyClient | undefined;
+    private info?: DOInfo;
 
-    private keyController: KeyController | undefined;
+    private rawRequestController?: RawRequestController;
+    private keyClient?: KeyClient;
+
+    private keyController?: KeyController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -30,9 +32,10 @@ export class BackendDO {
         const durableObjectName = request.headers.get('do-name');
         console.log('logprops:', { colo, durableObjectClass: 'BackendDO', durableObjectId: this.state.id.toString(), durableObjectName });
 
-        // TODO init: register with a registry do
-
         try {
+            if (!durableObjectName) throw new Error(`Missing do-name header!`);
+            await this.ensureInitialized({ colo, name: durableObjectName });
+
             const { method } = request;
             const { pathname } = new URL(request.url);
             if (method === 'POST' && pathname === '/rpc') {
@@ -56,8 +59,7 @@ export class BackendDO {
                     if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, encryptIpAddress, hashIpAddress);
                     await this.rawRequestController.save(obj.rawRequests);
                     
-                    const rpcResponse: RpcResponse = { kind: 'ok' };
-                    return newRpcResponse(rpcResponse);
+                    return newRpcResponse({ kind: 'ok' });
                 } else if (obj.kind === 'get-key') {
                     // get or generate key
                     if (!this.keyController) this.keyController = new KeyController(storage);
@@ -65,8 +67,21 @@ export class BackendDO {
                     const { keyKind, keyScope } = obj;
                     const rawKeyBase64 = (await this.keyController.getOrGenerateKey(keyKind, keyScope)).base64();
 
-                    const rpcResponse: RpcResponse = { kind: 'get-key', rawKeyBase64 };
-                    return newRpcResponse(rpcResponse);
+                    return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
+                } else if (obj.kind === 'register-do') {
+                    // just save it for now
+                    await storage.put(`reg.id.${obj.info.id}`, obj.info);
+
+                    // TODO make available in admin api
+                    // just log it for now
+                    const map = await storage.list();
+                    const objs = [...map.entries()].filter(k => k[0].startsWith('reg.id.')).map(v => v[1]);
+                    console.log(`${objs.length} DOs registered:`);
+                    for (const obj of objs) {
+                        console.log(JSON.stringify(obj, undefined, 2));
+                    }
+
+                    return newRpcResponse({ kind: 'ok' });
                 } else {
                     throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                 }
@@ -77,6 +92,56 @@ export class BackendDO {
             console.error(msg);
             return new Response(msg, { status: 500 });
         }
+    }
+
+    //
+    
+    private async ensureInitialized(opts: { colo: string, name: string }): Promise<DOInfo> {
+        if (this.info) return this.info;
+
+        const { storage } = this.state;
+        const { colo, name } = opts;
+        const time = new Date().toISOString();
+        const id = this.state.id.toString();
+
+        let info = await loadDOInfo(storage);
+        if (info) {
+            console.log(`ensureInitialized: updating`);
+            if (info.id !== id) {
+                info = { ...info, id, changes: [ ...info.changes, { name: 'id', value: id, time }] };
+            }
+            if (info.name !== name) {
+                info = { ...info, name, changes: [ ...info.changes, { name: 'name', value: name, time }] };
+            }
+            if (info.colo !== colo) {
+                info = { ...info, colo, changes: [ ...info.changes, { name: 'colo', value: colo, time }] };
+            }
+            info = { ...info, lastSeen: time };
+        } else {
+            console.log(`ensureInitialized: adding`);
+            info = { id, name, colo, firstSeen: time, lastSeen: time, changes: [
+                { name: 'id', value: id, time },
+                { name: 'name', value: name, time },
+                { name: 'colo', value: colo, time },
+            ] };
+        }
+        await saveDOInfo(info, storage);
+        this.info = info;
+
+        // register!
+        const { backendNamespace } = this.env;
+        (async () => {
+            try {
+                console.log(`ensureInitialized: registering`);
+                await sendRpc({ kind: 'register-do', info }, 'ok', { doName: 'registry', backendNamespace });
+                console.log(`ensureInitialized: registered`);
+            } catch (e) {
+                console.error(`Error registering do: ${e.stack || e}`);
+                // not the end of the world, info is saved, we'll try again next time
+            }
+        })()
+
+        return info;
     }
 
 }
@@ -105,4 +170,18 @@ async function getKey(keyKind: KeyKind, keyScope: string, isValid: (keyScope: st
 
 function newRpcResponse(rpcResponse: RpcResponse): Response {
     return new Response(JSON.stringify(rpcResponse), { headers: { 'content-type': 'application/json' } });
+}
+
+async function loadDOInfo(storage: DurableObjectStorage): Promise<DOInfo | undefined> {
+    const obj = await storage.get('i.do');
+    try {
+        if (checkDOInfo(obj)) return obj;
+    } catch (e) {
+        console.error(`Error loading do info: ${e.stack || e}`);
+    }
+    return undefined;
+}
+
+async function saveDOInfo(info: DOInfo, storage: DurableObjectStorage) {
+    await storage.put('i.do', info);
 }
