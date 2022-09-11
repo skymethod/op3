@@ -75,6 +75,7 @@ export interface AdminDataRequest {
     readonly kind: 'admin-data';
     readonly operationKind: 'list' | 'delete';
     readonly targetPath: string;
+    readonly dryRun?: boolean;
 }
 
 //
@@ -112,4 +113,5 @@ export interface GetKeyResponse {
 export interface AdminDataResponse {
     readonly kind: 'admin-data';
     readonly listResults?: unknown[];
+    readonly message?: string;
 }

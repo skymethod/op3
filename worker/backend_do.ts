@@ -9,6 +9,7 @@ import { sendRpc } from './rpc_client.ts';
 import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
+import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -73,12 +74,26 @@ export class BackendDO {
                     await register(obj.info, storage);
                     return newRpcResponse({ kind: 'ok' });
                 } else if (obj.kind === 'admin-data') {
-                    const { operationKind, targetPath } = obj;
+                    const { operationKind, targetPath, dryRun = false } = obj;
                     if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
                         return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
                     } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
                         if (!this.keyController) this.keyController = new KeyController(storage);
                         return newRpcResponse({ kind: 'admin-data', listResults: await this.keyController.listKeys() });
+                    } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
+                        const doName = checkDeleteDurableObjectAllowed(targetPath);
+                        if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
+                        let message = '';
+                        if (dryRun) {
+                            message = `DRY RUN: Would delete all storage for ${doName}`;
+                        } else {
+                            console.log(`Deleting all storage for ${doName}`);
+                            const start = Date.now();
+                            await storage.deleteAll();
+                            message = `Deleted all storage for ${doName} in ${Date.now() - start}ms`;
+                        }
+                        console.log(message);
+                        return newRpcResponse({ kind: 'admin-data', message });
                     }
                 } else {
                     throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
