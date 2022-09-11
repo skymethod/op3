@@ -57,8 +57,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
 
 //
 
-export type PackedRawRequest = readonly string[]; // array of string attributes
-export type PutBatch = Record<string, PackedRawRequest>; // timestamp-nnnn -> PackedRawRequest
+export type PutBatch = Record<string, string>; // timestamp-nnnn -> AttRecord
 export type IpAddressEncryptionFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
 export type IpAddressHashingFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
 
@@ -82,28 +81,28 @@ export async function computePutBatches(rawRequests: readonly RawRequest[], attN
     return rt;
 }
 
-export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<PackedRawRequest> {
+export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
     const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, other } = rawRequest;
-    const rt: string[] = [];
-    if (typeof uuid === 'string') rt.push(`${attNums.get('uuid')}:${uuid}`);
+    const rt: Record<string, string> = {};
+    if (typeof uuid === 'string') rt.uuid = uuid;
     if (typeof time !== 'number') throw new Error(`Bad rawRequest ${uuid}: no time!`);
     const timestamp = computeTimestamp(time);
-    rt.push(`${attNums.get('timestamp')}:${timestamp}`);
+    rt.timestamp = timestamp;
     if (typeof rawIpAddress === 'string') {
-        rt.push(`${attNums.get('encryptedIpAddress')}:${await encryptIpAddress(rawIpAddress, { timestamp })}`);
-        rt.push(`${attNums.get('hashedIpAddress')}:${await hashIpAddress(rawIpAddress, { timestamp })}`);
+        rt.encryptedIpAddress = await encryptIpAddress(rawIpAddress, { timestamp });
+        rt.hashedIpAddress = await hashIpAddress(rawIpAddress, { timestamp });
     }
-    if (typeof method === 'string') rt.push(`${attNums.get('method')}:${method}`);
-    if (typeof url === 'string') rt.push(`${attNums.get('url')}:${url}`);
-    if (typeof userAgent === 'string') rt.push(`${attNums.get('userAgent')}:${userAgent}`);
-    if (typeof referer === 'string') rt.push(`${attNums.get('referer')}:${referer}`);
-    if (typeof range === 'string') rt.push(`${attNums.get('range')}:${range}`);
+    if (typeof method === 'string') rt.method = method;
+    if (typeof url === 'string') rt.url = url;
+    if (typeof userAgent === 'string') rt.userAgent = userAgent;
+    if (typeof referer === 'string') rt.referer = referer;
+    if (typeof range === 'string') rt.range = range;
 
     for (const [ name, value ] of Object.entries(other ?? {})) {
         if (typeof name === 'string' && typeof value === 'string') {
-            rt.push(`${attNums.get(`other.${name}`)}:${value}`);
+            rt[`other.${name}`] = value;
         }
     }
-
-    return rt;
+    
+    return attNums.packRecord(rt);
 }

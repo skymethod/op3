@@ -37,7 +37,7 @@ export default {
                     const rpcRequest: SaveRawRequestsRequest = { kind: 'save-raw-requests', rawRequests };
 
                     const colo = (other ?? {}).colo ?? 'XXX';
-                    const doName = `request-${colo}`;
+                    const doName = `raw-request-${colo}`;
 
                     await sendRpc(rpcRequest, 'ok', { doName, backendNamespace });
                 } catch (e) {
