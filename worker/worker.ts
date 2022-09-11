@@ -8,11 +8,12 @@ import { WorkerEnv } from './worker_env.ts';
 import { SaveRawRequestsRequest } from './rpc.ts';
 import { sendRpc } from './rpc_client.ts';
 import { IsolateId } from './isolate_id.ts';
+import { computeApiResponse, tryParseApiRequest } from './api.ts';
 export { BackendDO } from './backend_do.ts';
 
 export default {
     
-    fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Response {
+    async fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
         const requestTime = Date.now();
         const { method } = request;
         const { instance, backendNamespace } = env;
@@ -54,9 +55,13 @@ export default {
         try {
             IsolateId.log();
             const { pathname } = new URL(request.url);
+            const { headers } = request;
+            const adminTokens = new Set((env.adminTokens ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
+
+            const apiRequest = tryParseApiRequest({ method, pathname, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { backendNamespace, adminTokens });
 
             return new Response('not found', { status: 404 });
         } catch (e) {

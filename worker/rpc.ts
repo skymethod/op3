@@ -3,10 +3,20 @@
 import { RawRequest } from './raw_request.ts';
 import { check, isStringRecord } from './check.ts';
 
-export type RpcRequest = SaveRawRequestsRequest | GetKeyRequest | RegisterDORequest;
+export type RpcRequest = 
+    SaveRawRequestsRequest 
+    | GetKeyRequest
+    | RegisterDORequest 
+    | AdminDataRequest
+    ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
-    return typeof obj === 'object' && (obj.kind === 'save-raw-requests' || obj.kind === 'get-key' || obj.kind === 'register-do');
+    return typeof obj === 'object' && (
+        obj.kind === 'save-raw-requests' 
+        || obj.kind === 'get-key' 
+        || obj.kind === 'register-do' 
+        || obj.kind === 'admin-data'
+    );
 }
 
 export interface SaveRawRequestsRequest {
@@ -61,12 +71,28 @@ export function isValidChange(change: any): boolean {
         ;
 }
 
+export interface AdminDataRequest {
+    readonly kind: 'admin-data';
+    readonly operationKind: 'list' | 'delete';
+    readonly targetPath: string;
+}
+
 //
 
-export type RpcResponse = OkResponse | ErrorResponse | GetKeyResponse;
+export type RpcResponse = 
+    OkResponse 
+    | ErrorResponse 
+    | GetKeyResponse 
+    | AdminDataResponse
+    ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
-    return typeof obj === 'object' && (obj.kind === 'ok' || obj.kind === 'error' || obj.kind === 'get-key');
+    return typeof obj === 'object' && (
+        obj.kind === 'ok' 
+        || obj.kind === 'error' 
+        || obj.kind === 'get-key'
+        || obj.kind === 'admin-data'
+    );
 }
 
 export interface OkResponse {
@@ -81,4 +107,9 @@ export interface ErrorResponse {
 export interface GetKeyResponse {
     readonly kind: 'get-key';
     readonly rawKeyBase64: string;
+}
+
+export interface AdminDataResponse {
+    readonly kind: 'admin-data';
+    readonly listResults?: unknown[];
 }

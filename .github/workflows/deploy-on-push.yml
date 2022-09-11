@@ -27,6 +27,7 @@ jobs:
           CF_SCRIPT_NAME: op3-ci
           CF_BACKEND_DO_NAMESPACE: backend-do-ci
           INSTANCE: ci
+          ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
   deploy-dev:
     runs-on: ubuntu-22.04
     env:

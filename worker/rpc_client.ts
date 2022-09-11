@@ -8,7 +8,7 @@ export async function sendRpc<T extends RpcResponse>(request: RpcRequest, expect
     const stub = backendNamespace.get(backendNamespace.idFromName(doName));
     const res = await stub.fetch('https://backend/rpc', { method: 'POST', body: JSON.stringify(request), headers: { 'do-name': doName } });
 
-    if (res.status !== 200) throw new Error(`Bad rpc status: ${res.status}`);
+    if (res.status !== 200) throw new Error(`Bad rpc status: ${res.status}, body=${await res.text()}`);
     const contentType = res.headers.get('content-type');
     if (contentType !== 'application/json') throw new Error(`Bad content-type: ${contentType}`);
     const obj = await res.json();

@@ -7,4 +7,5 @@ export interface WorkerEnv {
     readonly deploySha?: string;
     readonly deployFrom?: string;
     readonly backendNamespace: DurableObjectNamespace;
+    readonly adminTokens?: string;
 }

@@ -36,4 +36,5 @@ push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --
 --text-binding deployRepositoryUrl:$DEPLOY_REPOSITORY_URL \
 --text-binding deploySha:$DEPLOY_SHA \
 --text-binding deployFrom:$DEPLOY_FROM \
---do-namespace-binding backendNamespace:$CF_BACKEND_DO_NAMESPACE:BackendDO
+--do-namespace-binding backendNamespace:$CF_BACKEND_DO_NAMESPACE:BackendDO \
+--secret-binding adminTokens:$ADMIN_TOKENS

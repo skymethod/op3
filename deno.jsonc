@@ -1,0 +1,5 @@
+{
+    "tasks": {
+        "admin": "deno run --allow-net admin.ts"
+    }
+}

@@ -8,6 +8,7 @@ import { KeyClient, KeyFetcher } from './key_client.ts';
 import { sendRpc } from './rpc_client.ts';
 import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
+import { listRegistry, register } from './registry_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -69,19 +70,13 @@ export class BackendDO {
 
                     return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
                 } else if (obj.kind === 'register-do') {
-                    // just save it for now
-                    await storage.put(`reg.id.${obj.info.id}`, obj.info);
-
-                    // TODO make available in admin api
-                    // just log it for now
-                    const map = await storage.list();
-                    const objs = [...map.entries()].filter(k => k[0].startsWith('reg.id.')).map(v => v[1]);
-                    console.log(`${objs.length} DOs registered:`);
-                    for (const obj of objs) {
-                        console.log(JSON.stringify(obj, undefined, 2));
-                    }
-
+                    await register(obj.info, storage);
                     return newRpcResponse({ kind: 'ok' });
+                } else if (obj.kind === 'admin-data') {
+                    const { operationKind, targetPath } = obj;
+                    if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
+                        return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
+                    }
                 } else {
                     throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                 }
