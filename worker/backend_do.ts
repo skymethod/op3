@@ -43,67 +43,74 @@ export class BackendDO {
 
             const { method } = request;
             const { pathname } = new URL(request.url);
+
             if (method === 'POST' && pathname === '/rpc') {
-                const obj = await request.json();
-                if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
-                const { storage } = this.state;
-                if (obj.kind === 'save-raw-requests') {
-                    // save raw requests to storage
-                    if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
-                    const keyClient = this.keyClient;
-                    const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
-                        const key = await keyClient.getIpAddressAesKey(opts.timestamp);
-                        const { encrypted, iv } = await encrypt(Bytes.ofUtf8(rawIpAddress), key);
-                        return `1:${iv.hex()}:${encrypted.hex()}`;
-                    }
-                    const hashIpAddress: IpAddressHashingFn = async (rawIpAddress, opts) => {
-                        const key = await keyClient.getIpAddressHmacKey(opts.timestamp);
-                        const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
-                        return `1:${signature.hex()}`;
-                    }
-                    if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, durableObjectName, encryptIpAddress, hashIpAddress);
-                    await this.rawRequestController.save(obj.rawRequests);
-                    
-                    return newRpcResponse({ kind: 'ok' });
-                } else if (obj.kind === 'get-key') {
-                    // get or generate key
-                    if (!this.keyController) this.keyController = new KeyController(storage);
-
-                    const { keyKind, keyScope } = obj;
-                    const rawKeyBase64 = (await this.keyController.getOrGenerateKey(keyKind, keyScope)).base64();
-
-                    return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
-                } else if (obj.kind === 'register-do') {
-                    await register(obj.info, storage);
-                    return newRpcResponse({ kind: 'ok' });
-                } else if (obj.kind === 'admin-data') {
-                    const { operationKind, targetPath, dryRun = false } = obj;
-                    if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
-                        return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
-                    } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
-                        if (!this.keyController) this.keyController = new KeyController(storage);
-                        return newRpcResponse({ kind: 'admin-data', listResults: await this.keyController.listKeys() });
-                    } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
-                        const doName = checkDeleteDurableObjectAllowed(targetPath);
-                        if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
-                        let message = '';
-                        if (dryRun) {
-                            message = `DRY RUN: Would delete all storage for ${doName}`;
-                        } else {
-                            console.log(`Deleting all storage for ${doName}`);
-                            const start = Date.now();
-                            await storage.deleteAll();
-                            message = `Deleted all storage for ${doName} in ${Date.now() - start}ms`;
+                try {
+                    const obj = await request.json();
+                    if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
+                    const { storage } = this.state;
+                    if (obj.kind === 'save-raw-requests') {
+                        // save raw requests to storage
+                        if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
+                        const keyClient = this.keyClient;
+                        const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
+                            const key = await keyClient.getIpAddressAesKey(opts.timestamp);
+                            const { encrypted, iv } = await encrypt(Bytes.ofUtf8(rawIpAddress), key);
+                            return `1:${iv.hex()}:${encrypted.hex()}`;
                         }
-                        console.log(message);
-                        return newRpcResponse({ kind: 'admin-data', message });
+                        const hashIpAddress: IpAddressHashingFn = async (rawIpAddress, opts) => {
+                            const key = await keyClient.getIpAddressHmacKey(opts.timestamp);
+                            const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
+                            return `1:${signature.hex()}`;
+                        }
+                        if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, durableObjectName, encryptIpAddress, hashIpAddress);
+                        await this.rawRequestController.save(obj.rawRequests);
+                        
+                        return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'get-key') {
+                        // get or generate key
+                        if (!this.keyController) this.keyController = new KeyController(storage);
+
+                        const { keyKind, keyScope } = obj;
+                        const rawKeyBase64 = (await this.keyController.getOrGenerateKey(keyKind, keyScope)).base64();
+
+                        return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
+                    } else if (obj.kind === 'register-do') {
+                        await register(obj.info, storage);
+                        return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'admin-data') {
+                        const { operationKind, targetPath, dryRun = false } = obj;
+                        if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
+                            return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
+                        } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
+                            if (!this.keyController) this.keyController = new KeyController(storage);
+                            return newRpcResponse({ kind: 'admin-data', listResults: await this.keyController.listKeys() });
+                        } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
+                            const doName = checkDeleteDurableObjectAllowed(targetPath);
+                            if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
+                            let message = '';
+                            if (dryRun) {
+                                message = `DRY RUN: Would delete all storage for ${doName}`;
+                            } else {
+                                console.log(`Deleting all storage for ${doName}`);
+                                const start = Date.now();
+                                await storage.deleteAll();
+                                message = `Deleted all storage for ${doName} in ${Date.now() - start}ms`;
+                            }
+                            console.log(message);
+                            return newRpcResponse({ kind: 'admin-data', message });
+                        }
+                    } else if (obj.kind === 'raw-requests-notification') {
+                        // TODO: process in all-raw-request
+                        console.log(`notification received: ${JSON.stringify(obj)}`);
+                        return newRpcResponse({ kind: 'ok' });
+                    } else {
+                        throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }
-                } else if (obj.kind === 'raw-requests-notification') {
-                    // TODO: process in all-raw-request
-                    console.log(`notification received: ${JSON.stringify(obj)}`);
-                    return newRpcResponse({ kind: 'ok' });
-                } else {
-                    throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
+                } catch (e) {
+                    const message = `${e.stack || e}`;
+                    console.error(`Unhandled error in rpc call: ${message}`);
+                    return newRpcResponse({ kind: 'error',  message });
                 }
             }
             return new Response('not found', { status: 404 });
