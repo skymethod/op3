@@ -1,7 +1,5 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataResponse } from './rpc.ts';
-import { sendRpc } from './rpc_client.ts';
+import { RpcClient } from './rpc_model.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, headers, bodyProvider } = opts;
@@ -16,9 +14,9 @@ export function tryParseApiRequest(opts: { method: string, pathname: string, hea
 // deno-lint-ignore no-explicit-any
 type JsonProvider = () => Promise<any>;
 
-export async function computeApiResponse(request: ApiRequest, opts: { backendNamespace: DurableObjectNamespace, adminTokens: Set<string> }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string> }): Promise<Response> {
     const { method, path, bearerToken, bodyProvider } = request;
-    const { backendNamespace, adminTokens } = opts;
+    const { rpcClient, adminTokens } = opts;
 
     console.log(`computeApiResponse`, { method, path, hasBearerToken: typeof bearerToken === 'string' });
 
@@ -32,14 +30,14 @@ export async function computeApiResponse(request: ApiRequest, opts: { backendNam
                 if (method === 'POST') {
                     const { operationKind, targetPath, dryRun } = await bodyProvider();
                     if (operationKind === 'list' && targetPath === '/registry') {
-                        const { listResults } = await sendRpc<AdminDataResponse>({ kind: 'admin-data', operationKind, targetPath, dryRun }, 'admin-data', { doName: 'registry', backendNamespace });
+                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'registry');
                         return newJsonResponse({ listResults });
                     } else if (operationKind === 'list' && targetPath === '/keys') {
-                        const { listResults } = await sendRpc<AdminDataResponse>({ kind: 'admin-data', operationKind, targetPath, dryRun }, 'admin-data', { doName: 'key-server', backendNamespace });
+                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
                         return newJsonResponse({ listResults });
                     } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                         const doName = checkDeleteDurableObjectAllowed(targetPath);
-                        const { message } = await sendRpc<AdminDataResponse>({ kind: 'admin-data', operationKind, targetPath, dryRun }, 'admin-data', { doName, backendNamespace });
+                        const { message } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, doName);
                         return newJsonResponse({ message });
                     } else {
                         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);

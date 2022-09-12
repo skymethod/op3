@@ -133,3 +133,15 @@ export interface AdminDataResponse {
     readonly listResults?: unknown[];
     readonly message?: string;
 }
+
+//
+
+export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
+
+export interface RpcClient {
+    executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
+    registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse>;
+    getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
+    sendRawRequestsNotification(request: Unkinded<RawRequestsNotificationRequest>, target: string): Promise<OkResponse>;
+    saveRawRequests(request: Unkinded<SaveRawRequestsRequest>, target: string): Promise<OkResponse>;
+}

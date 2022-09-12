@@ -1,4 +1,4 @@
-import { KeyKind } from './rpc.ts';
+import { KeyKind } from './rpc_model.ts';
 import { isValidTimestamp } from './timestamp.ts';
 
 export class KeyClient {

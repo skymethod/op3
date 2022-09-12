@@ -1,9 +1,9 @@
-import { DurableObjectNamespace, DurableObjectStorage } from './deps.ts';
+import { DurableObjectStorage } from './deps.ts';
 import { RawRequest } from './raw_request.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
-import { sendRpc } from './rpc_client.ts';
+import { RpcClient } from './rpc_model.ts';
 
 export class RawRequestController {
     static notificationAlarmKind = 'send-notification';
@@ -45,14 +45,14 @@ export class RawRequestController {
         }
     }
 
-    static async sendNotification(input: Record<string, unknown>, opts: { fromColo: string, storage: DurableObjectStorage, backendNamespace: DurableObjectNamespace }) {
+    static async sendNotification(input: Record<string, unknown>, opts: { fromColo: string, storage: DurableObjectStorage, rpcClient: RpcClient }) {
         console.log(`RawRequestController.sendNotifcation: ${JSON.stringify(input)}`);
-        const { storage, backendNamespace, fromColo } = opts;
+        const { storage, rpcClient, fromColo } = opts;
         const { doName } = input;
         if (typeof doName === 'string') {
             const timestampId = await queryLatestTimestampId(storage);
             if (timestampId) {
-                await sendRpc({ kind: 'raw-requests-notification', doName, timestampId, fromColo }, 'ok', { doName: 'all-raw-request', backendNamespace });
+                await rpcClient.sendRawRequestsNotification({ doName, timestampId, fromColo }, 'all-raw-request');
             }
         }
     }

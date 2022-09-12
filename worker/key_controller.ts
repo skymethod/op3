@@ -1,7 +1,7 @@
 import { checkMatches, isStringRecord } from './check.ts';
 import { generateHmacKeyBytes, generateAesKeyBytes } from './crypto.ts';
 import { Bytes, DurableObjectStorage } from './deps.ts';
-import { KeyKind } from './rpc.ts';
+import { KeyKind } from './rpc_model.ts';
 
 export class KeyController {
     private readonly storage: DurableObjectStorage;

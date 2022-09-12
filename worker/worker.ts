@@ -5,10 +5,9 @@ import { computeInfoResponse } from './info.ts';
 import { computeRawRequest, RawRequest } from './raw_request.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './redirect_episode.ts';
 import { WorkerEnv } from './worker_env.ts';
-import { SaveRawRequestsRequest } from './rpc.ts';
-import { sendRpc } from './rpc_client.ts';
 import { IsolateId } from './isolate_id.ts';
 import { computeApiResponse, tryParseApiRequest } from './api.ts';
+import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 export { BackendDO } from './backend_do.ts';
 
 export default {
@@ -35,12 +34,10 @@ export default {
                     
                     rawRequests.push(rawRequest);
 
-                    const rpcRequest: SaveRawRequestsRequest = { kind: 'save-raw-requests', rawRequests };
-
                     const colo = (other ?? {}).colo ?? 'XXX';
                     const doName = `raw-request-${colo}`;
-
-                    await sendRpc(rpcRequest, 'ok', { doName, backendNamespace });
+                    const rpcClient = new CloudflareRpcClient(backendNamespace);
+                    await rpcClient.saveRawRequests({ rawRequests }, doName);
                 } catch (e) {
                     console.error(`Error sending raw requests: ${e.stack || e}`);
                     // TODO send errors to backend as well?
@@ -61,7 +58,8 @@ export default {
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
 
-            const apiRequest = tryParseApiRequest({ method, pathname, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { backendNamespace, adminTokens });
+            const rpcClient = new CloudflareRpcClient(backendNamespace);
+            const apiRequest = tryParseApiRequest({ method, pathname, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens });
 
             return new Response('not found', { status: 404 });
         } catch (e) {

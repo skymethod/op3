@@ -1,16 +1,16 @@
 import { BackendDOColo } from './backend_do_colo.ts';
-import { Bytes, DurableObjectNamespace, DurableObjectState, DurableObjectStorage } from './deps.ts';
-import { checkDOInfo, DOInfo, GetKeyRequest, GetKeyResponse, isRpcRequest, KeyKind, RpcResponse } from './rpc.ts';
+import { Bytes, DurableObjectState, DurableObjectStorage } from './deps.ts';
+import { checkDOInfo, DOInfo, isRpcRequest, KeyKind, RpcClient, RpcResponse } from './rpc_model.ts';
 import { IsolateId } from './isolate_id.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
-import { sendRpc } from './rpc_client.ts';
 import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 import { isStringRecord } from './check.ts';
+import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -37,7 +37,9 @@ export class BackendDO {
 
         try {
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            await this.ensureInitialized({ colo, name: durableObjectName });
+            if (!this.env.backendNamespace) throw new Error(`Missing backendNamespace!`);
+            const rpcClient = new CloudflareRpcClient(this.env.backendNamespace);
+            await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
 
             const { method } = request;
             const { pathname } = new URL(request.url);
@@ -47,7 +49,7 @@ export class BackendDO {
                 const { storage } = this.state;
                 if (obj.kind === 'save-raw-requests') {
                     // save raw requests to storage
-                    if (!this.keyClient) this.keyClient = newKeyClient(this.env.backendNamespace);
+                    if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
                     const keyClient = this.keyClient;
                     const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
                         const key = await keyClient.getIpAddressAesKey(opts.timestamp);
@@ -121,18 +123,19 @@ export class BackendDO {
             if (kind === RawRequestController.notificationAlarmKind) {
                 const { backendNamespace } = this.env;
                 const fromColo = await BackendDOColo.get();
-                await RawRequestController.sendNotification(input, { storage, backendNamespace, fromColo });
+                const rpcClient = new CloudflareRpcClient(backendNamespace);
+                await RawRequestController.sendNotification(input, { storage, rpcClient, fromColo });
             }
         }
     }
 
     //
     
-    private async ensureInitialized(opts: { colo: string, name: string }): Promise<DOInfo> {
+    private async ensureInitialized(opts: { colo: string, name: string, rpcClient: RpcClient }): Promise<DOInfo> {
         if (this.info) return this.info;
 
         const { storage } = this.state;
-        const { colo, name } = opts;
+        const { colo, name, rpcClient } = opts;
         const time = new Date().toISOString();
         const id = this.state.id.toString();
 
@@ -161,11 +164,10 @@ export class BackendDO {
         this.info = info;
 
         // register!
-        const { backendNamespace } = this.env;
         (async () => {
             try {
                 console.log(`ensureInitialized: registering`);
-                await sendRpc({ kind: 'register-do', info }, 'ok', { doName: 'registry', backendNamespace });
+                await rpcClient.registerDO({ info }, 'registry');
                 console.log(`ensureInitialized: registered`);
             } catch (e) {
                 console.error(`Error registering do: ${e.stack || e}`);
@@ -180,23 +182,22 @@ export class BackendDO {
 
 //
 
-function newKeyClient(backendNamespace: DurableObjectNamespace): KeyClient {
+function newKeyClient(rpcClient: RpcClient): KeyClient {
     const keyFetcher: KeyFetcher = async (keyKind: KeyKind, keyScope: string) => {
         if (keyKind === 'ip-address-hmac') {
-            return await getKey(keyKind, keyScope, isValidIpAddressHmacKeyScope, importHmacKey, backendNamespace);
+            return await getKey(keyKind, keyScope, isValidIpAddressHmacKeyScope, importHmacKey, rpcClient);
         } else if (keyKind === 'ip-address-aes') {
-            return await getKey(keyKind, keyScope, isValidIpAddressAesKeyScope, importAesKey, backendNamespace);
+            return await getKey(keyKind, keyScope, isValidIpAddressAesKeyScope, importAesKey, rpcClient);
         }
         throw new Error(`Unsupported keyKind: ${keyKind}`);
     }
     return new KeyClient(keyFetcher);
 }
 
-async function getKey(keyKind: KeyKind, keyScope: string, isValid: (keyScope: string) => boolean, importKey: (bytes: Bytes) => Promise<CryptoKey>, backendNamespace: DurableObjectNamespace) {
+async function getKey(keyKind: KeyKind, keyScope: string, isValid: (keyScope: string) => boolean, importKey: (bytes: Bytes) => Promise<CryptoKey>, rpcClient: RpcClient) {
     if (!isValid(keyScope)) throw new Error(`Unsupported keyKind for ${keyKind}: ${keyScope}`);
 
-    const req: GetKeyRequest = { kind: 'get-key', keyKind, keyScope };
-    const res = await sendRpc<GetKeyResponse>(req, 'get-key', { backendNamespace, doName: 'key-server' });
+    const res = await rpcClient.getKey({ keyKind, keyScope }, 'key-server');
     return await importKey(Bytes.ofBase64(res.rawKeyBase64));
 }
 
