@@ -4,25 +4,31 @@ import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
 import { RpcClient } from './rpc_model.ts';
+import { check } from './check.ts';
 
 export class RawRequestController {
-    static notificationAlarmKind = 'send-notification';
+    static readonly notificationAlarmKind = 'send-notification';
 
     private readonly storage: DurableObjectStorage;
     private readonly colo: string;
     private readonly doName: string;
     private readonly encryptIpAddress: IpAddressEncryptionFn;
     private readonly hashIpAddress: IpAddressHashingFn;
+    private readonly notificationDelaySeconds: number;
 
     private readonly timestampSequence = new TimestampSequence(3);
     private attNums: AttNums | undefined;
 
-    constructor(storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn) {
+    constructor(opts: { storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, notificationDelaySeconds?: number }) {
+        const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 30 } = opts;
+        check('notificationDelaySeconds', notificationDelaySeconds, v => v >= 0);
+
         this.storage = storage;
         this.colo = colo;
         this.doName = doName;
         this.encryptIpAddress = encryptIpAddress;
         this.hashIpAddress = hashIpAddress;
+        this.notificationDelaySeconds = notificationDelaySeconds;
     }
 
     async save(rawRequests: readonly RawRequest[]) {
@@ -41,7 +47,7 @@ export class RawRequestController {
                     await txn.put('rr.attNums', record);
                 }
             });
-            await scheduleNotification(this.doName, this.storage);
+            await scheduleNotification(this.doName, this.notificationDelaySeconds, this.storage);
         }
     }
 
@@ -68,14 +74,14 @@ async function queryLatestTimestampId(storage: DurableObjectStorage): Promise<st
     return key ? key.substring(prefix.length) : undefined;
 }
 
-async function scheduleNotification(doName: string, storage: DurableObjectStorage) {
+async function scheduleNotification(doName: string, notificationDelaySeconds: number, storage: DurableObjectStorage) {
     const currentAlarm = await storage.getAlarm();
     if (typeof currentAlarm === 'number') return; // pending alarm not started
 
-    console.log(`Scheduling notification 30 seconds from now`);
+    console.log(`Scheduling notification ${notificationDelaySeconds} seconds from now`);
     await storage.transaction(async txn => {
         await txn.put('alarm.input', { kind: RawRequestController.notificationAlarmKind, doName });
-        await txn.setAlarm(Date.now() + 1000 * 30);
+        await txn.setAlarm(Date.now() + 1000 * notificationDelaySeconds);
     });
 }
 

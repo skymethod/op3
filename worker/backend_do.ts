@@ -11,6 +11,8 @@ import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 import { isStringRecord } from './check.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
+import { AllRawRequestController } from './all_raw_request_controller.ts';
+import { tryParseInt } from './parse.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -19,6 +21,7 @@ export class BackendDO {
     private info?: DOInfo;
 
     private rawRequestController?: RawRequestController;
+    private allRawRequestController?: AllRawRequestController;
     private keyClient?: KeyClient;
 
     private keyController?: KeyController;
@@ -37,8 +40,9 @@ export class BackendDO {
 
         try {
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            if (!this.env.backendNamespace) throw new Error(`Missing backendNamespace!`);
-            const rpcClient = new CloudflareRpcClient(this.env.backendNamespace);
+            const { backendNamespace, rawRequestNotificationDelaySeconds } = this.env;
+            if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
+            const rpcClient = new CloudflareRpcClient(backendNamespace);
             await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
 
             const { method } = request;
@@ -63,7 +67,8 @@ export class BackendDO {
                             const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
                             return `1:${signature.hex()}`;
                         }
-                        if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, durableObjectName, encryptIpAddress, hashIpAddress);
+                        const notificationDelaySeconds = tryParseInt(rawRequestNotificationDelaySeconds);
+                        if (!this.rawRequestController) this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
                         await this.rawRequestController.save(obj.rawRequests);
                         
                         return newRpcResponse({ kind: 'ok' });
@@ -101,8 +106,10 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', message });
                         }
                     } else if (obj.kind === 'raw-requests-notification') {
-                        // TODO: process in all-raw-request
                         console.log(`notification received: ${JSON.stringify(obj)}`);
+                        const { doName, timestampId, fromColo } = obj;
+                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage);
+                        await this.allRawRequestController.receiveNotification({ doName, timestampId, fromColo });
                         return newRpcResponse({ kind: 'ok' });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
@@ -132,6 +139,9 @@ export class BackendDO {
                 const fromColo = await BackendDOColo.get();
                 const rpcClient = new CloudflareRpcClient(backendNamespace);
                 await RawRequestController.sendNotification(input, { storage, rpcClient, fromColo });
+            } else if (kind === AllRawRequestController.processNotificationAlarmKind) {
+                // TODO
+                console.log('got AllRawRequestController.processNotificationAlarmKind');
             }
         }
     }

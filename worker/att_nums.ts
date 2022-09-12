@@ -1,3 +1,5 @@
+import { tryParseInt } from './parse.ts';
+
 export class AttNums {
 
     private readonly namesToNums: Record<string, number> = {}; // attribute name -> unsigned int (starting at zero)
@@ -61,7 +63,7 @@ export class AttNums {
                 const colon = token.indexOf(':');
                 if (colon < 0) throw new Error(`Bad record: ${record}`);
                 const numStr = token.substring(0, colon);
-                const num = tryParseNum(numStr);
+                const num = tryParseInt(numStr);
                 if (typeof num !== 'number') throw new Error(`Bad record (bad numStr ${numStr}): ${record}`);
                 const name = this.numsToNames[num];
                 if (name === undefined) throw new Error(`Bad record (bad num ${num}): ${record}`);
@@ -71,15 +73,4 @@ export class AttNums {
         return rt;
     }
 
-}
-
-//
-
-function tryParseNum(str: string): number | undefined {
-    try {
-        const rt = parseInt(str);
-        return Number.isInteger(rt) && rt.toString() === str ? rt : undefined;
-    } catch {
-        // noop
-    }
 }

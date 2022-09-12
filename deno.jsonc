@@ -1,5 +1,6 @@
 {
     "tasks": {
-        "admin": "deno run --allow-net admin.ts"
+        "admin": "deno run --allow-net admin.ts",
+        "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/v0.5.7/cli/cli.ts serve worker/worker.ts --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken --text-binding rawRequestNotificationDelaySeconds:10"
     }
 }
