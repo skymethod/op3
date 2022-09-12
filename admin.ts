@@ -6,9 +6,9 @@ const positional = args._;
 
 if (positional[0] === 'data' && positional.length === 3) {
     const { token, origin, 'dry-run': dryRunOpt } = args;
-    const dryRun = typeof dryRunOpt === 'boolean' ? dryRunOpt : typeof dryRunOpt === 'string' ? (dryRunOpt === 'true' ? true : dryRunOpt === 'false' ? false : null) : null;
+    const dryRun = dryRunOpt === undefined ? undefined : typeof dryRunOpt === 'boolean' ? dryRunOpt : typeof dryRunOpt === 'string' ? (dryRunOpt === 'true' ? true : dryRunOpt === 'false' ? false : null) : null;
     if (dryRun === null) throw new Error(`'dry-run' is a boolean flag`);
-    
+
     const requestBody = { operationKind: positional[1], targetPath: positional[2], dryRun };
     if (typeof token !== 'string') throw new Error(`'token' is required`);
     if (typeof origin !== 'string') throw new Error(`'origin' is required`);

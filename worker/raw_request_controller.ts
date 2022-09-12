@@ -25,7 +25,7 @@ export class RawRequestController {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
         const { attNums } = this;
         const attNumsMaxBefore = attNums.max();
-        const batches = await computePutBatches(rawRequests, attNums, () => 'rr.r.' + this.timestampSequence.next(), this.encryptIpAddress, this.hashIpAddress);
+        const batches = await computePutBatches(rawRequests, attNums, this.colo, () => 'rr.r.' + this.timestampSequence.next(), this.encryptIpAddress, this.hashIpAddress);
         if (batches.length > 0) {
             await this.storage.transaction(async txn => {
                 for (const batch of batches) {
@@ -61,13 +61,13 @@ export type PutBatch = Record<string, string>; // timestamp-nnnn -> AttRecord
 export type IpAddressEncryptionFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
 export type IpAddressHashingFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
 
-export async function computePutBatches(rawRequests: readonly RawRequest[], attNums: AttNums, nextKey: () => string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<readonly PutBatch[]> {
+export async function computePutBatches(rawRequests: readonly RawRequest[], attNums: AttNums, doColo: string, nextKey: () => string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<readonly PutBatch[]> {
     const rt: PutBatch[] = [];
     let batch: PutBatch = {};
     let batchSize = 0;
     for (const rawRequest of rawRequests) {
         const key = nextKey();
-        const value = await packRawRequest(rawRequest, attNums, encryptIpAddress, hashIpAddress);
+        const value = await packRawRequest(rawRequest, attNums, doColo, encryptIpAddress, hashIpAddress);
         console.log(`batch item: ${key} -> ${value}`);
         batch[key] = value;
         batchSize++;
@@ -81,7 +81,7 @@ export async function computePutBatches(rawRequests: readonly RawRequest[], attN
     return rt;
 }
 
-export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
+export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, doColo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
     const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, other } = rawRequest;
     const rt: Record<string, string> = {};
     if (typeof uuid === 'string') rt.uuid = uuid;
@@ -103,6 +103,8 @@ export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, e
             rt[`other.${name}`] = value;
         }
     }
+
+    if (typeof doColo === 'string') rt.doColo = doColo;
     
     return attNums.packRecord(rt);
 }
