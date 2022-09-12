@@ -10,6 +10,7 @@ import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyControlle
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
+import { isStringRecord } from './check.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -58,7 +59,7 @@ export class BackendDO {
                         const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
                         return `1:${signature.hex()}`;
                     }
-                    if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, encryptIpAddress, hashIpAddress);
+                    if (!this.rawRequestController) this.rawRequestController = new RawRequestController(storage, colo, durableObjectName, encryptIpAddress, hashIpAddress);
                     await this.rawRequestController.save(obj.rawRequests);
                     
                     return newRpcResponse({ kind: 'ok' });
@@ -95,6 +96,10 @@ export class BackendDO {
                         console.log(message);
                         return newRpcResponse({ kind: 'admin-data', message });
                     }
+                } else if (obj.kind === 'raw-requests-notification') {
+                    // TODO: process in all-raw-request
+                    console.log(`notification received: ${JSON.stringify(obj)}`);
+                    return newRpcResponse({ kind: 'ok' });
                 } else {
                     throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                 }
@@ -104,6 +109,20 @@ export class BackendDO {
             const msg = `Unhandled error in BackendDO.fetch: ${e.stack || e}`;
             console.error(msg);
             return new Response(msg, { status: 500 });
+        }
+    }
+
+    async alarm() {
+        const { storage } = this.state;
+        const input = await storage.get('alarm.input');
+        console.log(`BackendDO.alarm: ${JSON.stringify(input)}`);
+        if (isStringRecord(input)) {
+            const { kind } = input;
+            if (kind === RawRequestController.notificationAlarmKind) {
+                const { backendNamespace } = this.env;
+                const fromColo = await BackendDOColo.get();
+                await RawRequestController.sendNotification(input, { storage, backendNamespace, fromColo });
+            }
         }
     }
 

@@ -1,22 +1,26 @@
-import { DurableObjectStorage } from './deps.ts';
+import { DurableObjectNamespace, DurableObjectStorage } from './deps.ts';
 import { RawRequest } from './raw_request.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
+import { sendRpc } from './rpc_client.ts';
 
 export class RawRequestController {
+    static notificationAlarmKind = 'send-notification';
 
     private readonly storage: DurableObjectStorage;
     private readonly colo: string;
+    private readonly doName: string;
     private readonly encryptIpAddress: IpAddressEncryptionFn;
     private readonly hashIpAddress: IpAddressHashingFn;
 
     private readonly timestampSequence = new TimestampSequence(3);
     private attNums: AttNums | undefined;
 
-    constructor(storage: DurableObjectStorage, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn) {
+    constructor(storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn) {
         this.storage = storage;
         this.colo = colo;
+        this.doName = doName;
         this.encryptIpAddress = encryptIpAddress;
         this.hashIpAddress = hashIpAddress;
     }
@@ -25,7 +29,7 @@ export class RawRequestController {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
         const { attNums } = this;
         const attNumsMaxBefore = attNums.max();
-        const batches = await computePutBatches(rawRequests, attNums, this.colo, () => 'rr.r.' + this.timestampSequence.next(), this.encryptIpAddress, this.hashIpAddress);
+        const batches = await computePutBatches(rawRequests, attNums, this.colo, () => `rr.r.${this.timestampSequence.next()}`, this.encryptIpAddress, this.hashIpAddress);
         if (batches.length > 0) {
             await this.storage.transaction(async txn => {
                 for (const batch of batches) {
@@ -37,12 +41,43 @@ export class RawRequestController {
                     await txn.put('rr.attNums', record);
                 }
             });
+            await scheduleNotification(this.doName, this.storage);
+        }
+    }
+
+    static async sendNotification(input: Record<string, unknown>, opts: { fromColo: string, storage: DurableObjectStorage, backendNamespace: DurableObjectNamespace }) {
+        console.log(`RawRequestController.sendNotifcation: ${JSON.stringify(input)}`);
+        const { storage, backendNamespace, fromColo } = opts;
+        const { doName } = input;
+        if (typeof doName === 'string') {
+            const timestampId = await queryLatestTimestampId(storage);
+            if (timestampId) {
+                await sendRpc({ kind: 'raw-requests-notification', doName, timestampId, fromColo }, 'ok', { doName: 'all-raw-request', backendNamespace });
+            }
         }
     }
 
 }
 
 //
+
+async function queryLatestTimestampId(storage: DurableObjectStorage): Promise<string | undefined> {
+    const prefix = 'rr.r.';
+    const map = await storage.list({ prefix, reverse: true, limit: 1 });
+    const key = [...map.keys()].at(0);
+    return key ? key.substring(prefix.length) : undefined;
+}
+
+async function scheduleNotification(doName: string, storage: DurableObjectStorage) {
+    const currentAlarm = await storage.getAlarm();
+    if (typeof currentAlarm === 'number') return; // pending alarm not started
+
+    console.log(`Scheduling notification 30 seconds from now`);
+    await storage.transaction(async txn => {
+        await txn.put('alarm.input', { kind: RawRequestController.notificationAlarmKind, doName });
+        await txn.setAlarm(Date.now() + 1000 * 30);
+    });
+}
 
 async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     const record = await storage.get('rr.attNums');

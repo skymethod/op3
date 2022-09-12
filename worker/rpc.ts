@@ -8,14 +8,16 @@ export type RpcRequest =
     | GetKeyRequest
     | RegisterDORequest 
     | AdminDataRequest
+    | RawRequestsNotificationRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
-    return typeof obj === 'object' && (
+    return isStringRecord(obj) && (
         obj.kind === 'save-raw-requests' 
         || obj.kind === 'get-key' 
         || obj.kind === 'register-do' 
         || obj.kind === 'admin-data'
+        || obj.kind === 'raw-requests-notification'
     );
 }
 
@@ -44,6 +46,15 @@ export interface DOInfo {
     readonly firstSeen: string; // instant
     readonly lastSeen: string; // instant
     readonly changes: readonly Change[]; // to id, name, colo
+}
+
+export function isValidDOInfo(obj: any): obj is DOInfo {
+    try {
+        checkDOInfo(obj);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 export function checkDOInfo(obj: any): obj is DOInfo {
@@ -76,6 +87,13 @@ export interface AdminDataRequest {
     readonly operationKind: 'list' | 'delete';
     readonly targetPath: string;
     readonly dryRun?: boolean;
+}
+
+export interface RawRequestsNotificationRequest {
+    readonly kind: 'raw-requests-notification';
+    readonly doName: string;
+    readonly timestampId: string;
+    readonly fromColo: string;
 }
 
 //

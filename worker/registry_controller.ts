@@ -1,18 +1,33 @@
-import { isStringRecord } from './check.ts';
 import { DurableObjectStorage } from './deps.ts';
-import { DOInfo } from './rpc.ts';
+import { DOInfo, isValidDOInfo } from './rpc.ts';
 
 export async function register(info: DOInfo, storage: DurableObjectStorage) {
     await storage.put(`reg.id.${info.id}`, info);
 
     const objs = await listRegistry(storage);
-    console.log(`${objs.length} DOs registered:`);
     for (const obj of objs) {
-        console.log(JSON.stringify(obj, undefined, 2));
+        console.log(toShortString(obj));
     }
+    console.log(`Total DOs registered: ${objs.length}`);
 }
 
-export async function listRegistry(storage: DurableObjectStorage): Promise<Record<string, unknown>[]> {
+export async function listRegistry(storage: DurableObjectStorage): Promise<DOInfo[]> {
     const map = await storage.list({ prefix: 'reg.id.' });
-    return [...map.values()].filter(isStringRecord);
+    return [...map.values()].filter(isValidDOInfo);
+}
+
+//
+
+function toShortString(info: DOInfo): string {
+    const { id, name, colo, firstSeen, lastSeen, changes } = info;
+    let rt = `${name} ${id} ${colo} [${firstSeen} to ${lastSeen}]`;
+    const values: Record<string, string> = {};
+    for (const change of [...changes].reverse()) {
+        const current = values[change.name];
+        if (current) {
+            rt += ` (${change.name}: ${current} -> ${change.value} at ${change.time})`;
+        }
+        values[change.name] = change.value;
+    }
+    return rt;
 }
