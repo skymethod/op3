@@ -9,6 +9,7 @@ export type RpcRequest =
     | RegisterDORequest 
     | AdminDataRequest
     | RawRequestsNotificationRequest
+    | AlarmRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -18,6 +19,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'register-do' 
         || obj.kind === 'admin-data'
         || obj.kind === 'raw-requests-notification'
+        || obj.kind === 'alarm'
     );
 }
 
@@ -96,6 +98,18 @@ export interface RawRequestsNotificationRequest {
     readonly fromColo: string;
 }
 
+export type AlarmPayload = Record<string, unknown> & { readonly kind: string };
+
+export function isValidAlarmPayload(obj: any): obj is AlarmPayload {
+    return isStringRecord(obj) && typeof obj.kind === 'string';
+}
+
+export interface AlarmRequest {
+    readonly kind: 'alarm';
+    readonly payload: AlarmPayload;
+    readonly fromIsolateId: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -144,4 +158,5 @@ export interface RpcClient {
     getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
     sendRawRequestsNotification(request: Unkinded<RawRequestsNotificationRequest>, target: string): Promise<OkResponse>;
     saveRawRequests(request: Unkinded<SaveRawRequestsRequest>, target: string): Promise<OkResponse>;
+    sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
 }

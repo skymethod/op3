@@ -1,6 +1,6 @@
 import { BackendDOColo } from './backend_do_colo.ts';
 import { Bytes, DurableObjectState, DurableObjectStorage } from './deps.ts';
-import { checkDOInfo, DOInfo, isRpcRequest, KeyKind, RpcClient, RpcResponse } from './rpc_model.ts';
+import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from './rpc_model.ts';
 import { IsolateId } from './isolate_id.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
@@ -9,7 +9,6 @@ import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyControlle
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { isStringRecord } from './check.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { AllRawRequestController } from './all_raw_request_controller.ts';
 import { tryParseInt } from './parse.ts';
@@ -108,8 +107,20 @@ export class BackendDO {
                     } else if (obj.kind === 'raw-requests-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
                         const { doName, timestampId, fromColo } = obj;
-                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage);
+                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
                         await this.allRawRequestController.receiveNotification({ doName, timestampId, fromColo });
+                        return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'alarm') {
+                        console.log(`alarm received: ${JSON.stringify(obj)}`);
+                        const { payload } = obj;
+                        const { kind: alarmKind } = payload;
+                        if (alarmKind === RawRequestController.notificationAlarmKind) {
+                            const fromColo = await BackendDOColo.get();
+                            await RawRequestController.sendNotification(payload, { storage, rpcClient, fromColo });
+                        } else if (alarmKind === AllRawRequestController.processAlarmKind) {
+                            if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
+                            await this.allRawRequestController.process();
+                        }
                         return newRpcResponse({ kind: 'ok' });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
@@ -130,19 +141,20 @@ export class BackendDO {
 
     async alarm() {
         const { storage } = this.state;
-        const input = await storage.get('alarm.input');
-        console.log(`BackendDO.alarm: ${JSON.stringify(input)}`);
-        if (isStringRecord(input)) {
-            const { kind } = input;
-            if (kind === RawRequestController.notificationAlarmKind) {
-                const { backendNamespace } = this.env;
-                const fromColo = await BackendDOColo.get();
-                const rpcClient = new CloudflareRpcClient(backendNamespace);
-                await RawRequestController.sendNotification(input, { storage, rpcClient, fromColo });
-            } else if (kind === AllRawRequestController.processNotificationAlarmKind) {
-                // TODO
-                console.log('got AllRawRequestController.processNotificationAlarmKind');
+        const payload = await storage.get('alarm.payload');
+        console.log(`BackendDO.alarm: ${JSON.stringify(payload)}`);
+        if (isValidAlarmPayload(payload)) {
+            // workaround no logs for alarm handlers
+            // make an rpc call back to this object
+            const { backendNamespace } = this.env;
+            const rpcClient = new CloudflareRpcClient(backendNamespace);
+            const fromIsolateId = IsolateId.get();
+            const info = this.info ?? await loadDOInfo(storage);
+            if (!info) {
+                console.error(`BackendDO: unable to compute name!`);
+                return;
             }
+            await rpcClient.sendAlarm({ payload, fromIsolateId }, info.name);
         }
     }
 

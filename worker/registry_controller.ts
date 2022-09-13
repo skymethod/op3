@@ -22,7 +22,7 @@ function toShortString(info: DOInfo): string {
     const { id, name, colo, firstSeen, lastSeen, changes } = info;
     let rt = `${name} ${id} ${colo} [${firstSeen} to ${lastSeen}]`;
     const values: Record<string, string> = {};
-    for (const change of [...changes].reverse()) {
+    for (const change of changes) {
         const current = values[change.name];
         if (current) {
             rt += ` (${change.name}: ${current} -> ${change.value} at ${change.time})`;

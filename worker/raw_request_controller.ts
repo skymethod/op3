@@ -3,11 +3,11 @@ import { RawRequest } from './raw_request.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
-import { RpcClient } from './rpc_model.ts';
+import { AlarmPayload, RpcClient } from './rpc_model.ts';
 import { check } from './check.ts';
 
 export class RawRequestController {
-    static readonly notificationAlarmKind = 'send-notification';
+    static readonly notificationAlarmKind = 'RawRequestController.notificationAlarmKind';
 
     private readonly storage: DurableObjectStorage;
     private readonly colo: string;
@@ -80,7 +80,7 @@ async function scheduleNotification(doName: string, notificationDelaySeconds: nu
 
     console.log(`Scheduling notification ${notificationDelaySeconds} seconds from now`);
     await storage.transaction(async txn => {
-        await txn.put('alarm.input', { kind: RawRequestController.notificationAlarmKind, doName });
+        await txn.put('alarm.payload', { kind: RawRequestController.notificationAlarmKind, doName } as AlarmPayload);
         await txn.setAlarm(Date.now() + 1000 * notificationDelaySeconds);
     });
 }
