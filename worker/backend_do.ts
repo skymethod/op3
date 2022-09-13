@@ -52,8 +52,10 @@ export class BackendDO {
                     const obj = await request.json();
                     if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
                     const { storage } = this.state;
-                    if (obj.kind === 'save-raw-requests') {
-                        // save raw requests to storage
+
+                    const getOrLoadRawRequestController = () => {
+                        if (this.rawRequestController) return this.rawRequestController;
+
                         if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
                         const keyClient = this.keyClient;
                         const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
@@ -67,16 +69,32 @@ export class BackendDO {
                             return `1:${signature.hex()}`;
                         }
                         const notificationDelaySeconds = tryParseInt(rawRequestNotificationDelaySeconds);
-                        if (!this.rawRequestController) this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
-                        await this.rawRequestController.save(obj.rawRequests);
-                        
+                        this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
+                        return this.rawRequestController;
+                    }
+
+                    const getOrLoadKeyController = () => {
+                        if (!this.keyController) this.keyController = new KeyController(storage);
+                        return this.keyController;
+                    }
+
+                    const getOrLoadAllRawRequestController = () => {
+                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
+                        return this.allRawRequestController;
+                    }
+
+                    if (obj.kind === 'save-raw-requests') {
+                        // save raw requests to storage
+                        await getOrLoadRawRequestController().save(obj.rawRequests);
                         return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'get-new-raw-requests') {
+                        const { startAfterTimestampId } = obj;
+                        const { namesToNums, records } = await getOrLoadRawRequestController().getNewRawRequests({ startAfterTimestampId });
+                        return newRpcResponse({ kind: 'get-new-raw-requests', namesToNums, records });
                     } else if (obj.kind === 'get-key') {
                         // get or generate key
-                        if (!this.keyController) this.keyController = new KeyController(storage);
-
                         const { keyKind, keyScope } = obj;
-                        const rawKeyBase64 = (await this.keyController.getOrGenerateKey(keyKind, keyScope)).base64();
+                        const rawKeyBase64 = (await getOrLoadKeyController().getOrGenerateKey(keyKind, keyScope)).base64();
 
                         return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
                     } else if (obj.kind === 'register-do') {
@@ -87,8 +105,7 @@ export class BackendDO {
                         if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
                             return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
                         } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
-                            if (!this.keyController) this.keyController = new KeyController(storage);
-                            return newRpcResponse({ kind: 'admin-data', listResults: await this.keyController.listKeys() });
+                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadKeyController().listKeys() });
                         } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                             const doName = checkDeleteDurableObjectAllowed(targetPath);
                             if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
@@ -107,8 +124,7 @@ export class BackendDO {
                     } else if (obj.kind === 'raw-requests-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
                         const { doName, timestampId, fromColo } = obj;
-                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
-                        await this.allRawRequestController.receiveNotification({ doName, timestampId, fromColo });
+                        await getOrLoadAllRawRequestController().receiveNotification({ doName, timestampId, fromColo });
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'alarm') {
                         console.log(`alarm received: ${JSON.stringify(obj)}`);
@@ -118,8 +134,7 @@ export class BackendDO {
                             const fromColo = await BackendDOColo.get();
                             await RawRequestController.sendNotification(payload, { storage, rpcClient, fromColo });
                         } else if (alarmKind === AllRawRequestController.processAlarmKind) {
-                            if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
-                            await this.allRawRequestController.process();
+                            await getOrLoadAllRawRequestController().process();
                         }
                         return newRpcResponse({ kind: 'ok' });
                     } else {

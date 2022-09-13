@@ -1,6 +1,7 @@
 import { DurableObjectStorage } from './deps.ts';
 import { isStringRecord } from './check.ts';
 import { AlarmPayload, RpcClient } from './rpc_model.ts';
+import { AttNums } from './att_nums.ts';
 
 export class AllRawRequestController {
     static readonly processAlarmKind = 'AllRawRequestController.processAlarmKind';
@@ -30,15 +31,22 @@ export class AllRawRequestController {
     }
 
     async process(): Promise<void> {
-        const { storage } = this;
+        const { storage, rpcClient } = this;
 
         const map = await storage.list({ prefix: 'arr.ss.'});
         console.log(`process: ${map.size} source states`);
+        // TODO load and save new records from all sources
         for (const [ key, value ] of map) {
-            const source = key.substring('ss.'.length);
+            const source = key.substring('arr.ss.'.length);
             if (isValidSourceState(value)) {
                 console.log(`${source}: ${JSON.stringify(value)}`);
-                // TODO get new raw requests
+                const startAfterTimestampId = undefined;
+                const { namesToNums, records } = await rpcClient.getNewRawRequests({ startAfterTimestampId }, source);
+                console.log(`${Object.keys(records).length} records`);
+                const attNums = new AttNums(namesToNums);
+                for (const [ timestampId, record ] of Object.entries(records)) {
+                    console.log(`${timestampId}: ${JSON.stringify(attNums.unpackRecord(record))}`);
+                }
             }
         }
     }

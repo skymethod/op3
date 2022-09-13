@@ -3,7 +3,7 @@ import { RawRequest } from './raw_request.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
-import { AlarmPayload, RpcClient } from './rpc_model.ts';
+import { AlarmPayload, PackedRawRequests, RpcClient } from './rpc_model.ts';
 import { check } from './check.ts';
 
 export class RawRequestController {
@@ -32,8 +32,7 @@ export class RawRequestController {
     }
 
     async save(rawRequests: readonly RawRequest[]) {
-        if (!this.attNums) this.attNums = await loadAttNums(this.storage);
-        const { attNums } = this;
+        const attNums = await this.getOrLoadAttNums();
         const attNumsMaxBefore = attNums.max();
         const batches = await computePutBatches(rawRequests, attNums, this.colo, () => `rr.r.${this.timestampSequence.next()}`, this.encryptIpAddress, this.hashIpAddress);
         if (batches.length > 0) {
@@ -49,6 +48,28 @@ export class RawRequestController {
             });
             await scheduleNotification(this.doName, this.notificationDelaySeconds, this.storage);
         }
+    }
+
+    private async getOrLoadAttNums(): Promise<AttNums> {
+        if (!this.attNums) this.attNums = await loadAttNums(this.storage);
+        return this.attNums;
+    }
+
+    async getNewRawRequests(opts: { startAfterTimestampId?: string }): Promise<PackedRawRequests> {
+        const { startAfterTimestampId } = opts;
+        const { storage } = this;
+        // TODO use startAfter once implemented
+        const start = startAfterTimestampId ? `rr.r.${startAfterTimestampId}` : undefined;
+        const map = await storage.list({ prefix: `rr.r.`, start, limit: 2 });
+        const records: Record<string, string> = {};
+        for (const [ key, value ] of map) {
+            const timestampId = key.substring('rr.r.'.length);
+            if (startAfterTimestampId && timestampId <= startAfterTimestampId) continue;
+            if (typeof value === 'string') records[timestampId] = value;
+        }
+        const attNums = await this.getOrLoadAttNums();
+        const namesToNums = attNums.toJson();
+        return { namesToNums, records };
     }
 
     static async sendNotification(input: Record<string, unknown>, opts: { fromColo: string, storage: DurableObjectStorage, rpcClient: RpcClient }) {

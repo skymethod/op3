@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, isRpcResponse, OkResponse, RawRequestsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, RpcResponse, SaveRawRequestsRequest, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRawRequestsRequest, GetNewRawRequestsResponse, isRpcResponse, OkResponse, RawRequestsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, RpcResponse, SaveRawRequestsRequest, Unkinded } from './rpc_model.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
@@ -30,6 +30,10 @@ export class CloudflareRpcClient implements RpcClient {
 
     async sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse> {
         return await sendRpc<OkResponse>({ kind: 'alarm', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+    }
+
+    async getNewRawRequests(request: Unkinded<GetNewRawRequestsRequest>, target: string): Promise<GetNewRawRequestsResponse> {
+        return await sendRpc<GetNewRawRequestsResponse>({ kind: 'get-new-raw-requests', ...request }, 'get-new-raw-requests', { doName: target, backendNamespace: this.backendNamespace });
     }
 
 }

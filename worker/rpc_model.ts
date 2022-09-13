@@ -10,6 +10,7 @@ export type RpcRequest =
     | AdminDataRequest
     | RawRequestsNotificationRequest
     | AlarmRequest
+    | GetNewRawRequestsRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -20,6 +21,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'admin-data'
         || obj.kind === 'raw-requests-notification'
         || obj.kind === 'alarm'
+        || obj.kind === 'get-new-raw-requests'
     );
 }
 
@@ -110,6 +112,11 @@ export interface AlarmRequest {
     readonly fromIsolateId: string;
 }
 
+export interface GetNewRawRequestsRequest {
+    readonly kind: 'get-new-raw-requests';
+    readonly startAfterTimestampId?: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -117,6 +124,7 @@ export type RpcResponse =
     | ErrorResponse 
     | GetKeyResponse 
     | AdminDataResponse
+    | GetNewRawRequestsResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -125,6 +133,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'error' 
         || obj.kind === 'get-key'
         || obj.kind === 'admin-data'
+        || obj.kind === 'get-new-raw-requests'
     );
 }
 
@@ -148,6 +157,15 @@ export interface AdminDataResponse {
     readonly message?: string;
 }
 
+export interface PackedRawRequests {
+    readonly namesToNums: Record<string, number>;
+    readonly records: Record<string, string>; // timestampId -> packed record
+}
+
+export interface GetNewRawRequestsResponse extends PackedRawRequests {
+    readonly kind: 'get-new-raw-requests';
+}
+
 //
 
 export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
@@ -159,4 +177,5 @@ export interface RpcClient {
     sendRawRequestsNotification(request: Unkinded<RawRequestsNotificationRequest>, target: string): Promise<OkResponse>;
     saveRawRequests(request: Unkinded<SaveRawRequestsRequest>, target: string): Promise<OkResponse>;
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
+    getNewRawRequests(request: Unkinded<GetNewRawRequestsRequest>, target: string): Promise<GetNewRawRequestsResponse>;
 }
