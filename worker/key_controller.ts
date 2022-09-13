@@ -1,84 +1,127 @@
-import { checkMatches, isStringRecord } from './check.ts';
+import { isStringRecord } from './check.ts';
 import { generateHmacKeyBytes, generateAesKeyBytes } from './crypto.ts';
-import { Bytes, DurableObjectStorage } from './deps.ts';
+import { DurableObjectStorage } from './deps.ts';
+import { tryParseInt } from './parse.ts';
 import { KeyKind } from './rpc_model.ts';
+import { timestampToYyyymmdd } from './timestamp.ts';
 
 export class KeyController {
     private readonly storage: DurableObjectStorage;
-    private readonly monthlyIpAddressHmacKeys = new Map<string, Bytes>();
-    private readonly monthlyIpAddressAesKeys = new Map<string, Bytes>();
+
+    private keyRecords?: Map<string, KeyRecord>;
 
     constructor(storage: DurableObjectStorage) {
         this.storage = storage;
     }
 
-    async getOrGenerateKey(keyKind: KeyKind, keyScope: string): Promise<Bytes> {
-        const { storage } = this;
+    async getOrGenerateKey(keyKind: KeyKind, timestamp: string, id?: string): Promise<Key> {
+        const month = timestampToYyyymmdd(timestamp).substring(0, 6);
+        const keyRecords = await this.getOrLoadKeyRecords();
 
-        if (keyKind === 'ip-address-hmac') {
-            return await getOrGenerateKey_(keyKind, 'iah', keyScope, isValidIpAddressHmacKeyScope, generateHmacKeyBytes, this.monthlyIpAddressHmacKeys, storage);
-        } else if (keyKind === 'ip-address-aes') {
-            return await getOrGenerateKey_(keyKind, 'iae', keyScope, isValidIpAddressAesKeyScope, generateAesKeyBytes, this.monthlyIpAddressAesKeys, storage);
-        } else {
-            throw new Error(`Unsupported keyKind: ${keyKind}`);
+        if (typeof id === 'string') {
+            // get an existing active or inactive key with a known id
+            const keyRecord = keyRecords.get(id);
+            if (keyRecord) {
+                if (keyKind !== keyRecord.keyKind) throw new Error(`Key ${id} is ${keyRecord.keyKind}, not ${keyKind}`);
+                if (month !== keyRecord.month) throw new Error(`Key ${id} is ${keyRecord.month}, not ${month}`);
+                console.log(`KeyController: Returning existing ${keyRecord.active ? 'active' : 'inactive'} key ${keyKind} key for ${month} with id ${keyRecord.id}`);
+                return computeKey(keyRecord);
+            }
         }
+
+        // no id specified, return the active one
+        const active = [...keyRecords.values()].filter(v => v.month === month && v.active && v.keyKind === keyKind);
+        if (active.length > 1) throw new Error(`${active.length} active ${keyKind} keys for ${month}`);
+        if (active.length === 1) {
+            console.log(`KeyController: Returning exiting active ${keyKind} key for ${month}`);
+            return computeKey(active[0]);
+        }
+
+        // no active key, generate a new one
+        console.log(`KeyController: Generating new active ${keyKind} key for ${month}`);
+        const generateKeyBytes = keyKind === 'ip-address-hmac' ? generateHmacKeyBytes : keyKind === 'ip-address-aes' ? generateAesKeyBytes : undefined;
+        if (generateKeyBytes === undefined) throw new Error(`Unsupported keyKind:: ${keyKind}`);
+        const newKeyBytes = await generateKeyBytes();
+        const newKeyRecord: KeyRecord = {
+            id: computeNextKeyId(keyRecords),
+            keyKind,
+            month,
+            active: true,
+            keyBytesBase64: newKeyBytes.base64(),
+        };
+        await this.storage.put(`kc.k.${newKeyRecord.id}`, newKeyRecord);
+        keyRecords.set(newKeyRecord.id, newKeyRecord);
+        return computeKey(newKeyRecord);
     }
 
     async listKeys(): Promise<Record<string, unknown>[]> {
-        const map = await this.storage.list({ prefix: 'k.'});
-        return [...map.keys()].map(v => {
-            const [ _, keyKindTag, month ] = checkMatches('key', v, /^k\.(.*?)\.(.*?)$/);
-            return { keyKindTag, month };
+        const keyRecords = await this.getOrLoadKeyRecords();
+        return [...keyRecords.values()].map(v => {
+            const { id, keyKind, active, month } = v;
+            return { id, keyKind, active, month };
         });
     }
+
+    //
+
+    private async getOrLoadKeyRecords(): Promise<Map<string,KeyRecord>> {
+        if (this.keyRecords) return this.keyRecords;
+
+        console.log('KeyController: loading key records');
+        const rt = new Map<string, KeyRecord>();
+        const map = await this.storage.list({ prefix: 'kc.k.'});
+        for (const record of map.values()) {
+            if (isValidKeyRecord(record)) {
+                rt.set(record.id, record);
+            }
+        }
+        this.keyRecords = rt;
+        return rt;
+    }
+
 }
 
 //
 
-export function isValidIpAddressHmacKeyScope(keyScope: string) {
-    return /^\d{8}$/.test(keyScope); // yyyymmdd
-}
-
-export function isValidIpAddressAesKeyScope(keyScope: string) {
-    return /^\d{8}$/.test(keyScope); // yyyymmdd
+export interface Key {
+    readonly id: string;
+    readonly keyBytesBase64: string;
 }
 
 //
 
-async function getOrGenerateKey_(keyKind: KeyKind, keyKindTag: string, keyScope: string, isValid: (keyScope: string) => boolean, generateNewKeyBytes: () => Promise<Bytes>, cache: Map<string, Bytes>, storage: DurableObjectStorage) {
-    if (!isValid(keyScope)) throw new Error(`Unsupported keyKind for ${keyKind}: ${keyScope}`);
-            
-    // for now, rotate every utc month
-    const month = keyScope.substring(0, 6);
-    const existing = cache.get(month);
-    if (existing) return existing;
-
-    const loaded = await loadKeyBytes(keyKindTag, month, storage);
-    if (loaded) {
-        cache.set(month, loaded);
-        return loaded;
-    }
-
-    console.log(`Generating new ${keyKind} key for ${month}`);
-    const newKeyBytes = await generateNewKeyBytes();
-    await saveKeyBytes(keyKindTag, month, newKeyBytes, storage);
-    cache.set(month, newKeyBytes);
-    return newKeyBytes;
+interface KeyRecord {
+    readonly id: string;
+    readonly keyKind: KeyKind;
+    readonly keyBytesBase64: string;
+    readonly active: boolean;
+    readonly month: string; // yyyymmdd
 }
 
-async function loadKeyBytes(keyKindTag: string, month: string, storage: DurableObjectStorage): Promise<Bytes | undefined> {
-    console.log(`loadKeyBytes: ${keyKindTag} ${month}`);
-    const storageKey = `k.${keyKindTag}.${month}`;
-    const record = await storage.get(storageKey);
-    if (isStringRecord(record) && typeof record.keyBytesBase64 === 'string') {
-        return Bytes.ofBase64(record.keyBytesBase64);
-    }
-    return undefined;
+//
+
+// deno-lint-ignore no-explicit-any
+function isValidKeyRecord(obj: any): obj is KeyRecord {
+    return isStringRecord(obj)
+        && typeof obj.id === 'string'
+        && typeof obj.keyKind === 'string'
+        && typeof obj.keyBytesBase64 === 'string'
+        && typeof obj.active === 'boolean'
+        && typeof obj.month === 'string'
 }
 
-async function saveKeyBytes(keyKindTag: string, month: string, keyBytes: Bytes, storage: DurableObjectStorage): Promise<void> {
-    console.log(`saveKeyBytes: ${keyKindTag} ${month}`);
-    const storageKey = `k.${keyKindTag}.${month}`;
-    const keyBytesBase64 = keyBytes.base64();
-    await storage.put(storageKey, { keyBytesBase64 });
+function computeKey(keyRecord: KeyRecord): Key {
+    const { id, keyBytesBase64 } = keyRecord;
+    return { id, keyBytesBase64 };
+}
+
+function computeNextKeyId(keyRecords: Map<string, KeyRecord>): string {
+    let maxKeyId = 0;
+    for (const record of keyRecords.values()) {
+        const id = tryParseInt(record.id);
+        if (typeof id === 'number') {
+            maxKeyId = Math.max(maxKeyId, id);
+        }
+    }
+    return (maxKeyId + 1).toString();
 }

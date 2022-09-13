@@ -23,3 +23,8 @@ export function timestampToInstant(timestamp: string): string {
     if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestamp: ${timestamp}`);
     return `20${timestamp.slice(0, 2)}-${timestamp.slice(2, 4)}-${timestamp.slice(4, 6)}T${timestamp.slice(6, 8)}:${timestamp.slice(8, 10)}:${timestamp.slice(10, 12)}.${timestamp.slice(12, 15)}Z`;
 }
+
+export function timestampToYyyymmdd(timestamp: string): string {
+    if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestamp: ${timestamp}`);
+    return `20${timestamp.substring(0, 6)}`;
+}

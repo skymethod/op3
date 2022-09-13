@@ -5,7 +5,7 @@ import { IsolateId } from './isolate_id.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
-import { isValidIpAddressAesKeyScope, isValidIpAddressHmacKeyScope, KeyController } from './key_controller.ts';
+import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
@@ -59,14 +59,14 @@ export class BackendDO {
                         if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
                         const keyClient = this.keyClient;
                         const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
-                            const key = await keyClient.getIpAddressAesKey(opts.timestamp);
+                            const { id, key } = await keyClient.getKey('ip-address-aes', opts.timestamp);
                             const { encrypted, iv } = await encrypt(Bytes.ofUtf8(rawIpAddress), key);
-                            return `1:${iv.hex()}:${encrypted.hex()}`;
+                            return `2:${id}:${iv.hex()}:${encrypted.hex()}`;
                         }
                         const hashIpAddress: IpAddressHashingFn = async (rawIpAddress, opts) => {
-                            const key = await keyClient.getIpAddressHmacKey(opts.timestamp);
+                            const { id, key } = await keyClient.getKey('ip-address-hmac', opts.timestamp);
                             const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
-                            return `1:${signature.hex()}`;
+                            return `2:${id}:${signature.hex()}`;
                         }
                         const notificationDelaySeconds = tryParseInt(rawRequestNotificationDelaySeconds);
                         this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
@@ -93,10 +93,9 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'get-new-raw-requests', namesToNums, records });
                     } else if (obj.kind === 'get-key') {
                         // get or generate key
-                        const { keyKind, keyScope } = obj;
-                        const rawKeyBase64 = (await getOrLoadKeyController().getOrGenerateKey(keyKind, keyScope)).base64();
-
-                        return newRpcResponse({ kind: 'get-key', rawKeyBase64 });
+                        const { keyKind, timestamp, id } = obj;
+                        const {id: keyId, keyBytesBase64: rawKeyBase64 } = await getOrLoadKeyController().getOrGenerateKey(keyKind, timestamp, id);
+                        return newRpcResponse({ kind: 'get-key', rawKeyBase64, keyId });
                     } else if (obj.kind === 'register-do') {
                         await register(obj.info, storage);
                         return newRpcResponse({ kind: 'ok' });
@@ -227,22 +226,14 @@ export class BackendDO {
 //
 
 function newKeyClient(rpcClient: RpcClient): KeyClient {
-    const keyFetcher: KeyFetcher = async (keyKind: KeyKind, keyScope: string) => {
-        if (keyKind === 'ip-address-hmac') {
-            return await getKey(keyKind, keyScope, isValidIpAddressHmacKeyScope, importHmacKey, rpcClient);
-        } else if (keyKind === 'ip-address-aes') {
-            return await getKey(keyKind, keyScope, isValidIpAddressAesKeyScope, importAesKey, rpcClient);
-        }
-        throw new Error(`Unsupported keyKind: ${keyKind}`);
+    const keyFetcher: KeyFetcher = async (keyKind: KeyKind, timestamp: string, id?: string) => {
+        const importKey = keyKind === 'ip-address-hmac' ? importHmacKey : keyKind === 'ip-address-aes' ? importAesKey : undefined;
+        if (!importKey) throw new Error(`Unsupported keyKind: ${keyKind}`);
+        const res = await rpcClient.getKey({ keyKind, timestamp, id }, 'key-server');
+        const key = await importKey(Bytes.ofBase64(res.rawKeyBase64));
+        return { id: res.keyId, key };
     }
     return new KeyClient(keyFetcher);
-}
-
-async function getKey(keyKind: KeyKind, keyScope: string, isValid: (keyScope: string) => boolean, importKey: (bytes: Bytes) => Promise<CryptoKey>, rpcClient: RpcClient) {
-    if (!isValid(keyScope)) throw new Error(`Unsupported keyKind for ${keyKind}: ${keyScope}`);
-
-    const res = await rpcClient.getKey({ keyKind, keyScope }, 'key-server');
-    return await importKey(Bytes.ofBase64(res.rawKeyBase64));
 }
 
 function newRpcResponse(rpcResponse: RpcResponse): Response {

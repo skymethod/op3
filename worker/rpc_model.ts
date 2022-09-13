@@ -35,7 +35,8 @@ export type KeyKind = 'ip-address-hmac' | 'ip-address-aes';
 export interface GetKeyRequest {
     readonly kind: 'get-key';
     readonly keyKind: KeyKind;
-    readonly keyScope: string; // e.g. 20220912
+    readonly timestamp: string;
+    readonly id?: string; // specific id if known
 }
 
 export interface RegisterDORequest {
@@ -149,6 +150,7 @@ export interface ErrorResponse {
 
 export interface GetKeyResponse {
     readonly kind: 'get-key';
+    readonly keyId: string;
     readonly rawKeyBase64: string;
 }
 
