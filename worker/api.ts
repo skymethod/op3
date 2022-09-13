@@ -35,6 +35,9 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
                     } else if (operationKind === 'list' && targetPath === '/keys') {
                         const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
                         return newJsonResponse({ listResults });
+                    } else if (operationKind === 'list' && targetPath === '/arr/sources') {
+                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
+                        return newJsonResponse({ listResults });
                     } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                         const doName = checkDeleteDurableObjectAllowed(targetPath);
                         const { message } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, doName);

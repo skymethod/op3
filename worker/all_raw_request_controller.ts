@@ -2,6 +2,8 @@ import { DurableObjectStorage } from './deps.ts';
 import { isStringRecord } from './check.ts';
 import { AlarmPayload, RpcClient } from './rpc_model.ts';
 import { AttNums } from './att_nums.ts';
+import { isValidTimestamp } from './timestamp.ts';
+import { isValidUuid } from './uuid.ts';
 
 export class AllRawRequestController {
     static readonly processAlarmKind = 'AllRawRequestController.processAlarmKind';
@@ -24,7 +26,7 @@ export class AllRawRequestController {
         const notificationTime = new Date().toISOString();
         const oldState = await loadSourceState(doName, storage);
         const newState = { ...oldState, doName, notificationTimestampId: timestampId, notificationFromColo: fromColo, notificationTime };
-        await saveSourceState(newState, storage);
+        await storage.put(`arr.ss.${doName}`, newState);
 
         await storage.transaction(async txn => {
             await txn.put('alarm.payload', { kind: AllRawRequestController.processAlarmKind } as AlarmPayload);
@@ -35,25 +37,27 @@ export class AllRawRequestController {
     async process(): Promise<void> {
         const { storage, rpcClient } = this;
 
+        // load and save new records from all sources
         const map = await storage.list({ prefix: 'arr.ss.'});
-        console.log(`process: ${map.size} source states`);
-        // TODO load and save new records from all sources
-        const limit = 128;
-        for (const [ key, value ] of map) {
-            const source = key.substring('arr.ss.'.length);
-            if (isValidSourceState(value)) {
-                console.log(`${source}: ${JSON.stringify(value)}`);
-                const startAfterTimestampId = value.haveTimestampId;
-                const { namesToNums, records } = await rpcClient.getNewRawRequests({ limit, startAfterTimestampId }, source);
-                console.log(`${Object.keys(records).length} records`);
-                const sourceAttNums = new AttNums(namesToNums);
-                for (const [ timestampId, record ] of Object.entries(records)) {
-                    const obj = sourceAttNums.unpackRecord(record);
-                    console.log(`${timestampId}: ${JSON.stringify(obj)}`);
-                }
+        console.log(`AllRawRequestController: process: ${map.size} source states`);
+
+        const attNums = await this.getOrLoadAttNums();
+
+        for (const state of map.values()) {
+            if (!isValidSourceState(state)) {
+                console.warn(`AllRawRequestController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
+                continue;
             }
+            await processSource(state, rpcClient, attNums, storage);
         }
     }
+
+    async listSources(): Promise<Record<string, unknown>[]> {
+        const map = await this.storage.list({ prefix: 'arr.ss.'});
+        return [...map.values()].filter(isStringRecord);
+    }
+
+    //
 
     private async getOrLoadAttNums(): Promise<AttNums> {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
@@ -67,26 +71,70 @@ export class AllRawRequestController {
 async function loadSourceState(doName: string, storage: DurableObjectStorage): Promise<SourceState | undefined> {
     const state = await storage.get(`arr.ss.${doName}`);
     if (state !== undefined && !isValidSourceState(state)) {
-        console.warn(`Invalid source state for ${doName}: ${JSON.stringify(state)}`);
+        console.warn(`AllRawRequestController: Invalid source state for ${doName}: ${JSON.stringify(state)}`);
         return undefined;
     }
     return state;
 }
 
-async function saveSourceState(state: SourceState, storage: DurableObjectStorage) {
-    const { doName } = state;
-    await storage.put(`arr.ss.${doName}`, state);
-}
-
 async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     const record = await storage.get('arr.attNums');
-    console.log(`loadAttNums: ${JSON.stringify(record)}`);
+    console.log(`AllRawRequestController: loadAttNums: ${JSON.stringify(record)}`);
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        console.error(`Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        console.error(`AllRawRequestController: Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
     }
     return new AttNums();
+}
+
+async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage) {
+    const { doName } = state;
+    console.log(`AllRawRequestController: processSource ${doName}: ${JSON.stringify(state)}`);
+
+    // fetch some new records from the source DO
+    const startAfterTimestampId = state.haveTimestampId;
+    const { namesToNums, records } = await rpcClient.getNewRawRequests({ limit: 128, startAfterTimestampId }, doName);
+    console.log(`${Object.keys(records).length} records`);
+
+    const sourceAttNums = new AttNums(namesToNums);
+    const maxBefore = attNums.max();
+    const newRecords: Record<string, string> = {};
+    let maxTimestampId = startAfterTimestampId;
+    for (const [ timestampId, sourceRecord ] of Object.entries(records)) {
+        if (maxTimestampId === undefined || timestampId > maxTimestampId) maxTimestampId = timestampId;
+        const obj = sourceAttNums.unpackRecord(sourceRecord);
+        // console.log(`${timestampId}: ${JSON.stringify(obj)}`);
+        const { uuid, timestamp } = obj;
+        if (typeof uuid !== 'string' || !isValidUuid(uuid)) {
+            console.warn(`AllRawRequestController: Skipping bad source obj (invalid uuid): ${JSON.stringify(obj)}`);
+            continue;
+        }
+        if (typeof timestamp !== 'string' || !isValidTimestamp(timestamp)) {
+            console.warn(`AllRawRequestController: Skipping bad source obj (invalid timestamp): ${JSON.stringify(obj)}`);
+            continue;
+        }
+        const key = `arr.r.${timestamp}-${uuid}`;
+        obj.source = doName;
+        const record = attNums.packRecord(obj);
+        newRecords[key] = record;
+    }
+    if (attNums.max() > maxBefore) {
+        await storage.put('arr.attNums', attNums.toJson());
+    }
+    if (Object.keys(newRecords).length > 0 || maxTimestampId !== startAfterTimestampId) {
+        const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
+        await storage.transaction(async txn => {
+            if (Object.keys(newRecords).length > 0) {
+                console.log(`AllRawRequestController: Saving ${Object.keys(newRecords).length} imported records from ${doName}`);
+                await txn.put(newRecords);
+            }
+            if (maxTimestampId !== startAfterTimestampId) {
+                console.log(`AllRawRequestController: Updating haveTimestampId from ${startAfterTimestampId} to ${maxTimestampId} for ${doName}`);
+                await txn.put(`arr.ss.${doName}`, newState);
+            }
+        });
+    }
 }
 
 //
