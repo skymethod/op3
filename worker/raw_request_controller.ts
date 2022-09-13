@@ -50,21 +50,14 @@ export class RawRequestController {
         }
     }
 
-    private async getOrLoadAttNums(): Promise<AttNums> {
-        if (!this.attNums) this.attNums = await loadAttNums(this.storage);
-        return this.attNums;
-    }
-
-    async getNewRawRequests(opts: { startAfterTimestampId?: string }): Promise<PackedRawRequests> {
-        const { startAfterTimestampId } = opts;
+    async getNewRawRequests(opts: { limit: number, startAfterTimestampId?: string }): Promise<PackedRawRequests> {
+        const { limit, startAfterTimestampId } = opts;
         const { storage } = this;
-        // TODO use startAfter once implemented
-        const start = startAfterTimestampId ? `rr.r.${startAfterTimestampId}` : undefined;
-        const map = await storage.list({ prefix: `rr.r.`, start, limit: 2 });
+        const startAfter = startAfterTimestampId ? `rr.r.${startAfterTimestampId}` : undefined;
+        const map = await storage.list({ prefix: `rr.r.`, startAfter, limit });
         const records: Record<string, string> = {};
         for (const [ key, value ] of map) {
             const timestampId = key.substring('rr.r.'.length);
-            if (startAfterTimestampId && timestampId <= startAfterTimestampId) continue;
             if (typeof value === 'string') records[timestampId] = value;
         }
         const attNums = await this.getOrLoadAttNums();
@@ -82,6 +75,13 @@ export class RawRequestController {
                 await rpcClient.sendRawRequestsNotification({ doName, timestampId, fromColo }, 'all-raw-request');
             }
         }
+    }
+
+    //
+
+    private async getOrLoadAttNums(): Promise<AttNums> {
+        if (!this.attNums) this.attNums = await loadAttNums(this.storage);
+        return this.attNums;
     }
 
 }

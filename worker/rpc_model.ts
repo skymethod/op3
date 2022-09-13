@@ -114,6 +114,7 @@ export interface AlarmRequest {
 
 export interface GetNewRawRequestsRequest {
     readonly kind: 'get-new-raw-requests';
+    readonly limit: number;
     readonly startAfterTimestampId?: string;
 }
 

@@ -15,7 +15,7 @@ export default {
     async fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
         const requestTime = Date.now();
         const { method } = request;
-        const { instance, backendNamespace } = env;
+        const { instance, backendNamespace, dataset1 } = env;
 
         // first, handle redirects - the most important function
         // be careful here: must never throw
@@ -23,6 +23,7 @@ export default {
         if (redirectRequest) {
             const rawRequests = pendingRawRequests.splice(0);
             context.waitUntil((async () => {
+                let colo = 'XXX';
                 try {
                     IsolateId.log();
                     if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
@@ -34,14 +35,17 @@ export default {
                     
                     rawRequests.push(rawRequest);
 
-                    const colo = (other ?? {}).colo ?? 'XXX';
+                    colo = (other ?? {}).colo ?? colo;
                     const doName = `raw-request-${colo}`;
                     const rpcClient = new CloudflareRpcClient(backendNamespace);
                     await rpcClient.saveRawRequests({ rawRequests }, doName);
+                    dataset1?.writeDataPoint({ blobs: [ 'success-saving-redirect', colo ], doubles: [ 1 ] });
                 } catch (e) {
                     console.error(`Error sending raw requests: ${e.stack || e}`);
-                    // TODO send errors to backend as well?
+                    // we'll retry if this isolate gets hit again, otherwise lost
+                    // TODO retry inline?
                     pendingRawRequests.push(...rawRequests);
+                    dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024) ], doubles: [ 1 ] });
                 }
             })());
             console.log(`Redirecting to: ${redirectRequest.targetUrl}`);

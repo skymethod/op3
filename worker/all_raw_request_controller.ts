@@ -9,6 +9,8 @@ export class AllRawRequestController {
     private readonly storage: DurableObjectStorage;
     private readonly rpcClient: RpcClient;
 
+    private attNums: AttNums | undefined;
+
     constructor(storage: DurableObjectStorage, rpcClient: RpcClient) {
         this.storage = storage;
         this.rpcClient = rpcClient;
@@ -36,19 +38,26 @@ export class AllRawRequestController {
         const map = await storage.list({ prefix: 'arr.ss.'});
         console.log(`process: ${map.size} source states`);
         // TODO load and save new records from all sources
+        const limit = 128;
         for (const [ key, value ] of map) {
             const source = key.substring('arr.ss.'.length);
             if (isValidSourceState(value)) {
                 console.log(`${source}: ${JSON.stringify(value)}`);
-                const startAfterTimestampId = undefined;
-                const { namesToNums, records } = await rpcClient.getNewRawRequests({ startAfterTimestampId }, source);
+                const startAfterTimestampId = value.haveTimestampId;
+                const { namesToNums, records } = await rpcClient.getNewRawRequests({ limit, startAfterTimestampId }, source);
                 console.log(`${Object.keys(records).length} records`);
-                const attNums = new AttNums(namesToNums);
+                const sourceAttNums = new AttNums(namesToNums);
                 for (const [ timestampId, record ] of Object.entries(records)) {
-                    console.log(`${timestampId}: ${JSON.stringify(attNums.unpackRecord(record))}`);
+                    const obj = sourceAttNums.unpackRecord(record);
+                    console.log(`${timestampId}: ${JSON.stringify(obj)}`);
                 }
             }
         }
+    }
+
+    private async getOrLoadAttNums(): Promise<AttNums> {
+        if (!this.attNums) this.attNums = await loadAttNums(this.storage);
+        return this.attNums;
     }
 
 }
@@ -69,10 +78,22 @@ async function saveSourceState(state: SourceState, storage: DurableObjectStorage
     await storage.put(`arr.ss.${doName}`, state);
 }
 
+async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
+    const record = await storage.get('arr.attNums');
+    console.log(`loadAttNums: ${JSON.stringify(record)}`);
+    try {
+        if (record !== undefined) return AttNums.fromJson(record);
+    } catch (e) {
+        console.error(`Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+    }
+    return new AttNums();
+}
+
 //
 
 interface SourceState {
     readonly doName: string;
+    readonly haveTimestampId?: string;
     readonly notificationTimestampId?: string;
     readonly notificationFromColo?: string;
     readonly notificationTime?: string; // instant
@@ -82,6 +103,7 @@ interface SourceState {
 function isValidSourceState(obj: any): obj is SourceState {
     return isStringRecord(obj)
         && typeof obj.doName === 'string'
+        && (obj.haveTimestampId === undefined || typeof obj.haveTimestampId === 'string')
         && (obj.notificationTimestampId === undefined || typeof obj.notificationTimestampId === 'string')
         && (obj.notificationFromColo === undefined || typeof obj.notificationFromColo === 'string')
         && (obj.notificationTime === undefined || typeof obj.notificationTime === 'string')

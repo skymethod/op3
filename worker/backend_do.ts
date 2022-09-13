@@ -88,8 +88,8 @@ export class BackendDO {
                         await getOrLoadRawRequestController().save(obj.rawRequests);
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'get-new-raw-requests') {
-                        const { startAfterTimestampId } = obj;
-                        const { namesToNums, records } = await getOrLoadRawRequestController().getNewRawRequests({ startAfterTimestampId });
+                        const { limit, startAfterTimestampId } = obj;
+                        const { namesToNums, records } = await getOrLoadRawRequestController().getNewRawRequests({ limit, startAfterTimestampId });
                         return newRpcResponse({ kind: 'get-new-raw-requests', namesToNums, records });
                     } else if (obj.kind === 'get-key') {
                         // get or generate key

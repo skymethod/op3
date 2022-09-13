@@ -1,2 +1,2 @@
-export type { IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.7/common/cloudflare_workers_types.d.ts';
-export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.7/common/bytes.ts';
+export type { IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage, AnalyticsEngine } from 'https://raw.githubusercontent.com/skymethod/denoflare/e86500996d8171c0f1c852b8affe028685c3bcf7/common/cloudflare_workers_types.d.ts';
+export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/e86500996d8171c0f1c852b8affe028685c3bcf7/common/bytes.ts';

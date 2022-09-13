@@ -1,4 +1,4 @@
-import { DurableObjectNamespace } from './deps.ts';
+import { DurableObjectNamespace, AnalyticsEngine } from './deps.ts';
 
 export interface WorkerEnv {
     readonly instance: string;
@@ -9,4 +9,5 @@ export interface WorkerEnv {
     readonly backendNamespace: DurableObjectNamespace;
     readonly adminTokens?: string;
     readonly rawRequestNotificationDelaySeconds?: string;
+    readonly dataset1?: AnalyticsEngine;
 }

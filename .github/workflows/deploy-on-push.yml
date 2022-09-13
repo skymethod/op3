@@ -26,6 +26,7 @@ jobs:
           CF_CUSTOM_DOMAIN: ci.op3.dev
           CF_SCRIPT_NAME: op3-ci
           CF_BACKEND_DO_NAMESPACE: backend-do-ci
+          CF_AE_DATASET: dataset1
           INSTANCE: ci
           ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
   deploy-dev:

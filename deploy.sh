@@ -11,7 +11,7 @@ fi
 
 # install deno
 DENO_VERSION="v1.25.2"
-DENOFLARE_VERSION="v0.5.7"
+DENOFLARE_VERSION="2c6c4266f597fd443356a7184d85517754656eb7"
 curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VERSION sh -s $DENO_VERSION
 
 # exit early if already deployed
@@ -38,4 +38,5 @@ push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --
 --text-binding deployFrom:$DEPLOY_FROM \
 --do-namespace-binding backendNamespace:$CF_BACKEND_DO_NAMESPACE:BackendDO \
 --secret-binding adminTokens:$ADMIN_TOKENS \
---text-binding rawRequestNotificationDelaySeconds:$RAW_REQUEST_NOTIFICATION_DELAY_SECONDS
+--text-binding rawRequestNotificationDelaySeconds:$RAW_REQUEST_NOTIFICATION_DELAY_SECONDS \
+${CF_AE_DATASET:+--ae-dataset-binding dataset1:$CF_AE_DATASET}
