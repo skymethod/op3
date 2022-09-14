@@ -1,11 +1,12 @@
 import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { isStringRecord } from '../check.ts';
-import { AlarmPayload, RpcClient } from '../rpc_model.ts';
+import { AlarmPayload, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
+import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -77,6 +78,11 @@ export class CombinedRedirectLogController {
         return rt;
     }
 
+    async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>): Promise<Response> {
+        const attNums = await this.getOrLoadAttNums();
+        return await queryCombinedRedirectLogs(request, attNums, this.storage);
+    }
+
     //
 
     private async getOrLoadAttNums(): Promise<AttNums> {
@@ -135,9 +141,10 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
             console.warn(`CombinedRedirectLogController: Skipping bad source obj (invalid timestamp): ${JSON.stringify(obj)}`);
             continue;
         }
-        const key = `crl.r.${timestamp}-${uuid}`;
+        const timestampAndUuid = `${timestamp}-${uuid}`;
+        const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
-        await computeIndexRecords(obj, key, newIndexRecords);
+        await computeIndexRecords(obj, timestampAndUuid, key, newIndexRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
@@ -164,20 +171,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         });
     }
 }
-
 //
-
-enum IndexId {
-    UrlSha256 = 1,
-    UserAgent = 2,
-    Referer = 3,
-    Range = 4,
-    HashedIpAddress = 5,
-    EdgeColo = 6,
-    DoColo = 7,
-    Source = 8,
-    Ulid = 9,
-}
 
 interface SourceState {
     readonly doName: string;
@@ -198,29 +192,44 @@ function isValidSourceState(obj: any): obj is SourceState {
         ;
 }
 
+export enum IndexId {
+    UrlSha256 = 1,
+    UserAgent = 2,
+    Referer = 3,
+    Range = 4,
+    HashedIpAddress = 5,
+    EdgeColo = 6,
+    DoColo = 7,
+    Source = 8,
+    Ulid = 9,
+    Method = 10,
+    Uuid = 11,
+}
+
+export const INDEX_DEFINITIONS: [ string, IndexId, (v: string) => string | undefined | Promise<string | undefined> ][] = [
+    [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(v).sha256()).hex() ],
+    [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
+    [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
+    [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
+    [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
+    [ 'other.colo', IndexId.EdgeColo, v => v ],
+    [ 'doColo', IndexId.DoColo, v => v ],
+    [ 'source', IndexId.Source, v => v ],
+    [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
+    [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
+    [ 'uuid', IndexId.Uuid, v => v ],
+];
+
 //
 
-async function computeIndexRecords(record: Record<string, string>, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
-
-    const indexDefinitions: [ string, IndexId, (v: string) => string | Promise<string> ][] = [
-        [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(v).sha256()).hex() ],
-        [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
-        [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
-        [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
-        [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
-        [ 'other.colo', IndexId.EdgeColo, v => v ],
-        [ 'doColo', IndexId.DoColo, v => v ],
-        [ 'source', IndexId.Source, v => v ],
-        [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
-    ];
-
-    for (const [ property, indexId, indexValueFn ] of indexDefinitions) {
+async function computeIndexRecords(record: Record<string, string>, timestampAndUuid: string, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
+    for (const [ property, indexId, indexValueFn ] of INDEX_DEFINITIONS) {
         const value = record[property];
         if (typeof value !== 'string') continue;
         const indexValueValueOrPromise = indexValueFn(value);
-        const indexValue = typeof indexValueValueOrPromise === 'string' ? indexValueValueOrPromise : await indexValueValueOrPromise;
+        const indexValue = typeof indexValueValueOrPromise === 'object' ? await indexValueValueOrPromise : indexValueValueOrPromise;
+        if (typeof indexValue !== 'string') continue;
         const indexRecords = getOrInit(outIndexRecords, indexId, () => ({} as Record<string, DurableObjectStorageValue>));
-        indexRecords[`crl.i.${indexId}.${indexValue}`] = { key };
+        indexRecords[`crl.i0.${indexId}.${indexValue}.${timestampAndUuid}`] = { key };
     }
-
 }

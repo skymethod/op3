@@ -10,6 +10,7 @@ export type RpcRequest =
     | RedirectLogsNotificationRequest
     | AlarmRequest
     | GetNewRedirectLogsRequest
+    | QueryRedirectLogsRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -21,6 +22,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'alarm'
         || obj.kind === 'get-new-redirect-logs'
+        || obj.kind === 'query-redirect-logs'
     );
 }
 
@@ -131,6 +133,29 @@ export interface GetNewRedirectLogsRequest {
     readonly startAfterTimestampId?: string;
 }
 
+export interface QueryRedirectLogsRequest {
+    readonly kind: 'query-redirect-logs';
+
+    readonly limit: number;
+    readonly format?: string; // tsv, json-o, json-a
+
+    readonly startTimeInclusive?: string; // instant
+    readonly startTimeExclusive?: string; // instant
+    readonly endTimeExclusive?: string; // instant
+
+    readonly urlSha256?: string;
+    readonly userAgent?: string;
+    readonly referer?: string;
+    readonly range?: string;
+    readonly hashedIpAddress?: string;
+    readonly edgeColo?: string;
+    readonly doColo?: string;
+    readonly source?: string;
+    readonly ulid?: string;
+    readonly method?: string;
+    readonly uuid?: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -193,4 +218,5 @@ export interface RpcClient {
     logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse>;
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
+    queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
 }

@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, RpcResponse, LogRawRedirectsRequest, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest } from './rpc_model.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
@@ -36,11 +36,15 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<GetNewRedirectLogsResponse>({ kind: 'get-new-redirect-logs', ...request }, 'get-new-redirect-logs', { doName: target, backendNamespace: this.backendNamespace });
     }
 
+    async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
+        return await sendRpc<Response>({ kind: 'query-redirect-logs', ...request }, 'response', { doName: target, backendNamespace: this.backendNamespace });
+    }
+
 }
 
 //
 
-async function sendRpc<T extends RpcResponse>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }): Promise<T> {
+async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }): Promise<T> {
     const { doName, backendNamespace } = opts;
 
     // TODO: retry on known transient DO errors
@@ -48,6 +52,8 @@ async function sendRpc<T extends RpcResponse>(request: RpcRequest, expectedRespo
     const res = await stub.fetch('https://backend/rpc', { method: 'POST', body: JSON.stringify(request), headers: { 'do-name': doName } });
 
     if (res.status !== 200) throw new Error(`Bad rpc status: ${res.status}, body=${await res.text()}`);
+    // deno-lint-ignore no-explicit-any
+    if (expectedResponseKind === 'response') return res as any;
     const contentType = res.headers.get('content-type');
     if (contentType !== 'application/json') throw new Error(`Bad content-type: ${contentType}`);
     const obj = await res.json();

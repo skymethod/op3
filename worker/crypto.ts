@@ -1,5 +1,9 @@
 import { Bytes } from './deps.ts';
 
+export function isValidSha256Hex(str: string): boolean {
+    return /^[0-9a-f]{64}$/.test(str);
+}
+
 // hmac sha-1
 
 export async function generateHmacKeyBytes(): Promise<Bytes> {

@@ -1,7 +1,7 @@
 import { isStringRecord } from '../check.ts';
 import { generateHmacKeyBytes, generateAesKeyBytes } from '../crypto.ts';
 import { DurableObjectStorage } from '../deps.ts';
-import { tryParseInt } from '../parse.ts';
+import { tryParseInt } from '../check.ts';
 import { KeyKind } from '../rpc_model.ts';
 import { timestampToYyyymmdd } from '../timestamp.ts';
 

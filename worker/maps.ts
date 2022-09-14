@@ -6,3 +6,9 @@ export function getOrInit<K, V>(map: Map<K, V>, key: K, init: () => V): V {
     }
     return rt;
 }
+
+export function setAll<K, V>(to: Map<K, V>, from: Map<K, V>) {
+    for (const [ name, value ] of from) {
+        to.set(name, value);
+    }
+}

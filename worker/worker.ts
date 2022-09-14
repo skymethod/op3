@@ -26,7 +26,7 @@ export default {
         try {
             const { instance, backendNamespace } = env;
             IsolateId.log();
-            const { pathname } = new URL(request.url);
+            const { pathname, searchParams } = new URL(request.url);
             const { method, headers } = request;
             const adminTokens = new Set((env.adminTokens ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 
@@ -34,7 +34,7 @@ export default {
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
 
             const rpcClient = new CloudflareRpcClient(backendNamespace);
-            const apiRequest = tryParseApiRequest({ method, pathname, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens });
+            const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens });
 
             return new Response('not found', { status: 404 });
         } catch (e) {

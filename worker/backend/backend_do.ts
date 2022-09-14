@@ -11,7 +11,7 @@ import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from '../routes/admin_api.ts';
 import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
-import { tryParseInt } from '../parse.ts';
+import { tryParseInt } from '../check.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
 
 export class BackendDO {
@@ -141,6 +141,8 @@ export class BackendDO {
                             await getOrLoadCombinedRedirectLogController().process();
                         }
                         return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'query-redirect-logs') {
+                        return await getOrLoadCombinedRedirectLogController().queryRedirectLogs(obj);
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

@@ -1,4 +1,4 @@
-import { tryParseInt } from '../parse.ts';
+import { tryParseInt } from '../check.ts';
 
 export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | undefined {
     // parse path by hand instead of using URL.pathname, we need to be robust to any and all input
