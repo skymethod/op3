@@ -3,28 +3,28 @@
 import { check, isStringRecord } from './check.ts';
 
 export type RpcRequest = 
-    SaveRawRequestsRequest 
+    LogRawRedirectsRequest 
     | GetKeyRequest
     | RegisterDORequest 
     | AdminDataRequest
-    | RawRequestsNotificationRequest
+    | RedirectLogsNotificationRequest
     | AlarmRequest
-    | GetNewRawRequestsRequest
+    | GetNewRedirectLogsRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
     return isStringRecord(obj) && (
-        obj.kind === 'save-raw-requests' 
+        obj.kind === 'log-raw-redirects' 
         || obj.kind === 'get-key' 
         || obj.kind === 'register-do' 
         || obj.kind === 'admin-data'
-        || obj.kind === 'raw-requests-notification'
+        || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'alarm'
-        || obj.kind === 'get-new-raw-requests'
+        || obj.kind === 'get-new-redirect-logs'
     );
 }
 
-export interface RawRequest {
+export interface RawRedirect {
     readonly uuid: string;
     readonly time: number; // epoch millis
     readonly rawIpAddress: string;
@@ -37,9 +37,9 @@ export interface RawRequest {
     readonly other?: Readonly<Record<string, string>>;
 }
 
-export interface SaveRawRequestsRequest {
-    readonly kind: 'save-raw-requests';
-    readonly rawRequests: readonly RawRequest[];
+export interface LogRawRedirectsRequest {
+    readonly kind: 'log-raw-redirects';
+    readonly rawRedirects: readonly RawRedirect[];
 }
 
 export type KeyKind = 'ip-address-hmac' | 'ip-address-aes';
@@ -106,8 +106,8 @@ export interface AdminDataRequest {
     readonly dryRun?: boolean;
 }
 
-export interface RawRequestsNotificationRequest {
-    readonly kind: 'raw-requests-notification';
+export interface RedirectLogsNotificationRequest {
+    readonly kind: 'redirect-logs-notification';
     readonly doName: string;
     readonly timestampId: string;
     readonly fromColo: string;
@@ -125,8 +125,8 @@ export interface AlarmRequest {
     readonly fromIsolateId: string;
 }
 
-export interface GetNewRawRequestsRequest {
-    readonly kind: 'get-new-raw-requests';
+export interface GetNewRedirectLogsRequest {
+    readonly kind: 'get-new-redirect-logs';
     readonly limit: number;
     readonly startAfterTimestampId?: string;
 }
@@ -138,7 +138,7 @@ export type RpcResponse =
     | ErrorResponse 
     | GetKeyResponse 
     | AdminDataResponse
-    | GetNewRawRequestsResponse
+    | GetNewRedirectLogsResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -147,7 +147,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'error' 
         || obj.kind === 'get-key'
         || obj.kind === 'admin-data'
-        || obj.kind === 'get-new-raw-requests'
+        || obj.kind === 'get-new-redirect-logs'
     );
 }
 
@@ -172,13 +172,13 @@ export interface AdminDataResponse {
     readonly message?: string;
 }
 
-export interface PackedRawRequests {
+export interface PackedRedirectLogs {
     readonly namesToNums: Record<string, number>;
     readonly records: Record<string, string>; // timestampId -> packed record
 }
 
-export interface GetNewRawRequestsResponse extends PackedRawRequests {
-    readonly kind: 'get-new-raw-requests';
+export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
+    readonly kind: 'get-new-redirect-logs';
 }
 
 //
@@ -189,8 +189,8 @@ export interface RpcClient {
     executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse>;
     getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
-    sendRawRequestsNotification(request: Unkinded<RawRequestsNotificationRequest>, target: string): Promise<OkResponse>;
-    saveRawRequests(request: Unkinded<SaveRawRequestsRequest>, target: string): Promise<OkResponse>;
+    sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse>;
+    logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse>;
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
-    getNewRawRequests(request: Unkinded<GetNewRawRequestsRequest>, target: string): Promise<GetNewRawRequestsResponse>;
+    getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
 }

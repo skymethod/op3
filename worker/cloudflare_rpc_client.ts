@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRawRequestsRequest, GetNewRawRequestsResponse, isRpcResponse, OkResponse, RawRequestsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, RpcResponse, SaveRawRequestsRequest, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, RpcResponse, LogRawRedirectsRequest, Unkinded } from './rpc_model.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
@@ -20,20 +20,20 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<GetKeyResponse>({ kind: 'get-key', ...request }, 'get-key', { doName: target, backendNamespace: this.backendNamespace });
     }
 
-    async sendRawRequestsNotification(request: Unkinded<RawRequestsNotificationRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'raw-requests-notification', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+    async sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse> {
+        return await sendRpc<OkResponse>({ kind: 'redirect-logs-notification', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
     }
 
-    async saveRawRequests(request: Unkinded<SaveRawRequestsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'save-raw-requests', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+    async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
     }
 
     async sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse> {
         return await sendRpc<OkResponse>({ kind: 'alarm', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
     }
 
-    async getNewRawRequests(request: Unkinded<GetNewRawRequestsRequest>, target: string): Promise<GetNewRawRequestsResponse> {
-        return await sendRpc<GetNewRawRequestsResponse>({ kind: 'get-new-raw-requests', ...request }, 'get-new-raw-requests', { doName: target, backendNamespace: this.backendNamespace });
+    async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse> {
+        return await sendRpc<GetNewRedirectLogsResponse>({ kind: 'get-new-redirect-logs', ...request }, 'get-new-redirect-logs', { doName: target, backendNamespace: this.backendNamespace });
     }
 
 }

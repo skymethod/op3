@@ -9,7 +9,7 @@ import { computeApiResponse, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './ulid.ts';
-import { RawRequest } from './rpc_model.ts';
+import { RawRedirect } from './rpc_model.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -47,7 +47,7 @@ export default {
 
 //
 
-const pendingRawRequests: RawRequest[] = [];
+const pendingRawRedirects: RawRedirect[] = [];
 
 function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Response | undefined {
     // must never throw!
@@ -55,7 +55,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
     if (!redirectRequest) return undefined;
 
     const { env, context, requestTime } = opts;
-    const rawRequests = pendingRawRequests.splice(0);
+    const rawRedirects = pendingRawRedirects.splice(0);
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
         const { backendNamespace, dataset1 } = env;
@@ -64,27 +64,27 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
         try {
             IsolateId.log();
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
+            
             if (redirectRequest.kind === 'valid') {
                 const rawIpAddress = computeRawIpAddress(request) ?? '<missing>';
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
-                const rawRequest = computeRawRequest(request, { time: requestTime, method, rawIpAddress, other });
-                console.log(`rawRequest: ${JSON.stringify({ ...rawRequest, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                
-                rawRequests.push(rawRequest);
+                const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
+                console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                rawRedirects.push(rawRedirect);
             }
             
-            if (rawRequests.length > 0) {
-                const doName = `raw-request-${colo}`;
+            if (rawRedirects.length > 0) {
+                const doName = `redirect-log-${colo}`;
                 const rpcClient = new CloudflareRpcClient(backendNamespace);
-                await rpcClient.saveRawRequests({ rawRequests }, doName);
+                await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }
         } catch (e) {
-            console.error(`Error sending raw requests: ${e.stack || e}`);
+            console.error(`Error sending raw redirects: ${e.stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
             // TODO retry inline?
-            pendingRawRequests.push(...rawRequests);
+            pendingRawRedirects.push(...rawRedirects);
             colo = computeColo(request) ?? colo;
             dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024) ], doubles: [ 1 ] });
         } finally {
@@ -101,7 +101,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
     }
 }
 
-function computeRawRequest(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRequest {
+function computeRawRedirect(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRedirect {
     const { time, method, rawIpAddress, other } = opts;
     const uuid = generateUuid();
     const { url, ulid } = tryParseUlid(request.url);

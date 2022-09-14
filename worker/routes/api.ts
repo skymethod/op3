@@ -58,11 +58,11 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         } else if (operationKind === 'list' && targetPath === '/keys') {
             const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
             return newJsonResponse({ listResults });
-        } else if (operationKind === 'list' && targetPath.startsWith('/arr/')) {
-            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
+        } else if (operationKind === 'list' && targetPath.startsWith('/crl/')) {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
             return newJsonResponse({ listResults });
-        } else if (operationKind === 'list' && targetPath === '/arr/records') {
-            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
+        } else if (operationKind === 'list' && targetPath === '/crl/records') {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
             return newJsonResponse({ listResults });
         } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
             const doName = checkDeleteDurableObjectAllowed(targetPath);

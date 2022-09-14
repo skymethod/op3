@@ -3,14 +3,14 @@ import { Bytes, DurableObjectState, DurableObjectStorage } from '../deps.ts';
 import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from '../rpc_model.ts';
 import { IsolateId } from '../isolate_id.ts';
 import { WorkerEnv } from '../worker_env.ts';
-import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
+import { IpAddressEncryptionFn, IpAddressHashingFn, RedirectLogController } from './redirect_log_controller.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
 import { checkDeleteDurableObjectAllowed } from '../routes/admin_api.ts';
 import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
-import { AllRawRequestController } from './all_raw_request_controller.ts';
+import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
 import { tryParseInt } from '../parse.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
 
@@ -20,8 +20,8 @@ export class BackendDO {
 
     private info?: DOInfo;
 
-    private rawRequestController?: RawRequestController;
-    private allRawRequestController?: AllRawRequestController;
+    private redirectLogController?: RedirectLogController;
+    private combinedRedirectLogController?: CombinedRedirectLogController;
     private keyClient?: KeyClient;
 
     private keyController?: KeyController;
@@ -40,7 +40,7 @@ export class BackendDO {
 
         try {
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, rawRequestNotificationDelaySeconds } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace);
             await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -54,8 +54,8 @@ export class BackendDO {
                     if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
                     const { storage } = this.state;
 
-                    const getOrLoadRawRequestController = () => {
-                        if (this.rawRequestController) return this.rawRequestController;
+                    const getOrLoadRedirectLogController = () => {
+                        if (this.redirectLogController) return this.redirectLogController;
 
                         if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
                         const keyClient = this.keyClient;
@@ -69,9 +69,9 @@ export class BackendDO {
                             const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
                             return packHashedIpAddress(id, signature);
                         }
-                        const notificationDelaySeconds = tryParseInt(rawRequestNotificationDelaySeconds);
-                        this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
-                        return this.rawRequestController;
+                        const notificationDelaySeconds = tryParseInt(redirectLogNotificationDelaySeconds);
+                        this.redirectLogController = new RedirectLogController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
+                        return this.redirectLogController;
                     }
 
                     const getOrLoadKeyController = () => {
@@ -79,19 +79,19 @@ export class BackendDO {
                         return this.keyController;
                     }
 
-                    const getOrLoadAllRawRequestController = () => {
-                        if (!this.allRawRequestController) this.allRawRequestController = new AllRawRequestController(storage, rpcClient);
-                        return this.allRawRequestController;
+                    const getOrLoadCombinedRedirectLogController = () => {
+                        if (!this.combinedRedirectLogController) this.combinedRedirectLogController = new CombinedRedirectLogController(storage, rpcClient);
+                        return this.combinedRedirectLogController;
                     }
 
-                    if (obj.kind === 'save-raw-requests') {
+                    if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
-                        await getOrLoadRawRequestController().save(obj.rawRequests);
+                        await getOrLoadRedirectLogController().save(obj.rawRedirects);
                         return newRpcResponse({ kind: 'ok' });
-                    } else if (obj.kind === 'get-new-raw-requests') {
+                    } else if (obj.kind === 'get-new-redirect-logs') {
                         const { limit, startAfterTimestampId } = obj;
-                        const { namesToNums, records } = await getOrLoadRawRequestController().getNewRawRequests({ limit, startAfterTimestampId });
-                        return newRpcResponse({ kind: 'get-new-raw-requests', namesToNums, records });
+                        const { namesToNums, records } = await getOrLoadRedirectLogController().getNewRedirectLogs({ limit, startAfterTimestampId });
+                        return newRpcResponse({ kind: 'get-new-redirect-logs', namesToNums, records });
                     } else if (obj.kind === 'get-key') {
                         // get or generate key
                         const { keyKind, timestamp, id } = obj;
@@ -106,10 +106,10 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
                         } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
                             return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadKeyController().listKeys() });
-                        } else if (operationKind === 'list' && targetPath === '/arr/sources') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadAllRawRequestController().listSources() });
-                        } else if (operationKind === 'list' && targetPath === '/arr/records') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadAllRawRequestController().listRecords() });
+                        } else if (operationKind === 'list' && targetPath === '/crl/sources') {
+                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadCombinedRedirectLogController().listSources() });
+                        } else if (operationKind === 'list' && targetPath === '/crl/records') {
+                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadCombinedRedirectLogController().listRecords() });
                         } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                             const doName = checkDeleteDurableObjectAllowed(targetPath);
                             if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
@@ -125,20 +125,20 @@ export class BackendDO {
                             console.log(message);
                             return newRpcResponse({ kind: 'admin-data', message });
                         }
-                    } else if (obj.kind === 'raw-requests-notification') {
+                    } else if (obj.kind === 'redirect-logs-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
                         const { doName, timestampId, fromColo } = obj;
-                        await getOrLoadAllRawRequestController().receiveNotification({ doName, timestampId, fromColo });
+                        await getOrLoadCombinedRedirectLogController().receiveNotification({ doName, timestampId, fromColo });
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'alarm') {
                         console.log(`alarm received: ${JSON.stringify(obj)}`);
                         const { payload } = obj;
                         const { kind: alarmKind } = payload;
-                        if (alarmKind === RawRequestController.notificationAlarmKind) {
+                        if (alarmKind === RedirectLogController.notificationAlarmKind) {
                             const fromColo = await BackendDOColo.get();
-                            await RawRequestController.sendNotification(payload, { storage, rpcClient, fromColo });
-                        } else if (alarmKind === AllRawRequestController.processAlarmKind) {
-                            await getOrLoadAllRawRequestController().process();
+                            await RedirectLogController.sendNotification(payload, { storage, rpcClient, fromColo });
+                        } else if (alarmKind === CombinedRedirectLogController.processAlarmKind) {
+                            await getOrLoadCombinedRedirectLogController().process();
                         }
                         return newRpcResponse({ kind: 'ok' });
                     } else {
