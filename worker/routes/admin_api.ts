@@ -1,4 +1,4 @@
-import { checkMatches } from './check.ts';
+import { checkMatches } from '../check.ts';
 
 export function checkDeleteDurableObjectAllowed(targetPath: string): string {
     const [ _, doName ] = checkMatches('targetPath', targetPath, /^\/durable-object\/([a-zA-Z-]+)$/);

@@ -1,11 +1,11 @@
 import { computeColo, computeOther, computeRawIpAddress } from './cloudflare_request.ts';
 import { ModuleWorkerContext } from './deps.ts';
-import { computeHomeResponse } from './home.ts';
-import { computeInfoResponse } from './info.ts';
-import { computeRedirectResponse, tryParseRedirectRequest } from './redirect_episode.ts';
+import { computeHomeResponse } from './routes/home.ts';
+import { computeInfoResponse } from './routes/info.ts';
+import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IsolateId } from './isolate_id.ts';
-import { computeApiResponse, tryParseApiRequest } from './api.ts';
+import { computeApiResponse, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './ulid.ts';

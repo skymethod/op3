@@ -1,5 +1,5 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { RpcClient } from './rpc_model.ts';
+import { RpcClient } from '../rpc_model.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, headers, bodyProvider } = opts;

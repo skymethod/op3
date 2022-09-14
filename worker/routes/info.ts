@@ -1,4 +1,4 @@
-import { WorkerEnv } from './worker_env.ts';
+import { WorkerEnv } from '../worker_env.ts';
 
 export function computeInfoResponse(env: WorkerEnv): Response {
     const { instance, deployTime, deployRepositoryUrl, deploySha, deployFrom } = env;
