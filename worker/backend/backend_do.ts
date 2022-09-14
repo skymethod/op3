@@ -8,7 +8,7 @@ import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
-import { checkDeleteDurableObjectAllowed } from '../admin_api.ts';
+import { checkDeleteDurableObjectAllowed } from '../routes/admin_api.ts';
 import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { AllRawRequestController } from './all_raw_request_controller.ts';
 import { tryParseInt } from '../parse.ts';
