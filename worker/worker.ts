@@ -2,12 +2,14 @@ import { computeOther, computeRawIpAddress } from './cloudflare_request.ts';
 import { ModuleWorkerContext } from './deps.ts';
 import { computeHomeResponse } from './home.ts';
 import { computeInfoResponse } from './info.ts';
-import { computeRawRequest, RawRequest } from './raw_request.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './redirect_episode.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IsolateId } from './isolate_id.ts';
 import { computeApiResponse, tryParseApiRequest } from './api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
+import { generateUuid } from './uuid.ts';
+import { tryParseUlid } from './ulid.ts';
+import { RawRequest } from './rpc_model.ts';
 export { BackendDO } from './backend_do.ts';
 
 export default {
@@ -77,3 +79,13 @@ export default {
 //
 
 const pendingRawRequests: RawRequest[] = [];
+
+function computeRawRequest(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRequest {
+    const { time, method, rawIpAddress, other } = opts;
+    const uuid = generateUuid();
+    const { url, ulid } = tryParseUlid(request.url);
+    const userAgent = request.headers.get('user-agent') ?? undefined;
+    const referer = request.headers.get('referer') ?? undefined;
+    const range = request.headers.get('range') ?? undefined;
+    return { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, other };
+}

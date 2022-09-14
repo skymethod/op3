@@ -1,9 +1,8 @@
 import { DurableObjectStorage } from './deps.ts';
-import { RawRequest } from './raw_request.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from './timestamp.ts';
-import { AlarmPayload, PackedRawRequests, RpcClient } from './rpc_model.ts';
+import { AlarmPayload, PackedRawRequests, RpcClient, RawRequest } from './rpc_model.ts';
 import { check } from './check.ts';
 
 export class RawRequestController {
@@ -144,7 +143,7 @@ export async function computePutBatches(rawRequests: readonly RawRequest[], attN
 }
 
 export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, doColo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
-    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, other } = rawRequest;
+    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, other } = rawRequest;
     const rt: Record<string, string> = {};
     if (typeof uuid === 'string') rt.uuid = uuid;
     if (typeof time !== 'number') throw new Error(`Bad rawRequest ${uuid}: no time!`);
@@ -159,6 +158,7 @@ export async function packRawRequest(rawRequest: RawRequest, attNums: AttNums, d
     if (typeof userAgent === 'string') rt.userAgent = userAgent;
     if (typeof referer === 'string') rt.referer = referer;
     if (typeof range === 'string') rt.range = range;
+    if (typeof ulid === 'string') rt.ulid = ulid;
 
     for (const [ name, value ] of Object.entries(other ?? {})) {
         if (typeof name === 'string' && typeof value === 'string') {

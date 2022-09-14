@@ -176,6 +176,7 @@ enum IndexId {
     EdgeColo = 6,
     DoColo = 7,
     Source = 8,
+    Ulid = 9,
 }
 
 interface SourceState {
@@ -210,6 +211,7 @@ async function computeIndexRecords(record: Record<string, string>, key: string, 
         [ 'other.colo', IndexId.EdgeColo, v => v ],
         [ 'doColo', IndexId.DoColo, v => v ],
         [ 'source', IndexId.Source, v => v ],
+        [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     ];
 
     for (const [ property, indexId, indexValueFn ] of indexDefinitions) {

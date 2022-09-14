@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { RawRequest } from './raw_request.ts';
 import { check, isStringRecord } from './check.ts';
 
 export type RpcRequest = 
@@ -23,6 +22,19 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'alarm'
         || obj.kind === 'get-new-raw-requests'
     );
+}
+
+export interface RawRequest {
+    readonly uuid: string;
+    readonly time: number; // epoch millis
+    readonly rawIpAddress: string;
+    readonly method: string;
+    readonly url: string;
+    readonly userAgent?: string;
+    readonly referer?: string;
+    readonly range?: string;
+    readonly ulid?: string;
+    readonly other?: Readonly<Record<string, string>>;
 }
 
 export interface SaveRawRequestsRequest {
