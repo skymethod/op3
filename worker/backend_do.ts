@@ -12,6 +12,7 @@ import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { AllRawRequestController } from './all_raw_request_controller.ts';
 import { tryParseInt } from './parse.ts';
+import { packHashedIpAddress } from './ip_addresses.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -66,7 +67,7 @@ export class BackendDO {
                         const hashIpAddress: IpAddressHashingFn = async (rawIpAddress, opts) => {
                             const { id, key } = await keyClient.getKey('ip-address-hmac', opts.timestamp);
                             const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
-                            return `2:${id}:${signature.hex()}`;
+                            return packHashedIpAddress(id, signature);
                         }
                         const notificationDelaySeconds = tryParseInt(rawRequestNotificationDelaySeconds);
                         this.rawRequestController = new RawRequestController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });

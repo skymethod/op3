@@ -1,9 +1,11 @@
-import { DurableObjectStorage } from './deps.ts';
+import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from './deps.ts';
 import { isStringRecord } from './check.ts';
 import { AlarmPayload, RpcClient } from './rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToInstant } from './timestamp.ts';
 import { isValidUuid } from './uuid.ts';
+import { getOrInit } from './maps.ts';
+import { unpackHashedIpAddressHash } from './ip_addresses.ts';
 
 export class AllRawRequestController {
     static readonly processAlarmKind = 'AllRawRequestController.processAlarmKind';
@@ -118,6 +120,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
     const sourceAttNums = new AttNums(namesToNums);
     const maxBefore = attNums.max();
     const newRecords: Record<string, string> = {};
+    const newIndexRecords = new Map<IndexId, Record<string, DurableObjectStorageValue>>();
     let maxTimestampId = startAfterTimestampId;
     for (const [ timestampId, sourceRecord ] of Object.entries(records)) {
         if (maxTimestampId === undefined || timestampId > maxTimestampId) maxTimestampId = timestampId;
@@ -134,18 +137,25 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         }
         const key = `arr.r.${timestamp}-${uuid}`;
         obj.source = doName;
+        await computeIndexRecords(obj, key, newIndexRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
     if (attNums.max() > maxBefore) {
         await storage.put('arr.attNums', attNums.toJson());
     }
-    if (Object.keys(newRecords).length > 0 || maxTimestampId !== startAfterTimestampId) {
+    if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId ) {
         const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
         await storage.transaction(async txn => {
             if (Object.keys(newRecords).length > 0) {
                 console.log(`AllRawRequestController: Saving ${Object.keys(newRecords).length} imported records from ${doName}`);
                 await txn.put(newRecords);
+            }
+            if (newIndexRecords.size > 0) {
+                for (const [ indexId, records ] of newIndexRecords) {
+                    console.log(`AllRawRequestController: Saving ${Object.keys(records).length} ${IndexId[indexId]} index records from ${doName}`);
+                    await txn.put(records);
+                }
             }
             if (maxTimestampId !== startAfterTimestampId) {
                 console.log(`AllRawRequestController: Updating haveTimestampId from ${startAfterTimestampId} to ${maxTimestampId} for ${doName}`);
@@ -156,6 +166,17 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
 }
 
 //
+
+enum IndexId {
+    UrlSha256 = 1,
+    UserAgent = 2,
+    Referer = 3,
+    Range = 4,
+    HashedIpAddress = 5,
+    EdgeColo = 6,
+    DoColo = 7,
+    Source = 8,
+}
 
 interface SourceState {
     readonly doName: string;
@@ -174,4 +195,30 @@ function isValidSourceState(obj: any): obj is SourceState {
         && (obj.notificationFromColo === undefined || typeof obj.notificationFromColo === 'string')
         && (obj.notificationTime === undefined || typeof obj.notificationTime === 'string')
         ;
+}
+
+//
+
+async function computeIndexRecords(record: Record<string, string>, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
+
+    const indexDefinitions: [ string, IndexId, (v: string) => string | Promise<string> ][] = [
+        [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(v).sha256()).hex() ],
+        [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
+        [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
+        [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
+        [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
+        [ 'other.colo', IndexId.EdgeColo, v => v ],
+        [ 'doColo', IndexId.DoColo, v => v ],
+        [ 'source', IndexId.Source, v => v ],
+    ];
+
+    for (const [ property, indexId, indexValueFn ] of indexDefinitions) {
+        const value = record[property];
+        if (typeof value !== 'string') continue;
+        const indexValueValueOrPromise = indexValueFn(value);
+        const indexValue = typeof indexValueValueOrPromise === 'string' ? indexValueValueOrPromise : await indexValueValueOrPromise;
+        const indexRecords = getOrInit(outIndexRecords, indexId, () => ({} as Record<string, DurableObjectStorageValue>));
+        indexRecords[`arr.i.${indexId}.${indexValue}`] = { key };
+    }
+
 }

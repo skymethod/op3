@@ -20,7 +20,7 @@ export class RawRequestController {
     private attNums: AttNums | undefined;
 
     constructor(opts: { storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, notificationDelaySeconds?: number }) {
-        const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 10 } = opts;
+        const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 5 } = opts;
         check('notificationDelaySeconds', notificationDelaySeconds, v => v >= 0);
 
         this.storage = storage;
