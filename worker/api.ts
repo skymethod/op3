@@ -26,29 +26,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (!isAdmin) return newJsonResponse({ error: 'forbidden' }, 403);
 
         try {
-            if (path === '/admin/data') {
-                if (method === 'POST') {
-                    const { operationKind, targetPath, dryRun } = await bodyProvider();
-                    if (operationKind === 'list' && targetPath === '/registry') {
-                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'registry');
-                        return newJsonResponse({ listResults });
-                    } else if (operationKind === 'list' && targetPath === '/keys') {
-                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
-                        return newJsonResponse({ listResults });
-                    } else if (operationKind === 'list' && targetPath === '/arr/sources') {
-                        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
-                        return newJsonResponse({ listResults });
-                    } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
-                        const doName = checkDeleteDurableObjectAllowed(targetPath);
-                        const { message } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, doName);
-                        return newJsonResponse({ message });
-                    } else {
-                        throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
-                    }
-                } else {
-                    return new Response(`${method} not allowed`, { status: 405 });
-                }
-            }
+            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
         } catch (e) {
             const error = `${e.stack || e}`;
             console.error(`Error in api call: ${error}`);
@@ -69,4 +47,31 @@ export interface ApiRequest {
 
 function newJsonResponse(obj: Record<string, unknown>, status = 200): Response {
     return new Response(JSON.stringify(obj, undefined, 2), { status, headers: { 'content-type': 'application/json' } });
+}
+
+async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+    if (method === 'POST') {
+        const { operationKind, targetPath, dryRun } = await bodyProvider();
+        if (operationKind === 'list' && targetPath === '/registry') {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'registry');
+            return newJsonResponse({ listResults });
+        } else if (operationKind === 'list' && targetPath === '/keys') {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
+            return newJsonResponse({ listResults });
+        } else if (operationKind === 'list' && targetPath.startsWith('/arr/')) {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
+            return newJsonResponse({ listResults });
+        } else if (operationKind === 'list' && targetPath === '/arr/records') {
+            const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'all-raw-request');
+            return newJsonResponse({ listResults });
+        } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
+            const doName = checkDeleteDurableObjectAllowed(targetPath);
+            const { message } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, doName);
+            return newJsonResponse({ message });
+        } else {
+            throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
+        }
+    } else {
+        return new Response(`${method} not allowed`, { status: 405 });
+    }
 }

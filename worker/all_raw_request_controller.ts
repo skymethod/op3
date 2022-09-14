@@ -2,7 +2,7 @@ import { DurableObjectStorage } from './deps.ts';
 import { isStringRecord } from './check.ts';
 import { AlarmPayload, RpcClient } from './rpc_model.ts';
 import { AttNums } from './att_nums.ts';
-import { isValidTimestamp } from './timestamp.ts';
+import { isValidTimestamp, timestampToInstant } from './timestamp.ts';
 import { isValidUuid } from './uuid.ts';
 
 export class AllRawRequestController {
@@ -53,8 +53,26 @@ export class AllRawRequestController {
     }
 
     async listSources(): Promise<Record<string, unknown>[]> {
-        const map = await this.storage.list({ prefix: 'arr.ss.'});
+        const map = await this.storage.list({ prefix: 'arr.ss.' });
         return [...map.values()].filter(isStringRecord);
+    }
+
+    async listRecords(): Promise<Record<string, unknown>[]> {
+        const attNums = await this.getOrLoadAttNums();
+
+        const map = await this.storage.list({ prefix: 'arr.r.', limit: 200 });
+        const rt: Record<string, unknown>[] = [];
+        for (const [ key, record ] of map) {
+            if (typeof record === 'string') {
+                const obj = attNums.unpackRecord(record);
+                rt.push({ 
+                    key: key.substring('arr.r.'.length),
+                    time: timestampToInstant(obj.timestamp),
+                    ...obj,
+                    encryptedIpAddress: undefined });
+            }
+        }
+        return rt;
     }
 
     //

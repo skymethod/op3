@@ -107,6 +107,8 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadKeyController().listKeys() });
                         } else if (operationKind === 'list' && targetPath === '/arr/sources') {
                             return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadAllRawRequestController().listSources() });
+                        } else if (operationKind === 'list' && targetPath === '/arr/records') {
+                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadAllRawRequestController().listRecords() });
                         } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                             const doName = checkDeleteDurableObjectAllowed(targetPath);
                             if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
