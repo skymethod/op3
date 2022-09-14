@@ -13,13 +13,11 @@ Deno.test({
             'https://example.org/e/example.com/path/to/episode.mp3?foo=bar': 'https://example.com/path/to/episode.mp3?foo=bar',
         }
         for (const [ requestUrl, expectedTargetUrl ] of Object.entries(good)) {
-            assertEquals(tryParseRedirectRequest(requestUrl), { targetUrl: expectedTargetUrl });
+            assertEquals(tryParseRedirectRequest(requestUrl), { kind: 'valid', targetUrl: expectedTargetUrl });
         }
 
-        const bad = [ 
+        const other = [ 
             'https://example.org/',
-            'https://example.org/e/',
-            'https://example.org/e/https://',
             'https://example.org/favicon.ico',
             '',
             'asdf',
@@ -27,8 +25,23 @@ Deno.test({
             'https://example.org/f/example.com/path/to/episode.mp3',
             'https://example.org//e/example.com/path/to/episode.mp3',
         ];
-        for (const requestUrl of bad) {
+        for (const requestUrl of other) {
             assertEquals(tryParseRedirectRequest(requestUrl), undefined);
+        }
+        const bad = [
+            'https://example.org/e/',
+            'https://example.org/e/https://',
+            'https://example.org/e/example.com',
+            'https://example.org/e/example.com/',
+            'https://example.org/e/f',
+            'https://example.org/e/localhost',
+            'https://example.org/e/localhost/foo.mp3',
+            'https://example.org/e/asdf-/foo.mp3',
+            'https://example.org/e/asdf../foo.mp3',
+            'https://example.org/e/.asdf/foo.mp3',
+        ];
+        for (const requestUrl of bad) {
+            assertEquals(tryParseRedirectRequest(requestUrl), { kind: 'invalid' });
         }
     }
 });
@@ -37,7 +50,7 @@ Deno.test({
     name: 'computeRedirectResponse',
     fn: () => {
         const targetUrl = `https://example.com/path/to/episode.mp3`;
-        const res = computeRedirectResponse({ targetUrl });
+        const res = computeRedirectResponse({ kind: 'valid', targetUrl });
         assertEquals(res.status, 302);
         assertEquals(res.headers.get('location'), targetUrl);
         assertEquals(res.headers.get('cache-control'), 'private, no-cache');

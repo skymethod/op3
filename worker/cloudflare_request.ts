@@ -17,3 +17,7 @@ export function computeOther(request: Request): Record<string, string> | undefin
     const rt = Object.fromEntries(Object.entries(req.cf).filter(v => v[0] === 'colo' && typeof v[1] === 'string' && v[1] !== ''));
     return Object.keys(rt).length > 0 ? rt : undefined;
 }
+
+export function computeColo(request: Request): string | undefined {
+    return (computeOther(request) ?? {}).colo;
+}

@@ -1,4 +1,4 @@
-import { computeOther, computeRawIpAddress } from './cloudflare_request.ts';
+import { computeColo, computeOther, computeRawIpAddress } from './cloudflare_request.ts';
 import { ModuleWorkerContext } from './deps.ts';
 import { computeHomeResponse } from './home.ts';
 import { computeInfoResponse } from './info.ts';
@@ -16,49 +16,18 @@ export default {
     
     async fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
         const requestTime = Date.now();
-        const { method } = request;
-        const { instance, backendNamespace, dataset1 } = env;
-
+       
         // first, handle redirects - the most important function
         // be careful here: must never throw
-        const redirectRequest = tryParseRedirectRequest(request.url);
-        if (redirectRequest) {
-            const rawRequests = pendingRawRequests.splice(0);
-            context.waitUntil((async () => {
-                let colo = 'XXX';
-                try {
-                    IsolateId.log();
-                    if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
-                    const rawIpAddress = computeRawIpAddress(request) ?? '<missing>';
-                    const other = computeOther(request) ?? {};
-                    other.isolateId = IsolateId.get();
-                    const rawRequest = computeRawRequest(request, { time: requestTime, method, rawIpAddress, other });
-                    console.log(`rawRequest: ${JSON.stringify({ ...rawRequest, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                    
-                    rawRequests.push(rawRequest);
-
-                    colo = (other ?? {}).colo ?? colo;
-                    const doName = `raw-request-${colo}`;
-                    const rpcClient = new CloudflareRpcClient(backendNamespace);
-                    await rpcClient.saveRawRequests({ rawRequests }, doName);
-                    dataset1?.writeDataPoint({ blobs: [ 'success-saving-redirect', colo ], doubles: [ 1 ] });
-                } catch (e) {
-                    console.error(`Error sending raw requests: ${e.stack || e}`);
-                    // we'll retry if this isolate gets hit again, otherwise lost
-                    // TODO retry inline?
-                    pendingRawRequests.push(...rawRequests);
-                    dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024) ], doubles: [ 1 ] });
-                }
-            })());
-            console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
-            return computeRedirectResponse(redirectRequest);
-        }
+        const redirectResponse = tryComputeRedirectResponse(request, { env, context, requestTime });
+        if (redirectResponse) return redirectResponse;
 
         // handle all other requests
         try {
+            const { instance, backendNamespace } = env;
             IsolateId.log();
             const { pathname } = new URL(request.url);
-            const { headers } = request;
+            const { method, headers } = request;
             const adminTokens = new Set((env.adminTokens ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
@@ -79,6 +48,58 @@ export default {
 //
 
 const pendingRawRequests: RawRequest[] = [];
+
+function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Response | undefined {
+    // must never throw!
+    const redirectRequest = tryParseRedirectRequest(request.url);
+    if (!redirectRequest) return undefined;
+
+    const { env, context, requestTime } = opts;
+    const rawRequests = pendingRawRequests.splice(0);
+    // do the expensive work after quickly returning the redirect response
+    context.waitUntil((async () => {
+        const { backendNamespace, dataset1 } = env;
+        const { method } = request;
+        let colo = 'XXX';
+        try {
+            IsolateId.log();
+            if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
+            if (redirectRequest.kind === 'valid') {
+                const rawIpAddress = computeRawIpAddress(request) ?? '<missing>';
+                const other = computeOther(request) ?? {};
+                colo = (other ?? {}).colo ?? colo;
+                other.isolateId = IsolateId.get();
+                const rawRequest = computeRawRequest(request, { time: requestTime, method, rawIpAddress, other });
+                console.log(`rawRequest: ${JSON.stringify({ ...rawRequest, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                
+                rawRequests.push(rawRequest);
+            }
+            
+            if (rawRequests.length > 0) {
+                const doName = `raw-request-${colo}`;
+                const rpcClient = new CloudflareRpcClient(backendNamespace);
+                await rpcClient.saveRawRequests({ rawRequests }, doName);
+            }
+        } catch (e) {
+            console.error(`Error sending raw requests: ${e.stack || e}`);
+            // we'll retry if this isolate gets hit again, otherwise lost
+            // TODO retry inline?
+            pendingRawRequests.push(...rawRequests);
+            colo = computeColo(request) ?? colo;
+            dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024) ], doubles: [ 1 ] });
+        } finally {
+            if (colo === 'XXX') colo = computeColo(request) ?? colo;
+            dataset1?.writeDataPoint({ blobs: [ redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, request.url.substring(0, 1024) ], doubles: [ 1 ] });
+        }
+    })());
+    if (redirectRequest.kind === 'valid') {
+        console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
+        return computeRedirectResponse(redirectRequest);
+    } else {
+        console.log(`Invalid redirect url: ${request.url}`);
+        return new Response('Invalid redirect url', { status: 400 });
+    }
+}
 
 function computeRawRequest(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRequest {
     const { time, method, rawIpAddress, other } = opts;
