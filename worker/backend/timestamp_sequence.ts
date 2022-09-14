@@ -1,4 +1,4 @@
-import { computeTimestamp } from './timestamp.ts';
+import { computeTimestamp } from '../timestamp.ts';
 
 export class TimestampSequence {
 

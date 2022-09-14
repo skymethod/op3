@@ -1,5 +1,5 @@
-import { DurableObjectStorage } from './deps.ts';
-import { DOInfo, isValidDOInfo } from './rpc_model.ts';
+import { DurableObjectStorage } from '../deps.ts';
+import { DOInfo, isValidDOInfo } from '../rpc_model.ts';
 
 export async function register(info: DOInfo, storage: DurableObjectStorage) {
     await storage.put(`reg.id.${info.id}`, info);

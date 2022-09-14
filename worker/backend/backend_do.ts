@@ -1,18 +1,18 @@
 import { BackendDOColo } from './backend_do_colo.ts';
-import { Bytes, DurableObjectState, DurableObjectStorage } from './deps.ts';
-import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from './rpc_model.ts';
-import { IsolateId } from './isolate_id.ts';
-import { WorkerEnv } from './worker_env.ts';
+import { Bytes, DurableObjectState, DurableObjectStorage } from '../deps.ts';
+import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from '../rpc_model.ts';
+import { IsolateId } from '../isolate_id.ts';
+import { WorkerEnv } from '../worker_env.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, RawRequestController } from './raw_request_controller.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
-import { encrypt, hmac, importAesKey, importHmacKey } from './crypto.ts';
+import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
-import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
+import { checkDeleteDurableObjectAllowed } from '../admin_api.ts';
+import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { AllRawRequestController } from './all_raw_request_controller.ts';
-import { tryParseInt } from './parse.ts';
-import { packHashedIpAddress } from './ip_addresses.ts';
+import { tryParseInt } from '../parse.ts';
+import { packHashedIpAddress } from '../ip_addresses.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;

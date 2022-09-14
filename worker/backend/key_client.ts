@@ -1,6 +1,6 @@
-import { KeyKind } from './rpc_model.ts';
-import { isValidTimestamp } from './timestamp.ts';
-import { getOrInit } from './maps.ts';
+import { KeyKind } from '../rpc_model.ts';
+import { isValidTimestamp } from '../timestamp.ts';
+import { getOrInit } from '../maps.ts';
 
 export class KeyClient {
     private readonly keyIdsByKindByDay = new Map<KeyKind, Map<string, string>>();

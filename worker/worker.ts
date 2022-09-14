@@ -10,7 +10,7 @@ import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './ulid.ts';
 import { RawRequest } from './rpc_model.ts';
-export { BackendDO } from './backend_do.ts';
+export { BackendDO } from './backend/backend_do.ts';
 
 export default {
     

@@ -1,9 +1,9 @@
-import { DurableObjectStorage } from './deps.ts';
+import { DurableObjectStorage } from '../deps.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
-import { computeTimestamp } from './timestamp.ts';
-import { AlarmPayload, PackedRawRequests, RpcClient, RawRequest } from './rpc_model.ts';
-import { check } from './check.ts';
+import { computeTimestamp } from '../timestamp.ts';
+import { AlarmPayload, PackedRawRequests, RpcClient, RawRequest } from '../rpc_model.ts';
+import { check } from '../check.ts';
 
 export class RawRequestController {
     static readonly notificationAlarmKind = 'RawRequestController.notificationAlarmKind';

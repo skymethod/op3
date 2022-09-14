@@ -1,4 +1,4 @@
-import { tryParseInt } from './parse.ts';
+import { tryParseInt } from '../parse.ts';
 
 export class AttNums {
 

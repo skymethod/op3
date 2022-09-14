@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
-import { computeTimestamp } from './timestamp.ts';
+import { computeTimestamp } from '../timestamp.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 
 Deno.test({

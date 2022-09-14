@@ -1,11 +1,11 @@
-import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from './deps.ts';
-import { isStringRecord } from './check.ts';
-import { AlarmPayload, RpcClient } from './rpc_model.ts';
+import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
+import { isStringRecord } from '../check.ts';
+import { AlarmPayload, RpcClient } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
-import { isValidTimestamp, timestampToInstant } from './timestamp.ts';
-import { isValidUuid } from './uuid.ts';
-import { getOrInit } from './maps.ts';
-import { unpackHashedIpAddressHash } from './ip_addresses.ts';
+import { isValidTimestamp, timestampToInstant } from '../timestamp.ts';
+import { isValidUuid } from '../uuid.ts';
+import { getOrInit } from '../maps.ts';
+import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 
 export class AllRawRequestController {
     static readonly processAlarmKind = 'AllRawRequestController.processAlarmKind';
