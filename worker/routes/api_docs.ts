@@ -1,12 +1,15 @@
-export function computeApiDocsResponse(opts: { instance: string }): Response {
-    const { instance } = opts;
+import { computeCloudflareAnalyticsSnippet } from './html.ts';
+
+export function computeApiDocsResponse(opts: { instance: string, cfAnalyticsToken: string | undefined }): Response {
+    const { instance, cfAnalyticsToken } = opts;
     const titleSuffix = instance === 'prod' ? '' : ` (${instance})`;
-    return new Response(html(titleSuffix), { headers: { 'content-type': 'text/html' } });
+    const cfAnalyticsSnippet = computeCloudflareAnalyticsSnippet(cfAnalyticsToken);
+    return new Response(html(titleSuffix, cfAnalyticsSnippet), { headers: { 'content-type': 'text/html' } });
 }
 
 //
 
-const html = (titleSuffix: string) => `<!DOCTYPE html>
+const html = (titleSuffix: string, cfAnalyticsSnippet: string) => `<!DOCTYPE html>
 <html>
   <head>
     <title>OP3 API Documentation${titleSuffix}</title>
@@ -23,6 +26,7 @@ const html = (titleSuffix: string) => `<!DOCTYPE html>
   <body>
     <redoc spec-url="/api/docs/swagger.json"></redoc>
     <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+    ${cfAnalyticsSnippet}
   </body>
 </html>
 `;

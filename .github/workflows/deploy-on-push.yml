@@ -28,6 +28,7 @@ jobs:
           CF_SCRIPT_NAME: op3-ci
           CF_BACKEND_DO_NAMESPACE: backend-do-ci
           CF_AE_DATASET: dataset1
+          CF_ANALYTICS_TOKEN: 031c86bb64214cb5a6b7aab02b5e1925
           INSTANCE: ci
           ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
           PREVIEW_TOKENS: ${{ secrets.CI_PREVIEW_TOKENS }}

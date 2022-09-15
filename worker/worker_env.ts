@@ -12,4 +12,5 @@ export interface WorkerEnv {
     readonly redirectLogNotificationDelaySeconds?: string;
     readonly dataset1?: AnalyticsEngine;
     readonly productionDomain?: string;
+    readonly cfAnalyticsToken?: string;
 }

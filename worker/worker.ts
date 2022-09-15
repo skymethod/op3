@@ -28,18 +28,19 @@ export default {
 
         // handle all other requests
         try {
-            const { instance, backendNamespace, productionDomain } = env;
+            const { instance, backendNamespace, productionDomain, cfAnalyticsToken } = env;
             IsolateId.log();
             const { origin, pathname, searchParams } = new URL(request.url);
             const { method, headers } = request;
             const adminTokens = parseStringSet(env.adminTokens);
             const previewTokens = parseStringSet(env.previewTokens);
+            const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
 
-            if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionDomain });
-            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, origin, productionDomain });
-            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, productionDomain });
+            if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken });
+            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, productionOrigin, cfAnalyticsToken });
+            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, productionOrigin, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
-            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance });
+            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
 
             const rpcClient = new CloudflareRpcClient(backendNamespace);

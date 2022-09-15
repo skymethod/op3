@@ -9,3 +9,7 @@ export function computeHtml(template: string, variables: Record<string, string>)
 export function removeHeader(html: string) {
     return html.replace(/<header.*?<\/header>/s, '');
 }
+
+export function computeCloudflareAnalyticsSnippet(cfAnalyticsToken: string | undefined) {
+    return cfAnalyticsToken ? `<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "${cfAnalyticsToken}"}'></script><!-- End Cloudflare Web Analytics -->` : '';
+}
