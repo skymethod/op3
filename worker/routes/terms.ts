@@ -13,7 +13,7 @@ export function computeTermsResponse(opts: { instance: string, productionOrigin:
         styleTag: `<style>\n${outputCss}\n</style>`,
         productionOrigin, 
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
-        cfAnalyticsSnipped: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
+        cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });

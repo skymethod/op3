@@ -14,7 +14,7 @@ export function computeHomeResponse(opts: { instance: string, origin: string, pr
         styleTag: `<style>\n${outputCss}\n</style>`,
         origin,
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
-        cfAnalyticsSnipped: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
+        cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
