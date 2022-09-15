@@ -36,8 +36,8 @@ export default {
             const previewTokens = parseStringSet(env.previewTokens);
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionDomain });
-            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance });
-            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance });
+            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, origin, productionDomain });
+            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, productionDomain });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
             if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance });
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });

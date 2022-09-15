@@ -5,3 +5,7 @@ export function computeHtml(template: string, variables: Record<string, string>)
         return value;
     });
 }
+
+export function removeHeader(html: string) {
+    return html.replace(/<header.*?<\/header>/s, '');
+}

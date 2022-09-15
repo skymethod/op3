@@ -1,4 +1,5 @@
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
+import { computeNonProdWarning } from './instances.ts';
 
 export function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string> }): Response {
     const { instance, origin, previewTokens } = opts;
@@ -14,10 +15,8 @@ export function computeApiDocsSwaggerResponse(opts: { instance: string, origin: 
         queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleApiCall}](${exampleApiCall})`;
     }
 
-    descriptionSuffix += instance === 'ci' ? `\n\n**CI INSTANCE: This instance is redeployed on every codebase change!**`
-        : instance === 'dev' ? `\n\n**DEV INSTANCE: This instance is used for testing and staging production-candidate releases**`
-        : instance !== 'prod' ? `\n\n**NON-PRODUCTION INSTANCE: This instance is a non-production version, and may be redeployed often for testing**`
-        : '';
+    const nonProdWarning = computeNonProdWarning(instance);
+    if (nonProdWarning) descriptionSuffix += `\n\n**${nonProdWarning}**`;
 
     const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
