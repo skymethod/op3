@@ -3,9 +3,10 @@ import { QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { check, checkMatches, isNotBlank, isValidHttpUrl, isValidInstant, tryParseInt } from '../check.ts';
 import { packError } from '../errors.ts';
 import { Bytes } from '../deps.ts';
-import { isValidSha256Hex } from '../crypto.ts';
+import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
+import { tryParseDurationMillis } from '../duration.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, searchParams, headers, bodyProvider } = opts;
@@ -116,20 +117,25 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
     let request: Unkinded<QueryRedirectLogsRequest> = { limit: limitDefault };
 
     try {
-        const { start, startAfter, end, limit, url, urlSha256, userAgent, referer, edgeColo, ulid, format, method, uuid } = Object.fromEntries(searchParams);
+        const { start, startAfter, end, limit, url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, format, method, uuid } = Object.fromEntries(searchParams);
 
+        const checkTime = (name: string, value: string) => {
+            const duration = tryParseDurationMillis(value);
+            if (typeof duration === 'number') {
+                value = new Date(Date.now() + duration).toISOString();
+            }
+            check(name, value, isValidInstant);
+            return value;
+        }
         if (typeof start === 'string' && typeof startAfter === 'string') throw new Error(`Specify either 'start' or 'startAfter', not both`);
         if (typeof start === 'string') {
-            check('start', start, isValidInstant);
-            request = { ...request, startTimeInclusive: start };
+            request = { ...request, startTimeInclusive: checkTime('start', start) };
         }
         if (typeof startAfter === 'string') {
-            check('startAfter', startAfter, isValidInstant);
-            request = { ...request, startTimeExclusive: startAfter };
+            request = { ...request, startTimeExclusive: checkTime('startAfter', startAfter) };
         }
         if (typeof end === 'string') {
-            check('end', end, isValidInstant);
-            request = { ...request, endTimeExclusive: end };
+            request = { ...request, endTimeExclusive: checkTime('end', end) };
         }
         if (typeof limit === 'string') {
             const lim = tryParseInt(limit);
@@ -140,7 +146,7 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
             checkMatches('format', format, /^(tsv|json|json-o|json-a)$/);
             request = { ...request, format };
         }
-        if ([ url, urlSha256, userAgent, referer, edgeColo, ulid, method, uuid].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
+        if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method, uuid].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
         if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
         if (typeof url === 'string') {
             check('url', url, isValidHttpUrl);
@@ -158,6 +164,10 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
         if (typeof referer === 'string') {
             check('referer', referer, isNotBlank);
             request = { ...request, referer };
+        }
+        if (typeof hashedIpAddress === 'string') {
+            check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
+            request = { ...request, hashedIpAddress };
         }
         if (typeof edgeColo === 'string') {
             check('edgeColo', edgeColo, isNotBlank);

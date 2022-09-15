@@ -20,6 +20,10 @@ export async function hmac(data: Bytes, key: CryptoKey): Promise<Bytes> {
     return new Bytes(new Uint8Array(signature));
 }
 
+export function isValidSha1Hex(str: string): boolean {
+    return /^[0-9a-f]{40}$/.test(str);
+}
+
 // aes-gcm 256
 
 export async function generateAesKeyBytes(): Promise<Bytes> {

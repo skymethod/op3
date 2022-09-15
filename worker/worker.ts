@@ -35,8 +35,8 @@ export default {
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
-            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse();
-            if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ origin, previewTokens });
+            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance });
+            if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
 
             const rpcClient = new CloudflareRpcClient(backendNamespace);
             const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
