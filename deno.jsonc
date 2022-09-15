@@ -1,6 +1,6 @@
 {
     "tasks": {
         "admin": "deno run --allow-net admin.ts",
-        "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/v0.5.7/cli/cli.ts serve worker/worker.ts --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken"
+        "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/2c6c4266f597fd443356a7184d85517754656eb7/cli/cli.ts serve worker/worker.ts --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken"
     }
 }

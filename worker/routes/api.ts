@@ -5,6 +5,7 @@ import { packError } from '../errors.ts';
 import { Bytes } from '../deps.ts';
 import { isValidSha256Hex } from '../crypto.ts';
 import { isValidUuid } from '../uuid.ts';
+import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, searchParams, headers, bodyProvider } = opts;
@@ -19,11 +20,11 @@ export function tryParseApiRequest(opts: { method: string, pathname: string, sea
 // deno-lint-ignore no-explicit-any
 type JsonProvider = () => Promise<any>;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string> }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string> }): Promise<Response> {
     const { method, path, searchParams, bearerToken, bodyProvider } = request;
-    const { rpcClient, adminTokens } = opts;
+    const { rpcClient, adminTokens, previewTokens } = opts;
 
-    const identity = computeIdentity(bearerToken, searchParams, adminTokens);
+    const identity = computeIdentity(bearerToken, searchParams, adminTokens, previewTokens);
     console.log(`computeApiResponse`, { method, path, identity });
 
     // all api endpoints required auth
@@ -65,11 +66,11 @@ type Identity = 'admin' | 'preview' | 'invalid';
 
 //
 
-function computeIdentity(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>): Identity | undefined {
+function computeIdentity(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>): Identity | undefined {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
     if (token === undefined) return undefined;
     if (adminTokens.has(token)) return 'admin';
-    if (token === 'preview20f4') return 'preview';
+    if (previewTokens.has(token)) return 'preview';
     return 'invalid';
 }
 
@@ -110,7 +111,9 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
 async function computeQueryRedirectLogsResponse(method: string, searchParams: URLSearchParams, rpcClient: RpcClient) {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
-    let request: Unkinded<QueryRedirectLogsRequest> = { limit: 100 };
+    const { limitDefault, limitMax, limitMin } = QUERY_REDIRECT_LOGS;
+
+    let request: Unkinded<QueryRedirectLogsRequest> = { limit: limitDefault };
 
     try {
         const { start, startAfter, end, limit, url, urlSha256, userAgent, referer, edgeColo, ulid, format, method, uuid } = Object.fromEntries(searchParams);
@@ -130,7 +133,7 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
         }
         if (typeof limit === 'string') {
             const lim = tryParseInt(limit);
-            if (lim === undefined || lim < 0 || lim > 1000) throw new Error(`Bad limit: ${limit}`);
+            if (lim === undefined || lim < limitMin || lim > limitMax) throw new Error(`Bad limit: ${limit}`);
             request = { ...request, limit: lim };
         }
         if (typeof format === 'string') {

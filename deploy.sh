@@ -38,5 +38,6 @@ push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --
 --text-binding deployFrom:$DEPLOY_FROM \
 --do-namespace-binding backendNamespace:$CF_BACKEND_DO_NAMESPACE:BackendDO \
 --secret-binding adminTokens:$ADMIN_TOKENS \
+--secret-binding previewTokens:$PREVIEW_TOKENS \
 ${REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS:+--text-binding redirectLogNotificationDelaySeconds:$REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS} \
 ${CF_AE_DATASET:+--ae-dataset-binding dataset1:$CF_AE_DATASET}

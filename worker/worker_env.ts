@@ -8,6 +8,7 @@ export interface WorkerEnv {
     readonly deployFrom?: string;
     readonly backendNamespace: DurableObjectNamespace;
     readonly adminTokens?: string;
+    readonly previewTokens?: string;
     readonly redirectLogNotificationDelaySeconds?: string;
     readonly dataset1?: AnalyticsEngine;
 }

@@ -29,6 +29,7 @@ jobs:
           CF_AE_DATASET: dataset1
           INSTANCE: ci
           ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
+          PREVIEW_TOKENS: ${{ secrets.CI_PREVIEW_TOKENS }}
   deploy-dev:
     runs-on: ubuntu-22.04
     env:

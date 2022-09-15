@@ -10,6 +10,8 @@ import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './ulid.ts';
 import { RawRedirect } from './rpc_model.ts';
+import { computeApiDocsResponse } from './routes/api_docs.ts';
+import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -26,15 +28,18 @@ export default {
         try {
             const { instance, backendNamespace } = env;
             IsolateId.log();
-            const { pathname, searchParams } = new URL(request.url);
+            const { origin, pathname, searchParams } = new URL(request.url);
             const { method, headers } = request;
-            const adminTokens = new Set((env.adminTokens ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
+            const adminTokens = parseStringSet(env.adminTokens);
+            const previewTokens = parseStringSet(env.previewTokens);
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
+            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse();
+            if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ origin, previewTokens });
 
             const rpcClient = new CloudflareRpcClient(backendNamespace);
-            const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens });
+            const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
 
             return new Response('not found', { status: 404 });
         } catch (e) {
@@ -109,4 +114,8 @@ function computeRawRedirect(request: Request, opts: { time: number, method: stri
     const referer = request.headers.get('referer') ?? undefined;
     const range = request.headers.get('range') ?? undefined;
     return { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, other };
+}
+
+function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
+    return new Set((commaDelimitedString  ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 }
