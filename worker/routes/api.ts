@@ -133,6 +133,11 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
             if (lim === undefined || lim < 0 || lim > 1000) throw new Error(`Bad limit: ${limit}`);
             request = { ...request, limit: lim };
         }
+        if (typeof format === 'string') {
+            checkMatches('format', format, /^(tsv|json|json-o|json-a)$/);
+            request = { ...request, format };
+        }
+        if ([ url, urlSha256, userAgent, referer, edgeColo, ulid, method, uuid].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
         if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
         if (typeof url === 'string') {
             check('url', url, isValidHttpUrl);
@@ -160,12 +165,8 @@ async function computeQueryRedirectLogsResponse(method: string, searchParams: UR
             request = { ...request, ulid };
         }
         if (typeof method === 'string') {
-            checkMatches('method', method, /^(NONGET|HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$/);
+            checkMatches('method', method, /^(HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$/);
             request = { ...request, method };
-        }
-        if (typeof format === 'string') {
-            checkMatches('format', format, /^(tsv|json|json-o|json-a)$/);
-            request = { ...request, format };
         }
         if (typeof uuid === 'string') {
             check('uuid', uuid, isValidUuid);

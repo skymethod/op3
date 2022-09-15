@@ -55,7 +55,8 @@ async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, sto
             const def = INDEX_DEFINITIONS.find(v => v[0] === property);
             if (def) {
                 const [ _, indexId, indexFn ] = def;
-                const indexValue = await indexFn(value);
+                const fn = name === 'hashedIpAddress' ? ((v: string) => v) : indexFn; // provided hashedIpAddress already unpacked!
+                const indexValue = await fn(value);
                 if (typeof indexValue === 'string') {
                     prefix = `crl.i0.${indexId}.${indexValue}.`;
                     index = IndexId[indexId];
