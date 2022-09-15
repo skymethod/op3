@@ -2,6 +2,6 @@
     "tasks": {
         "admin": "deno run --allow-net admin.ts",
         "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/v0.5.8/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
-        "tailwind": "npx tailwindcss --content ./worker/static/home.htm,./worker/static/terms.htm,./worker/static/privacy.htm,./worker/static/header.htm -i ./worker/static/input.css -o ./worker/static/output.css --watch"
+        "tailwind": "npx tailwindcss --content ./worker/static/home.htm,./worker/static/terms.htm,./worker/static/privacy.htm,./worker/static/header.htm,./worker/static/footer.htm -i ./worker/static/input.css -o ./worker/static/output.css --watch"
     }
 }

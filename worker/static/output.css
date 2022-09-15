@@ -611,10 +611,6 @@ a:hover {
   padding: 1rem;
 }
 
-.pl-4 {
-  padding-left: 1rem;
-}
-
 .pl-2 {
   padding-left: 0.5rem;
 }
@@ -655,7 +651,17 @@ a:hover {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-indigo-400 {
+  --tw-text-opacity: 1;
+  color: rgb(129 140 248 / var(--tw-text-opacity));
+}
+
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.hover\:text-indigo-400:hover {
+  --tw-text-opacity: 1;
+  color: rgb(129 140 248 / var(--tw-text-opacity));
 }
