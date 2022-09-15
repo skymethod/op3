@@ -41,7 +41,7 @@ A free service for podcasters and podcast hosts to compute standard episode/show
   - Deployments run entirely on GitHub, and are pushed directly to Cloudflare's CDN environment, no black boxes in the middle
   - Any IP lists will default to being public in the codebase
     - For those that cannot be public, a hash will be present in the codebase - so changes can be tracked and verified by other parties with the same list
-  - The logs never leave Cloudflare's infrastructure, and stored in a storage product that _has no backend query api_, all access goes through the public code paths that are fully public in this source repository
+  - The logs never leave Cloudflare's infrastructure, and stored in a storage product that _has no backend query api_, all access goes through the public code paths that are fully visible in this source repository
     
 ## Commitment to **high-performance redirects**
   - Since any prefix service is in the path of serving podcast episodes, it needs to be lightning-fast
