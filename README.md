@@ -5,11 +5,16 @@ OP3: The Open Podcast Prefix Project
 
 The Open Podcast Prefix Project (OP3) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
 
+# TL;DR
 Podcasters or podcast hosting companies can prepend
 
 `https://op3.dev/e/`
 
 to podcast episode urls in their feed to participate and start sending data.
+
+Anyone can verify the data using the [OP3 API](https://op3.dev/api/docs).  Only a safe set of request attributes are currently stored and returned by this API.
+
+The service is still in early development, but any and all data is appreciated and will help improve the system. 
 
 # The Vision
 A free service for podcasters and podcast hosts to compute standard episode/show-level analytics and make them available to everyone
@@ -29,13 +34,14 @@ A free service for podcasters and podcast hosts to compute standard episode/show
 ## Commitment to **open development**
   - Anyone can get involved in the project [discussions](https://github.com/skymethod/op3/discussions)
   - Currently, only a minimal set of fields are saved for every request
-    - Other data like rough geo-location is available, but should be first discussed with a wider community
+    - Other data like rough geo-location is available, but should be first discussed with a wider community before saving
    
 ## Commitment to **auditable infrastructure**
   - Entire code base is open source (here)
   - Deployments run entirely on GitHub, and are pushed directly to Cloudflare's CDN environment, no black boxes in the middle
   - Any IP lists will default to being public in the codebase
     - For those that cannot be public, a hash will be present in the codebase - so changes can be tracked and verified by other parties with the same list
+  - The logs never leave Cloudflare's infrastructure, and stored in a storage product that _has no backend query api_, all access goes through the public code paths that are fully public in this source repository
     
 ## Commitment to **high-performance redirects**
   - Since any prefix service is in the path of serving podcast episodes, it needs to be lightning-fast
