@@ -14,16 +14,16 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
     const rows: unknown[] = [];
     for (const record of map.values()) {
         if (typeof record !== 'string') continue;
-        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, ulid, 'other.colo': edgeColo } = attNums.unpackRecord(record);
+        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, range, ulid, 'other.colo': edgeColo } = attNums.unpackRecord(record);
         if (typeof timestamp !== 'string') continue;
         if (typeof uuid !== 'string') continue;
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
         if (format === 'tsv' || format === 'json-a') {
-            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, ulid, edgeColo ];
+            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, range, ulid, edgeColo ];
             rows.push(format === 'tsv' ? arr.join('\t') : arr);
         } else {
-            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, ulid, edgeColo });
+            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, range, ulid, edgeColo });
         }
     }
     const queryTime = Date.now() - startTime;

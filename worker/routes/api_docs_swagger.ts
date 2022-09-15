@@ -253,6 +253,9 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "userAgent": {
                         "type": "string",
                     },
+                    "range": {
+                        "type": "string",
+                    },
                     "ulid": {
                         "type": "string",
                     },
