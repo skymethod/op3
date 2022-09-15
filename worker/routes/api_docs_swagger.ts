@@ -20,7 +20,7 @@ export function computeApiDocsSwaggerResponse(opts: { instance: string, origin: 
         : '';
 
     const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix);
-    return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json' } });
+    return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //

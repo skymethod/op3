@@ -5,5 +5,5 @@ export function computeInfoResponse(env: WorkerEnv): Response {
 
     const payload = Object.fromEntries(Object.entries({ instance, deployTime, deployRepositoryUrl, deploySha, deployFrom }).filter(v => v[1] !== ''));
 
-    return new Response(JSON.stringify(payload, undefined, 2), { headers: { 'content-type': 'application/json' } });
+    return new Response(JSON.stringify(payload, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }

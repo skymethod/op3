@@ -29,10 +29,10 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
     const queryTime = Date.now() - startTime;
     if (format === 'tsv') {
         rows.unshift(headers.join('\t'));
-        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString() } });
+        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), 'access-control-allow-origin': '*' } });
     }
     const obj = format === 'json-a' ? { headers, rows, queryTime } : { rows, queryTime };
-    return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json' } });
+    return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
