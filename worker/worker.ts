@@ -12,6 +12,8 @@ import { tryParseUlid } from './ulid.ts';
 import { RawRedirect } from './rpc_model.ts';
 import { computeApiDocsResponse } from './routes/api_docs.ts';
 import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
+import { computeTermsResponse } from './routes/terms.ts';
+import { computePrivacyResponse } from './routes/privacy.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -26,14 +28,16 @@ export default {
 
         // handle all other requests
         try {
-            const { instance, backendNamespace } = env;
+            const { instance, backendNamespace, productionDomain } = env;
             IsolateId.log();
             const { origin, pathname, searchParams } = new URL(request.url);
             const { method, headers } = request;
             const adminTokens = parseStringSet(env.adminTokens);
             const previewTokens = parseStringSet(env.previewTokens);
 
-            if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance });
+            if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionDomain });
+            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance });
+            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
             if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance });
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });

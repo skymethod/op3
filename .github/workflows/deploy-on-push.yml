@@ -9,6 +9,7 @@ env:
   DEPLOY_REPOSITORY_URL: ${{ github.repositoryUrl }}
   CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
   CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+  PRODUCTION_DOMAIN: op3.st
 
 jobs:
   deploy-ci:
@@ -57,6 +58,6 @@ jobs:
       - name: Deploy to prod
         run: ./deploy.sh
         env:
-          CF_CUSTOM_DOMAIN: op3.st
+          CF_CUSTOM_DOMAIN: ${{ env.PRODUCTION_DOMAIN }}
           CF_SCRIPT_NAME: op3-prod
           INSTANCE: prod

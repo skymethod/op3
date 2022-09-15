@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    a {
+        @apply underline-offset-4;
+        @apply text-orange-600;
+    }
+    a:hover {
+        @apply text-orange-500;
+        @apply underline;
+    }
+}

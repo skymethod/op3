@@ -11,4 +11,5 @@ export interface WorkerEnv {
     readonly previewTokens?: string;
     readonly redirectLogNotificationDelaySeconds?: string;
     readonly dataset1?: AnalyticsEngine;
+    readonly productionDomain?: string;
 }
