@@ -1,6 +1,8 @@
 # op3
 OP3: The Open Podcast Prefix Project
 
+<img width="366" alt="image" src="https://user-images.githubusercontent.com/47259736/190524974-3959056a-cb8c-40e5-8e46-2d4f0d5e6de5.png">
+
 The Open Podcast Prefix Project (OP3) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
 
 Podcasters or podcast hosting companies can prepend
