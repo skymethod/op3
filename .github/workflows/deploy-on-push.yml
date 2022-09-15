@@ -9,7 +9,7 @@ env:
   DEPLOY_REPOSITORY_URL: ${{ github.repositoryUrl }}
   CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
   CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-  PRODUCTION_DOMAIN: op3.st
+  PRODUCTION_DOMAIN: op3.dev
 
 jobs:
   deploy-ci:
@@ -27,30 +27,35 @@ jobs:
           CF_CUSTOM_DOMAIN: ci.op3.dev
           CF_SCRIPT_NAME: op3-ci
           CF_BACKEND_DO_NAMESPACE: backend-do-ci
-          CF_AE_DATASET: dataset1
+          CF_AE_DATASET: dataset1-ci
           CF_ANALYTICS_TOKEN: 031c86bb64214cb5a6b7aab02b5e1925
           INSTANCE: ci
           ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
           PREVIEW_TOKENS: ${{ secrets.CI_PREVIEW_TOKENS }}
-  deploy-dev:
+  deploy-staging:
     runs-on: ubuntu-22.04
     env:
-      DEPLOY_SHA: 412d42c33cf2ceaea44070869979b22f9923fa36
+      DEPLOY_SHA: db44c7b26bda52548d5d59f0c072601e87ed169d
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ env.DEPLOY_SHA }}
-      - name: Deploy to dev
+      - name: Deploy to staging
         run: ./deploy.sh
         env:
-          CF_CUSTOM_DOMAIN: op3.dev
-          CF_SCRIPT_NAME: op3-dev
-          INSTANCE: dev
+          CF_CUSTOM_DOMAIN: staging.op3.dev
+          CF_SCRIPT_NAME: op3-staging
+          CF_BACKEND_DO_NAMESPACE: backend-do-staging
+          CF_AE_DATASET: dataset1-staging
+          CF_ANALYTICS_TOKEN: 3c527d531d83451b8c89fba58678822a
+          INSTANCE: staging
+          ADMIN_TOKENS: ${{ secrets.STAGING_ADMIN_TOKENS }}
+          PREVIEW_TOKENS: ${{ secrets.STAGING_PREVIEW_TOKENS }}
   deploy-prod:
     runs-on: ubuntu-22.04
     env:
-      DEPLOY_SHA: 412d42c33cf2ceaea44070869979b22f9923fa36
+      DEPLOY_SHA: db44c7b26bda52548d5d59f0c072601e87ed169d
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -61,4 +66,9 @@ jobs:
         env:
           CF_CUSTOM_DOMAIN: ${{ env.PRODUCTION_DOMAIN }}
           CF_SCRIPT_NAME: op3-prod
+          CF_BACKEND_DO_NAMESPACE: backend-do-prod
+          CF_AE_DATASET: dataset1-prod
+          CF_ANALYTICS_TOKEN: 7da609030515408f9ec8b16c529cecaf
           INSTANCE: prod
+          ADMIN_TOKENS: ${{ secrets.PROD_ADMIN_TOKENS }}
+          PREVIEW_TOKENS: ${{ secrets.PROD_PREVIEW_TOKENS }}
