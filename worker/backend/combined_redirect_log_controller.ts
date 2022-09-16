@@ -120,7 +120,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
 
     // fetch some new records from the source DO
     const startAfterTimestampId = state.haveTimestampId;
-    const { namesToNums, records } = await rpcClient.getNewRedirectLogs({ limit: 20, startAfterTimestampId }, doName);
+    const { namesToNums, records } = await rpcClient.getNewRedirectLogs({ limit: 15, startAfterTimestampId }, doName);
     console.log(`${Object.keys(records).length} records`);
 
     const sourceAttNums = new AttNums(namesToNums);
