@@ -2,12 +2,13 @@ import { tryParseInt } from '../check.ts';
 
 export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | undefined {
     // parse path by hand instead of using URL.pathname, we need to be robust to any and all input
-    const m = /^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?\/e\/(https?:\/\/)?(.*?)$/.exec(requestUrl);
+    const m = /^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?\/e\/(https?:\/\/?)?(.*?)$/.exec(requestUrl);
     if (!m) return undefined;
     const [ _, _optPort, optPrefix, suffix ] = m;
     if (/^https?:\/\//.test(suffix)) return { kind: 'invalid' }; // /e/https://
     if (!isValidSuffix(suffix))  return { kind: 'invalid' };
-    const prefix = optPrefix ?? 'https://';
+    let prefix = optPrefix ?? 'https://';
+    if (!prefix.endsWith('//')) prefix += '/'; // /e/https:/
     const targetUrl = `${prefix}${suffix}`;
     return { kind: 'valid', targetUrl };
 }

@@ -11,6 +11,7 @@ Deno.test({
             'https://example.org/e/http://example.com/path/to/episode.mp3': 'http://example.com/path/to/episode.mp3',
             'https://example.org/e/https://example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3',
             'https://example.org/e/example.com/path/to/episode.mp3?foo=bar': 'https://example.com/path/to/episode.mp3?foo=bar',
+            'https://example.org/e/https:/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3',
         }
         for (const [ requestUrl, expectedTargetUrl ] of Object.entries(good)) {
             assertEquals(tryParseRedirectRequest(requestUrl), { kind: 'valid', targetUrl: expectedTargetUrl });
