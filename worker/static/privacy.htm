@@ -19,7 +19,7 @@
         <p>The Open Podcast Prefix Project (OP3) is a free and open-source podcast prefix analytics service committed to open data and listener privacy.</p>
         <p>
             The production system is made up of three distinct services from a privacy point-of-view, and covered separately below for clarity.
-            All of the claims below can be audited by looking at the <a href="https://github.com/skymethod/op3">public codebase</a>.
+            Every claim can be audited by looking at the <a href="https://github.com/skymethod/op3">public codebase</a>.
         </p>
         
         <h2>Hosting infrastructure</h2>
@@ -29,10 +29,10 @@
         </p>
 
         <h2>Prefix Redirect Service</h2>
-        <p>The OP3 redirect service ("the service") logs basic, non-identifying request data every time a podcast listener downloads an episode by a participating publisher.</p> 
+        <p>The OP3 redirect service ("the service") saves basic, non-identifying request data every time a podcast listener downloads an episode using the service.</p> 
         <p>Like other prefix services, it uses this information to compute standarized metrics such as downloads per show.</p>
         <p>Unlike other prefix services, it makes the data available over a public Data API (below) at a granular level for the benefit of the wider open podcast ecosystem.</p>
-        <p>In order to meet boths goals of open data and listener privacy, the service saves only basic request attributes, securely hashes and encrypts all listener IP addresses before storing, and does not join data with any third-party services.</p>
+        <p>In order to meet both goals of open data and listener privacy, the service saves only basic request attributes, securely hashes and encrypts all listener IP addresses before storing, and does not join data with any third-party services.</p>
         <p>The request attributes currently captured for each request are:</p>
         <ul>
             <li><b>Time</b>: request time</li>
@@ -40,7 +40,7 @@
             <li><b>Method</b>: HTTP method</li>
             <li><b>URL</b>: HTTP url</li>
             <li><b>User-Agent</b>: HTTP User-Agent header (if present)</li>
-            <li><b>Referer</b>: HTTP Referer header (if present)</li>
+            <li><b>Referer</b> <i>[sic]</i>: HTTP Referer header (if present)</li>
             <li><b>Range</b>: HTTP Range header (if present)</li>
             <li><b>ULID</b>: <a href="https://podcastlistening.com/">ULID</a> query parameter (if present)</li>
             <li><b>Edge Colo</b>: airport code of the edge datacenter that processed the request</li>
@@ -50,10 +50,10 @@
         <h4>IP Address Handling</h2>
         <p>
             IP addresses are not personally-identifiable in and of themselves, and the service does not have any associated data that makes them so.  
-            However, the service takes extra precautions to avoid republishing them back out to Data API users, who only ever see a hashed version with a monthly-rotating secret key.
+            However, the service takes extra precautions to avoid republishing them back out to Data API users, who only ever see a secure hash, computed by the service using a monthly-rotating secret key.
         </p>
         <p>
-            Internally, the service stores a separate symmetrically-encrypted version with another set of monthly-rotating secret keys.
+            Internally, the service also stores a separate symmetrically-encrypted version with another set of monthly-rotating secret keys.
             This version is never returned in the Data API, and only used internally to apply IP range filters in back-calculations and to combat abuse of the service. 
         </p>
         <p>
@@ -71,7 +71,7 @@
         <h2>Website</h2>
        
         <p>The <a href="${origin}/">${hostname}</a> Website ("the Website") consists of a handful of public web pages hosted by the service.</p>
-        <p>The source code for every page of the Website is available in <a href="https://github.com/skymethod/op3">the public GitHub repo</a>, part of the same deployment that includes the Prefix Redirect Service and the Data API.</p>
+        <p>The source code for every page of the Website is available in <a href="https://github.com/skymethod/op3">the public GitHub repo</a>, part of the same deployment that includes the Prefix Redirect Service and the Data API service.</p>
         <p>
             The Website uses <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a> (<a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a>) to monitor summary metrics like top-performing pages,
             number of views, top referrers, and to monitor for abuse.
