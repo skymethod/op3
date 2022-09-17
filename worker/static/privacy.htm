@@ -10,16 +10,79 @@
 
 <body class="bg-indigo-900 flex flex-col text-indigo-200">
     ${nonProdHeader}
-    <div class="max-w-xl mx-auto text-3xl font-semibold mt-16">
+    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
         Privacy Policy
+    </h1>
+    <div class="basic max-w-2xl mx-auto px-8">
+
+        <h2>Overview</h2>
+        <p>The Open Podcast Prefix Project (OP3) is a free and open-source podcast prefix analytics service committed to open data and listener privacy.</p>
+        <p>
+            The production system is made up of three distinct services from a privacy point-of-view, and covered separately below for clarity.
+            All of the claims below can be audited by looking at the <a href="https://github.com/skymethod/op3">public codebase</a>.
+        </p>
+        
+        <h2>Hosting infrastructure</h2>
+        <p>
+            All three services are automatically deployed as a unit to <a href="https://www.cloudflare.com/">Cloudflare</a> (<a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a>), 
+            which serves as the sole hosting provider and data store.
+        </p>
+
+        <h2>Prefix Redirect Service</h2>
+        <p>The OP3 redirect service ("the service") logs basic, non-identifying request data every time a podcast listener downloads an episode by a participating publisher.</p> 
+        <p>Like other prefix services, it uses this information to compute standarized metrics such as downloads per show.</p>
+        <p>Unlike other prefix services, it makes the data available over a public Data API (below) at a granular level for the benefit of the wider open podcast ecosystem.</p>
+        <p>In order to meet boths goals of open data and listener privacy, the service saves only basic request attributes, securely hashes and encrypts all listener IP addresses before storing, and does not join data with any third-party services.</p>
+        <p>The request attributes currently captured for each request are:</p>
+        <ul>
+            <li><b>Time</b>: request time</li>
+            <li><b>IP Address</b>: originating IP address, securely hashed and encrypted before storage</li>
+            <li><b>Method</b>: HTTP method</li>
+            <li><b>URL</b>: HTTP url</li>
+            <li><b>User-Agent</b>: HTTP User-Agent header (if present)</li>
+            <li><b>Referer</b>: HTTP Referer header (if present)</li>
+            <li><b>Range</b>: HTTP Range header (if present)</li>
+            <li><b>ULID</b>: <a href="https://podcastlistening.com/">ULID</a> query parameter (if present)</li>
+            <li><b>Edge Colo</b>: airport code of the edge datacenter that processed the request</li>
+        </ul>
+        <p>No cookies are used.</p>
+
+        <h4>IP Address Handling</h2>
+        <p>
+            IP addresses are not personally-identifiable in and of themselves, and the service does not have any associated data that makes them so.  
+            However, the service takes extra precautions to avoid republishing them back out to Data API users, who only ever see a hashed version with a monthly-rotating secret key.
+        </p>
+        <p>
+            Internally, the service stores a separate symmetrically-encrypted version with another set of monthly-rotating secret keys.
+            This version is never returned in the Data API, and only used internally to apply IP range filters in back-calculations and to combat abuse of the service. 
+        </p>
+        <p>
+            IP addresses are never joined with outside third-party data or services.
+        </p>
+
+        <h2>Data API Service</h2>
+        <p>The OP3 Data API service ("the Data API") makes podcast and episode download data available to anyone with a valid authorization token.</p>
+        <p>Users of the Data API are not tracked in any way, other than to implement mechanisms like rate-limiting to prevent abuse of the system.</p>
+        <p>
+            The data returned by the Data API cannot be used to obtain listener IP addresses, only a secure hash (computed with an internal key rotated monthly).
+            Even if a listener's IP address is known, there is no way to find it in any Data API response.
+        </p>
+
+        <h2>Website</h2>
+       
+        <p>The <a href="${origin}/">${hostname}</a> Website ("the Website") consists of a handful of public web pages hosted by the service.</p>
+        <p>The source code for every page of the Website is available in <a href="https://github.com/skymethod/op3">the public GitHub repo</a>, part of the same deployment that includes the Prefix Redirect Service and the Data API.</p>
+        <p>
+            The Website uses <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a> (<a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a>) to monitor summary metrics like top-performing pages,
+            number of views, top referrers, and to monitor for abuse.
+        </p>
+
+        <h2>History</h2>
+        <p>2022-09-17: Published initial version.</p>
+
     </div>
-    <div class="max-w-xl mx-auto mt-16">
-        Still in development...
-    </div>
-    <div class="max-w-xl mx-auto mt-16">
-        Learn more about our future plans on the <a href="https://github.com/skymethod/op3">GitHub readme</a>.
-    </div>
-    <div class="max-w-xl mx-auto mt-16">
+   
+    <div class="max-w-xl mx-auto my-16">
         <a href="/">Home</a>
     </div>
     ${cfAnalyticsSnippet}

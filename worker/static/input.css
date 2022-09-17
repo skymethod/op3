@@ -11,4 +11,20 @@
         @apply text-orange-500;
         @apply underline;
     }
+    .basic p {
+        @apply mt-4
+    }
+    .basic hr {
+        @apply mt-4
+    }
+    .basic h2 {
+        @apply text-2xl font-semibold mt-8
+    }
+    .basic h4 {
+        @apply text-xl font-semibold mt-8
+    }
+    
+    .basic ul {
+        @apply list-inside list-disc mt-4 pl-4
+    }
 }

@@ -423,6 +423,35 @@ a:hover {
           text-decoration-line: underline;
 }
 
+.basic p {
+  margin-top: 1rem;
+}
+
+.basic hr {
+  margin-top: 1rem;
+}
+
+.basic h2 {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+.basic h4 {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.basic ul {
+  margin-top: 1rem;
+  list-style-position: inside;
+  list-style-type: disc;
+  padding-left: 1rem;
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -569,8 +598,17 @@ a:hover {
   margin-right: auto;
 }
 
+.my-16 {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
 .mt-16 {
   margin-top: 4rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
 }
 
 .inline-block {
@@ -609,6 +647,11 @@ a:hover {
 
 .p-4 {
   padding: 1rem;
+}
+
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .pl-2 {

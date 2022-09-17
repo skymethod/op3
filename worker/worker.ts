@@ -30,7 +30,7 @@ export default {
         try {
             const { instance, backendNamespace, productionDomain, cfAnalyticsToken, deploySha, deployTime } = env;
             IsolateId.log();
-            const { origin, pathname, searchParams } = new URL(request.url);
+            const { origin, hostname, pathname, searchParams } = new URL(request.url);
             const { method, headers } = request;
             const adminTokens = parseStringSet(env.adminTokens);
             const previewTokens = parseStringSet(env.previewTokens);
@@ -38,7 +38,7 @@ export default {
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
             if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, productionOrigin, cfAnalyticsToken });
-            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, productionOrigin, cfAnalyticsToken });
+            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
             if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
