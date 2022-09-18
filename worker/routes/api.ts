@@ -7,6 +7,7 @@ import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { tryParseDurationMillis } from '../duration.ts';
+import { newMethodNotAllowedResponse, newJsonResponse } from './responses.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, searchParams, headers, bodyProvider } = opts;
@@ -73,14 +74,6 @@ function computeIdentity(bearerToken: string | undefined, searchParams: URLSearc
     if (adminTokens.has(token)) return 'admin';
     if (previewTokens.has(token)) return 'preview';
     return 'invalid';
-}
-
-function newJsonResponse(obj: Record<string, unknown>, status = 200): Response {
-    return new Response(JSON.stringify(obj, undefined, 2), { status, headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
-}
-
-function newMethodNotAllowedResponse(method: string): Response {
-    return new Response(`${method} not allowed`, { status: 405, headers: { 'access-control-allow-origin': '*' } });
 }
 
 async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

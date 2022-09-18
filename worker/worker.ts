@@ -14,6 +14,7 @@ import { computeApiDocsResponse } from './routes/api_docs.ts';
 import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
 import { computeTermsResponse } from './routes/terms.ts';
 import { computePrivacyResponse } from './routes/privacy.ts';
+import { computeReleasesResponse, tryParseReleasesRequest } from './routes/releases.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -42,6 +43,7 @@ export default {
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
             if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
+            const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
 
             const rpcClient = new CloudflareRpcClient(backendNamespace);
             const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
