@@ -657,28 +657,8 @@ a:hover {
   fill: #c2410c;
 }
 
-.fill-orange-600 {
-  fill: #ea580c;
-}
-
-.fill-orange-800 {
-  fill: #9a3412;
-}
-
-.stroke-cyan-500 {
-  stroke: #06b6d4;
-}
-
-.stroke-orange-700 {
-  stroke: #c2410c;
-}
-
-.stroke-orange-800 {
-  stroke: #9a3412;
-}
-
-.stroke-orange-900 {
-  stroke: #7c2d12;
+.fill-indigo-400 {
+  fill: #818cf8;
 }
 
 .stroke-transparent {
