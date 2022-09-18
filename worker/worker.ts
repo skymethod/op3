@@ -15,6 +15,8 @@ import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
 import { computeTermsResponse } from './routes/terms.ts';
 import { computePrivacyResponse } from './routes/privacy.ts';
 import { computeReleasesResponse, tryParseReleasesRequest } from './routes/releases.ts';
+import { compute404Response } from './routes/404.ts';
+import { newMethodNotAllowedResponse } from './routes/responses.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -48,7 +50,8 @@ export default {
             const rpcClient = new CloudflareRpcClient(backendNamespace);
             const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
 
-            return new Response('not found', { status: 404 });
+            if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+            return newMethodNotAllowedResponse(method);
         } catch (e) {
             console.error(`Unhandled error computing response: ${e.stack || e}`);
             return new Response('failed', { status: 500 });

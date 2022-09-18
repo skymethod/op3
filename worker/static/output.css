@@ -607,16 +607,12 @@ a:hover {
   margin-top: 4rem;
 }
 
-.mb-8 {
-  margin-bottom: 2rem;
-}
-
 .mb-16 {
   margin-bottom: 4rem;
 }
 
-.mt-8 {
-  margin-top: 2rem;
+.mb-8 {
+  margin-bottom: 2rem;
 }
 
 .inline-block {
@@ -655,6 +651,38 @@ a:hover {
 .bg-orange-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(154 52 18 / var(--tw-bg-opacity));
+}
+
+.fill-orange-700 {
+  fill: #c2410c;
+}
+
+.fill-orange-600 {
+  fill: #ea580c;
+}
+
+.fill-orange-800 {
+  fill: #9a3412;
+}
+
+.stroke-cyan-500 {
+  stroke: #06b6d4;
+}
+
+.stroke-orange-700 {
+  stroke: #c2410c;
+}
+
+.stroke-orange-800 {
+  stroke: #9a3412;
+}
+
+.stroke-orange-900 {
+  stroke: #7c2d12;
+}
+
+.stroke-transparent {
+  stroke: transparent;
 }
 
 .p-4 {
@@ -711,12 +739,12 @@ a:hover {
   color: rgb(129 140 248 / var(--tw-text-opacity));
 }
 
-.hover\:text-white:hover {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
 .hover\:text-indigo-400:hover {
   --tw-text-opacity: 1;
   color: rgb(129 140 248 / var(--tw-text-opacity));
+}
+
+.hover\:text-white:hover {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
