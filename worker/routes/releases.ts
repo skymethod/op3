@@ -72,7 +72,7 @@ function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin 
 }
 
 function computeBulletPointsDescription(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
-    return bulletPoints.map(v => ` • ${computeMarkdownHtml(v({ origin }))}<br>\n`).join('');
+    return bulletPoints.map(v => ` • ${computeMarkdownHtml(v({ origin }))}\n`).join('');
 }
 
 function computeBasicHtml({ origin }: { origin: string }): string {
