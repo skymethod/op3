@@ -627,6 +627,10 @@ a:hover {
   display: flex;
 }
 
+.contents {
+  display: contents;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }

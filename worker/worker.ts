@@ -37,7 +37,7 @@ export default {
             const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
 
             if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
-            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, productionOrigin, cfAnalyticsToken });
+            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, productionOrigin, productionDomain, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
             if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
             if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
