@@ -3,7 +3,7 @@ import { computeRfc822 } from '../timestamp.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
 import { computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
-import { computeMarkdownHtml } from './markdown.ts';
+import { computeMarkdownHtml, computeMarkdownText } from './markdown.ts';
 import { newMethodNotAllowedResponse, newRssResponse } from './responses.ts';
 const releasesHtm = await importText(import.meta.url, '../static/releases.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
@@ -72,7 +72,7 @@ function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin 
 }
 
 function computeBulletPointsDescription(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
-    return bulletPoints.map(v => ` • ${computeMarkdownHtml(v({ origin }))}\n`).join('');
+    return bulletPoints.map(v => ` • ${computeMarkdownText(v({ origin }))}\n`).join('');
 }
 
 function computeBasicHtml({ origin }: { origin: string }): string {
@@ -83,7 +83,7 @@ function computeBasicHtml({ origin }: { origin: string }): string {
 }
 
 const computeReleasesRss = ({ title, origin }: { title: string, origin: string }) => `<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>${encodeXml(title)}</title>
     <link>${origin}/releases</link>
@@ -98,6 +98,7 @@ ${RELEASES.map(v => `
       <pubDate>${computeRfc822(v.time)}</pubDate>
       <guid>${origin}/releases#${v.id}</guid>
       <description>${computeBulletPointsDescription(v.bulletPoints, { origin })}</description>
+      <content:encoded>${encodeXml(computeBulletPointsHtml(v.bulletPoints, { origin }))}</content:encoded>
     </item>  
 `)}
   </channel>
