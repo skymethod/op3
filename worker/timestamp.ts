@@ -28,3 +28,12 @@ export function timestampToYyyymmdd(timestamp: string): string {
     if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestamp: ${timestamp}`);
     return `20${timestamp.substring(0, 6)}`;
 }
+
+export function computeRfc822(instant: string) {
+    // Wed, 02 Oct 2002 13:00:00 GMT
+    const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', hourCycle: 'h24', minute: '2-digit', second: '2-digit', timeZone: 'UTC' };
+    const dateTimeFormat = new Intl.DateTimeFormat('en-US', options);
+    const parts = Object.fromEntries(dateTimeFormat.formatToParts(new Date(instant)).map(v => [ v.type, v.value ]));
+    const { weekday, month, day, year, hour, minute, second } = parts;
+    return `${weekday}, ${day} ${month} ${year} ${hour}:${minute}:${second} GMT`;
+}

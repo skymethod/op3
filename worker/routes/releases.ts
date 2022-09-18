@@ -1,7 +1,9 @@
 import { importText, encodeXml } from '../deps.ts';
+import { computeRfc822 } from '../timestamp.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
 import { computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
+import { computeMarkdownHtml } from './markdown.ts';
 import { newMethodNotAllowedResponse, newRssResponse } from './responses.ts';
 const releasesHtm = await importText(import.meta.url, '../static/releases.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
@@ -29,32 +31,6 @@ export function computeReleasesResponse({ method, type } : ReleasesRequest, { in
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
-}
-
-export function computeRfc822(instant: string) {
-    // Wed, 02 Oct 2002 13:00:00 GMT
-    const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', hourCycle: 'h24', minute: '2-digit', second: '2-digit', timeZone: 'UTC' };
-    const dateTimeFormat = new Intl.DateTimeFormat('en-US', options);
-    const parts = Object.fromEntries(dateTimeFormat.formatToParts(new Date(instant)).map(v => [ v.type, v.value ]));
-    const { weekday, month, day, year, hour, minute, second } = parts;
-    return `${weekday}, ${day} ${month} ${year} ${hour}:${minute}:${second} GMT`;
-}
-
-export function computeMarkdownHtml(markdown: string): string {
-    const regex = /\[(.*?)\]\((.*?)\)/g;
-    let m: RegExpExecArray | null;
-    const rt: string[] = [];
-    let i = 0;
-    while ((m = regex.exec(markdown)) !== null) {
-        const { lastIndex } = regex;
-        const { index } = m;
-        const [ _, text, href ] = m;
-        rt.push(encodeXml(markdown.substring(i, index)));
-        rt.push(`<a href="${href}">${encodeXml(text)}</a>`);
-        i = lastIndex;
-    }
-    rt.push(encodeXml(markdown.substring(i)));
-    return rt.join('');
 }
 
 //

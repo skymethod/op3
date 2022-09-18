@@ -1,12 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
-import { computeMarkdownHtml, computeRfc822 } from './releases.ts';
-
-Deno.test({
-    name: 'computeRfc822',
-    fn: () => {
-        assertEquals(computeRfc822('2022-09-18T16:18:54.780Z'), 'Sun, 18 Sep 2022 16:18:54 GMT');
-    }
-});
+import { computeMarkdownHtml } from './markdown.ts';
 
 Deno.test({
     name: 'computeMarkdownHtml',

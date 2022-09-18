@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
-import { computeTimestamp, isValidTimestamp } from './timestamp.ts';
+import { computeRfc822, computeTimestamp, isValidTimestamp } from './timestamp.ts';
 
 Deno.test({
     name: 'computeTimestamp',
@@ -31,5 +31,12 @@ Deno.test({
         for (const ts of bad) {
             assertEquals(isValidTimestamp(ts), false);
         }
+    }
+});
+
+Deno.test({
+    name: 'computeRfc822',
+    fn: () => {
+        assertEquals(computeRfc822('2022-09-18T16:18:54.780Z'), 'Sun, 18 Sep 2022 16:18:54 GMT');
     }
 });
