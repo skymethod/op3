@@ -28,6 +28,7 @@ export function computeReleasesResponse({ method, type } : ReleasesRequest, { in
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         basicHtml: computeBasicHtml({ origin }),
+        origin,
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
@@ -82,7 +83,7 @@ const computeReleasesRss = ({ title, origin }: { title: string, origin: string }
   <channel>
     <title>${encodeXml(title)}</title>
     <link>${origin}/releases</link>
-    <description>Latest feature releases from the OP3, the Open Podcast Prefix Project</description>
+    <description>Latest releases from the OP3, the Open Podcast Prefix Project</description>
     <language>en-us</language>
     <lastBuildDate>${computeRfc822(RELEASES[0].time)}</lastBuildDate>
     <atom:link href="${origin}/releases.rss" rel="self" type="application/rss+xml" />
