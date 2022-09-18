@@ -71,6 +71,10 @@ function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin 
     return `<ul>${bulletPoints.map(v => `<li>${computeMarkdownHtml(v({ origin }))}</li>\n`).join('')}</ul>`
 }
 
+function computeBulletPointsDescription(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
+    return bulletPoints.map(v => ` • ${computeMarkdownHtml(v({ origin }))}<br>\n`).join('');
+}
+
 function computeBasicHtml({ origin }: { origin: string }): string {
     return RELEASES.map(v => `
         <h4 id="${v.id}">${encodeXml(v.title)}</h4>
@@ -93,7 +97,7 @@ ${RELEASES.map(v => `
       <link>${origin}/releases#${v.id}</link>
       <pubDate>${computeRfc822(v.time)}</pubDate>
       <guid>${origin}/releases#${v.id}</guid>
-      <description>${computeBulletPointsHtml(v.bulletPoints, { origin })}</description>
+      <description>${computeBulletPointsDescription(v.bulletPoints, { origin })}</description>
     </item>  
 `)}
   </channel>
