@@ -33,7 +33,7 @@ export class KeyController {
         const active = [...keyRecords.values()].filter(v => v.month === month && v.active && v.keyKind === keyKind);
         if (active.length > 1) throw new Error(`${active.length} active ${keyKind} keys for ${month}`);
         if (active.length === 1) {
-            console.log(`KeyController: Returning exiting active ${keyKind} key for ${month}`);
+            console.log(`KeyController: Returning existing active ${keyKind} key for ${month}`);
             return computeKey(active[0]);
         }
 
