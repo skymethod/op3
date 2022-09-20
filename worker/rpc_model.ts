@@ -144,6 +144,7 @@ export interface QueryRedirectLogsRequest {
     readonly endTimeExclusive?: string; // instant
 
     readonly urlSha256?: string;
+    readonly urlStartsWith?: string;
     readonly userAgent?: string;
     readonly referer?: string;
     readonly range?: string;

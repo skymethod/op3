@@ -55,9 +55,7 @@ export async function computeQueryRedirectLogsResponse(method: string, searchPar
                 const u = tryParseUrl(urlStartsWith);
                 if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid url`);
                 if (u.pathname.length <= '/audio/'.length) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, pathname must be at least ${'/audio/'.length + 1} characters long`);
-
-                // TODO
-                throw new Error('urlStartsWith not implemented yet');
+                request = { ...request, urlStartsWith };
             } else {
                 check('url', url, isValidHttpUrl);
                 const urlSha256 = (await Bytes.ofUtf8(url).sha256()).hex();

@@ -151,7 +151,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         const timestampAndUuid = `${timestamp}-${uuid}`;
         const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
-        await computeIndexRecords(obj, timestampAndUuid, key, newIndexRecords);
+        await computeIndexRecords(obj, timestamp, timestampAndUuid, key, newIndexRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
@@ -159,12 +159,20 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         await storage.put('crl.attNums', attNums.toJson());
     }
     if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId ) {
-        const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
+        // two transactions to stay under 128
+        // it's ok if this first transaction runs more than once
+
+        // first, save data records
         await storage.transaction(async txn => {
             if (Object.keys(newRecords).length > 0) {
                 console.log(`CombinedRedirectLogController: Saving ${Object.keys(newRecords).length} imported records from ${doName}`);
                 await txn.put(newRecords);
             }
+        });
+
+        // then, save index records and update source state
+        const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
+        await storage.transaction(async txn => {
             if (newIndexRecords.size > 0) {
                 for (const [ indexId, records ] of newIndexRecords) {
                     console.log(`CombinedRedirectLogController: Saving ${Object.keys(records).length} ${IndexId[indexId]} index records from ${doName}`);
@@ -178,6 +186,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         });
     }
 }
+
 //
 
 interface SourceState {
@@ -211,9 +220,10 @@ export enum IndexId {
     Ulid = 9,
     Method = 10,
     Uuid = 11,
+    DayUrl = 12,
 }
 
-export const INDEX_DEFINITIONS: [ string, IndexId, (v: string) => string | undefined | Promise<string | undefined> ][] = [
+export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string) => string | undefined | Promise<string | undefined> ][] = [
     [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(v).sha256()).hex() ],
     [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
     [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
@@ -225,15 +235,16 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string) => string | undef
     [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
     [ 'uuid', IndexId.Uuid, v => v ],
+    [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${v.substring(0, 1024)}` ],
 ];
 
 //
 
-async function computeIndexRecords(record: Record<string, string>, timestampAndUuid: string, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
+async function computeIndexRecords(record: Record<string, string>, timestamp: string, timestampAndUuid: string, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
     for (const [ property, indexId, indexValueFn ] of INDEX_DEFINITIONS) {
         const value = record[property];
         if (typeof value !== 'string') continue;
-        const indexValueValueOrPromise = indexValueFn(value);
+        const indexValueValueOrPromise = indexValueFn(value, timestamp);
         const indexValue = typeof indexValueValueOrPromise === 'object' ? await indexValueValueOrPromise : indexValueValueOrPromise;
         if (typeof indexValue !== 'string') continue;
         const indexRecords = getOrInit(outIndexRecords, indexId, () => ({} as Record<string, DurableObjectStorageValue>));
