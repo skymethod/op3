@@ -51,10 +51,11 @@ export async function computeQueryRedirectLogsResponse(method: string, searchPar
         if (typeof url === 'string') {
             const m = /^(https?:\/\/.+?)\*$/.exec(url);
             if (m) {
-                const urlStartsWith = computeChainDestination(m[1]);
-                const u = tryParseUrl(urlStartsWith);
-                if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid url`);
-                if (u.pathname.length <= '/audio/'.length) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, pathname must be at least ${'/audio/'.length + 1} characters long`);
+                const [ _, urlStartsWith ] = m;
+                const destinationUrl = computeChainDestination(m[1]);
+                const u = tryParseUrl(destinationUrl);
+                if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid destination url ${destinationUrl}`);
+                if (u.pathname.length <= '/audio/'.length) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, destination url pathname must be at least ${'/audio/'.length + 1} characters long, found ${u.pathname}`);
                 request = { ...request, urlStartsWith };
             } else {
                 check('url', url, isValidHttpUrl);

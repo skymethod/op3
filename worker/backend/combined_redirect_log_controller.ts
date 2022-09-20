@@ -1,6 +1,6 @@
 import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
-import { isStringRecord } from '../check.ts';
-import { AlarmPayload, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { checkMatches, isStringRecord } from '../check.ts';
+import { AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -81,6 +81,11 @@ export class CombinedRedirectLogController {
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>): Promise<Response> {
         const attNums = await this.getOrLoadAttNums();
         return await queryCombinedRedirectLogs(request, attNums, this.storage);
+    }
+
+    async rebuildIndex(request: Unkinded<AdminRebuildIndexRequest>): Promise<AdminRebuildIndexResponse> {
+        const attNums = await this.getOrLoadAttNums();
+        return computeRebuildIndexResponse(request, attNums, this.storage);
     }
 
     //
@@ -187,6 +192,47 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
     }
 }
 
+async function computeRebuildIndexResponse(request: Unkinded<AdminRebuildIndexRequest>, attNums: AttNums, storage: DurableObjectStorage): Promise<AdminRebuildIndexResponse> {
+    const { indexName } = request;
+
+    const startTime = Date.now();
+
+    const limit = Math.min(request.limit, 128);
+    const filterIndexId = IndexId[indexName as keyof typeof IndexId];
+    const prefix = 'crl.r.';
+    const start = request.inclusive ? `${prefix}${request.start}` : undefined;
+    const startAfter = request.inclusive ? undefined : `${prefix}${request.start}`;
+    console.log(`computeRebuildIndexResponse: list storage: ${JSON.stringify({ prefix, start, startAfter, limit })}`);
+    const map = await storage.list({ prefix, start, startAfter, limit });
+    const newIndexRecords = new Map<IndexId, Record<string, DurableObjectStorageValue>>();
+    let count = 0;
+    let first: string | undefined;
+    let last: string | undefined;
+    for (const [ key, value ] of map) {
+        if (typeof value !== 'string') throw new Error(`Bad value: ${value} for key ${key}`);
+        const obj = attNums.unpackRecord(value);
+        const [ _, timestampAndUuid, timestamp, uuid ] = checkMatches('key', key, /^crl\.r\.((.+?)-(.+?))$/);
+        if (!isValidTimestamp(timestamp) || !isValidUuid(uuid)) throw new Error(`Bad key: ${key}`);
+        await computeIndexRecords(obj, timestamp, timestampAndUuid, key, newIndexRecords, filterIndexId);
+        if (count === 0) first = timestampAndUuid;
+        last = timestampAndUuid;
+        count++;
+    }
+    if (newIndexRecords.size > 0) {
+        await storage.transaction(async txn => {
+            if (newIndexRecords.size > 0) {
+                for (const [ indexId, records ] of newIndexRecords) {
+                    console.log(`computeRebuildIndexResponse: Saving ${Object.keys(records).length} ${IndexId[indexId]} index records (first=${JSON.stringify(Object.entries(records).at(0))})`);
+                    await txn.put(records);
+                }
+            }
+        });
+    }
+    const rt: AdminRebuildIndexResponse = { kind: 'admin-rebuild-index', millis: Date.now() - startTime, count, first, last };
+    console.log(`computeRebuildIndexResponse: returning: ${JSON.stringify(rt)}`);
+    return rt;
+}
+
 //
 
 interface SourceState {
@@ -240,8 +286,9 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
 
 //
 
-async function computeIndexRecords(record: Record<string, string>, timestamp: string, timestampAndUuid: string, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>) {
+async function computeIndexRecords(record: Record<string, string>, timestamp: string, timestampAndUuid: string, key: string, outIndexRecords: Map<IndexId, Record<string, DurableObjectStorageValue>>, filterIndexId?: IndexId) {
     for (const [ property, indexId, indexValueFn ] of INDEX_DEFINITIONS) {
+        if (filterIndexId && filterIndexId !== indexId) continue;
         const value = record[property];
         if (typeof value !== 'string') continue;
         const indexValueValueOrPromise = indexValueFn(value, timestamp);

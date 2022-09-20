@@ -35,6 +35,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             if (identity !== 'admin') return newJsonResponse({ error: 'forbidden' }, 403);
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
+            if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
         }
@@ -94,4 +95,18 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else {
         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
     }
+}
+
+async function computeAdminRebuildResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+
+    const { indexName, start, inclusive, limit } = await bodyProvider();
+
+    if (typeof indexName !== 'string') throw new Error(`Bad indexName: ${indexName}`);
+    if (typeof start !== 'string') throw new Error(`Bad start: ${start}`);
+    if (typeof inclusive !== 'boolean') throw new Error(`Bad inclusive: ${inclusive}`);
+    if (typeof limit !== 'number') throw new Error(`Bad limit: ${limit}`);
+
+    const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, 'combined-redirect-log');
+    return newJsonResponse({ first, last, count, millis });
 }

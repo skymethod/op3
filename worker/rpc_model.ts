@@ -7,6 +7,7 @@ export type RpcRequest =
     | GetKeyRequest
     | RegisterDORequest 
     | AdminDataRequest
+    | AdminRebuildIndexRequest
     | RedirectLogsNotificationRequest
     | AlarmRequest
     | GetNewRedirectLogsRequest
@@ -19,6 +20,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'get-key' 
         || obj.kind === 'register-do' 
         || obj.kind === 'admin-data'
+        || obj.kind === 'admin-rebuild-index'
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'alarm'
         || obj.kind === 'get-new-redirect-logs'
@@ -108,6 +110,14 @@ export interface AdminDataRequest {
     readonly dryRun?: boolean;
 }
 
+export interface AdminRebuildIndexRequest {
+    readonly kind: 'admin-rebuild-index';
+    readonly indexName: string;
+    readonly start: string;
+    readonly inclusive: boolean;
+    readonly limit: number;
+}
+
 export interface RedirectLogsNotificationRequest {
     readonly kind: 'redirect-logs-notification';
     readonly doName: string;
@@ -164,6 +174,7 @@ export type RpcResponse =
     | ErrorResponse 
     | GetKeyResponse 
     | AdminDataResponse
+    | AdminRebuildIndexResponse
     | GetNewRedirectLogsResponse
     ;
 
@@ -173,6 +184,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'error' 
         || obj.kind === 'get-key'
         || obj.kind === 'admin-data'
+        || obj.kind === 'admin-rebuild-index'
         || obj.kind === 'get-new-redirect-logs'
     );
 }
@@ -198,6 +210,14 @@ export interface AdminDataResponse {
     readonly message?: string;
 }
 
+export interface AdminRebuildIndexResponse {
+    readonly kind: 'admin-rebuild-index';
+    readonly first?: string;
+    readonly last?: string;
+    readonly count: number;
+    readonly millis: number;
+}
+
 export interface PackedRedirectLogs {
     readonly namesToNums: Record<string, number>;
     readonly records: Record<string, string>; // timestampId -> packed record
@@ -213,6 +233,7 @@ export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
 
 export interface RpcClient {
     executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
+    adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse>;
     getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
     sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse>;

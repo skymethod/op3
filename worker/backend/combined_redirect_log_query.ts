@@ -137,7 +137,7 @@ async function computeUrlStartsWithIndexValues({ urlStartsWith, limit, startTime
             return rt;
         }
         const prefix = `crl.i0.${index}.${indexValue}`;
-        const start =  `crl.i0.${index}.${indexValue.substring(0, 6)}`;
+        const start = `crl.i0.${index}.${indexValue.substring(0, 6)}`;
         const end = `crl.i0.${index}.${computeTimestamp(addDays(date, 1)).substring(0, 6)}`;
         console.log(`computeUrlStartsWithIndexValues: list storage: ${JSON.stringify({ prefix, index, limit, start, end })}`);
         const results = await storage.list({ prefix, limit, start, end });
