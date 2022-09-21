@@ -50,7 +50,12 @@ export default {
             const rpcClient = new CloudflareRpcClient(backendNamespace);
             const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
 
+            // redirect /foo/ to /foo (canonical)
+            if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
+
+            // not found
             if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+
             return newMethodNotAllowedResponse(method);
         } catch (e) {
             console.error(`Unhandled error computing response: ${e.stack || e}`);
