@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
+import { assert, assertEquals } from '../tests/deps.ts';
 import { generateHmacKeyBytes, importHmacKey } from '../crypto.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
 import { computeTimestamp, timestampToYyyymmdd } from '../timestamp.ts';

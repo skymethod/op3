@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
+import { assertEquals } from '../tests/deps.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 

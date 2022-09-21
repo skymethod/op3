@@ -1,4 +1,4 @@
-import { assert, assertMatch, assertEquals, assertNotEquals, assertRejects } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
+import { assert, assertMatch, assertEquals, assertNotEquals, assertRejects } from './tests/deps.ts';
 import { decrypt, encrypt, generateAesKeyBytes, generateHmacKeyBytes, hmac, importAesKey, importHmacKey } from './crypto.ts';
 import { Bytes } from './deps.ts';
 

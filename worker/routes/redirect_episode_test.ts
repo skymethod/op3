@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.155.0/testing/asserts.ts';
+import { assertEquals } from '../tests/deps.ts';
 import { tryParseRedirectRequest, computeRedirectResponse } from './redirect_episode.ts';
 
 Deno.test({
