@@ -16,5 +16,20 @@ Deno.test({
             { kind: 'prefix', prefix: 'artsai', url: 'https://arttrk.com/p/ARTS1/sub.example.com/media/1234/episodes/123-Something-456_zz7f.mp3' }, 
             { kind: 'destination', url: 'https://sub.example.com/media/1234/episodes/123-Something-456_zz7f.mp3' },
         ]);
+        assertEquals(computeChainEstimate('https://op3.dev/e/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/http://a.com/path/to/episode.mp3' }, 
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3'} 
+        ]);
+
+        assertEquals(computeChainEstimate('http://pdst.fm/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podsights', url: 'http://pdst.fm/e/a.com/path/to/episode.mp3' }, 
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3'} 
+        ]);
+
+        assertEquals(computeChainEstimate('http://chrt.fm/track/CHRT123/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'chartable', url: 'http://chrt.fm/track/CHRT123/a.com/path/to/episode.mp3' }, 
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3'} 
+        ]);
+
     }
 });

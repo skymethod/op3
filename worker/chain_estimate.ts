@@ -8,6 +8,7 @@ export function computeChainDestination(url: string): string {
 export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://op3.dev/e/(https?://)?
+    // no http support (.dev TLD on HSTS preload list)
     let m = /^https:\/\/(ci\.|staging\.)?\op3\.dev\/e\/(.+?)$/.exec(url);
     if (m) {
         const [ _, _subdomain, suffix ] = m;
@@ -17,7 +18,9 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://dts.podtrac.com/redirect.mp3/
-    m = /^https:\/\/dts\.podtrac\.com\/redirect\.mp3\/(.*?)$/.exec(url);
+    // http redirects to https for registered feeds
+    // need to find an http example
+    m = /^https?:\/\/dts\.podtrac\.com\/redirect\.mp3\/(.*?)$/.exec(url);
     if (m) {
         const [ _, suffix ] = m;
         const targetUrl = `https://${suffix}`;
@@ -25,22 +28,25 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://pdst.fm/e/
-    m = /^https:\/\/pdst\.fm\/e\/(.*?)$/.exec(url);
+    // http redirects to target http
+    m = /^(https?):\/\/pdst\.fm\/e\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
-        const targetUrl = `https://${suffix}`;
+        const [ _, scheme, suffix ] = m;
+        const targetUrl = `${scheme}://${suffix}`;
         return [ { kind: 'prefix', prefix: 'podsights', url }, ...computeChainEstimate(targetUrl) ];
     }
 
     // https://chrt.fm/track/CHRT123/
-    m = /^https:\/\/chrt\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
+    // http redirects to target http
+    m = /^(https?):\/\/chrt\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
-        const targetUrl = `https://${suffix}`;
+        const [ _, scheme, suffix ] = m;
+        const targetUrl = `${scheme}://${suffix}`;
         return [ { kind: 'prefix', prefix: 'chartable', url }, ...computeChainEstimate(targetUrl) ];
     }
 
     // https://pfx.veritonicmetrics.com/vt123/
+    // no http support
     m = /^https:\/\/pfx\.veritonicmetrics\.com\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
         const [ _, suffix ] = m;
@@ -49,7 +55,8 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://arttrk.com/p/ARTS1/
-    m = /^https:\/\/arttrk\.com\/p\/[^/]+\/(.*?)$/.exec(url);
+    // http redirects to target https
+    m = /^https?:\/\/arttrk\.com\/p\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
         const [ _, suffix ] = m;
         const targetUrl = `https://${suffix}`;
