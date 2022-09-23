@@ -9,14 +9,14 @@ Deno.test({
         const rpcClient = new class extends StubRpcClient {
             async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
                 await Promise.resolve();
-                if (request.urlStartsWith === 'https://example.com/path/to/ep.mp3' && target === 'combined-redirect-log') {
+                if (request.urlStartsWith === 'https://example.com/path/to/' && target === 'combined-redirect-log') {
                     return new Response('ok!');
                 }
                 console.log(request, target);
                 throw new Error();
             }
         }
-        const res = await computeQueryRedirectLogsResponse('GET', new URLSearchParams({ url: 'https://example.com/path/to/ep.mp3*'}), rpcClient);
+        const res = await computeQueryRedirectLogsResponse('GET', new URLSearchParams({ url: 'https://example.com/path/to/*' }), rpcClient);
         assertEquals(res.status, 200);
     }
 });

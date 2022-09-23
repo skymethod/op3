@@ -58,40 +58,62 @@ Deno.test({
         const controller = new CombinedRedirectLogController(storage, rpcClient);
         await controller.process();
 
-        // ensure basic query returns the saved record
-        const res = await controller.queryRedirectLogs({ limit: 10, format: 'json' });
-        assertEquals(res.status, 200);
-        const { rows } = await res.json();
-        // console.log(rows);
-        assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, range, ulid, edgeColo } ], rows);
-        // ensure the hashed ip address is a sha, not equal to the input raw ip address
-        assertNotEquals(hashedIpAddress, '1.2.3.4')
-        assert(isValidSha1Hex(hashedIpAddress));
+        {
+            // ensure basic query returns the saved record
+            const res = await controller.queryRedirectLogs({ limit: 10, format: 'json' });
+            assertEquals(res.status, 200);
+            const { rows } = await res.json();
+            // console.log(rows);
+            assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, range, ulid, edgeColo } ], rows);
+            // ensure the hashed ip address is a sha, not equal to the input raw ip address
+            assertNotEquals(hashedIpAddress, '1.2.3.4')
+            assert(isValidSha1Hex(hashedIpAddress));
 
-        // ensure saved row count
-        const data = await storage.list();
-        // console.log(data);
-        assertEquals(data.size, 10 /* index records: 12 - DoColo (not in test) - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */);
+            // ensure saved row count
+            const data = await storage.list();
+            // console.log(data);
+            assertEquals(data.size, 10 /* index records: 12 - DoColo (not in test) - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */);
 
-        // ensure attnums
-        const namesToNums = data.get('crl.attNums');
-        assert(isStringRecord(namesToNums));
-        const attNums2 = new AttNums(namesToNums as Record<string, number>);
-        assertEquals(attNums2.max(), 10);
+            // ensure attnums
+            const namesToNums = data.get('crl.attNums');
+            assert(isStringRecord(namesToNums));
+            const attNums2 = new AttNums(namesToNums as Record<string, number>);
+            assertEquals(attNums2.max(), 10);
 
-        // ensure data record
-        const record = data.get(`crl.r.${timestampAndUuid}`);
-        assert(typeof record === 'string');
-        const obj = attNums2.unpackRecord(record);
-        // console.log(obj);
-        assert(isStringRecord(obj));
-        assertEquals(obj.uuid, uuid);
+            // ensure data record
+            const record = data.get(`crl.r.${timestampAndUuid}`);
+            assert(typeof record === 'string');
+            const obj = attNums2.unpackRecord(record);
+            // console.log(obj);
+            assert(isStringRecord(obj));
+            assertEquals(obj.uuid, uuid);
 
-        // ensure DayUrl is indexed as expected
-        const expectedDayUrlValueKey = `crl.r.${timestampAndUuid}`;
-        const expectedDayUrlValue = data.get(`crl.i0.${IndexId.DayUrl}.${timestamp.substring(0, 6)}.${url}.${timestampAndUuid}`);
-        assert(isStringRecord(expectedDayUrlValue));
-        const { key: actualDayUrlValueKey } = expectedDayUrlValue;
-        assertEquals(actualDayUrlValueKey, expectedDayUrlValueKey);
+            // ensure DayUrl is indexed as expected
+            const expectedDayUrlValueKey = `crl.r.${timestampAndUuid}`;
+            const expectedDayUrlValue = data.get(`crl.i0.${IndexId.DayUrl}.${timestamp.substring(0, 6)}.${url}.${timestampAndUuid}`);
+            assert(isStringRecord(expectedDayUrlValue));
+            const { key: actualDayUrlValueKey } = expectedDayUrlValue;
+            assertEquals(actualDayUrlValueKey, expectedDayUrlValueKey);
+        }
+
+        {
+            // ensure successful urlStartsWith query
+            const res = await controller.queryRedirectLogs({ limit: 10, format: 'json', urlStartsWith: 'https://example.com/path/to/' });
+            assertEquals(res.status, 200);
+            const { rows } = await res.json();
+            // console.log(rows);
+            assert(Array.isArray(rows));
+            assertEquals(rows.length, 1);
+        }
+
+        {
+            // ensure empty urlStartsWith query
+            const res = await controller.queryRedirectLogs({ limit: 10, format: 'json', urlStartsWith: 'https://example2.com/path/to/' });
+            assertEquals(res.status, 200);
+            const { rows } = await res.json();
+            // console.log(rows);
+            assert(Array.isArray(rows));
+            assertEquals(rows.length, 0);
+        }
     }
 });
