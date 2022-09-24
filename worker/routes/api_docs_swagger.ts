@@ -126,7 +126,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "url",
                             "in": "query",
-                            "description": `Filter by a specific episode url\n\nYou can specify either \`url\` or \`urlSha256\`, not both\n\n**[New]** Supports trailing wildcards, e.g. \`${origin}/e/example.com/path/to/*\``,
+                            "description": `Filter by a specific episode url\n\nYou can specify either \`url\` or \`urlSha256\`, not both\n\n**[New]** Supports trailing wildcards, i.e. "starts with"\n\nExample: \`url=${origin}/e/example.com/path/to/*\``,
                             "example": `${origin}/e/example.com/path/to/episode.mp3`,
                             "required": false,
                             "type": "string",

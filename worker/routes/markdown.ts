@@ -3,33 +3,33 @@ import { encodeXml } from '../deps.ts';
 export function computeMarkdownHtml(markdown: string): string {
     const regex = /\[(.*?)\]\((.*?)\)/g;
     let m: RegExpExecArray | null;
-    const rt: string[] = [];
+    const parts: string[] = [];
     let i = 0;
     while ((m = regex.exec(markdown)) !== null) {
         const { lastIndex } = regex;
         const { index } = m;
         const [ _, text, href ] = m;
-        rt.push(encodeXml(markdown.substring(i, index)));
-        rt.push(`<a href="${href}">${encodeXml(text)}</a>`);
+        parts.push(encodeXml(markdown.substring(i, index)));
+        parts.push(`<a href="${href}">${encodeXml(text)}</a>`);
         i = lastIndex;
     }
-    rt.push(encodeXml(markdown.substring(i)));
-    return rt.join('');
+    parts.push(encodeXml(markdown.substring(i)));
+    return parts.join('').replaceAll(/`([a-z]+)`/g, `<code>$1</code>`);
 }
 
 export function computeMarkdownText(markdown: string): string {
     const regex = /\[(.*?)\]\((.*?)\)/g;
     let m: RegExpExecArray | null;
-    const rt: string[] = [];
+    const parts: string[] = [];
     let i = 0;
     while ((m = regex.exec(markdown)) !== null) {
         const { lastIndex } = regex;
         const { index } = m;
         const [ _, text, href ] = m;
-        rt.push(markdown.substring(i, index));
-        rt.push(`${text} (${href})`);
+        parts.push(markdown.substring(i, index));
+        parts.push(`${text} (${href})`);
         i = lastIndex;
     }
-    rt.push(markdown.substring(i));
-    return rt.join('');
+    parts.push(markdown.substring(i));
+    return parts.join('').replaceAll(/`([a-z]+)`/g, `$1`);
 }

@@ -56,6 +56,15 @@ interface Release {
 
 const RELEASES: Release[] = [
     {
+        id: '2022-09-24',
+        time: '2022-09-24T20:21:00.000Z',
+        title: '2022-09-24: Request URL "starts with" queries',
+        bulletPoints: [
+            ({ origin }) => `The existing [Query Redirect Logs](${origin}/api/docs#tag/redirect-logs/operation/queryRedirectLogs) \`url\` parameter now supports trailing wildcards. Can be used for simple "episode URL starts with" queries before proper show rollup logic is in place.`,
+            ({ origin }) => `Added documention about the sort order of the [Query Redirect Logs](${origin}/api/docs#tag/redirect-logs/operation/queryRedirectLogs) results.`,
+        ]
+    },
+    {
         id: '2022-09-15',
         time: '2022-09-15T23:33:00.000Z',
         title: '2022-09-15: Initial launch! Prefix redirect and Data API preview',
@@ -64,7 +73,7 @@ const RELEASES: Release[] = [
             ({ origin }) => `New API and associated [API Documentation](${origin}/api/docs) providing open access to low-level episode data, as a preview of what's to come.`,
             () => `Existing podcasters can contribute real data to this project by adding the prefix to the episode urls in their podcast RSS feed.`,
         ]
-    }
+    },
 ];
 
 function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
