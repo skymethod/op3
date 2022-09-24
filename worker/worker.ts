@@ -47,7 +47,7 @@ export default {
             if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
             const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
 
-            const rpcClient = new CloudflareRpcClient(backendNamespace);
+            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
 
             // redirect /foo/ to /foo (canonical)
@@ -97,7 +97,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
             
             if (rawRedirects.length > 0) {
                 const doName = `redirect-log-${colo}`;
-                const rpcClient = new CloudflareRpcClient(backendNamespace);
+                const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
                 await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }
         } catch (e) {
@@ -106,7 +106,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
             // TODO retry inline?
             pendingRawRedirects.push(...rawRedirects);
             colo = computeColo(request) ?? colo;
-            dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024) ], doubles: [ 1 ] });
+            dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024), rawRedirects.map(v => v.uuid).join(',') ], doubles: [ 1 ] });
         } finally {
             if (colo === 'XXX') colo = computeColo(request) ?? colo;
             dataset1?.writeDataPoint({ blobs: [ redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, request.url.substring(0, 1024) ], doubles: [ 1 ] });

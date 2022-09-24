@@ -1,57 +1,90 @@
 import { DurableObjectNamespace } from './deps.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse } from './rpc_model.ts';
+import { sleep } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
+    private readonly maxRetries: number;
 
-    constructor(backendNamespace: DurableObjectNamespace) {
+    constructor(backendNamespace: DurableObjectNamespace, maxRetries: number) {
         this.backendNamespace = backendNamespace;
+        this.maxRetries = maxRetries;
     }
 
     async executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target));
     }
 
     async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
-        return await sendRpc<AdminRebuildIndexResponse>({ kind: 'admin-rebuild-index', ...request }, 'admin-rebuild-index', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<AdminRebuildIndexResponse>({ kind: 'admin-rebuild-index', ...request }, 'admin-rebuild-index', this.computeOpts(target));
     }
 
     async registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'register-do', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<OkResponse>({ kind: 'register-do', ...request }, 'ok', this.computeOpts(target));
     }
 
     async getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse> {
-        return await sendRpc<GetKeyResponse>({ kind: 'get-key', ...request }, 'get-key', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<GetKeyResponse>({ kind: 'get-key', ...request }, 'get-key', this.computeOpts(target));
     }
 
     async sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'redirect-logs-notification', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<OkResponse>({ kind: 'redirect-logs-notification', ...request }, 'ok', this.computeOpts(target));
     }
 
     async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target));
     }
 
     async sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'alarm', ...request }, 'ok', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<OkResponse>({ kind: 'alarm', ...request }, 'ok', this.computeOpts(target));
     }
 
     async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse> {
-        return await sendRpc<GetNewRedirectLogsResponse>({ kind: 'get-new-redirect-logs', ...request }, 'get-new-redirect-logs', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<GetNewRedirectLogsResponse>({ kind: 'get-new-redirect-logs', ...request }, 'get-new-redirect-logs', this.computeOpts(target));
     }
 
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
-        return await sendRpc<Response>({ kind: 'query-redirect-logs', ...request }, 'response', { doName: target, backendNamespace: this.backendNamespace });
+        return await sendRpc<Response>({ kind: 'query-redirect-logs', ...request }, 'response', this.computeOpts(target));
+    }
+
+    //
+
+    private computeOpts(target: string): { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number } {
+        const { backendNamespace, maxRetries } = this;
+        return { doName: target, backendNamespace, maxRetries };
     }
 
 }
 
 //
 
-async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }): Promise<T> {
+async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number }): Promise<T> {
+    const { maxRetries } = opts;
+
+    let retries = 0;
+    while (true) {
+        try {
+            if (retries > 0) {
+                const waitMillis = retries * 1000;
+                await sleep(waitMillis);
+            }
+            return await sendSingleRpc(request, expectedResponseKind, opts);
+        } catch (e) {
+            if (isRetryable(e)) {
+                if (retries >= maxRetries) {
+                    throw new Error(`sendRpc: Out of retries (max=${maxRetries}): ${e.stack || e}`);
+                }
+                retries++;
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+
+async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }) {
     const { doName, backendNamespace } = opts;
 
-    // TODO: retry on known transient DO errors
     const stub = backendNamespace.get(backendNamespace.idFromName(doName));
     const res = await stub.fetch('https://backend/rpc', { method: 'POST', body: JSON.stringify(request), headers: { 'do-name': doName } });
 
@@ -66,4 +99,12 @@ async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opt
     if (obj.kind !== expectedResponseKind) throw new Error(`Unexpected rpc response: ${JSON.stringify(obj)}`);
     // deno-lint-ignore no-explicit-any
     return obj as any;
+}
+
+function isRetryable(e: Error): boolean {
+    const error = `${e.stack || e}`;
+    if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
+    if (error.includes('The Durable Object\'s code has been updated')) return true; // TypeError: The Durable Object's code has been updated, this version can no longer access storage.
+    if (error.includes('Response closed due to connection limit')) return true; // Error: Response closed due to connection limit
+    return false;
 }
