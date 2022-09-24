@@ -59,7 +59,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "redirect-logs"
                     ],
                     "summary": "Query redirect logs",
-                    "description": `Perform a query of every request logged using the redirect.\n\nThis can be used to verify that requests are stored properly in the system.\n\nYou can filter by a time range and one additional optional dimension (such as \`url\`).${queryRedirectLogsDescriptionSuffix}`,
+                    "description": `Perform a query of every request logged using the redirect.\n\nThis can be used to verify that requests are stored properly in the system.\n\nResults are returned in ascending order by time (plus uuid to break ties for multiple requests in the same millisecond).\n\nYou can filter by a time range and one additional optional dimension (such as \`url\`).${queryRedirectLogsDescriptionSuffix}`,
                     "operationId": "queryRedirectLogs",
                     "produces": [
                         "application/json",
