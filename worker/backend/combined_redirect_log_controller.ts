@@ -122,8 +122,9 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
 async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage) {
     const { doName } = state;
     const nothingNew = typeof state.notificationTimestampId === 'string' && state.notificationTimestampId === state.haveTimestampId;
-    console.log(`CombinedRedirectLogController: processSource ${doName}: ${nothingNew ? `nothing new` : JSON.stringify(state)}`);
     if (nothingNew) return;
+
+    console.log(`CombinedRedirectLogController: processSource ${doName}: ${JSON.stringify(state)}`);
 
     if (typeof state.notificationTimestampId === 'string' && state.notificationTimestampId === state.haveTimestampId) {
         console.log(`CombinedRedirectLogController: Up to date at ${state.notificationTimestampId}`);
