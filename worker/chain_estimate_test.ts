@@ -31,5 +31,15 @@ Deno.test({
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3'} 
         ]);
 
+        assertEquals(computeChainEstimate('https://pdcn.co/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podcorn', url: 'https://pdcn.co/e/a.com/path/to/episode.mp3' }, 
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3'} 
+        ]);
+
+        assertEquals(computeChainEstimate('https://2.gum.fm/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'gumball', url: 'https://2.gum.fm/a.com/path/to/episode.mp3' }, 
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3'} 
+        ]);
+
     }
 });

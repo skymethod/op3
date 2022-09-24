@@ -63,6 +63,25 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'artsai', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://pdcn.co/e/
+    // https://podcorn.com/analytics-prefix/
+    // http redirects to target https
+    m = /^https?:\/\/pdcn\.co\/e\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podcorn', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
+    // https://2.gum.fm/
+    // http redirects to target https
+    m = /^https?:\/\/2\.gum\.fm\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'gumball', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -74,5 +93,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball';
 }
