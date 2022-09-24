@@ -125,7 +125,7 @@ async function computeUrlStartsWithIndexValues({ urlStartsWith, limit, startTime
     const def = INDEX_DEFINITIONS.find(v => v[1] === index)!;
     for (let i = 0; i < 10; i++) { // max 10 day scans
         const date = addDays(new Date(rangeStartInstant), i);
-        if (date.getTime() > Date.now()) return rt; // don't bother to scan in the future
+        if (computeTimestamp(date).substring(0, 6) > computeTimestamp().substring(0, 6)) return rt; // don't bother to scan in future days
 
         const timestamp = computeTimestamp(date);
         console.log(`computeUrlStartsWithIndexValues: urlStartsWith, rangeStartInstant=${rangeStartInstant}, timestamp=${timestamp}`);
