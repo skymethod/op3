@@ -14,7 +14,7 @@ export function computeRawIpAddress(request: Request): string | undefined {
 export function computeOther(request: Request): Record<string, string> | undefined {
     const req = request as IncomingRequestCf;
     if (typeof req.cf !== 'object') return undefined;
-    const rt = Object.fromEntries(Object.entries(req.cf).filter(v => v[0] === 'colo' && typeof v[1] === 'string' && v[1] !== ''));
+    const rt = Object.fromEntries(Object.entries(req.cf).filter(v => /^(colo|country)$/.test(v[0]) && typeof v[1] === 'string' && v[1] !== ''));
     return Object.keys(rt).length > 0 ? rt : undefined;
 }
 

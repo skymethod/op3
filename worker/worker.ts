@@ -1,4 +1,4 @@
-import { computeColo, computeOther, computeRawIpAddress } from './cloudflare_request.ts';
+import { computeOther, computeRawIpAddress } from './cloudflare_request.ts';
 import { ModuleWorkerContext } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
@@ -30,37 +30,28 @@ export default {
         if (redirectResponse) return redirectResponse;
 
         // handle all other requests
+        let response: Response;
         try {
-            const { instance, backendNamespace, productionDomain, cfAnalyticsToken, deploySha, deployTime } = env;
-            IsolateId.log();
-            const { origin, hostname, pathname, searchParams } = new URL(request.url);
-            const { method, headers } = request;
-            const adminTokens = parseStringSet(env.adminTokens);
-            const previewTokens = parseStringSet(env.previewTokens);
-            const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
-
-            if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
-            if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
-            if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
-            if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
-            if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
-            if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
-            const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
-
-            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-            const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
-
-            // redirect /foo/ to /foo (canonical)
-            if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
-
-            // not found
-            if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
-
-            return newMethodNotAllowedResponse(method);
+            response = await computeResponse(request, env);
         } catch (e) {
             console.error(`Unhandled error computing response: ${e.stack || e}`);
-            return new Response('failed', { status: 500 });
+            response = new Response('failed', { status: 500 });
         }
+        // request/response metrics
+        try {
+            const { dataset1 } = env;
+            if (dataset1) {
+                const millis = Date.now() - requestTime;
+                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+                const { method } = request;
+                const { pathname } = new URL(request.url);
+                const contentType = response.headers.get('content-type') ?? '<unspecified>';
+                dataset1.writeDataPoint({ blobs: [ 'worker-request', colo, pathname.substring(0, 1024), country, method, contentType ], doubles: [ 1, millis, response.status ] });
+            }
+        } catch {
+            // noop
+        }
+        return response;
     }
     
 }
@@ -103,13 +94,12 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
         } catch (e) {
             console.error(`Error sending raw redirects: ${e.stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
-            // TODO retry inline?
             pendingRawRedirects.push(...rawRedirects);
-            colo = computeColo(request) ?? colo;
-            dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024), rawRedirects.map(v => v.uuid).join(',') ], doubles: [ 1 ] });
+            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+            try { dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024), country, rawRedirects.map(v => v.uuid).join(',') ], doubles: [ 1 ] }); } catch { /* noop */ }
         } finally {
-            if (colo === 'XXX') colo = computeColo(request) ?? colo;
-            dataset1?.writeDataPoint({ blobs: [ redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, request.url.substring(0, 1024) ], doubles: [ 1 ] });
+            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+            try { dataset1?.writeDataPoint({ blobs: [ redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, request.url.substring(0, 1024), country ], doubles: [ 1 ] }); } catch { /* noop */ }
         }
     })());
     if (redirectRequest.kind === 'valid') {
@@ -133,4 +123,34 @@ function computeRawRedirect(request: Request, opts: { time: number, method: stri
 
 function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
     return new Set((commaDelimitedString  ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
+}
+
+async function computeResponse(request: Request, env: WorkerEnv): Promise<Response> {
+        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, deploySha, deployTime } = env;
+        IsolateId.log();
+        const { origin, hostname, pathname, searchParams } = new URL(request.url);
+        const { method, headers } = request;
+        const adminTokens = parseStringSet(env.adminTokens);
+        const previewTokens = parseStringSet(env.previewTokens);
+        const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
+
+        if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
+        if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
+        if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
+        const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
+
+        const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+        const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
+
+        // redirect /foo/ to /foo (canonical)
+        if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
+
+        // not found
+        if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+
+        return newMethodNotAllowedResponse(method);
+
 }
