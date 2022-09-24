@@ -42,7 +42,7 @@ export class BackendDO {
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
             const { backendNamespace, redirectLogNotificationDelaySeconds } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
-            const rpcClient = new CloudflareRpcClient(backendNamespace);
+            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
 
             const { method } = request;
@@ -171,7 +171,7 @@ export class BackendDO {
             // workaround no logs for alarm handlers
             // make an rpc call back to this object
             const { backendNamespace } = this.env;
-            const rpcClient = new CloudflareRpcClient(backendNamespace);
+            const rpcClient = new CloudflareRpcClient(backendNamespace, 0 /* alarm handler will retry for us */);
             const fromIsolateId = IsolateId.get();
             const info = this.info ?? await loadDOInfo(storage);
             if (!info) {
