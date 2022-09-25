@@ -46,5 +46,10 @@ Deno.test({
             { kind: 'prefix', prefix: 'chartable', url: 'https://chtbl.com/track/12345/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('http://op3.dev/e/a.com/path/to/episode.mp3?aid=rss_feed&feed=asdf'), [
+            { kind: 'prefix', prefix: 'op3', url: 'http://op3.dev/e/a.com/path/to/episode.mp3?aid=rss_feed&feed=asdf' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3?aid=rss_feed&feed=asdf' }
+        ]);
     }
 });

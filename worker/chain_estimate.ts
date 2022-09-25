@@ -14,8 +14,8 @@ export function computeChainDestinationHostname(url: string): string | undefined
 export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://op3.dev/e/(https?://)?
-    // no http support (.dev TLD on HSTS preload list)
-    let m = /^https:\/\/(ci\.|staging\.)?\op3\.dev\/e\/(.+?)$/.exec(url);
+    // no http support (.dev TLD on HSTS preload list), but clients (browsers) redirect anyway?
+    let m = /^https?:\/\/(ci\.|staging\.)?\op3\.dev\/e\/(.+?)$/.exec(url);
     if (m) {
         const [ _, _subdomain, suffix ] = m;
         m = /^((https?):\/\/?).*?$/i.exec(suffix);
