@@ -25,6 +25,9 @@ export function computeRedirectResponse(request: ValidRedirectRequest): Response
 
             // specify the target of the redirect
             'location': request.targetUrl,
+
+            // allow cors requests, we should not be the blocking link in the redirect chain
+            'access-control-allow-origin': '*',
         }
     })
 }
