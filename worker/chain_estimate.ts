@@ -43,10 +43,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://chrt.fm/track/CHRT123/
+    // also chtbl.com/track/12345
     // http redirects to target http
-    m = /^(https?):\/\/chrt\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
+    m = /^(https?):\/\/(chrt\.fm|chtbl\.com)\/track\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, suffix ] = m;
+        const [ _, scheme, _domain, suffix ] = m;
         const targetUrl = `${scheme}://${suffix}`;
         return [ { kind: 'prefix', prefix: 'chartable', url }, ...computeChainEstimate(targetUrl) ];
     }
