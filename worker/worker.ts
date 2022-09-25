@@ -18,12 +18,17 @@ import { computeReleasesResponse, tryParseReleasesRequest } from './routes/relea
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './routes/responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
+import { writeTraceEvent } from './tracer.ts';
+import { computeChainDestinationHostname } from './chain_estimate.ts';
+import { initCloudflareTracer } from './cloudflare_tracer.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
     
     async fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
         const requestTime = Date.now();
+
+        initCloudflareTracer(env.dataset1);
        
         // first, handle redirects - the most important function
         // be careful here: must never throw
@@ -38,20 +43,18 @@ export default {
             console.error(`Unhandled error computing response: ${e.stack || e}`);
             response = new Response('failed', { status: 500 });
         }
+        
         // request/response metrics
-        try {
-            const { dataset1 } = env;
-            if (dataset1) {
-                const millis = Date.now() - requestTime;
-                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-                const { method } = request;
-                const { pathname } = new URL(request.url);
-                const contentType = response.headers.get('content-type') ?? '<unspecified>';
-                dataset1.writeDataPoint({ blobs: [ 'worker-request', colo, pathname.substring(0, 1024), country, method, contentType ], doubles: [ 1, millis, response.status ] });
-            }
-        } catch {
-            // noop
-        }
+        writeTraceEvent(() => {
+            const millis = Date.now() - requestTime;
+            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+            const { method } = request;
+            const { status } = response;
+            const { pathname } = new URL(request.url);
+            const contentType = response.headers.get('content-type') ?? '<unspecified>';
+            return { kind: 'worker-request', colo, pathname, country, method, contentType, millis, status };
+        });
+
         return response;
     }
     
@@ -70,7 +73,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
     const rawRedirects = pendingRawRedirects.splice(0);
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
-        const { backendNamespace, dataset1 } = env;
+        const { backendNamespace } = env;
         const { method } = request;
         let colo = 'XXX';
         try {
@@ -96,11 +99,17 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
             console.error(`Error sending raw redirects: ${e.stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
             pendingRawRedirects.push(...rawRedirects);
-            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-            try { dataset1?.writeDataPoint({ blobs: [ 'error-saving-redirect', colo, `${e.stack || e}`.substring(0, 1024), country, rawRedirects.map(v => v.uuid).join(',') ], doubles: [ 1 ] }); } catch { /* noop */ }
+            writeTraceEvent(() => {
+                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+                return { kind: 'error-saving-redirect', colo, error: `${e.stack || e}`, country, uuids: rawRedirects.map(v => v.uuid) };
+            });
         } finally {
-            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-            try { dataset1?.writeDataPoint({ blobs: [ redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, request.url.substring(0, 1024), country ], doubles: [ 1 ] }); } catch { /* noop */ }
+            writeTraceEvent(() => {
+                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+                const { url } = request;
+                const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
+                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname };
+            });
         }
     })());
     if (redirectRequest.kind === 'valid') {

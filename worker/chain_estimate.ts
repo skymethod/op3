@@ -1,8 +1,14 @@
+import { tryParseUrl } from './check.ts';
 
-export function computeChainDestination(url: string): string {
+export function computeChainDestinationUrl(url: string): string | undefined {
     const estimate = computeChainEstimate(url);
     const last = estimate.at(-1);
-    return last && last.kind === 'destination' ? last.url : url;
+    return last && last.kind === 'destination' ? last.url : undefined;
+}
+
+export function computeChainDestinationHostname(url: string): string | undefined {
+    const destinationUrl = computeChainDestinationUrl(url);
+    return destinationUrl ? tryParseUrl(destinationUrl)?.hostname : undefined;
 }
 
 export function computeChainEstimate(url: string): ChainEstimate {

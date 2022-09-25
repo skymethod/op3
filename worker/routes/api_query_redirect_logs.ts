@@ -1,4 +1,4 @@
-import { computeChainDestination } from '../chain_estimate.ts';
+import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkMatches, isNotBlank, isValidHttpUrl, isValidInstant, tryParseInt, tryParseUrl } from '../check.ts';
 import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { Bytes } from '../deps.ts';
@@ -52,7 +52,7 @@ export async function computeQueryRedirectLogsResponse(method: string, searchPar
             const m = /^(https?:\/\/.+?)\*$/.exec(url);
             if (m) {
                 const [ _, urlStartsWith ] = m;
-                const destinationUrl = computeChainDestination(m[1]);
+                const destinationUrl = computeChainDestinationUrl(urlStartsWith) ?? urlStartsWith;
                 const u = tryParseUrl(destinationUrl);
                 if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid destination url ${destinationUrl}`);
                 if (u.pathname.length <= '/audio/'.length) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, destination url pathname must be at least ${'/audio/'.length + 1} characters long, found ${u.pathname}`);
