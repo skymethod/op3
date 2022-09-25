@@ -17,6 +17,7 @@ import { computePrivacyResponse } from './routes/privacy.ts';
 import { computeReleasesResponse, tryParseReleasesRequest } from './routes/releases.ts';
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './routes/responses.ts';
+import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -141,7 +142,8 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
         const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
-
+        if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
+        if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
         const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
         const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
 
