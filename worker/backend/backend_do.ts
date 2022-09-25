@@ -13,6 +13,8 @@ import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
 import { tryParseInt } from '../check.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
+import { initCloudflareTracer } from '../cloudflare_tracer.ts';
+import { writeTraceEvent } from '../tracer.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -29,24 +31,28 @@ export class BackendDO {
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
         this.env = env;
+        initCloudflareTracer(env.dataset1);
     }
 
     async fetch(request: Request): Promise<Response> {
-        IsolateId.log();
+        const isolateId = IsolateId.log();
         console.log(request.url);
         const colo = await BackendDOColo.get();
         const durableObjectName = request.headers.get('do-name');
-        console.log('logprops:', { colo, durableObjectClass: 'BackendDO', durableObjectId: this.state.id.toString(), durableObjectName });
+        const durableObjectId = this.state.id.toString();
+        const durableObjectClass = 'BackendDO';
+        console.log('logprops:', { colo, durableObjectClass, durableObjectId, durableObjectName });
 
         try {
+            const { method } = request;
+            const { pathname } = new URL(request.url);
+            writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
+
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
             const { backendNamespace, redirectLogNotificationDelaySeconds } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
-
-            const { method } = request;
-            const { pathname } = new URL(request.url);
 
             if (method === 'POST' && pathname === '/rpc') {
                 try {
@@ -178,7 +184,10 @@ export class BackendDO {
                 console.error(`BackendDO: unable to compute name!`);
                 return;
             }
-            await rpcClient.sendAlarm({ payload, fromIsolateId }, info.name);
+            const { id: durableObjectId, name: durableObjectName, colo } = info;
+            writeTraceEvent({ kind: 'do-alarm', colo, durableObjectClass: 'BackendDO', durableObjectId, durableObjectName: durableObjectName, isolateId: fromIsolateId });
+
+            await rpcClient.sendAlarm({ payload, fromIsolateId }, durableObjectName);
         }
     }
 

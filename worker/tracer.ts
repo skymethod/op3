@@ -32,6 +32,8 @@ export type TraceEvent =
     | InvalidRedirect
     | ErrorComputingTraceEvent
     | WorkerRequest
+    | DurableObjectFetchRequest
+    | DurableObjectAlarmRequest
     ;
 
 export interface ErrorSavingRedirect {
@@ -71,4 +73,24 @@ export interface WorkerRequest {
     readonly millis: number;
     readonly status: number;
     readonly contentType: string;
+}
+
+export interface DurableObjectFetchRequest {
+    readonly kind: 'do-fetch',
+    readonly colo: string;
+    readonly durableObjectName: string;
+    readonly durableObjectId: string;
+    readonly durableObjectClass: string;
+    readonly isolateId: string;
+    readonly method: string;
+    readonly pathname: string;
+}
+
+export interface DurableObjectAlarmRequest {
+    readonly kind: 'do-alarm',
+    readonly colo: string;
+    readonly durableObjectName: string;
+    readonly durableObjectId: string;
+    readonly durableObjectClass: string;
+    readonly isolateId: string;
 }

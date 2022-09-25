@@ -17,8 +17,10 @@ export class IsolateId {
         return (Date.now() - time) / 1000
     }
 
-    static log() {
-        console.log(`isolateId: ${IsolateId.get()} (${IsolateId.ageInSeconds()} seconds old)`);
+    static log(): string {
+        const isolateId = IsolateId.get();
+        console.log(`isolateId: ${isolateId} (${IsolateId.ageInSeconds()} seconds old)`);
+        return isolateId;
     }
     
 }
