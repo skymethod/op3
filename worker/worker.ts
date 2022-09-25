@@ -18,7 +18,7 @@ import { computeReleasesResponse, tryParseReleasesRequest } from './routes/relea
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './routes/responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
-import { writeTraceEvent } from './tracer.ts';
+import { consoleError, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
 export { BackendDO } from './backend/backend_do.ts';
@@ -40,7 +40,7 @@ export default {
         try {
             response = await computeResponse(request, env);
         } catch (e) {
-            console.error(`Unhandled error computing response: ${e.stack || e}`);
+            consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
             response = new Response('failed', { status: 500 });
         }
         
@@ -96,7 +96,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
                 await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }
         } catch (e) {
-            console.error(`Error sending raw redirects: ${e.stack || e}`);
+            consoleError('worker-sending-redirects', `Error sending raw redirects: ${e.stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
             pendingRawRedirects.push(...rawRedirects);
             writeTraceEvent(() => {

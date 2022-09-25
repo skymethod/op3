@@ -14,7 +14,7 @@ import { CombinedRedirectLogController } from './combined_redirect_log_controlle
 import { tryParseInt } from '../check.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
 import { initCloudflareTracer } from '../cloudflare_tracer.ts';
-import { writeTraceEvent } from '../tracer.ts';
+import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -157,14 +157,14 @@ export class BackendDO {
                     }
                 } catch (e) {
                     const message = `${e.stack || e}`;
-                    console.error(`Unhandled error in rpc call: ${message}`);
+                    consoleError('backend-do-rpc', `Unhandled error in rpc call: ${message}`);
                     return newRpcResponse({ kind: 'error',  message });
                 }
             }
             return new Response('not found', { status: 404 });
         } catch (e) {
             const msg = `Unhandled error in BackendDO.fetch: ${e.stack || e}`;
-            console.error(msg);
+            consoleError('backend-do-fetch', msg);
             return new Response(msg, { status: 500 });
         }
     }
@@ -181,7 +181,7 @@ export class BackendDO {
             const fromIsolateId = IsolateId.get();
             const info = this.info ?? await loadDOInfo(storage);
             if (!info) {
-                console.error(`BackendDO: unable to compute name!`);
+                consoleError('backend-do-alarm-do-name', `BackendDO: unable to compute name!`);
                 return;
             }
             const { id: durableObjectId, name: durableObjectName, colo } = info;
@@ -232,7 +232,7 @@ export class BackendDO {
                 await rpcClient.registerDO({ info }, 'registry');
                 console.log(`ensureInitialized: registered`);
             } catch (e) {
-                console.error(`Error registering do: ${e.stack || e}`);
+                consoleWarn('backend-do-register', `Error registering do: ${e.stack || e}`);
                 // not the end of the world, info is saved, we'll try again next time
             }
         })()
@@ -264,7 +264,7 @@ async function loadDOInfo(storage: DurableObjectStorage): Promise<DOInfo | undef
     try {
         if (checkDOInfo(obj)) return obj;
     } catch (e) {
-        console.error(`Error loading do info: ${e.stack || e}`);
+        consoleError('backend-do-loading-do-info', `Error loading do info: ${e.stack || e}`);
     }
     return undefined;
 }

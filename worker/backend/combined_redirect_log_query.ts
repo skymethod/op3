@@ -4,6 +4,7 @@ import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { setAll } from '../maps.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { addDays, computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
+import { consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { IndexId, INDEX_DEFINITIONS } from './combined_redirect_log_controller.ts';
 
@@ -117,7 +118,7 @@ async function computeUrlStartsWithIndexValues({ urlStartsWith, limit, startTime
     const endTimestamp = endTimeExclusive ? computeTimestamp(endTimeExclusive) : undefined;
     const rangeStartTimestamp = (startTimestamp ?? startAfterTimestamp ?? await computeEarliestTimestamp(storage));
     if (!rangeStartTimestamp) {
-        console.warn(`computeUrlStartsWithIndexValues: no rangeStartTimestamp, assume no data`);
+        consoleWarn('crlq-no-data', `computeUrlStartsWithIndexValues: no rangeStartTimestamp, assume no data`);
         return rt; // we must have no data at all
     }
     const rangeStartInstant = timestampToInstant(rangeStartTimestamp);
@@ -133,7 +134,7 @@ async function computeUrlStartsWithIndexValues({ urlStartsWith, limit, startTime
         // scan the index for the day
         const indexValue = await def[2](urlStartsWith, timestamp);
         if (!indexValue) {
-            console.warn(`computeUrlStartsWithIndexValues: no indexValue, urlStartsWith=${urlStartsWith}, timestamp=${timestamp}`);
+            consoleWarn('crlq-no-index-value', `computeUrlStartsWithIndexValues: no indexValue, urlStartsWith=${urlStartsWith}, timestamp=${timestamp}`);
             return rt;
         }
         const prefix = `crl.i0.${index}.${indexValue}`;

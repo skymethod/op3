@@ -7,6 +7,7 @@ import { isValidUuid } from '../uuid.ts';
 import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
+import { consoleError, consoleWarn } from '../tracer.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -48,7 +49,7 @@ export class CombinedRedirectLogController {
 
         for (const state of map.values()) {
             if (!isValidSourceState(state)) {
-                console.warn(`CombinedRedirectLogController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
+                consoleWarn('crlc-bad-ss', `CombinedRedirectLogController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
                 continue;
             }
             await processSource(state, rpcClient, attNums, storage);
@@ -102,7 +103,7 @@ export class CombinedRedirectLogController {
 async function loadSourceState(doName: string, storage: DurableObjectStorage): Promise<SourceState | undefined> {
     const state = await storage.get(`crl.ss.${doName}`);
     if (state !== undefined && !isValidSourceState(state)) {
-        console.warn(`CombinedRedirectLogController: Invalid source state for ${doName}: ${JSON.stringify(state)}`);
+        consoleWarn('crlc-load-bad-ss', `CombinedRedirectLogController: Invalid source state for ${doName}: ${JSON.stringify(state)}`);
         return undefined;
     }
     return state;
@@ -114,7 +115,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        console.error(`CombinedRedirectLogController: Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        consoleError('crlc-loading-attnums', `CombinedRedirectLogController: Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
     }
     return new AttNums();
 }
@@ -147,11 +148,11 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         // console.log(`${timestampId}: ${JSON.stringify(obj)}`);
         const { uuid, timestamp } = obj;
         if (typeof uuid !== 'string' || !isValidUuid(uuid)) {
-            console.warn(`CombinedRedirectLogController: Skipping bad source obj (invalid uuid): ${JSON.stringify(obj)}`);
+            consoleWarn('crlc-bad-source-obj-uuid', `CombinedRedirectLogController: Skipping bad source obj (invalid uuid): ${JSON.stringify(obj)}`);
             continue;
         }
         if (typeof timestamp !== 'string' || !isValidTimestamp(timestamp)) {
-            console.warn(`CombinedRedirectLogController: Skipping bad source obj (invalid timestamp): ${JSON.stringify(obj)}`);
+            consoleWarn('crlc-bad-source-obj-timestamp', `CombinedRedirectLogController: Skipping bad source obj (invalid timestamp): ${JSON.stringify(obj)}`);
             continue;
         }
         const timestampAndUuid = `${timestamp}-${uuid}`;

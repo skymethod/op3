@@ -2,6 +2,7 @@ import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse } from './responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
+import { consoleError } from '../tracer.ts';
 
 export function tryParseApiRequest(opts: { method: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { method, pathname, searchParams, headers, bodyProvider } = opts;
@@ -41,7 +42,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         }
     } catch (e) {
         const error = `${e.stack || e}`;
-        console.error(`Error in api call: ${error}`);
+        consoleError('api-call', `Error in api call: ${error}`);
         return newJsonResponse({ error }, 500);
     }
 

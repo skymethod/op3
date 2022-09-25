@@ -4,6 +4,7 @@ import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from '../timestamp.ts';
 import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect } from '../rpc_model.ts';
 import { check } from '../check.ts';
+import { consoleError } from '../tracer.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -111,7 +112,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        console.error(`Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        consoleError('rlc-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
     }
     return new AttNums();
 }
