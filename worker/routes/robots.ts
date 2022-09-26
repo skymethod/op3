@@ -6,7 +6,7 @@ export function computeRobotsTxtResponse(opts: { origin: string }): Response {
         `User-agent: *`, 
         `Disallow: /e/`,
         `Disallow: /api/1/`,
-        `${origin}/sitemap.xml`,
+        `Sitemap: ${origin}/sitemap.xml`,
     ];
     return newTextResponse(lines.join('\n'));
 }
