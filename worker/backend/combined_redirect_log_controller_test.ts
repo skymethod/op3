@@ -1,5 +1,5 @@
 import { assertEquals, assertNotEquals } from '../tests/deps.ts';
-import { InMemoryDurableObjectStorage } from '../tests/deps.ts';
+import { InMemoryDurableObjectStorage, assert } from '../tests/deps.ts';
 import { CombinedRedirectLogController, IndexId } from './combined_redirect_log_controller.ts';
 import { StubRpcClient } from '../tests/stub_rpc_client.ts';
 import { Unkinded,GetNewRedirectLogsRequest,GetNewRedirectLogsResponse } from '../rpc_model.ts';
@@ -12,7 +12,6 @@ import { Bytes } from '../deps.ts';
 import { generateHmacKeyBytes } from '../crypto.ts';
 import { packHashedIpAddress, unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { importHmacKey } from '../crypto.ts';
-import { assert } from 'https://deno.land/std@0.144.0/_util/assert.ts';
 import { isStringRecord } from '../check.ts';
 
 Deno.test({
