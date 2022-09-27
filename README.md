@@ -37,7 +37,7 @@ A free service for podcasters and podcast hosts to compute standard episode/show
     - Other data like rough geo-location is available, but should be first discussed with a wider community before saving
    
 ## Commitment to **auditable infrastructure**
-  - Entire code base is open source (here)
+  - Entire code base is open source, right here in this very GitHub repo
   - Deployments run entirely on GitHub, and are pushed directly to Cloudflare's CDN environment, no black boxes in the middle
   - Any IP lists will default to being public in the codebase
     - For those that cannot be public, a hash will be present in the codebase - so changes can be tracked and verified by other parties with the same list
@@ -46,7 +46,7 @@ A free service for podcasters and podcast hosts to compute standard episode/show
 ## Commitment to **high-performance redirects**
   - Since any prefix service is in the path of serving podcast episodes, it needs to be lightning-fast
   - Runs entirely on Cloudflare's CDN platform, a global infrastructure with edge nodes in over 275 cites in over 100 countries
-  - The redirects always succeed, even if the backend storage is down. Logging is done in the background after the response is returned.
+  - The redirects always succeed, even if the backend storage is down. Logging is done in the background after the response is returned
  
 ## Commitment to **sustainable development**
   - Although the service runs on serverless infrastructure, there will still be monthly costs involved, and ongoing administration (combatting fraud and abuse, managing current IP lists)
@@ -55,3 +55,30 @@ A free service for podcasters and podcast hosts to compute standard episode/show
   - Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships
     - For initial development, there is a [Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) as a way to gauge interest
     - Sponsors will be listed on the project page if desired
+
+# Roadmap
+The production [op3.dev](https://op3.dev) prefix service is ready to use, it's been tested with large shows and is safely storing and returning episode request logs. 
+Basic request-level data is available in the API, all other features will build on top in a layered approach.
+
+## Work plan
+ - Launch highly-available, performant prefix redirect service ✅
+ - Make low-level minimized **request** data available in the API ✅
+ - Identify podcast show and episode information for each episode url using the service 👨‍💻
+ - Publish documentation site with setup guides for every podcast hosting company and FAQs on how to audit the project claims and policies
+ - Make high-quality podcast and episode **download** data available in the API
+   - (This will be the most useful data for podcast use cases such as verifying downloads for advertisers or comparing shows)
+   - Filter out duplicate requests from the same listener
+   - Distinguish apps from bots by User-Agent, building on the [public OPAWG User agent list](https://github.com/opawg/user-agents)
+   - Categorize request IPs using known IP ranges of cloud services, vpns, tor traffic, etc, and exclude ranges representing automated traffic
+   - Implement a solid first-pass calculation along the lines of the [Open Downloads](https://github.com/open-downloads/odl) criteria
+ - Build user-friendly charts and widgets for podcasters to easily reference and/or integrate into their own sites
+ - Build useful data exports to Google Sheets, Zapier, etc
+ - Build operational tools to support ongoing maintenance, data management, and abuse/fraud detection with minimal staffing needs
+
+# Sponsors
+Public list coming soon...
+
+Support initial build-out and operations by purchasing a [Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148).
+
+# Questions?
+Email [john@op3.dev](mailto:john@op3.dev) or [start a discussion](https://github.com/skymethod/op3/discussions).

@@ -20,26 +20,29 @@
     <div class="max-w-2xl mx-auto mt-16 text-center px-8">
         The Open Podcast Prefix Project (OP3) is a free and <a href="https://github.com/skymethod/op3">open-source</a> podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a> committed to open data and listener privacy.
     </div>
-    <div class="max-w-2xl mx-auto mt-16 text-center px-8">
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8 bg-gray-900 bg-opacity-50 py-8">
         Podcasters or podcast hosting companies can prepend<br>
         <span class="font-mono p-4 inline-block font-bold">${origin}/e/</span><br>
         to podcast episode urls in their feed to participate and start sending us data.<br>
         (No need to remove existing prefixes, there can be more than one)
     </div>
-    <div class="max-w-2xl mx-auto mt-16 text-center px-8">
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8">
         This service is a departure from all other analytics services, it's an open and auditable machine.  Not only is the code available on <a href="https://github.com/skymethod/op3">GitHub</a>, but all deployments are triggered there as well.
     </div>
     <div class="max-w-2xl mx-auto mt-16 text-center px-8">
-        It runs on a global CDN with edge nodes in over 275 cites in over 100 countries.
+        Once you start using this prefix, you are opening up your show's listener numbers to the world, <i>without compromising your listeners privacy</i>.  Developers and companies can start building products and services for you with the data, without you having to manage a custom integration.
+    </div>
+    <div class="max-w-2xl mx-auto mt-16 text-center px-8">
+        OP3 runs on a global CDN with edge nodes in over 275 cites in over 100 countries, it is already one of the fastest (if not the fastest) podcast redirect service.
     </div>
     <div class="max-w-2xl mx-auto mt-16 text-center px-8">
         This project is still very much in early development, but is ready to receive real data from early adopters and make it available over the <a href="/api/docs">OP3 API</a>.
     </div>
-    <div class="max-w-2xl mx-auto mt-16 text-center px-8">
-        Learn more about our future plans on the <a href="https://github.com/skymethod/op3">GitHub readme</a>.
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8 py-8 bg-gray-900 bg-opacity-50">
+        Learn more about our future plans on the <a href="https://github.com/skymethod/op3#op3">GitHub readme</a>. 
     </div>
-    <div class="max-w-2xl mx-auto mt-16 text-center px-8">
-        <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> · <a href="/releases">Releases</a>
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8">
+        <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a><br><a href="/releases">Releases · <a href="mailto:john@op3.dev">Email · <a href="https://github.com/skymethod/op3#commitment-to-sustainable-development">Sponsor</a>
     </div>
     <div class="max-w-2xl mx-auto text-center text-sm md:text-base md:px-8 text-indigo-400 mb-16">Version <a class="text-indigo-400 hover:text-indigo-400" href="https://github.com/skymethod/op3/blob/${deploySha}/.github/workflows/deploy-on-push.yml">${deploySha}</a><br>Deployed ${deployTime}</div>
     ${cfAnalyticsSnippet}
