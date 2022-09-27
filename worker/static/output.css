@@ -653,10 +653,6 @@ a:hover {
   background-color: rgb(154 52 18 / var(--tw-bg-opacity));
 }
 
-.fill-orange-700 {
-  fill: #c2410c;
-}
-
 .fill-indigo-400 {
   fill: #818cf8;
 }
@@ -696,6 +692,11 @@ a:hover {
   line-height: 2.25rem;
 }
 
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .font-semibold {
   font-weight: 600;
 }
@@ -727,4 +728,16 @@ a:hover {
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+@media (min-width: 768px) {
+  .md\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .md\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
 }
