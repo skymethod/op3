@@ -89,6 +89,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'gumball', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://verifi.podscribe.com/rss/p/
+    // https://podscribe.com/blog/impression-verification-mb45x
+    // http not supported
+    m = /^https:\/\/verifi\.podscribe\.com\/rss\/p\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podscribe', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -100,5 +110,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe';
 }

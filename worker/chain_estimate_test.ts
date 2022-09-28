@@ -61,5 +61,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'op3', url: 'http://op3.dev:80/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' } // for now, we redirect to https in this case
         ]);
+
+        assertEquals(computeChainEstimate('https://pdst.fm/e/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podscribe', url: 'https://verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
