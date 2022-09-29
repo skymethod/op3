@@ -122,6 +122,7 @@ export class CombinedRedirectLogController {
             behind = Math.round(Math.max(time - mostBehindTime, 0) / 1000);
         }
         lines.push(`${id} ${behind} ${time}`);
+        lines.push('');
 
         return newTextResponse(lines.join('\n'));
     }
