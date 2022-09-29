@@ -110,6 +110,6 @@ function isRetryable(e: Error): boolean {
     if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
     if (error.includes('The Durable Object\'s code has been updated')) return true; // TypeError: The Durable Object's code has been updated, this version can no longer access storage.
     if (error.includes('Response closed due to connection limit')) return true; // Error: Response closed due to connection limit
-    if (error.includes('Rpc error: Error: Durable Object reset because its code was updated')) return true; // Error: Rpc error: Error: Durable Object reset because its code was updated.
+    if (error.includes('Error: Durable Object reset because its code was updated')) return true; // Error: Rpc error: Error: Durable Object reset because its code was updated.
     return false;
 }
