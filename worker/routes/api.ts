@@ -37,6 +37,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
+            if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(method, rpcClient);
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
         }
@@ -110,4 +111,9 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 
     const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, 'combined-redirect-log');
     return newJsonResponse({ first, last, count, millis });
+}
+
+async function computeAdminGetMetricsResponse(method: string, rpcClient: RpcClient): Promise<Response> {
+    if (method !== 'GET') return newMethodNotAllowedResponse(method);
+    return await rpcClient.getMetrics({}, 'combined-redirect-log');
 }

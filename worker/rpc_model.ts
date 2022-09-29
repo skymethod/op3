@@ -12,6 +12,7 @@ export type RpcRequest =
     | AlarmRequest
     | GetNewRedirectLogsRequest
     | QueryRedirectLogsRequest
+    | GetMetricsRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -25,6 +26,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'alarm'
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'query-redirect-logs'
+        || obj.kind === 'get-metrics'
     );
 }
 
@@ -167,6 +169,10 @@ export interface QueryRedirectLogsRequest {
     readonly uuid?: string;
 }
 
+export interface GetMetricsRequest {
+    readonly kind: 'get-metrics';
+}
+
 //
 
 export type RpcResponse = 
@@ -241,4 +247,5 @@ export interface RpcClient {
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
+    getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response>;
 }

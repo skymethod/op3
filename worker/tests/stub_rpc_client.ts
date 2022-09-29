@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, Unkinded } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
     executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
@@ -36,6 +36,10 @@ export class StubRpcClient implements RpcClient {
 
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
         throw new Error(`StubRpcClient: queryRedirectLogs not implemented`);
+    }
+
+    getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response> {
+        throw new Error(`StubRpcClient: getMetrics not implemented`);
     }
 
 }

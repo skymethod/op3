@@ -152,6 +152,8 @@ export class BackendDO {
                     } else if (obj.kind === 'admin-rebuild-index') {
                         const { first, last, count, millis } = await getOrLoadCombinedRedirectLogController().rebuildIndex(obj);
                         return newRpcResponse({ kind: 'admin-rebuild-index', first, last, count, millis });
+                    } else if (obj.kind === 'get-metrics') {
+                        return  await getOrLoadCombinedRedirectLogController().getMetrics();
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

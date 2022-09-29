@@ -2,12 +2,13 @@ import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.
 import { checkMatches, isStringRecord } from '../check.ts';
 import { AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
-import { isValidTimestamp, timestampToInstant } from '../timestamp.ts';
+import { isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
 import { consoleError, consoleWarn } from '../tracer.ts';
+import { newTextResponse } from '../routes/responses.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -16,7 +17,8 @@ export class CombinedRedirectLogController {
     private readonly rpcClient: RpcClient;
     private readonly sourceStateCache = new Map<string, SourceState>();
 
-    private attNums: AttNums | undefined;
+    private attNums?: AttNums;
+    private minHaveTimestampId?: string;
 
     constructor(storage: DurableObjectStorage, rpcClient: RpcClient) {
         this.storage = storage;
@@ -44,17 +46,14 @@ export class CombinedRedirectLogController {
         const { storage, rpcClient } = this;
 
         // load and save new records from all sources
-        const map = await storage.list({ prefix: 'crl.ss.'});
-        console.log(`CombinedRedirectLogController: process: ${map.size} source states`);
+        const sourceStates = await loadSourceStates(storage);
+        console.log(`CombinedRedirectLogController: process: ${sourceStates.length} source states`);
+
+        this.updateSourceStateCache(sourceStates);
 
         const attNums = await this.getOrLoadAttNums();
 
-        for (const state of map.values()) {
-            if (!isValidSourceState(state)) {
-                consoleWarn('crlc-bad-ss', `CombinedRedirectLogController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
-                continue;
-            }
-            this.updateSourceStateCache(state);
+        for (const state of sourceStates) {
             await processSource(state, rpcClient, attNums, storage, v => this.updateSourceStateCache(v));
         }
     }
@@ -92,6 +91,39 @@ export class CombinedRedirectLogController {
         return computeRebuildIndexResponse(request, attNums, this.storage);
     }
 
+    async getMetrics(): Promise<Response> {
+        if (this.sourceStateCache.size === 0) {
+            const states = await loadSourceStates(this.storage);
+            this.updateSourceStateCache(states);
+        }
+
+        const lines: string[] = [];
+        const time = Date.now();
+        {
+            const id = 'crlc_source_state_behind_seconds';
+            lines.push(`# HELP ${id} source states by how far behind`, `# TYPE ${id} gauge`);
+            for (const { doName, notificationTimestampId, haveTimestampId } of this.sourceStateCache.values()) {
+                if (typeof notificationTimestampId === 'string' && typeof haveTimestampId === 'string') {
+                    const notificationTime = timestampToEpochMillis(notificationTimestampId.substring(0, 15));
+                    const haveTime = timestampToEpochMillis(haveTimestampId.substring(0, 15));
+                    const behind = Math.round(Math.max(notificationTime - haveTime, 0) / 1000);
+                    lines.push(`${id}{source="${doName}"} ${behind} ${time}`);
+                }
+            }
+        }
+
+        if (typeof this.minHaveTimestampId === 'string') {
+            lines.push('\n');
+            const id = 'crlc_min_have_timestamp_behind_seconds';
+            lines.push(`# HELP ${id} min have timestamp how far behind`, `# TYPE ${id} gauge`);
+            const minHaveTime = timestampToEpochMillis(this.minHaveTimestampId.substring(0, 15));
+            const behind = Math.round(Math.max(time - minHaveTime, 0) / 1000);
+            lines.push(`${id} ${behind} ${time}`);
+        }
+
+        return newTextResponse(lines.join('\n'));
+    }
+
     //
 
     private async getOrLoadAttNums(): Promise<AttNums> {
@@ -99,14 +131,33 @@ export class CombinedRedirectLogController {
         return this.attNums;
     }
 
-    private updateSourceStateCache(state: SourceState) {
-        this.sourceStateCache.set(state.doName, state);
-        // TODO update watermark
+    private updateSourceStateCache(stateOrAllStates: SourceState | readonly SourceState[]) {
+        for (const state of Array.isArray(stateOrAllStates) ? stateOrAllStates : [ stateOrAllStates ]) {
+            this.sourceStateCache.set(state.doName, state);
+        }
+        this.recomputeMinHaveTimestampId();
+    }
+
+    private recomputeMinHaveTimestampId() {
+        this.minHaveTimestampId = [...this.sourceStateCache.values()].map(v => v.haveTimestampId).filter(v => typeof v === 'string').sort().at(0);
     }
 
 }
 
 //
+
+async function loadSourceStates(storage: DurableObjectStorage): Promise<readonly SourceState[]> {
+    const rt: SourceState[] = [];
+    const map = await storage.list({ prefix: 'crl.ss.'});
+    for (const state of map.values()) {
+        if (!isValidSourceState(state)) {
+            consoleWarn('crlc-bad-ss', `CombinedRedirectLogController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
+            continue;
+        }
+        rt.push(state);
+    }
+    return rt;
+}
 
 async function loadSourceState(doName: string, storage: DurableObjectStorage): Promise<SourceState | undefined> {
     const state = await storage.get(`crl.ss.${doName}`);
