@@ -8,7 +8,7 @@ import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
 import { consoleError, consoleWarn } from '../tracer.ts';
-import { newTextResponse } from '../routes/responses.ts';
+import { newTextResponse } from '../responses.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';

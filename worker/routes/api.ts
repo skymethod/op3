@@ -1,6 +1,6 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
 import { RpcClient } from '../rpc_model.ts';
-import { newMethodNotAllowedResponse, newJsonResponse } from './responses.ts';
+import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 

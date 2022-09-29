@@ -4,7 +4,7 @@ import { computeCloudflareAnalyticsSnippet } from './html.ts';
 import { computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 import { computeMarkdownHtml, computeMarkdownText } from './markdown.ts';
-import { newMethodNotAllowedResponse, newRssResponse } from './responses.ts';
+import { newMethodNotAllowedResponse, newRssResponse } from '../responses.ts';
 const releasesHtm = await importText(import.meta.url, '../static/releases.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
 

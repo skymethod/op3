@@ -7,7 +7,7 @@ import { packError } from '../errors.ts';
 import { QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
-import { newJsonResponse, newMethodNotAllowedResponse } from './responses.ts';
+import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 
 export async function computeQueryRedirectLogsResponse(method: string, searchParams: URLSearchParams, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);

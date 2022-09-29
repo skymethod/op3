@@ -16,7 +16,7 @@ import { computeTermsResponse } from './routes/terms.ts';
 import { computePrivacyResponse } from './routes/privacy.ts';
 import { computeReleasesResponse, tryParseReleasesRequest } from './routes/releases.ts';
 import { compute404Response } from './routes/404.ts';
-import { newMethodNotAllowedResponse } from './routes/responses.ts';
+import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
 import { consoleError, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';

@@ -1,4 +1,4 @@
-import { newTextResponse, newXmlResponse } from './responses.ts';
+import { newTextResponse, newXmlResponse } from '../responses.ts';
 
 export function computeRobotsTxtResponse(opts: { origin: string }): Response {
     const { origin } = opts;
