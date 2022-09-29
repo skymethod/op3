@@ -113,7 +113,7 @@ export class CombinedRedirectLogController {
             }
         }
 
-        lines.push('\n');
+        lines.push('');
         const id = 'crlc_most_behind_timestamp_seconds';
         lines.push(`# HELP ${id} most behind timestamp how far behind`, `# TYPE ${id} gauge`);
         let behind = 0;
