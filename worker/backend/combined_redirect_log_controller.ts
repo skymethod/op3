@@ -14,6 +14,7 @@ export class CombinedRedirectLogController {
 
     private readonly storage: DurableObjectStorage;
     private readonly rpcClient: RpcClient;
+    private readonly sourceStateCache = new Map<string, SourceState>();
 
     private attNums: AttNums | undefined;
 
@@ -31,6 +32,7 @@ export class CombinedRedirectLogController {
         const oldState = await loadSourceState(doName, storage);
         const newState = { ...oldState, doName, notificationTimestampId: timestampId, notificationFromColo: fromColo, notificationTime };
         await storage.put(`crl.ss.${doName}`, newState);
+        this.updateSourceStateCache(newState);
 
         await storage.transaction(async txn => {
             await txn.put('alarm.payload', { kind: CombinedRedirectLogController.processAlarmKind } as AlarmPayload);
@@ -52,7 +54,8 @@ export class CombinedRedirectLogController {
                 consoleWarn('crlc-bad-ss', `CombinedRedirectLogController: Skipping bad SourceState record: ${JSON.stringify(state)}`);
                 continue;
             }
-            await processSource(state, rpcClient, attNums, storage);
+            this.updateSourceStateCache(state);
+            await processSource(state, rpcClient, attNums, storage, v => this.updateSourceStateCache(v));
         }
     }
 
@@ -96,6 +99,11 @@ export class CombinedRedirectLogController {
         return this.attNums;
     }
 
+    private updateSourceStateCache(state: SourceState) {
+        this.sourceStateCache.set(state.doName, state);
+        // TODO update watermark
+    }
+
 }
 
 //
@@ -120,17 +128,12 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     return new AttNums();
 }
 
-async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage) {
+async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, stateUpdated: (state: SourceState) => void) {
     const { doName } = state;
-    const nothingNew = typeof state.notificationTimestampId === 'string' && state.notificationTimestampId === state.haveTimestampId;
+    const nothingNew = typeof state.notificationTimestampId === 'string' && typeof state.haveTimestampId === 'string' && state.haveTimestampId >= state.notificationTimestampId;
     if (nothingNew) return;
 
     console.log(`CombinedRedirectLogController: processSource ${doName}: ${JSON.stringify(state)}`);
-
-    if (typeof state.notificationTimestampId === 'string' && state.notificationTimestampId === state.haveTimestampId) {
-        console.log(`CombinedRedirectLogController: Up to date at ${state.notificationTimestampId}`);
-        return;
-    }
 
     // fetch some new records from the source DO
     const startAfterTimestampId = state.haveTimestampId;
@@ -178,7 +181,6 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         });
 
         // then, save index records and update source state
-        const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
         await storage.transaction(async txn => {
             if (newIndexRecords.size > 0) {
                 for (const [ indexId, records ] of newIndexRecords) {
@@ -188,7 +190,9 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
             }
             if (maxTimestampId !== startAfterTimestampId) {
                 console.log(`CombinedRedirectLogController: Updating haveTimestampId from ${startAfterTimestampId} to ${maxTimestampId} for ${doName}`);
+                const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
                 await txn.put(`crl.ss.${doName}`, newState);
+                stateUpdated(newState);
             }
         });
     }
