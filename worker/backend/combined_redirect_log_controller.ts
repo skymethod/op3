@@ -18,7 +18,7 @@ export class CombinedRedirectLogController {
     private readonly sourceStateCache = new Map<string, SourceState>();
 
     private attNums?: AttNums;
-    private minHaveTimestampId?: string;
+    private mostBehindTimestampId?: string;
 
     constructor(storage: DurableObjectStorage, rpcClient: RpcClient) {
         this.storage = storage;
@@ -112,14 +112,15 @@ export class CombinedRedirectLogController {
             }
         }
 
-        if (typeof this.minHaveTimestampId === 'string') {
-            lines.push('\n');
-            const id = 'crlc_min_have_timestamp_behind_seconds';
-            lines.push(`# HELP ${id} min have timestamp how far behind`, `# TYPE ${id} gauge`);
-            const minHaveTime = timestampToEpochMillis(this.minHaveTimestampId.substring(0, 15));
-            const behind = Math.round(Math.max(time - minHaveTime, 0) / 1000);
-            lines.push(`${id} ${behind} ${time}`);
+        lines.push('\n');
+        const id = 'crlc_most_behind_timestamp_seconds';
+        lines.push(`# HELP ${id} most behind timestamp how far behind`, `# TYPE ${id} gauge`);
+        let behind = 0;
+        if (typeof this.mostBehindTimestampId === 'string') {
+            const mostBehindTime = timestampToEpochMillis(this.mostBehindTimestampId.substring(0, 15));
+            behind = Math.round(Math.max(time - mostBehindTime, 0) / 1000);
         }
+        lines.push(`${id} ${behind} ${time}`);
 
         return newTextResponse(lines.join('\n'));
     }
@@ -135,11 +136,24 @@ export class CombinedRedirectLogController {
         for (const state of Array.isArray(stateOrAllStates) ? stateOrAllStates : [ stateOrAllStates ]) {
             this.sourceStateCache.set(state.doName, state);
         }
-        this.recomputeMinHaveTimestampId();
+        this.recomputeMostBehindTimestampId();
     }
 
-    private recomputeMinHaveTimestampId() {
-        this.minHaveTimestampId = [...this.sourceStateCache.values()].map(v => v.haveTimestampId).filter(v => typeof v === 'string').sort().at(0);
+    private recomputeMostBehindTimestampId() {
+        let maxBehind = 0;
+        let rt: string | undefined;
+        for (const { notificationTimestampId, haveTimestampId } of this.sourceStateCache.values()) {
+            if (typeof notificationTimestampId === 'string' && typeof haveTimestampId === 'string') {
+                const notificationTime = timestampToEpochMillis(notificationTimestampId.substring(0, 15));
+                const haveTime = timestampToEpochMillis(haveTimestampId.substring(0, 15));
+                const behind = Math.round(Math.max(notificationTime - haveTime, 0) / 1000);
+                if (behind > maxBehind) {
+                    rt = haveTimestampId;
+                    maxBehind = behind;
+                }
+            }
+        }
+        this.mostBehindTimestampId = rt;
     }
 
 }
