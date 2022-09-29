@@ -8,7 +8,7 @@ import { consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { IndexId, INDEX_DEFINITIONS } from './combined_redirect_log_controller.ts';
 
-export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, attNums: AttNums, storage: DurableObjectStorage): Promise<Response> {
+export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, mostBehindTimestamp: string | undefined, attNums: AttNums, storage: DurableObjectStorage): Promise<Response> {
     const { format = 'tsv' } = request;
     const startTime = Date.now();
     const map = await computeResultMap(request, storage);
@@ -17,6 +17,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
         if (typeof record !== 'string') continue;
         const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, range, ulid, 'other.colo': edgeColo } = attNums.unpackRecord(record);
         if (typeof timestamp !== 'string') continue;
+        if (typeof mostBehindTimestamp === 'string' && timestamp > mostBehindTimestamp) continue;
         if (typeof uuid !== 'string') continue;
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;

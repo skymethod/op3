@@ -83,7 +83,8 @@ export class CombinedRedirectLogController {
 
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>): Promise<Response> {
         const attNums = await this.getOrLoadAttNums();
-        return await queryCombinedRedirectLogs(request, attNums, this.storage);
+        const mostBehindTimestamp = typeof this.mostBehindTimestampId === 'string' ? this.mostBehindTimestampId.substring(0, 15) : undefined;
+        return await queryCombinedRedirectLogs(request, mostBehindTimestamp, attNums, this.storage);
     }
 
     async rebuildIndex(request: Unkinded<AdminRebuildIndexRequest>): Promise<AdminRebuildIndexResponse> {
