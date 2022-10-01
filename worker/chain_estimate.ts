@@ -89,6 +89,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'gumball', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://s.gum.fm/r1/<24-hex-char>
+    // http 308s to itself https
+    m = /^https:\/\/s\.gum\.fm\/r1\/[0-9a-f]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'gumball', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // https://verifi.podscribe.com/rss/p/
     // https://podscribe.com/blog/impression-verification-mb45x
     // http not supported
