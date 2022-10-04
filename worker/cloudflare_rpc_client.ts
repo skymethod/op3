@@ -111,5 +111,8 @@ function isRetryable(e: Error): boolean {
     if (error.includes('The Durable Object\'s code has been updated')) return true; // TypeError: The Durable Object's code has been updated, this version can no longer access storage.
     if (error.includes('Response closed due to connection limit')) return true; // Error: Response closed due to connection limit
     if (error.includes('Error: Durable Object reset because its code was updated')) return true; // Error: Rpc error: Error: Durable Object reset because its code was updated.
+    if (error.includes('Internal error in Durable Object storage write')) return true; // Error: Internal error in Durable Object storage write caused object to be reset.
+    if (error.includes('Durable Object storage operation exceeded timeout')) return true; // Error: Durable Object storage operation exceeded timeout which caused object to be reset.
+    if (error.includes('Error: internal error')) return true; // Error: internal error
     return false;
 }
