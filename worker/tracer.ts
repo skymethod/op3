@@ -62,6 +62,7 @@ interface Redirect {
     readonly country: string;
     readonly destinationHostname: string;
     readonly userAgent: string;
+    readonly referer: string;
 }
 
 export interface ValidRedirect extends Redirect {

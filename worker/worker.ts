@@ -109,7 +109,8 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
                 const { url, headers } = request;
                 const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
                 const userAgent = headers.get('user-agent') ?? '<missing>';
-                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent };
+                const referer = headers.get('referer') ?? '<missing>';
+                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer };
             });
         }
     })());
