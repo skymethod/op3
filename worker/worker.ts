@@ -106,9 +106,10 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
         } finally {
             writeTraceEvent(() => {
                 const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-                const { url } = request;
+                const { url, headers } = request;
                 const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
-                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname };
+                const userAgent = headers.get('user-agent') ?? '<missing>';
+                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent };
             });
         }
     })());
