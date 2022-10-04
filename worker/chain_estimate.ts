@@ -1,4 +1,4 @@
-import { tryParseUrl } from './check.ts';
+import { tryParseInt, tryParseUrl } from './check.ts';
 
 export function computeChainDestinationUrl(url: string): string | undefined {
     const estimate = computeChainEstimate(url);
@@ -12,6 +12,8 @@ export function computeChainDestinationHostname(url: string): string | undefined
 }
 
 export function computeChainEstimate(url: string): ChainEstimate {
+
+    url = normalizeOrigin(url);
 
     // https://op3.dev/e/(https?://)?
     // no http support (.dev TLD on HSTS preload list), but clients (browsers) redirect anyway?
@@ -110,6 +112,18 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // final destination
     return [ { kind: 'destination', url } ];
+}
+
+export function normalizeOrigin(url: string): string {
+    // htTps://HoSTname:443/patH -> https://hostname/patH
+    const m = /^(https?):\/\/([^:\/]+)(:(\d+))?(\/.*?)?$/i.exec(url);
+    if (!m) return url;
+    const [ _, scheme, hostname, __, portNumStr, path = '' ] = m;
+    const schemeLower = scheme.toLowerCase();
+    const hostnameLower = hostname.toLowerCase();
+    const portNum = typeof portNumStr === 'string' ? tryParseInt(portNumStr) : undefined;
+    const port = typeof portNum === 'number' && !(schemeLower === 'http' && portNum === 80 || schemeLower === 'https' && portNum === 443) ? `:${portNum}` : '';
+    return `${schemeLower}://${hostnameLower}${port}${path}`;
 }
 
 //

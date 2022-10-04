@@ -1,5 +1,5 @@
 import { assertEquals } from './tests/deps.ts';
-import { computeChainEstimate } from './chain_estimate.ts';
+import { computeChainEstimate, normalizeOrigin } from './chain_estimate.ts';
 
 Deno.test({
     name: 'computeChainEstimate',
@@ -53,12 +53,12 @@ Deno.test({
         ]);
 
         assertEquals(computeChainEstimate('https://op3.dev:443/e/a.com/path/to/episode.mp3'), [
-            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev:443/e/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
         assertEquals(computeChainEstimate('http://op3.dev:80/e/a.com/path/to/episode.mp3'), [
-            { kind: 'prefix', prefix: 'op3', url: 'http://op3.dev:80/e/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'op3', url: 'http://op3.dev/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' } // for now, we redirect to https in this case
         ]);
 
@@ -73,5 +73,27 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://Op3.dev/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+    }
+});
+
+Deno.test({
+    name: 'normalizeOrigin',
+    fn: () => {
+        const tests = {
+            'asdf': 'asdf',
+            'httpS://asdf.com': 'https://asdf.com',
+            'http://asdf-POW.com': 'http://asdf-pow.com',
+            'http://aSdf:8080/path': 'http://asdf:8080/path',
+            'http://aSdf.com:80/path': 'http://asdf.com/path',
+            'HTTPS://aSdf.com:443/path': 'https://asdf.com/path',
+        }
+        for (const [ input, expectedOutput ] of Object.entries(tests)) {
+            assertEquals(normalizeOrigin(input), expectedOutput);
+        }
     }
 });
