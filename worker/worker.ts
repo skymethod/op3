@@ -150,7 +150,7 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
-        if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
         const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
