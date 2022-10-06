@@ -1,5 +1,5 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { RpcClient } from '../rpc_model.ts';
+import { ApiTokenPermission, RpcClient } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
@@ -21,19 +21,20 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
     const { method, path, searchParams, bearerToken, bodyProvider } = request;
     const { rpcClient, adminTokens, previewTokens } = opts;
 
-    const identity = computeIdentity(bearerToken, searchParams, adminTokens, previewTokens);
-    console.log(`computeApiResponse`, { method, path, identity });
-
-    // all api endpoints required auth
-    if (identity === undefined) return newJsonResponse({ error: 'unauthorized' }, 401);
-
-    // unknown token
-    if (identity === 'invalid') return newJsonResponse({ error: 'forbidden' }, 403);
-
     try {
+        // first, we need to know who's calling
+        const identity = await computeIdentityResult(bearerToken, searchParams, adminTokens, previewTokens, rpcClient);
+        console.log(`computeApiResponse`, { method, path, identity });
+    
+        // all api endpoints require an auth token
+        if (identity.kind === 'invalid' && identity.reason === 'missing-token') return newJsonResponse({ error: 'unauthorized' }, 401);
+    
+        // invalid token or any other invalid reason
+        if (identity.kind === 'invalid') return newJsonResponse({ error: 'forbidden' }, 403);
+
         if (path.startsWith('/admin/')) {
             // admin endpoints require admin
-            if (identity !== 'admin') return newJsonResponse({ error: 'forbidden' }, 403);
+            if (!identity.permissions.has('admin')) return newJsonResponse({ error: 'forbidden' }, 403);
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
@@ -41,14 +42,14 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
         }
+        
+        // unknown api endpoint
+        return newJsonResponse({ error: 'not found' }, 404);
     } catch (e) {
         const error = `${e.stack || e}`;
         consoleError('api-call', `Error in api call: ${error}`);
         return newJsonResponse({ error }, 500);
     }
-
-    // unknown api endpoint
-    return newJsonResponse({ error: 'not found' }, 404);
 }
 
 export interface ApiRequest {
@@ -61,16 +62,28 @@ export interface ApiRequest {
 
 //
 
-type Identity = 'admin' | 'preview' | 'invalid';
+type IdentityResult = ValidIdentityResult | InvalidIdentityResult;
+
+interface ValidIdentityResult {
+    readonly kind: 'valid';
+    readonly permissions: ReadonlySet<ApiTokenPermission>;
+}
+
+interface InvalidIdentityResult {
+    readonly kind: 'invalid';
+    readonly reason: 'missing-token' | 'invalid-token';
+}
 
 //
 
-function computeIdentity(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>): Identity | undefined {
+async function computeIdentityResult(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient): Promise<IdentityResult> {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
-    if (token === undefined) return undefined;
-    if (adminTokens.has(token)) return 'admin';
-    if (previewTokens.has(token)) return 'preview';
-    return 'invalid';
+    if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
+    if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
+    if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
+    const res = await rpcClient.resolveApiToken({ token }, 'api-auth-server');
+    if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
+    return { kind: 'invalid', reason: 'invalid-token' };
 }
 
 async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

@@ -15,6 +15,7 @@ import { tryParseInt } from '../check.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
 import { initCloudflareTracer } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
+import { ApiAuthController } from './api_auth_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -27,6 +28,7 @@ export class BackendDO {
     private keyClient?: KeyClient;
 
     private keyController?: KeyController;
+    private apiAuthController?: ApiAuthController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -88,6 +90,11 @@ export class BackendDO {
                     const getOrLoadCombinedRedirectLogController = () => {
                         if (!this.combinedRedirectLogController) this.combinedRedirectLogController = new CombinedRedirectLogController(storage, rpcClient);
                         return this.combinedRedirectLogController;
+                    }
+
+                    const getOrLoadApiAuthController = () => {
+                        if (!this.apiAuthController) this.apiAuthController = new ApiAuthController(storage);
+                        return this.apiAuthController;
                     }
 
                     if (obj.kind === 'log-raw-redirects') {
@@ -153,7 +160,9 @@ export class BackendDO {
                         const { first, last, count, millis } = await getOrLoadCombinedRedirectLogController().rebuildIndex(obj);
                         return newRpcResponse({ kind: 'admin-rebuild-index', first, last, count, millis });
                     } else if (obj.kind === 'get-metrics') {
-                        return  await getOrLoadCombinedRedirectLogController().getMetrics();
+                        return await getOrLoadCombinedRedirectLogController().getMetrics();
+                    } else if (obj.kind === 'resolve-api-token') {
+                        return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

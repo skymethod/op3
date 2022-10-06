@@ -13,6 +13,7 @@ export type RpcRequest =
     | GetNewRedirectLogsRequest
     | QueryRedirectLogsRequest
     | GetMetricsRequest
+    | ResolveApiTokenRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -27,6 +28,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'query-redirect-logs'
         || obj.kind === 'get-metrics'
+        || obj.kind === 'resolve-api-token'
     );
 }
 
@@ -173,6 +175,11 @@ export interface GetMetricsRequest {
     readonly kind: 'get-metrics';
 }
 
+export interface ResolveApiTokenRequest {
+    readonly kind: 'resolve-api-token';
+    readonly token: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -182,6 +189,7 @@ export type RpcResponse =
     | AdminDataResponse
     | AdminRebuildIndexResponse
     | GetNewRedirectLogsResponse
+    | ResolveApiTokenResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -192,6 +200,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'admin-data'
         || obj.kind === 'admin-rebuild-index'
         || obj.kind === 'get-new-redirect-logs'
+        || obj.kind === 'resolve-api-token'
     );
 }
 
@@ -233,6 +242,14 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'get-new-redirect-logs';
 }
 
+export type ApiTokenPermission = 'admin' | 'preview' | 'notification';
+
+export interface ResolveApiTokenResponse {
+    readonly kind: 'resolve-api-token';
+    readonly permissions?: readonly ApiTokenPermission[];
+    readonly reason?: 'invalid';
+}
+
 //
 
 export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
@@ -248,4 +265,5 @@ export interface RpcClient {
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
     getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response>;
+    resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
 }
