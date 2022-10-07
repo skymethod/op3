@@ -14,6 +14,7 @@ export type RpcRequest =
     | QueryRedirectLogsRequest
     | GetMetricsRequest
     | ResolveApiTokenRequest
+    | ModifyApiKeyRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -29,6 +30,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'query-redirect-logs'
         || obj.kind === 'get-metrics'
         || obj.kind === 'resolve-api-token'
+        || obj.kind === 'modify-api-key'
     );
 }
 
@@ -180,6 +182,12 @@ export interface ResolveApiTokenRequest {
     readonly token: string;
 }
 
+export interface ModifyApiKeyRequest {
+    readonly kind: 'modify-api-key';
+    readonly apiKey: string;
+    readonly permissions?: readonly SettableApiTokenPermission[];
+}
+
 //
 
 export type RpcResponse = 
@@ -242,12 +250,27 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'get-new-redirect-logs';
 }
 
-export type ApiTokenPermission = 'admin' | 'preview' | 'notification';
+export type SettableApiTokenPermission = 'notification';
+export type ApiTokenPermission = 'admin' | 'preview' | SettableApiTokenPermission;
 
 export interface ResolveApiTokenResponse {
     readonly kind: 'resolve-api-token';
     readonly permissions?: readonly ApiTokenPermission[];
     readonly reason?: 'invalid';
+}
+
+
+export interface ApiKeyInfo {
+    readonly apiKey: string;
+    readonly created: string; // instant
+    readonly updated: string; // instant
+    readonly permissions: readonly SettableApiTokenPermission[];
+    readonly status: 'active' | 'inactive' | 'inactive-admin';
+}
+
+export interface ApiKeyInfoResponse {
+    readonly kind: 'api-key-info';
+    readonly info?: ApiKeyInfo;
 }
 
 //

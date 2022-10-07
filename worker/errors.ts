@@ -8,6 +8,10 @@ export class CodedError extends Error implements ErrorInterface {
         this.name = 'CodedError';
         this.code = code;
     }
+
+    get cause(): ErrorInterface | undefined {
+        return isErrorInterface(super.cause) ? super.cause : undefined;
+    }
 }
 
 export interface ErrorInterface {
