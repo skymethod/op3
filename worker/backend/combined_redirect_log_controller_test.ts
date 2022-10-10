@@ -63,7 +63,7 @@ Deno.test({
             assertEquals(res.status, 200);
             const { rows } = await res.json();
             // console.log(rows);
-            assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, range, ulid, edgeColo } ], rows);
+            assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, referer, range, ulid, edgeColo } ], rows);
             // ensure the hashed ip address is a sha, not equal to the input raw ip address
             assertNotEquals(hashedIpAddress, '1.2.3.4')
             assert(isValidSha1Hex(hashedIpAddress));

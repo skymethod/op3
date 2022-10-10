@@ -251,6 +251,9 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "type": "string",
                     },
                     "userAgent": {
+                        "type": "string"
+                    },
+                    "referer": {
                         "type": "string",
                     },
                     "range": {
@@ -263,6 +266,9 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "type": "string",
                     },
                 },
+                "required": [
+                    "time", "uuid", "hashedIpAddress", "method", "url", "edgeColo"
+                ]
             },
         },
         "externalDocs": {
