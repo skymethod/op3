@@ -110,6 +110,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podscribe', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://claritaspod.com/measure/
+    // https://claritas.com/podcast-attribution-audience-identification/
+    // http redirects to target https
+    m = /^https?:\/\/claritaspod\.com\/measure\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'claritas', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -133,5 +143,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas';
 }

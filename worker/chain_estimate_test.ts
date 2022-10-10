@@ -78,6 +78,15 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://claritaspod.com/measure/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'claritas', url: 'https://claritaspod.com/measure/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://claritaspod.com/measure/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'claritas', url: 'http://claritaspod.com/measure/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
