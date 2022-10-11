@@ -96,7 +96,7 @@ const computeReleasesRss = ({ title, origin }: { title: string, origin: string }
   <channel>
     <title>${encodeXml(title)}</title>
     <link>${origin}/releases</link>
-    <description>Latest releases from the OP3, the Open Podcast Prefix Project</description>
+    <description>Latest releases from OP3, the Open Podcast Prefix Project</description>
     <language>en-us</language>
     <lastBuildDate>${computeRfc822(RELEASES[0].time)}</lastBuildDate>
     <atom:link href="${origin}/releases.rss" rel="self" type="application/rss+xml" />

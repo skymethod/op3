@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Costs · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href="${origin}/costs" />
+    ${styleTag}
+</head>
+
+<body class="bg-indigo-900 flex flex-col text-indigo-200">
+    ${nonProdHeader}
+    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
+        Costs
+    </h1>
+
+    <div class="basic max-w-2xl mx-auto px-8">
+        <p>
+            As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-sustainable-development">commitment to sustainable development</a>,
+            we publish our ongoing infrastructure costs below.
+        </p>
+        <p>
+            If you want to help support this project, consider <a href="https://github.com/skymethod/op3#commitment-to-sustainable-development">purchasing a sponsorship</a>.
+        </p>
+
+    </div>
+
+    <div class="text-xs md:text-base md:w-10/12 md:max-w-2xl mx-2 md:mx-auto cursor-pointer select-none mt-8">
+        <div class="grid grid-cols-5 gap-4 text-indigo-400">
+            <div>Date</div>
+            <div class="col-span-3">Description</div>
+            <div class="text-right">Cost</div>
+        </div>
+
+${costsHtml}
+
+        <div class="grid grid-cols-5 gap-4 mt-4">
+            <div>2022 YTD</div>
+            <div class="col-start-5 text-right">${costs2022}</div>
+        </div>
+    </div>
+
+
+</div>
+
+   
+   
+    <div class="max-w-xl mx-auto my-16">
+        <a href="/">Home</a>
+    </div>
+    ${cfAnalyticsSnippet}
+</body>
+
+</html>

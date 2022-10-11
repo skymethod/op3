@@ -21,6 +21,7 @@ import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/ro
 import { consoleError, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
+import { computeCostsResponse } from './routes/costs.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -148,6 +149,7 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
 
         if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
         if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
         if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });

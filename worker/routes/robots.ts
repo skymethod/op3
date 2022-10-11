@@ -20,6 +20,7 @@ export function computeSitemapXmlResponse(opts: { origin: string }): Response {
         '/api/docs',
         '/terms',
         '/privacy',
+        '/costs',
     ];
     const lines = [ 
         `<?xml version="1.0" encoding="utf-8" standalone="yes"?>`, 
