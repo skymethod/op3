@@ -601,6 +601,10 @@ a:hover {
   grid-column-start: 5;
 }
 
+.col-start-2 {
+  grid-column-start: 2;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -634,6 +638,14 @@ a:hover {
 
 .mt-4 {
   margin-top: 1rem;
+}
+
+.mt-0\.5 {
+  margin-top: 0.125rem;
+}
+
+.mt-0 {
+  margin-top: 0px;
 }
 
 .inline-block {
@@ -800,6 +812,10 @@ a:hover {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .md\:mt-0 {
+    margin-top: 0px;
   }
 
   .md\:w-10\/12 {
