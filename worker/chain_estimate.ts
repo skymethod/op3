@@ -120,6 +120,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'claritas', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://growx.podkite.com/https/1234ASDF/
+    // http and https endpoints are supported, but destination determined by parameter
+    m = /^https?:\/\/growx\.podkite\.com\/(https?)\/[A-Z0-9]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffix ] = m;
+        const targetUrl = `${scheme}://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podkite', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -143,5 +152,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite';
 }
