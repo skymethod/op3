@@ -22,6 +22,7 @@ import { consoleError, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
+import { computeApiKeysResponse } from './routes/api_keys.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -139,7 +140,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv): Promise<Response> {
-        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, deploySha, deployTime } = env;
+        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, deploySha, deployTime } = env;
         IsolateId.log();
         const { origin, hostname, pathname, searchParams } = new URL(request.url);
         const { method, headers } = request;
@@ -153,6 +154,7 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
         if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
+        if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
         if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
         const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });

@@ -42,5 +42,5 @@ push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --
 ${REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS:+--text-binding redirectLogNotificationDelaySeconds:$REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS} \
 ${CF_AE_DATASET:+--ae-dataset-binding dataset1:$CF_AE_DATASET} \
 ${PRODUCTION_DOMAIN:+--text-binding productionDomain:$PRODUCTION_DOMAIN} \
-${CF_ANALYTICS_TOKEN:+--text-binding cfAnalyticsToken:$CF_ANALYTICS_TOKEN}
-
+${CF_ANALYTICS_TOKEN:+--text-binding cfAnalyticsToken:$CF_ANALYTICS_TOKEN} \
+${TURNSTILE_SITEKEY:+--text-binding turnstileSitekey:$TURNSTILE_SITEKEY}

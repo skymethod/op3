@@ -41,6 +41,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(method, rpcClient);
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
+            if (path === '/api-keys') return await computeApiKeysResponse(method, bodyProvider, rpcClient);
         }
         
         // unknown api endpoint
@@ -129,4 +130,14 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 async function computeAdminGetMetricsResponse(method: string, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
+}
+
+async function computeApiKeysResponse(method: string, bodyProvider: JsonProvider, _rpcClient: RpcClient): Promise<Response> {
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+    const obj = await bodyProvider();
+    if (typeof obj !== 'object') throw new Error(`Expected object`);
+    const { turnstileToken } = obj;
+    if (typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
+    console.log(`TODO turnstileToken=${turnstileToken}`);
+    return newJsonResponse({ message: 'TODO '});
 }

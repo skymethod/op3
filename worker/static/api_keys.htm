@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html class="sl-theme-dark">
+
+<head>
+    <title>API Keys · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="${origin}/api/keys" />
+    ${styleTag}
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/dark.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/shoelace.js"></script>
+    <script type="module">
+        await Promise.allSettled(['sl-button', 'sl-input', 'sl-textarea'].map(v => customElements.whenDefined(v)));
+        document.querySelectorAll('.wait').forEach(v => v.classList.add('ready'));
+    </script>
+    <style>
+        .wait {
+            opacity: 0;
+        }
+
+        .wait.ready {
+            opacity: 1;
+            transition: 0.25s opacity;
+        }
+
+        :root {
+            /* use tailwind orange for shoelace primary */
+            --sl-color-primary-50: #fff7ed;
+            --sl-color-primary-100: #ffedd5;
+            --sl-color-primary-200: #fed7aa;
+            --sl-color-primary-300: #fdba74;
+            --sl-color-primary-400: #fb923c;
+            --sl-color-primary-500: #f97316;
+            --sl-color-primary-600: #ea580c;
+            --sl-color-primary-700: #c2410c;
+            --sl-color-primary-800: #9a3412;
+            --sl-color-primary-900: #7c2d12;
+            --sl-color-primary-950: #7c2d12;
+        }
+    </style>
+
+    <script type="module">
+const sitekey = '${turnstileSitekey}';
+const previewToken = '${previewToken}';
+${apiKeysJs}
+    </script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=updateApp&action=api-key" async defer></script>
+</head>
+
+<body class="bg-indigo-900 flex flex-col">
+    ${nonProdHeader}
+    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
+        API Keys
+    </h1>
+
+    <form id="form" class="wait max-w-2xl mx-auto p-8" onsubmit="return false;">
+
+        <div id="turnstile-container" class="cf-turnstile flex justify-center relative h-16"></div> 
+
+        <sl-button id="generate-button" class="mt-16 w-96" variant="primary" outline disabled>Generate a new API Key</sl-button>
+
+        <sl-input id="api-key-input" class="w-96 mt-4" label="Manage an existing API Key" placeholder="e.g. 34fc63aab29244babeb37fb91cd4f122" autofocus></sl-input>
+
+        <fieldset id="form-fields" class="invisible">
+            <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4">
+                <dt>Created</dt><dd>three days ago</dd>
+                <dt>Last used</dt><dd>Just now</dd>
+                <dt>Permissions</dt><dd>Preview</dd>
+                <dt>Status</dt><dd>Active</dd>
+            </dl>
+            <sl-input class="w-96 mt-4" label="API Key Name" help-text="Readable name for this API Key"></sl-input>
+            <div class="relative h-48">
+                <div class="absolute">
+                    <sl-textarea class="mt-4" resize="none" label="Bearer Token (only shown once!)" readonly value="asdf"></sl-textarea>
+                    <sl-button class="w-96 mt-2" outline>Copy to clipboard</sl-button>
+                </div>
+                <div class="absolute invisible">
+                    <sl-button class="w-96 mt-2" outline variant="primary" >Roll token</sl-button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+
+    <div class="wait max-w-xl mx-auto my-8">
+        <a href="/api/docs">OP3 API Documentation</a>
+    </div>
+
+    ${cfAnalyticsSnippet}
+</body>
+
+</html>

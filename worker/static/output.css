@@ -593,6 +593,18 @@ a:hover {
   --tw-backdrop-sepia:  ;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
 .col-span-3 {
   grid-column: span 3 / span 3;
 }
@@ -620,6 +632,11 @@ a:hover {
   margin-right: 0.5rem;
 }
 
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .mt-16 {
   margin-top: 4rem;
 }
@@ -638,6 +655,10 @@ a:hover {
 
 .mt-4 {
   margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
 }
 
 .mt-0\.5 {
@@ -664,6 +685,18 @@ a:hover {
   display: contents;
 }
 
+.h-16 {
+  height: 4rem;
+}
+
+.h-48 {
+  height: 12rem;
+}
+
+.w-96 {
+  width: 24rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -682,16 +715,33 @@ a:hover {
           user-select: none;
 }
 
+.resize {
+  resize: both;
+}
+
 .grid-cols-5 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.grid-cols-\[auto_1fr\] {
+  grid-template-columns: auto 1fr;
 }
 
 .flex-col {
   flex-direction: column;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .gap-4 {
   gap: 1rem;
+}
+
+.gap-x-4 {
+  -moz-column-gap: 1rem;
+       column-gap: 1rem;
 }
 
 .whitespace-nowrap {
@@ -727,6 +777,10 @@ a:hover {
 
 .p-4 {
   padding: 1rem;
+}
+
+.p-8 {
+  padding: 2rem;
 }
 
 .px-8 {
@@ -796,6 +850,18 @@ a:hover {
 .text-indigo-400 {
   --tw-text-opacity: 1;
   color: rgb(129 140 248 / var(--tw-text-opacity));
+}
+
+.outline {
+  outline-style: solid;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
 .hover\:text-indigo-400:hover {

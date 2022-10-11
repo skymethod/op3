@@ -13,4 +13,5 @@ export interface WorkerEnv {
     readonly dataset1?: AnalyticsEngine;
     readonly productionDomain?: string;
     readonly cfAnalyticsToken?: string;
+    readonly turnstileSitekey?: string;
 }
