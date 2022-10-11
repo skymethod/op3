@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, GetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, AdminModifyApiKeyRequest } from './rpc_model.ts';
 import { sleep } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
@@ -9,14 +9,6 @@ export class CloudflareRpcClient implements RpcClient {
     constructor(backendNamespace: DurableObjectNamespace, maxRetries: number) {
         this.backendNamespace = backendNamespace;
         this.maxRetries = maxRetries;
-    }
-
-    async executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target));
-    }
-
-    async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
-        return await sendRpc<AdminRebuildIndexResponse>({ kind: 'admin-rebuild-index', ...request }, 'admin-rebuild-index', this.computeOpts(target));
     }
 
     async registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
@@ -47,12 +39,25 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<Response>({ kind: 'query-redirect-logs', ...request }, 'response', this.computeOpts(target));
     }
 
-    async getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response> {
-        return await sendRpc<Response>({ kind: 'get-metrics', ...request }, 'response', this.computeOpts(target));
-    }
-
     async resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse> {
         return await sendRpc<ResolveApiTokenResponse>({ kind: 'resolve-api-token', ...request }, 'resolve-api-token', this.computeOpts(target));
+    }
+
+
+    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target));
+    }
+
+    async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
+        return await sendRpc<AdminRebuildIndexResponse>({ kind: 'admin-rebuild-index', ...request }, 'admin-rebuild-index', this.computeOpts(target));
+    }
+
+    async adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response> {
+        return await sendRpc<Response>({ kind: 'admin-get-metrics', ...request }, 'response', this.computeOpts(target));
+    }
+
+    async adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse> {
+        return await sendRpc<OkResponse>({ kind: 'admin-modify-api-key', ...request }, 'ok', this.computeOpts(target));
     }
 
     //

@@ -1,5 +1,5 @@
 import { DurableObjectStorage } from '../deps.ts';
-import { ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded } from '../rpc_model.ts';
+import { AdminModifyApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded } from '../rpc_model.ts';
 
 export class ApiAuthController {
 
@@ -14,6 +14,12 @@ export class ApiAuthController {
         // TODO lookup from storage
         await Promise.resolve();
         return { 'kind': 'resolve-api-token', reason: 'invalid' };
+    }
+
+    async modifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>): Promise<void> {
+        const { apiKey: _, permissions: __ } = request;
+        // TODO modify in storage
+        await Promise.resolve();
     }
 
 }

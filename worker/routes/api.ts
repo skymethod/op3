@@ -92,20 +92,20 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     const { operationKind, targetPath, dryRun } = await bodyProvider();
 
     if (operationKind === 'list' && targetPath === '/registry') {
-        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'registry');
+        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'registry');
         return newJsonResponse({ listResults });
     } else if (operationKind === 'list' && targetPath === '/keys') {
-        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
+        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
         return newJsonResponse({ listResults });
     } else if (operationKind === 'list' && targetPath.startsWith('/crl/')) {
-        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
         return newJsonResponse({ listResults });
     } else if (operationKind === 'list' && targetPath === '/crl/records') {
-        const { listResults } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
         return newJsonResponse({ listResults });
     } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
         const doName = checkDeleteDurableObjectAllowed(targetPath);
-        const { message } = await rpcClient.executeAdminDataQuery({ operationKind, targetPath, dryRun }, doName);
+        const { message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, doName);
         return newJsonResponse({ message });
     } else {
         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
@@ -128,5 +128,5 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 
 async function computeAdminGetMetricsResponse(method: string, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    return await rpcClient.getMetrics({}, 'combined-redirect-log');
+    return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
 }

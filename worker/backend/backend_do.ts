@@ -159,10 +159,13 @@ export class BackendDO {
                     } else if (obj.kind === 'admin-rebuild-index') {
                         const { first, last, count, millis } = await getOrLoadCombinedRedirectLogController().rebuildIndex(obj);
                         return newRpcResponse({ kind: 'admin-rebuild-index', first, last, count, millis });
-                    } else if (obj.kind === 'get-metrics') {
+                    } else if (obj.kind === 'admin-get-metrics') {
                         return await getOrLoadCombinedRedirectLogController().getMetrics();
                     } else if (obj.kind === 'resolve-api-token') {
                         return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
+                    } else if (obj.kind === 'admin-modify-api-key') {
+                        await getOrLoadApiAuthController().modifyApiKey(obj);
+                        return newRpcResponse({ kind: 'ok' });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

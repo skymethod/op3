@@ -12,9 +12,9 @@ export type RpcRequest =
     | AlarmRequest
     | GetNewRedirectLogsRequest
     | QueryRedirectLogsRequest
-    | GetMetricsRequest
+    | AdminGetMetricsRequest
     | ResolveApiTokenRequest
-    | ModifyApiKeyRequest
+    | AdminModifyApiKeyRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -28,9 +28,9 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'alarm'
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'query-redirect-logs'
-        || obj.kind === 'get-metrics'
+        || obj.kind === 'admin-get-metrics'
         || obj.kind === 'resolve-api-token'
-        || obj.kind === 'modify-api-key'
+        || obj.kind === 'admin-modify-api-key'
     );
 }
 
@@ -173,8 +173,8 @@ export interface QueryRedirectLogsRequest {
     readonly uuid?: string;
 }
 
-export interface GetMetricsRequest {
-    readonly kind: 'get-metrics';
+export interface AdminGetMetricsRequest {
+    readonly kind: 'admin-get-metrics';
 }
 
 export interface ResolveApiTokenRequest {
@@ -182,8 +182,8 @@ export interface ResolveApiTokenRequest {
     readonly token: string;
 }
 
-export interface ModifyApiKeyRequest {
-    readonly kind: 'modify-api-key';
+export interface AdminModifyApiKeyRequest {
+    readonly kind: 'admin-modify-api-key';
     readonly apiKey: string;
     readonly permissions?: readonly SettableApiTokenPermission[];
 }
@@ -250,8 +250,8 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'get-new-redirect-logs';
 }
 
-export type SettableApiTokenPermission = 'notification';
-export type ApiTokenPermission = 'admin' | 'preview' | SettableApiTokenPermission;
+export type SettableApiTokenPermission = 'preview' | 'notification' | 'admin-metrics';
+export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
 export interface ResolveApiTokenResponse {
     readonly kind: 'resolve-api-token';
@@ -278,8 +278,6 @@ export interface ApiKeyInfoResponse {
 export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
 
 export interface RpcClient {
-    executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
-    adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse>;
     getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
     sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse>;
@@ -287,6 +285,10 @@ export interface RpcClient {
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
-    getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
+
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
+    adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
+    adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
+    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse>;
 }

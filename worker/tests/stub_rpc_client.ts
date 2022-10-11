@@ -1,14 +1,7 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
-    executeAdminDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        throw new Error(`StubRpcClient: executeAdminDataQuery not implemented`);
-    }
-
-    adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
-        throw new Error(`StubRpcClient: adminRebuildIndex not implemented`);
-    }
 
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
         throw new Error(`StubRpcClient: registerDO not implemented`);
@@ -38,12 +31,24 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: queryRedirectLogs not implemented`);
     }
 
-    getMetrics(request: Unkinded<GetMetricsRequest>, target: string): Promise<Response> {
-        throw new Error(`StubRpcClient: getMetrics not implemented`);
-    }
-
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse> {
         throw new Error(`StubRpcClient: resolveApiToken not implemented`);
+    }
+
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
+        throw new Error(`StubRpcClient: adminExecuteDataQuery not implemented`);
+    }
+
+    adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
+        throw new Error(`StubRpcClient: adminRebuildIndex not implemented`);
+    }
+
+    adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response> {
+        throw new Error(`StubRpcClient: adminGetMetrics not implemented`);
+    }
+
+    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse> {
+        throw new Error(`StubRpcClient: adminModifyApiKey not implemented`);
     }
 
 }
