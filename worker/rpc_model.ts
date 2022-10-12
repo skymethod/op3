@@ -285,7 +285,7 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
 export type SettableApiTokenPermission = 'preview' | 'notification' | 'admin-metrics';
 export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
-function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
+export function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
     return value === 'preview' || value === 'notification' || value === 'admin-metrics';
 }
 
@@ -299,12 +299,26 @@ export interface ApiKeyInfo {
     readonly apiKey: string;
     readonly created: string; // instant
     readonly updated: string; // instant
-    readonly used: string; // instant
     readonly name: string; // user tag
     readonly permissions: readonly SettableApiTokenPermission[];
     readonly status: 'active' | 'inactive' /* no token */ | 'blocked';
     readonly token?: string;
+    readonly tokenLastUsed?: string;
     readonly blockReason?: string;
+}
+
+export function isApiKeyInfo(obj: unknown): obj is ApiKeyInfo {
+    return isStringRecord(obj)
+        && typeof obj.apiKey === 'string'
+        && typeof obj.created === 'string'
+        && typeof obj.updated === 'string'
+        && typeof obj.name === 'string'
+        && Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission)
+        && typeof obj.status === 'string' && ['active', 'inactive', 'blocked'].includes(obj.status)
+        && (obj.token === undefined || typeof obj.token === 'string')
+        && (obj.tokenLastUsed === undefined || typeof obj.tokenLastUsed === 'string')
+        && (obj.blockReason === undefined || typeof obj.blockReason === 'string')
+        ;
 }
 
 export interface ApiKeyResponse {

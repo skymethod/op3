@@ -43,3 +43,8 @@ export function addDays(date: Date, days: number): Date {
     rt.setDate(rt.getDate() + days);
     return rt;
 }
+
+export function addHours(date: Date | string, hours: number): Date {
+    const time = new Date(date).getTime();
+    return new Date(time + hours * 60 * 60 * 1000);
+}

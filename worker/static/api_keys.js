@@ -63,11 +63,11 @@ const app = (() => {
     });
 
     regenerateTokenButton.addEventListener('click', async () => {
-        await performModification({ apiKey: apiKeyInput.value, action: 'regenerate-token' });
+        await performModification({ apiKey: existingApiKey, action: 'regenerate-token' });
     });
 
     deleteTokenButton.addEventListener('click', async () => {
-        await performModification({ apiKey: apiKeyInput.value, action: 'delete-token' });
+        await performModification({ apiKey: existingApiKey, action: 'delete-token' });
     });
 
     async function makeApiCall(opts) {
@@ -101,7 +101,10 @@ const app = (() => {
     }
 
     async function getOrGenerateApiKey() {
+        console.log('getOrGenerateApiKey', existingApiKey);
+
         const existing = existingApiKey !== undefined;
+
         await makeApiCall({ 
             beforeMessage: existing ? 'Finding API Key...' : 'Generating new API Key...',
             pathname: '/api/1/api-keys',
@@ -125,8 +128,14 @@ const app = (() => {
 
     async function performModification(req) {
         console.log(`performModification`, req);
+
+        const { beforeMessage, afterMessage, errorMessage } = typeof req.name === 'string' ? { beforeMessage: 'Updating nickname...', afterMessage: 'Updated nickname', errorMessage: 'Error updating nickname' }
+            : req.action === 'regenerate-token' ? { beforeMessage: 'Regenerating token...', afterMessage: 'Regenerated token', errorMessage: 'Error regenerating token' }
+            : req.action === 'delete-token' ? { beforeMessage: 'Deleting token...', afterMessage: 'Deleted token', errorMessage: 'Error deleting token' }
+            : { beforeMessage: 'Performing modification...', afterMessage: 'Performed modification', errorMessage: 'Failed to perform modification' };
+
         await makeApiCall({ 
-            beforeMessage: 'Performing modification...',
+            beforeMessage,
             pathname: `/api/1/api-keys/${req.apiKey}`,
             body: { ...req, turnstileToken },
             callback: obj => {
@@ -134,8 +143,8 @@ const app = (() => {
                 apiKeyInput.value = info.apiKey;
                 existingApiKey = info.apiKey;
             },
-            afterMessage: 'Performed modification',
-            errorMessage: 'Failed to perform modification',
+            afterMessage,
+            errorMessage,
             errorCallback: () => {
                 nameInput.value = info.name;
             },
@@ -149,21 +158,21 @@ const app = (() => {
             generateButton.style.display = turnstileToken && existingApiKey === undefined ? 'block' : 'none';
             generateButton.disabled = fetching || turnstileToken === undefined;
 
-            const { status, created, used, permissions, token } = info ?? {};
+            const { status, created, permissions, token, tokenLastUsed, blockReason } = info ?? {};
 
             nameInput.readonly = turnstileToken === undefined;
             createdDef.textContent = created ? computeRelativeTimeString(created) : '';
-            lastUsedDef.textContent = used ? computeRelativeTimeString(used) : '';
+            lastUsedDef.textContent = tokenLastUsed ? computeRelativeTimeString(tokenLastUsed) : 'never';
             permissionsDef.textContent = permissions ? permissions.join(', ') : '';
-            statusDef.textContent = status;
+            statusDef.textContent = status + (blockReason ? ` (${blockReason})` : '');
             tokenTextarea.value = token ?? '';
             formFields.style.visibility = info ? 'visible' : 'invisible';
             tokenTextarea.style.display = token ? 'block' : 'none';
             copyTokenTooltip.style.display = navigator && navigator.clipboard && token ? 'block' : 'none';
             regenerateTokenButton.disabled = fetching || turnstileToken === undefined;
+            deleteTokenButton.style.display = status === 'active' ? 'block' : 'none';
             deleteTokenButton.disabled = fetching || turnstileToken === undefined;
         }
-
 
         if (globalThis.turnstile && turnstileContainer && !turnstileContainer.rendered) {
             console.log('Rendering turnstile');

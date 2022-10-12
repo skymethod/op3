@@ -90,7 +90,7 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
     if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
     if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
     if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
-    const res = await rpcClient.resolveApiToken({ token }, 'api-auth-server');
+    const res = await rpcClient.resolveApiToken({ token }, 'api-key-server');
     if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
     return { kind: 'invalid', reason: 'invalid-token' };
 }
