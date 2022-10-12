@@ -16,8 +16,35 @@ function computeRelativeTimeString(instant) {
 }
 
 globalThis.updateApp = function() {
-    const [ turnstileContainer, apiKeyInput, formFields, generateButton, createdDef, lastUsedDef, permissionsDef, statusDef, nameInput, tokenTextarea, copyTokenButton, copyTokenTooltip ] = 
-    [ 'turnstile-container', 'api-key-input', 'form-fields', 'generate-button', 'created-def', 'last-used-def', 'permissions-def', 'status-def', 'name-input', 'token-textarea', 'copy-token-button', 'copy-token-tooltip' ].map(v => document.getElementById(v));
+    const [ turnstileContainer, apiKeyInput, formFields, generateButton, createdDef, lastUsedDef, permissionsDef, statusDef, nameInput, tokenTextarea, copyTokenButton, copyTokenTooltip, generatedDiv, existedDiv ] = 
+    [ 'turnstile-container', 'api-key-input', 'form-fields', 'generate-button', 'created-def', 'last-used-def', 'permissions-def', 'status-def', 'name-input', 'token-textarea', 'copy-token-button', 'copy-token-tooltip', 'generated-div', 'existed-div' ].map(v => document.getElementById(v));
+
+    async function getOrGenerateApiKey(apiKeyFromInput) {
+        generateButton.disabled = true;
+        apiKeyInput.readonly = true;
+        const res = await fetch('/api/1/api-keys', { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify({ turnstileToken, apiKey: apiKeyFromInput }) });
+        console.log(res);
+        if (res.status !== 200) throw new Error(`Unexpected status ${res.status}`);
+        const { apiKey, status, created, used, permissions, name, token } = await res.json();
+        apiKeyInput.value = apiKey;
+        createdDef.textContent = computeRelativeTimeString(created);
+        lastUsedDef.textContent = computeRelativeTimeString(used);
+        permissionsDef.textContent = permissions.join(', ');
+        statusDef.textContent = status;
+        nameInput.value = name;
+        tokenTextarea.value = token ?? '';
+        formFields.style.visibility = 'visible';
+        if (apiKeyFromInput) {
+            generatedDiv.style.visibility = 'hidden';
+            existedDiv.style.visibility = 'visible';
+        } else {
+            copyTokenButton.style.visibility = 'visible';
+            copyTokenTooltip.style.visibility = 'visible';
+        }
+
+        nameInput.focus();
+        nameInput.select();
+    }
 
     if (globalThis.turnstile && turnstileContainer && !turnstileContainer.rendered) {
         console.log('Rendering turnstile');
@@ -36,24 +63,7 @@ globalThis.updateApp = function() {
         console.log('Unlocking fields');
         generateButton.disabled = false;
         generateButton.addEventListener('click', async () => {
-            generateButton.disabled = true;
-            apiKeyInput.readonly = true;
-            const res = await fetch('/api/1/api-keys', { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify({ turnstileToken }) });
-            console.log(res);
-            if (res.status !== 200) throw new Error(`Unexpected status ${res.status}`);
-            const { apiKey, status, created, used, permissions, name, token } = await res.json();
-            apiKeyInput.value = apiKey;
-            createdDef.textContent = computeRelativeTimeString(created);
-            lastUsedDef.textContent = computeRelativeTimeString(used);
-            permissionsDef.textContent = permissions.join(', ');
-            statusDef.textContent = status;
-            nameInput.value = name;
-            tokenTextarea.value = token ?? '';
-            formFields.style.visibility = 'visible';
-            copyTokenButton.style.visibility = 'visible';
-            copyTokenTooltip.style.visibility = 'visible';
-            nameInput.focus();
-            nameInput.select();
+            await getOrGenerateApiKey();
         });
         if (navigator && navigator.clipboard) {
             copyTokenButton.addEventListener('click', async () => {
@@ -69,12 +79,12 @@ globalThis.updateApp = function() {
                 setTimeout(() => copyTokenTooltip.hide(), 5000);
             });
         }
-        apiKeyInput.addEventListener('sl-input', () => {
+        apiKeyInput.addEventListener('sl-input', async () => {
             const { value } = apiKeyInput;
-            if (/^[0-9a-f]{32}$/.test(value) && apiKeyInput.apiKey !== value) {
+            if (/^[0-9a-f]{32}$/.test(value) && !apiKeyInput.fired) {
                 console.log(`Api key: ${value}`);
-                apiKeyInput.apiKey = value;
-                apiKeyInput.disabled = true;
+                apiKeyInput.fired = true;
+                await getOrGenerateApiKey(value);
             }
         });
         fieldsUnlocked = true;

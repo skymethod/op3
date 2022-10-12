@@ -16,6 +16,7 @@ export type RpcRequest =
     | ResolveApiTokenRequest
     | AdminModifyApiKeyRequest
     | GenerateNewApiKeyRequest
+    | GetApiKeyRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -33,6 +34,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'admin-modify-api-key'
         || obj.kind === 'generate-new-api-key'
+        || obj.kind === 'get-api-key'
     );
 }
 
@@ -194,6 +196,11 @@ export interface GenerateNewApiKeyRequest {
     readonly kind: 'generate-new-api-key';
 }
 
+export interface GetApiKeyRequest {
+    readonly kind: 'get-api-key';
+    readonly apiKey: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -297,6 +304,7 @@ export interface RpcClient {
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
+    getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;

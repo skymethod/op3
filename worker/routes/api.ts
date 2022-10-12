@@ -4,6 +4,7 @@ import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
+import { isValidUuid } from '../uuid.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, pathname, searchParams, headers, bodyProvider } = opts;
@@ -143,9 +144,11 @@ async function computeApiKeysResponse(instance: string, method: string, hostname
     if (instance !== 'local' && typeof turnstileSecretKey !== 'string') throw new Error('Expected turnstileSecretKey string');
     const requestBody = await bodyProvider();
     if (typeof requestBody !== 'object') throw new Error(`Expected object`);
-    const { turnstileToken } = requestBody;
+    const { turnstileToken, apiKey: apiKeyFromInput } = requestBody;
     if (typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
-    console.log(`turnstileToken=${turnstileToken}`);
+    if (apiKeyFromInput !== undefined && typeof apiKeyFromInput !== 'string') throw new Error(`Expected apiKeyFromInput string`);
+    if (apiKeyFromInput !== undefined && !isValidUuid(apiKeyFromInput)) throw new Error(`Bad apiKeyFromInput`);
+    console.log(JSON.stringify({ turnstileToken, apiKeyFromInput}));
 
     if (typeof turnstileSecretKey === 'string') { // everywhere except instance = local
         // validate the turnstile token
@@ -168,8 +171,9 @@ async function computeApiKeysResponse(instance: string, method: string, hostname
         if (!success) throw new Error(`Validation failed`);
     }
 
-    // looks good, generate a new api key
-    const { info: { apiKey, status, created, used, permissions, name, token } } = await rpcClient.generateNewApiKey({ }, 'api-key-server');
+    // looks good, generate or lookup an api key
+    const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, 'api-key-server') : await rpcClient.generateNewApiKey({ }, 'api-key-server');
+    const { info: { apiKey, status, created, used, permissions, name, token } } = res;
 
     return newJsonResponse({ apiKey, status, created, used, permissions, name, token });
 }

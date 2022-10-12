@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest, ApiKeyResponse, GenerateNewApiKeyRequest } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
 
@@ -37,6 +37,10 @@ export class StubRpcClient implements RpcClient {
 
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
         throw new Error(`StubRpcClient: generateNewApiKey not implemented`);
+    }
+
+    getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
+        throw new Error(`StubRpcClient: getApiKey not implemented`);
     }
 
     //

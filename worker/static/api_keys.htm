@@ -72,14 +72,19 @@ ${apiKeysJs}
             </dl>
             <sl-input id="name-input" class="w-96 mt-4" label="Nickname" help-text="Something to help you identify this API Key"></sl-input>
             <div class="relative h-48">
-                <div class="absolute">
+                <div id="generated-div" class="absolute">
                     <sl-textarea id="token-textarea" class="mt-4" resize="none" label="Bearer Token (only shown once!)" readonly></sl-textarea>
                     <sl-tooltip id="copy-token-tooltip" class="invisible" placement="bottom" trigger="manual">
                         <sl-button id="copy-token-button" class="w-96 mt-2 invisible" outline variant="primary">Copy to clipboard</sl-button>
                     </sl-tooltip>
                 </div>
-                <div class="absolute invisible">
-                    <sl-button class="w-96 mt-2" outline variant="primary">Rotate token</sl-button>
+                <div id="existed-div" class="absolute invisible">
+                    <sl-tooltip placement="top" content="Generate a new bearer token associated with this API key. The old token will still be active for two hours to give you time to switch.">
+                        <sl-button class="w-96 mt-4" outline variant="primary">Regenerate token</sl-button>
+                    </sl-tooltip>
+                    <sl-tooltip placement="top" content="Delete the bearer token associated with this API key. You can always generate a new one later.">
+                        <sl-button class="w-96 mt-4" outline variant="primary">Delete token</sl-button>
+                    </sl-tooltip>
                 </div>
             </div>
         </fieldset>
