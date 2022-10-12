@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/dark.css" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/shoelace.js"></script>
     <script type="module">
-        await Promise.allSettled(['sl-button', 'sl-input', 'sl-textarea'].map(v => customElements.whenDefined(v)));
+        await Promise.allSettled([ 'sl-button', 'sl-input', 'sl-textarea' ].map(v => customElements.whenDefined(v)));
         document.querySelectorAll('.wait').forEach(v => v.classList.add('ready'));
     </script>
     <style>
@@ -39,6 +39,13 @@
             --sl-color-primary-900: #7c2d12;
             --sl-color-primary-950: #7c2d12;
         }
+
+        .panel {
+            background-color: var(--sl-panel-background-color);
+            box-shadow: var(--sl-shadow-x-small);
+            border: solid 1px var(--sl-color-neutral-200);
+            border-radius: var(--sl-border-radius-medium);
+        }
     </style>
 
     <script type="module">
@@ -49,44 +56,57 @@ ${apiKeysJs}
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=updateApp" async defer></script>
 </head>
 
-<body class="bg-indigo-900 flex flex-col">
+<body class="bg-neutral-900 flex flex-col">
     ${nonProdHeader}
     <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
         API Keys
     </h1>
 
-    <form id="form" class="wait max-w-2xl mx-auto p-8" onsubmit="return false;">
+    <div></div>
+    <form id="form" class="wait max-w-2xl mx-auto w-96" onsubmit="return false;">
 
-        <div id="turnstile-container" class="cf-turnstile flex justify-center relative h-16"></div> 
+        <div class="panel pt-10 pb-4">
+            <div id="turnstile-container" class="cf-turnstile flex justify-center h-16"></div>
+            <div class="flex items-center mt-4">
+                <sl-spinner id="status-spinner" class="ml-4 mr-3"></sl-spinner><div id="status-div" class="text-sm truncate w-80">Checking for signs of humanity...</div>
+            </div>
+        </div>
 
-        <sl-button id="generate-button" class="mt-16 w-96" variant="primary" outline disabled>Generate a new API Key</sl-button>
+        <sl-input id="api-key-input" class="mt-12 w-full" placeholder="e.g. 34fc63aab29244babeb37fb91cd4f122" autofocus>
+            <div slot="label" class="pb-1">Manage an existing API Key</div>
+            <div slot="help-text" class="pt-0.5">This is your identity, keep it secret</div>
+        </sl-input>
 
-        <sl-input id="api-key-input" class="w-96 mt-4" label="Manage an existing API Key" placeholder="e.g. 34fc63aab29244babeb37fb91cd4f122" autofocus></sl-input>
+        <sl-button id="generate-button" class="mt-4 w-full invisible" variant="primary" outline disabled>Generate a new API Key</sl-button>
 
         <fieldset id="form-fields" class="invisible">
+            <sl-input id="name-input" class="w-full mt-4">
+                <div slot="label" class="pb-1">Nickname</div>
+                <div slot="help-text" class="pt-0.5">Something to help you identify this API Key</div>
+            </sl-input>
+
             <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4">
                 <dt>Created</dt><dd id="created-def"></dd>
                 <dt>Last used</dt><dd id="last-used-def"></dd>
                 <dt>Permissions</dt><dd id="permissions-def"></dd>
                 <dt>Status</dt><dd id="status-def"></dd>
             </dl>
-            <sl-input id="name-input" class="w-96 mt-4" label="Nickname" help-text="Something to help you identify this API Key"></sl-input>
-            <div class="relative h-48">
-                <div id="generated-div" class="absolute">
-                    <sl-textarea id="token-textarea" class="mt-4" resize="none" label="Bearer Token (only shown once!)" readonly></sl-textarea>
-                    <sl-tooltip id="copy-token-tooltip" class="invisible" placement="bottom" trigger="manual">
-                        <sl-button id="copy-token-button" class="w-96 mt-2 invisible" outline variant="primary">Copy to clipboard</sl-button>
-                    </sl-tooltip>
-                </div>
-                <div id="existed-div" class="absolute invisible">
-                    <sl-tooltip placement="top" content="Generate a new bearer token associated with this API key. The old token will still be active for two hours to give you time to switch.">
-                        <sl-button class="w-96 mt-4" outline variant="primary">Regenerate token</sl-button>
-                    </sl-tooltip>
-                    <sl-tooltip placement="top" content="Delete the bearer token associated with this API key. You can always generate a new one later.">
-                        <sl-button class="w-96 mt-4" outline variant="primary">Delete token</sl-button>
-                    </sl-tooltip>
-                </div>
-            </div>
+
+            <sl-textarea id="token-textarea" class="w-full mt-4" resize="none">
+                <div slot="label" class="pb-1">API Token</div>
+                <div slot="help-text" class="pt-0.5">This is your credential in API calls - keep it secret, we'll only show it here once</div>
+            </sl-textarea>
+            <sl-tooltip id="copy-token-tooltip" class="hidden" placement="bottom" trigger="manual">
+                <sl-button id="copy-token-button" class="w-full mt-2" outline variant="primary">Copy to clipboard</sl-button>
+            </sl-tooltip>
+
+            <sl-tooltip id="regenerate-token-tooltip" placement="top" content="Generate a new API token associated with this API key. The old token will still be active for two hours to give you time to switch.">
+                <sl-button class="w-full mt-12" outline variant="primary">Regenerate token</sl-button>
+            </sl-tooltip>
+    
+            <sl-tooltip id="delete-token-tooltip" placement="top" content="Delete the API token associated with this API key. You can always generate a new one later.">
+                <sl-button class="w-full mt-4" outline variant="primary">Delete token</sl-button>
+            </sl-tooltip>
         </fieldset>
     </form>
 
