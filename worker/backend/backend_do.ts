@@ -163,7 +163,7 @@ export class BackendDO {
                         return await getOrLoadCombinedRedirectLogController().getMetrics();
                     } else if (obj.kind === 'resolve-api-token') {
                         return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
-                    } else if (obj.kind === 'admin-modify-api-key') {
+                    } else if (obj.kind === 'modify-api-key') {
                         return newRpcResponse(await getOrLoadApiAuthController().modifyApiKey(obj));
                     } else if (obj.kind === 'generate-new-api-key') {
                         return newRpcResponse(await getOrLoadApiAuthController().generateNewApiKey(obj));

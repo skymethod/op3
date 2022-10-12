@@ -4,11 +4,11 @@ import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
-import { isValidUuid } from '../uuid.ts';
+import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, pathname, searchParams, headers, bodyProvider } = opts;
-    const m = /^\/api\/1(\/[a-z\/-]+)$/.exec(pathname);
+    const m = /^\/api\/1(\/[a-z\/-]+(\/.+?)?)$/.exec(pathname);
     if (!m) return undefined;
     const [ _, path ] = m;
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
@@ -18,7 +18,7 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 }
 
 // deno-lint-ignore no-explicit-any
-type JsonProvider = () => Promise<any>;
+export type JsonProvider = () => Promise<any>;
 
 export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined }): Promise<Response> {
     const { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
@@ -35,16 +35,18 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         // invalid token or any other invalid reason
         if (identity.kind === 'invalid') return newJsonResponse({ error: 'forbidden' }, 403);
 
+        const isAdmin = identity.permissions.has('admin');
         if (path.startsWith('/admin/')) {
             // admin endpoints require admin
-            if (!identity.permissions.has('admin')) return newJsonResponse({ error: 'forbidden' }, 403);
+            if (!isAdmin) return newJsonResponse({ error: 'forbidden' }, 403);
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(method, rpcClient);
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
-            if (path === '/api-keys') return await computeApiKeysResponse(instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient);
+            if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+            const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         }
         
         // unknown api endpoint
@@ -136,44 +138,4 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 async function computeAdminGetMetricsResponse(method: string, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
-}
-
-async function computeApiKeysResponse(instance: string, method: string, hostname: string, bodyProvider: JsonProvider, rawIpAddress: string | undefined, turnstileSecretKey: string | undefined, rpcClient: RpcClient): Promise<Response> {
-    if (method !== 'POST') return newMethodNotAllowedResponse(method);
-    if (typeof rawIpAddress !== 'string') throw new Error('Expected rawIpAddress string');
-    if (instance !== 'local' && typeof turnstileSecretKey !== 'string') throw new Error('Expected turnstileSecretKey string');
-    const requestBody = await bodyProvider();
-    if (typeof requestBody !== 'object') throw new Error(`Expected object`);
-    const { turnstileToken, apiKey: apiKeyFromInput } = requestBody;
-    if (typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
-    if (apiKeyFromInput !== undefined && typeof apiKeyFromInput !== 'string') throw new Error(`Expected apiKeyFromInput string`);
-    if (apiKeyFromInput !== undefined && !isValidUuid(apiKeyFromInput)) throw new Error(`Bad apiKeyFromInput`);
-    console.log(JSON.stringify({ turnstileToken, apiKeyFromInput}));
-
-    if (typeof turnstileSecretKey === 'string') { // everywhere except instance = local
-        // validate the turnstile token
-        const formData = new FormData();
-        formData.append('secret', turnstileSecretKey);
-        formData.append('response', turnstileToken);
-        formData.append('remoteip', rawIpAddress);
-
-        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: formData } );
-        if (res.status !== 200) throw new Error(`Unexpected status ${res.status}`);
-        const obj = await res.json();
-        console.log(JSON.stringify(obj, undefined, 2));
-        const { success, hostname: responseHostname, challenge_ts, action } = obj;
-        if (typeof success !== 'boolean' || typeof responseHostname !== 'string' || typeof challenge_ts !== 'string' || typeof action !== 'string') throw new Error(`Unexpected validation response`);
-        if (responseHostname !== hostname) throw new Error(`Unexpected responseHostname`);
-        if (action !== 'api-key') throw new Error(`Unexpected action`);
-        const age = Date.now() - new Date(challenge_ts).getTime();
-        console.log({ age });
-        if (age > 30000) throw new Error(`Challenge age too old`);
-        if (!success) throw new Error(`Validation failed`);
-    }
-
-    // looks good, generate or lookup an api key
-    const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, 'api-key-server') : await rpcClient.generateNewApiKey({ }, 'api-key-server');
-    const { info: { apiKey, status, created, used, permissions, name, token } } = res;
-
-    return newJsonResponse({ apiKey, status, created, used, permissions, name, token });
 }

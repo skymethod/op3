@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
 
@@ -43,6 +43,10 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: getApiKey not implemented`);
     }
 
+    modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
+        throw new Error(`StubRpcClient: modifyApiKey not implemented`);
+    }
+
     //
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
@@ -55,10 +59,6 @@ export class StubRpcClient implements RpcClient {
 
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response> {
         throw new Error(`StubRpcClient: adminGetMetrics not implemented`);
-    }
-
-    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
-        throw new Error(`StubRpcClient: adminModifyApiKey not implemented`);
     }
 
 }

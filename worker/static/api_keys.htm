@@ -77,7 +77,7 @@ ${apiKeysJs}
             <div slot="help-text" class="pt-0.5">This is your identity, keep it secret</div>
         </sl-input>
 
-        <sl-button id="generate-button" class="mt-4 w-full invisible" variant="primary" outline disabled>Generate a new API Key</sl-button>
+        <sl-button id="generate-button" class="mt-4 w-full hidden" variant="primary" outline disabled>Generate a new API Key</sl-button>
 
         <fieldset id="form-fields" class="invisible">
             <sl-input id="name-input" class="w-full mt-4">
@@ -101,11 +101,11 @@ ${apiKeysJs}
             </sl-tooltip>
 
             <sl-tooltip id="regenerate-token-tooltip" placement="top" content="Generate a new API token associated with this API key. The old token will still be active for two hours to give you time to switch.">
-                <sl-button class="w-full mt-12" outline variant="primary">Regenerate token</sl-button>
+                <sl-button id="regenerate-token-button" class="w-full mt-12" outline variant="primary">Regenerate token</sl-button>
             </sl-tooltip>
     
             <sl-tooltip id="delete-token-tooltip" placement="top" content="Delete the API token associated with this API key. You can always generate a new one later.">
-                <sl-button class="w-full mt-4" outline variant="primary">Delete token</sl-button>
+                <sl-button id="delete-token-button" class="w-full mt-4" outline variant="primary">Delete token</sl-button>
             </sl-tooltip>
         </fieldset>
     </form>

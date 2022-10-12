@@ -1,6 +1,6 @@
 import { encodeBase58 } from '../base58.ts';
 import { DurableObjectStorage } from '../deps.ts';
-import { AdminModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded } from '../rpc_model.ts';
+import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded } from '../rpc_model.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 
 export class ApiAuthController {
@@ -18,8 +18,9 @@ export class ApiAuthController {
         return { 'kind': 'resolve-api-token', reason: 'invalid' };
     }
 
-    async modifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>): Promise<ApiKeyResponse> {
-        const { apiKey, permissions: __ } = request;
+    async modifyApiKey(request: Unkinded<ModifyApiKeyRequest>): Promise<ApiKeyResponse> {
+        const { apiKey, permissions, name, action } = request;
+        console.log(JSON.stringify({ apiKey, permissions, name, action }));
         // TODO modify in storage
         await Promise.resolve();
         throw new Error(`Api key not found: ${apiKey}`);
@@ -57,8 +58,6 @@ export class ApiAuthController {
 
         const created = new Date(Date.now() - 1000 * 60 * 5).toISOString();
 
-        const token = encodeBase58(crypto.getRandomValues(new Uint8Array(32))); // 16 -> 22 chars, 32 -> 43 chars
-
         const info: ApiKeyInfo = {
             apiKey,
             created,
@@ -67,7 +66,7 @@ export class ApiAuthController {
             permissions: [ 'preview' ],
             status: 'active',
             name: 'my-new-key',
-            token,
+            // don't return token
         };
 
         return { kind: 'api-key', info };

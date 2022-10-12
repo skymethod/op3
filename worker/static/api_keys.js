@@ -13,69 +13,171 @@ function computeRelativeTimeString(instant) {
 }
 
 const app = (() => {
+    let turnstileWidgetId = undefined;
     let turnstileToken = undefined;
-    let fieldsUnlocked = false;
     let status = undefined;
-    let pendingApiKeyFromInput = undefined;
+    let existingApiKey = undefined;
+    let fetchedExisting = false;
+    let fetching = false;
+    let info = undefined;
+    let nameChangeTimeout = undefined;
 
-    const [ statusSpinner, statusDiv, turnstileContainer, apiKeyInput, formFields, generateButton, createdDef, lastUsedDef, permissionsDef, statusDef, nameInput, regenerateTokenTooltip, tokenTextarea, copyTokenButton, copyTokenTooltip, deleteTokenTooltip ] = 
-    [ 'status-spinner', 'status-div', 'turnstile-container', 'api-key-input', 'form-fields', 'generate-button', 'created-def', 'last-used-def', 'permissions-def', 'status-def', 'name-input', 'regenerate-token-tooltip', 'token-textarea', 'copy-token-button', 'copy-token-tooltip', 'delete-token-tooltip' ].map(v => document.getElementById(v));
+    const [ statusSpinner, statusDiv, turnstileContainer, apiKeyInput, formFields, generateButton, createdDef, lastUsedDef, permissionsDef, statusDef, nameInput, regenerateTokenButton, tokenTextarea, copyTokenButton, copyTokenTooltip, deleteTokenButton ] = 
+    [ 'status-spinner', 'status-div', 'turnstile-container', 'api-key-input', 'form-fields', 'generate-button', 'created-def', 'last-used-def', 'permissions-def', 'status-def', 'name-input', 'regenerate-token-button', 'token-textarea', 'copy-token-button', 'copy-token-tooltip', 'delete-token-button' ].map(v => document.getElementById(v));
 
     apiKeyInput.addEventListener('sl-input', () => {
         const { value } = apiKeyInput;
-        if (/^[0-9a-f]{32}$/.test(value) && pendingApiKeyFromInput === undefined) {
+        if (/^[0-9a-f]{32}$/.test(value) && existingApiKey === undefined) {
             console.log(`Api key: ${value}`);
-            pendingApiKeyFromInput = value;
+            existingApiKey = value;
             updateApp();
         }
     });
 
-    async function getOrGenerateApiKey(apiKeyFromInput) {
-        generateButton.disabled = true;
-        apiKeyInput.readonly = true;
-        status = { pending: true, message: apiKeyFromInput ? 'Finding API Key...' : 'Generating new API Key...' }; updateApp();
+    generateButton.addEventListener('click', async () => {
+        await getOrGenerateApiKey();
+    });
+
+    nameInput.addEventListener('sl-input', () => {
+        clearTimeout(nameChangeTimeout);
+        nameChangeTimeout = setTimeout(async () => {
+            const name = nameInput.value;
+            console.log({ name });
+            if (info && name !== info.name) {
+                await performModification({ apiKey: existingApiKey, name });
+            }
+        }, 2000);
+    });
+    
+    copyTokenButton.addEventListener('click', async () => {
         try {
-            const res = await fetch('/api/1/api-keys', { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify({ turnstileToken, apiKey: apiKeyFromInput }) });
+            await navigator.clipboard.writeText(tokenTextarea.value);
+            copyTokenTooltip.content = 'Copied!';
+            console.log('copied!');
+        } catch {
+            copyTokenTooltip.content = 'Failed to copy!';
+            console.error('failed to copy', e);
+        }
+        copyTokenTooltip.show();
+        setTimeout(() => copyTokenTooltip.hide(), 5000);
+    });
+
+    regenerateTokenButton.addEventListener('click', async () => {
+        await performModification({ apiKey: apiKeyInput.value, action: 'regenerate-token' });
+    });
+
+    deleteTokenButton.addEventListener('click', async () => {
+        await performModification({ apiKey: apiKeyInput.value, action: 'delete-token' });
+    });
+
+    async function makeApiCall(opts) {
+        const { beforeMessage, pathname, body, callback, afterMessage, errorMessage, errorCallback } = opts;
+        fetching = true;
+        status = { pending: true, message: beforeMessage };
+        updateApp();
+        try {
+            const res = await fetch(pathname, { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify(body) });
             console.log(res);
-            if (res.status !== 200) throw new Error(`Unexpected status ${res.status}`);
-            const { apiKey, status: apiKeyStatus, created, used, permissions, name, token } = await res.json();
-            generateButton.style.display = 'none';
+            if (res.status !== 200) {
+                console.log(await res.text());
+                throw new Error(`Unexpected status ${res.status}`);
+            }
+            const obj = await res.json();
+            console.log(JSON.stringify(obj, undefined, 2));
+            callback(obj);
 
-            apiKeyInput.value = apiKey;
-            createdDef.textContent = computeRelativeTimeString(created);
-            lastUsedDef.textContent = computeRelativeTimeString(used);
-            permissionsDef.textContent = permissions.join(', ');
-            statusDef.textContent = apiKeyStatus;
-            nameInput.value = name;
-            tokenTextarea.value = token ?? '';
-            formFields.style.visibility = 'visible';
-            const showToken = !apiKeyFromInput;
-            tokenTextarea.style.display = showToken ? 'block' : 'none';
-            copyTokenTooltip.style.display = showToken ? 'block' : 'none';
-
-            nameInput.focus();
-            nameInput.select();
-            status = { message: apiKeyFromInput ? 'Found API Key' : 'Generated new API Key' }; updateApp();
+            status = { message: afterMessage };
         } catch (e) {
-            console.error('Error in getOrGenerateApiKey', e);
-            status = { message: apiKeyFromInput ? 'Failed to find API Key' : 'Failed to generate new API Key' }; updateApp();
+            if (errorCallback) errorCallback();
+            console.error(`Error making api call: ${pathname}`, e);
+            status = { message: errorMessage };
+        } finally {
+            globalThis.turnstile.reset(turnstileWidgetId);
+            turnstileToken = undefined;
+
+            fetching = false;
+            updateApp();
         }
     }
 
+    async function getOrGenerateApiKey() {
+        const existing = existingApiKey !== undefined;
+        await makeApiCall({ 
+            beforeMessage: existing ? 'Finding API Key...' : 'Generating new API Key...',
+            pathname: '/api/1/api-keys',
+            body: { turnstileToken, apiKey: existingApiKey },
+            callback: obj => {
+                info = obj;
+                apiKeyInput.value = info.apiKey;
+                existingApiKey = info.apiKey;
+                nameInput.value = info.name;
+
+                fetching = false;
+                updateApp();
+
+                nameInput.focus();
+                nameInput.select();
+            },
+            afterMessage: existing ? 'Found API Key' : 'Generated new API Key',
+            errorMessage: existing ? 'Failed to find API Key' : 'Failed to generate new API Key',
+        });
+    }
+
+    async function performModification(req) {
+        console.log(`performModification`, req);
+        await makeApiCall({ 
+            beforeMessage: 'Performing modification...',
+            pathname: `/api/1/api-keys/${req.apiKey}`,
+            body: { ...req, turnstileToken },
+            callback: obj => {
+                info = obj;
+                apiKeyInput.value = info.apiKey;
+                existingApiKey = info.apiKey;
+            },
+            afterMessage: 'Performed modification',
+            errorMessage: 'Failed to perform modification',
+            errorCallback: () => {
+                nameInput.value = info.name;
+            },
+        });
+    }
+
     function update() {
+        {
+            apiKeyInput.readonly = existingApiKey !== undefined;
+
+            generateButton.style.display = turnstileToken && existingApiKey === undefined ? 'block' : 'none';
+            generateButton.disabled = fetching || turnstileToken === undefined;
+
+            const { status, created, used, permissions, token } = info ?? {};
+
+            nameInput.readonly = turnstileToken === undefined;
+            createdDef.textContent = created ? computeRelativeTimeString(created) : '';
+            lastUsedDef.textContent = used ? computeRelativeTimeString(used) : '';
+            permissionsDef.textContent = permissions ? permissions.join(', ') : '';
+            statusDef.textContent = status;
+            tokenTextarea.value = token ?? '';
+            formFields.style.visibility = info ? 'visible' : 'invisible';
+            tokenTextarea.style.display = token ? 'block' : 'none';
+            copyTokenTooltip.style.display = navigator && navigator.clipboard && token ? 'block' : 'none';
+            regenerateTokenButton.disabled = fetching || turnstileToken === undefined;
+            deleteTokenButton.disabled = fetching || turnstileToken === undefined;
+        }
+
+
         if (globalThis.turnstile && turnstileContainer && !turnstileContainer.rendered) {
             console.log('Rendering turnstile');
-            globalThis.turnstile.render('#turnstile-container', {
+            turnstileWidgetId = globalThis.turnstile.render('#turnstile-container', {
                 sitekey,
                 action: 'api-key',
                 callback: token => {
                     console.log(`Challenge Success`, token);
                     turnstileToken = token;
-                    status = { message: `We think you're human` };
+                    status = { message: `Alright, you're human` };
                     updateApp();
                 },
                 'error-callback': () => {
-                    status = { message: `We don't think you're human` };
+                    status = { message: `Are you human?` };
                 },
                 'expired-callback': () => {
                     status = { message: 'Took too long, reload the page' };
@@ -90,34 +192,9 @@ const app = (() => {
             statusSpinner.style.visibility = pending ? 'visible' : 'hidden';
         }
     
-        if (typeof turnstileToken === 'string' && generateButton && apiKeyInput && !fieldsUnlocked) {
-            console.log('Unlocking fields');
-            generateButton.disabled = false;
-            generateButton.style.visibility = 'visible';
-            generateButton.addEventListener('click', async () => {
-                await getOrGenerateApiKey();
-            });
-            if (navigator && navigator.clipboard) {
-                copyTokenButton.style.display = 'block';
-                copyTokenButton.addEventListener('click', async () => {
-                    try {
-                        await navigator.clipboard.writeText(tokenTextarea.value);
-                        copyTokenTooltip.content = 'Copied!';
-                        console.log('copied!');
-                    } catch {
-                        copyTokenTooltip.content = 'Failed to copy!';
-                        console.error('failed to copy', e);
-                    }
-                    copyTokenTooltip.show();
-                    setTimeout(() => copyTokenTooltip.hide(), 5000);
-                });
-            }
-            fieldsUnlocked = true;
-        }
-        if (pendingApiKeyFromInput && turnstileToken) {
-            const apiKeyFromInput = pendingApiKeyFromInput;
-            pendingApiKeyFromInput = undefined;
-            getOrGenerateApiKey(apiKeyFromInput);
+        if (!fetchedExisting && existingApiKey && turnstileToken) {
+            fetchedExisting = true;
+            getOrGenerateApiKey();
         }
     }
 

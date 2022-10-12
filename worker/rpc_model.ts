@@ -3,38 +3,38 @@
 import { check, isStringRecord } from './check.ts';
 
 export type RpcRequest = 
-    LogRawRedirectsRequest 
-    | GetKeyRequest
-    | RegisterDORequest 
     | AdminDataRequest
-    | AdminRebuildIndexRequest
-    | RedirectLogsNotificationRequest
-    | AlarmRequest
-    | GetNewRedirectLogsRequest
-    | QueryRedirectLogsRequest
     | AdminGetMetricsRequest
-    | ResolveApiTokenRequest
-    | AdminModifyApiKeyRequest
+    | AdminRebuildIndexRequest
+    | AlarmRequest
     | GenerateNewApiKeyRequest
     | GetApiKeyRequest
+    | GetKeyRequest
+    | GetNewRedirectLogsRequest
+    | LogRawRedirectsRequest 
+    | ModifyApiKeyRequest
+    | QueryRedirectLogsRequest
+    | RedirectLogsNotificationRequest
+    | RegisterDORequest 
+    | ResolveApiTokenRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
-    return isStringRecord(obj) && (
-        obj.kind === 'log-raw-redirects' 
-        || obj.kind === 'get-key' 
-        || obj.kind === 'register-do' 
+    return isStringRecord(obj) && ( false
         || obj.kind === 'admin-data'
-        || obj.kind === 'admin-rebuild-index'
-        || obj.kind === 'redirect-logs-notification'
-        || obj.kind === 'alarm'
-        || obj.kind === 'get-new-redirect-logs'
-        || obj.kind === 'query-redirect-logs'
         || obj.kind === 'admin-get-metrics'
-        || obj.kind === 'resolve-api-token'
-        || obj.kind === 'admin-modify-api-key'
+        || obj.kind === 'admin-rebuild-index'
+        || obj.kind === 'alarm'
         || obj.kind === 'generate-new-api-key'
         || obj.kind === 'get-api-key'
+        || obj.kind === 'get-key' 
+        || obj.kind === 'get-new-redirect-logs'
+        || obj.kind === 'log-raw-redirects' 
+        || obj.kind === 'modify-api-key'
+        || obj.kind === 'query-redirect-logs'
+        || obj.kind === 'redirect-logs-notification'
+        || obj.kind === 'register-do' 
+        || obj.kind === 'resolve-api-token'
     );
 }
 
@@ -186,10 +186,27 @@ export interface ResolveApiTokenRequest {
     readonly token: string;
 }
 
-export interface AdminModifyApiKeyRequest {
-    readonly kind: 'admin-modify-api-key';
+export interface ModifyApiKeyRequest {
+    readonly kind: 'modify-api-key';
     readonly apiKey: string;
     readonly permissions?: readonly SettableApiTokenPermission[];
+    readonly name?: string;
+    readonly action?: ModifyApiKeyAction;
+}
+
+export type ModifyApiKeyAction = 'delete-token' | 'regenerate-token' | { kind: 'block', reason: string } | 'unblock';
+
+function isModifyApiKeyAction(obj: unknown): obj is ModifyApiKeyAction {
+    return typeof obj === 'string' && [ 'delete-token', 'regenerate-token', 'unblock' ].includes(obj) 
+        || isStringRecord(obj) && obj.kind === 'block' && typeof obj.reason === 'string';
+}
+
+export function isUnkindedModifyApiKeyRequest(obj: unknown): obj is Unkinded<ModifyApiKeyRequest> {
+    return isStringRecord(obj)
+    && typeof obj.apiKey === 'string'
+    && (obj.permissions === undefined || Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission))
+    && (obj.name === undefined || typeof obj.name === 'string')
+    && (obj.action === undefined || isModifyApiKeyAction(obj.action));
 }
 
 export interface GenerateNewApiKeyRequest {
@@ -268,6 +285,10 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
 export type SettableApiTokenPermission = 'preview' | 'notification' | 'admin-metrics';
 export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
+function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
+    return value === 'preview' || value === 'notification' || value === 'admin-metrics';
+}
+
 export interface ResolveApiTokenResponse {
     readonly kind: 'resolve-api-token';
     readonly permissions?: readonly ApiTokenPermission[];
@@ -281,8 +302,9 @@ export interface ApiKeyInfo {
     readonly used: string; // instant
     readonly name: string; // user tag
     readonly permissions: readonly SettableApiTokenPermission[];
-    readonly status: 'active' | 'inactive' | 'inactive-admin';
+    readonly status: 'active' | 'inactive' /* no token */ | 'blocked';
     readonly token?: string;
+    readonly blockReason?: string;
 }
 
 export interface ApiKeyResponse {
@@ -305,9 +327,9 @@ export interface RpcClient {
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
+    modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
-    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
 }
