@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, AdminModifyApiKeyRequest } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, AdminModifyApiKeyRequest, ApiKeyResponse, GenerateNewApiKeyRequest } from './rpc_model.ts';
 import { sleep } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
@@ -43,6 +43,11 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<ResolveApiTokenResponse>({ kind: 'resolve-api-token', ...request }, 'resolve-api-token', this.computeOpts(target));
     }
 
+    async generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
+        return await sendRpc<ApiKeyResponse>({ kind: 'generate-new-api-key', ...request }, 'api-key', this.computeOpts(target));
+    }
+
+    //
 
     async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
         return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target));
@@ -56,8 +61,8 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<Response>({ kind: 'admin-get-metrics', ...request }, 'response', this.computeOpts(target));
     }
 
-    async adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'admin-modify-api-key', ...request }, 'ok', this.computeOpts(target));
+    async adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
+        return await sendRpc<ApiKeyResponse>({ kind: 'admin-modify-api-key', ...request }, 'api-key', this.computeOpts(target));
     }
 
     //

@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, AdminModifyApiKeyRequest, ApiKeyResponse, GenerateNewApiKeyRequest } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
 
@@ -35,6 +35,12 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: resolveApiToken not implemented`);
     }
 
+    generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
+        throw new Error(`StubRpcClient: generateNewApiKey not implemented`);
+    }
+
+    //
+
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
         throw new Error(`StubRpcClient: adminExecuteDataQuery not implemented`);
     }
@@ -47,7 +53,7 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: adminGetMetrics not implemented`);
     }
 
-    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse> {
+    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
         throw new Error(`StubRpcClient: adminModifyApiKey not implemented`);
     }
 

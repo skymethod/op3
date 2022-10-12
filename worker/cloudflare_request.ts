@@ -1,9 +1,9 @@
 import { IncomingRequestCf } from './deps.ts';
 
-export function computeRawIpAddress(request: Request): string | undefined {
+export function computeRawIpAddress(headers: Headers): string | undefined {
     // e.g. 1.1.1.1
     // e.g. 1.1.1.1, 2.2.2.2
-    return (request.headers.get('cf-connecting-ip') ?? '')
+    return (headers.get('cf-connecting-ip') ?? '')
         .split(',')
         .map(v => v.trim())
         .filter(v => v !== '')

@@ -3,23 +3,25 @@ import { ApiTokenPermission, RpcClient } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
+import { computeRawIpAddress } from '../cloudflare_request.ts';
 
-export function tryParseApiRequest(opts: { method: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
-    const { method, pathname, searchParams, headers, bodyProvider } = opts;
+export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
+    const { instance, method, hostname, pathname, searchParams, headers, bodyProvider } = opts;
     const m = /^\/api\/1(\/[a-z\/-]+)$/.exec(pathname);
     if (!m) return undefined;
     const [ _, path ] = m;
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
     const bearerToken = m2 ? m2[1] : undefined;
-    return { method, path, searchParams, bearerToken, bodyProvider };
+    const rawIpAddress = computeRawIpAddress(headers);
+    return { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider };
 }
 
 // deno-lint-ignore no-explicit-any
 type JsonProvider = () => Promise<any>;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string> }): Promise<Response> {
-    const { method, path, searchParams, bearerToken, bodyProvider } = request;
-    const { rpcClient, adminTokens, previewTokens } = opts;
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined }): Promise<Response> {
+    const { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey } = opts;
 
     try {
         // first, we need to know who's calling
@@ -41,7 +43,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(method, rpcClient);
         } else {
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
-            if (path === '/api-keys') return await computeApiKeysResponse(method, bodyProvider, rpcClient);
+            if (path === '/api-keys') return await computeApiKeysResponse(instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient);
         }
         
         // unknown api endpoint
@@ -54,10 +56,13 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
 }
 
 export interface ApiRequest {
+    readonly instance: string;
     readonly method: string;
+    readonly hostname: string;
     readonly path: string;
     readonly searchParams: URLSearchParams;
     readonly bearerToken?: string;
+    readonly rawIpAddress?: string;
     readonly bodyProvider: JsonProvider;
 }
 
@@ -132,12 +137,39 @@ async function computeAdminGetMetricsResponse(method: string, rpcClient: RpcClie
     return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
 }
 
-async function computeApiKeysResponse(method: string, bodyProvider: JsonProvider, _rpcClient: RpcClient): Promise<Response> {
+async function computeApiKeysResponse(instance: string, method: string, hostname: string, bodyProvider: JsonProvider, rawIpAddress: string | undefined, turnstileSecretKey: string | undefined, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
-    const obj = await bodyProvider();
-    if (typeof obj !== 'object') throw new Error(`Expected object`);
-    const { turnstileToken } = obj;
+    if (typeof rawIpAddress !== 'string') throw new Error('Expected rawIpAddress string');
+    if (instance !== 'local' && typeof turnstileSecretKey !== 'string') throw new Error('Expected turnstileSecretKey string');
+    const requestBody = await bodyProvider();
+    if (typeof requestBody !== 'object') throw new Error(`Expected object`);
+    const { turnstileToken } = requestBody;
     if (typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
-    console.log(`TODO turnstileToken=${turnstileToken}`);
-    return newJsonResponse({ message: 'TODO '});
+    console.log(`turnstileToken=${turnstileToken}`);
+
+    if (typeof turnstileSecretKey === 'string') { // everywhere except instance = local
+        // validate the turnstile token
+        const formData = new FormData();
+        formData.append('secret', turnstileSecretKey);
+        formData.append('response', turnstileToken);
+        formData.append('remoteip', rawIpAddress);
+
+        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: formData } );
+        if (res.status !== 200) throw new Error(`Unexpected status ${res.status}`);
+        const obj = await res.json();
+        console.log(JSON.stringify(obj, undefined, 2));
+        const { success, hostname: responseHostname, challenge_ts, action } = obj;
+        if (typeof success !== 'boolean' || typeof responseHostname !== 'string' || typeof challenge_ts !== 'string' || typeof action !== 'string') throw new Error(`Unexpected validation response`);
+        if (responseHostname !== hostname) throw new Error(`Unexpected responseHostname`);
+        if (action !== 'api-key') throw new Error(`Unexpected action`);
+        const age = Date.now() - new Date(challenge_ts).getTime();
+        console.log({ age });
+        if (age > 30000) throw new Error(`Challenge age too old`);
+        if (!success) throw new Error(`Validation failed`);
+    }
+
+    // looks good, generate a new api key
+    const { info: { apiKey, status, created, used, permissions, name, token } } = await rpcClient.generateNewApiKey({ }, 'api-key-server');
+
+    return newJsonResponse({ apiKey, status, created, used, permissions, name, token });
 }

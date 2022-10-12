@@ -12,10 +12,10 @@ Deno.test({
             '': undefined,
         }
         for (const [ cfConnectingIp, expected ] of Object.entries(cfConnectingIps)) {
-            assertEquals(computeRawIpAddress(new Request('http://example.com', { headers: { 'cf-connecting-ip': cfConnectingIp } })), expected);
+            assertEquals(computeRawIpAddress(new Headers({ 'cf-connecting-ip': cfConnectingIp })), expected);
         }
 
-        assertEquals(computeRawIpAddress(new Request('http://example.com', { headers: { 'asdf': '1.1.1.1' } })), undefined);
+        assertEquals(computeRawIpAddress(new Headers({ 'asdf': '1.1.1.1' })), undefined);
     }
 });
 

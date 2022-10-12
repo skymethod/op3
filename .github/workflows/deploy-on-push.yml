@@ -30,6 +30,7 @@ jobs:
           CF_AE_DATASET: dataset1-ci
           CF_ANALYTICS_TOKEN: 031c86bb64214cb5a6b7aab02b5e1925
           TURNSTILE_SITEKEY: 0x4AAAAAAAAv-9Je89jD5c9h
+          TURNSTILE_SECRET_KEY: ${{ secrets.CI_TURNSTILE_SECRET_KEY }}
           INSTANCE: ci
           ADMIN_TOKENS: ${{ secrets.CI_ADMIN_TOKENS }}
           PREVIEW_TOKENS: ${{ secrets.CI_PREVIEW_TOKENS }}

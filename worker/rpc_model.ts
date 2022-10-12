@@ -15,6 +15,7 @@ export type RpcRequest =
     | AdminGetMetricsRequest
     | ResolveApiTokenRequest
     | AdminModifyApiKeyRequest
+    | GenerateNewApiKeyRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -31,6 +32,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'admin-get-metrics'
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'admin-modify-api-key'
+        || obj.kind === 'generate-new-api-key'
     );
 }
 
@@ -188,6 +190,10 @@ export interface AdminModifyApiKeyRequest {
     readonly permissions?: readonly SettableApiTokenPermission[];
 }
 
+export interface GenerateNewApiKeyRequest {
+    readonly kind: 'generate-new-api-key';
+}
+
 //
 
 export type RpcResponse = 
@@ -198,6 +204,7 @@ export type RpcResponse =
     | AdminRebuildIndexResponse
     | GetNewRedirectLogsResponse
     | ResolveApiTokenResponse
+    | ApiKeyResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -209,6 +216,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'admin-rebuild-index'
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'resolve-api-token'
+        || obj.kind === 'api-key'
     );
 }
 
@@ -259,18 +267,20 @@ export interface ResolveApiTokenResponse {
     readonly reason?: 'invalid';
 }
 
-
 export interface ApiKeyInfo {
     readonly apiKey: string;
     readonly created: string; // instant
     readonly updated: string; // instant
+    readonly used: string; // instant
+    readonly name: string; // user tag
     readonly permissions: readonly SettableApiTokenPermission[];
     readonly status: 'active' | 'inactive' | 'inactive-admin';
+    readonly token?: string;
 }
 
-export interface ApiKeyInfoResponse {
-    readonly kind: 'api-key-info';
-    readonly info?: ApiKeyInfo;
+export interface ApiKeyResponse {
+    readonly kind: 'api-key';
+    readonly info: ApiKeyInfo;
 }
 
 //
@@ -286,9 +296,10 @@ export interface RpcClient {
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
+    generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
-    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<OkResponse>;
+    adminModifyApiKey(request: Unkinded<AdminModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
 }

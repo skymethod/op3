@@ -46,7 +46,7 @@ const sitekey = '${turnstileSitekey}';
 const previewToken = '${previewToken}';
 ${apiKeysJs}
     </script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=updateApp&action=api-key" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=updateApp" async defer></script>
 </head>
 
 <body class="bg-indigo-900 flex flex-col">
@@ -65,19 +65,21 @@ ${apiKeysJs}
 
         <fieldset id="form-fields" class="invisible">
             <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4">
-                <dt>Created</dt><dd>three days ago</dd>
-                <dt>Last used</dt><dd>Just now</dd>
-                <dt>Permissions</dt><dd>Preview</dd>
-                <dt>Status</dt><dd>Active</dd>
+                <dt>Created</dt><dd id="created-def"></dd>
+                <dt>Last used</dt><dd id="last-used-def"></dd>
+                <dt>Permissions</dt><dd id="permissions-def"></dd>
+                <dt>Status</dt><dd id="status-def"></dd>
             </dl>
-            <sl-input class="w-96 mt-4" label="API Key Name" help-text="Readable name for this API Key"></sl-input>
+            <sl-input id="name-input" class="w-96 mt-4" label="Nickname" help-text="Something to help you identify this API Key"></sl-input>
             <div class="relative h-48">
                 <div class="absolute">
-                    <sl-textarea class="mt-4" resize="none" label="Bearer Token (only shown once!)" readonly value="asdf"></sl-textarea>
-                    <sl-button class="w-96 mt-2" outline>Copy to clipboard</sl-button>
+                    <sl-textarea id="token-textarea" class="mt-4" resize="none" label="Bearer Token (only shown once!)" readonly></sl-textarea>
+                    <sl-tooltip id="copy-token-tooltip" class="invisible" placement="bottom" trigger="manual">
+                        <sl-button id="copy-token-button" class="w-96 mt-2 invisible" outline variant="primary">Copy to clipboard</sl-button>
+                    </sl-tooltip>
                 </div>
                 <div class="absolute invisible">
-                    <sl-button class="w-96 mt-2" outline variant="primary" >Roll token</sl-button>
+                    <sl-button class="w-96 mt-2" outline variant="primary">Rotate token</sl-button>
                 </div>
             </div>
         </fieldset>

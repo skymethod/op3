@@ -83,7 +83,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
             
             if (redirectRequest.kind === 'valid') {
-                const rawIpAddress = computeRawIpAddress(request) ?? '<missing>';
+                const rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
@@ -140,7 +140,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv): Promise<Response> {
-        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, deploySha, deployTime } = env;
+        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, deploySha, deployTime } = env;
         IsolateId.log();
         const { origin, hostname, pathname, searchParams } = new URL(request.url);
         const { method, headers } = request;
@@ -160,7 +160,7 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
         if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
         const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-        const apiRequest = tryParseApiRequest({ method, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens });
+        const apiRequest = tryParseApiRequest({ instance, method, hostname, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey });
 
         // redirect /foo/ to /foo (canonical)
         if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

@@ -14,4 +14,5 @@ export interface WorkerEnv {
     readonly productionDomain?: string;
     readonly cfAnalyticsToken?: string;
     readonly turnstileSitekey?: string;
+    readonly turnstileSecretKey?: string;
 }

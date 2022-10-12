@@ -164,8 +164,9 @@ export class BackendDO {
                     } else if (obj.kind === 'resolve-api-token') {
                         return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
                     } else if (obj.kind === 'admin-modify-api-key') {
-                        await getOrLoadApiAuthController().modifyApiKey(obj);
-                        return newRpcResponse({ kind: 'ok' });
+                        return newRpcResponse(await getOrLoadApiAuthController().modifyApiKey(obj));
+                    } else if (obj.kind === 'generate-new-api-key') {
+                        return newRpcResponse(await getOrLoadApiAuthController().generateNewApiKey(obj));
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }
