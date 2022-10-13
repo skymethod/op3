@@ -1,6 +1,6 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { ApiTokenPermission, RpcClient } from '../rpc_model.ts';
-import { newMethodNotAllowedResponse, newJsonResponse } from '../responses.ts';
+import { ApiTokenPermission, hasPermission, RpcClient } from '../rpc_model.ts';
+import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
@@ -36,21 +36,19 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (identity.kind === 'invalid') return newForbiddenJsonResponse();
 
         const { permissions } = identity;
+        if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
         const isAdmin = permissions.has('admin');
         if (path.startsWith('/admin/')) {
-            if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(method, permissions, rpcClient);
-
             // all other admin endpoints require admin
             if (!isAdmin) return newForbiddenJsonResponse();
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
-        } else {
-            if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(method, searchParams, rpcClient);
-            if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
-            const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         }
-        
+        if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
+        if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+        const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+    
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
     } catch (e) {
@@ -141,12 +139,8 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
     return newJsonResponse({ first, last, count, millis });
 }
 
-async function computeAdminGetMetricsResponse(method: string, permissions: ReadonlySet<ApiTokenPermission>, rpcClient: RpcClient): Promise<Response> {
-    if (!permissions.has('admin') && !permissions.has('admin-metrics')) return newForbiddenJsonResponse();
+async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
+    if (!hasPermission(permissions, 'admin-metrics')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
-}
-
-function newForbiddenJsonResponse() {
-    return newJsonResponse({ error: 'forbidden' }, 403);
 }

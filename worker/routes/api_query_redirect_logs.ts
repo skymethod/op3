@@ -4,12 +4,13 @@ import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { Bytes } from '../deps.ts';
 import { tryParseDurationMillis } from '../duration.ts';
 import { packError } from '../errors.ts';
-import { QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
-import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
+import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 
-export async function computeQueryRedirectLogsResponse(method: string, searchParams: URLSearchParams, rpcClient: RpcClient): Promise<Response> {
+export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient): Promise<Response> {
+    if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
     const { limitDefault, limitMax, limitMin } = QUERY_REDIRECT_LOGS;

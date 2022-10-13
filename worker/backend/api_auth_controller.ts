@@ -123,7 +123,7 @@ export class ApiAuthController {
             apiKey,
             created,
             updated: created,
-            permissions: [ 'preview' ],
+            permissions: [ 'read-data' ],
             status: 'active',
             name: 'my-new-key',
             token,

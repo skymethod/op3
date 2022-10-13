@@ -282,11 +282,15 @@ export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'get-new-redirect-logs';
 }
 
-export type SettableApiTokenPermission = 'preview' | 'notification' | 'admin-metrics';
+export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics';
 export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
 export function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
-    return value === 'preview' || value === 'notification' || value === 'admin-metrics';
+    return value === 'preview' || value === 'read-data' || value === 'notification' || value === 'admin-metrics';
+}
+
+export function hasPermission(permissions: ReadonlySet<ApiTokenPermission>, ...allowablePermissions: ApiTokenPermission[]): boolean {
+    return permissions.has('admin') || allowablePermissions.some(v => permissions.has(v));
 }
 
 export interface ResolveApiTokenResponse {
