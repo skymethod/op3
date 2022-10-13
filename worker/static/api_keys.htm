@@ -62,8 +62,13 @@ ${apiKeysJs}
         API Keys
     </h1>
 
-    <div></div>
-    <form id="form" class="wait max-w-2xl mx-auto w-80 md:w-96" onsubmit="return false;">
+    <form id="form" class="wait max-w-2xl mx-auto w-80 md:w-96 mb-16" onsubmit="return false;">
+
+        <div class="my-8 leading-relaxed">
+            <p>Every call to the <a href="/api/docs">OP3 API</a> requires a bearer token associated with a valid API Key.</p>
+            <p class="mt-4">Since OP3 does not store email addresses, the API Key is used as your stable identity, and the associated bearer token as the credential to use in calls.</p>
+            <p class="mt-4">You'll need to pass our human verification check in order to make any changes.</p>
+        </div>
 
         <div class="panel pt-10 pb-4">
             <div id="turnstile-container" class="cf-turnstile flex justify-center h-16"></div>
@@ -78,7 +83,7 @@ ${apiKeysJs}
         </sl-input>
 
         <sl-button id="generate-button" class="mt-4 w-full hidden" variant="primary" outline disabled>Generate a new API Key</sl-button>
-
+       
         <fieldset id="form-fields" class="invisible">
             <sl-input id="name-input" class="w-full mt-4">
                 <div slot="label" class="pb-1">Nickname</div>
@@ -93,27 +98,22 @@ ${apiKeysJs}
             </dl>
 
             <sl-textarea id="token-textarea" class="w-full mt-4" resize="none">
-                <div slot="label" class="pb-1">API Token</div>
+                <div slot="label" class="pb-1">Bearer Token</div>
                 <div slot="help-text" class="pt-0.5">This is your credential in API calls - keep it secret, we'll only show it here once</div>
             </sl-textarea>
             <sl-tooltip id="copy-token-tooltip" class="hidden" placement="bottom" trigger="manual">
                 <sl-button id="copy-token-button" class="w-full mt-2" outline variant="primary">Copy to clipboard</sl-button>
             </sl-tooltip>
 
-            <sl-tooltip id="regenerate-token-tooltip" placement="top" content="Generate a new API token associated with this API key. The old token will still be active for two hours to give you time to switch.">
+            <sl-tooltip id="regenerate-token-tooltip" placement="top" content="Generate a new bearer token associated with this API key. The old token will still be active for two hours to give you time to switch.">
                 <sl-button id="regenerate-token-button" class="w-full mt-12" outline variant="primary">Regenerate token</sl-button>
             </sl-tooltip>
     
-            <sl-tooltip id="delete-token-tooltip" placement="top" content="Delete the API token associated with this API key. You can always generate a new one later.">
+            <sl-tooltip id="delete-token-tooltip" placement="top" content="Delete the bearer token associated with this API key. You can always generate a new one later.">
                 <sl-button id="delete-token-button" class="w-full mt-4" outline variant="primary">Delete token</sl-button>
             </sl-tooltip>
         </fieldset>
     </form>
-
-    <div class="wait max-w-xl mx-auto my-8">
-        <a href="/api/docs">OP3 API Documentation</a>
-    </div>
-
     ${cfAnalyticsSnippet}
 </body>
 

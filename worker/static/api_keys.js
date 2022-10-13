@@ -17,7 +17,7 @@ const app = (() => {
     let turnstileToken = undefined;
     let status = undefined;
     let existingApiKey = undefined;
-    let fetchedExisting = false;
+    let gotOrGeneratedApiKey = false;
     let fetching = false;
     let info = undefined;
     let nameChangeTimeout = undefined;
@@ -103,6 +103,7 @@ const app = (() => {
     async function getOrGenerateApiKey() {
         console.log('getOrGenerateApiKey', existingApiKey);
 
+        gotOrGeneratedApiKey = true;
         const existing = existingApiKey !== undefined;
 
         await makeApiCall({ 
@@ -123,6 +124,9 @@ const app = (() => {
             },
             afterMessage: existing ? 'Found API Key' : 'Generated new API Key',
             errorMessage: existing ? 'Failed to find API Key' : 'Failed to generate new API Key',
+            errorCallback: () => {
+                gotOrGeneratedApiKey = false;
+            }
         });
     }
 
@@ -201,8 +205,7 @@ const app = (() => {
             statusSpinner.style.visibility = pending ? 'visible' : 'hidden';
         }
     
-        if (!fetchedExisting && existingApiKey && turnstileToken) {
-            fetchedExisting = true;
+        if (!gotOrGeneratedApiKey && existingApiKey && turnstileToken) {
             getOrGenerateApiKey();
         }
     }
