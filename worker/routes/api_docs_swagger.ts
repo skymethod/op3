@@ -6,17 +6,17 @@ export function computeApiDocsSwaggerResponse(opts: { instance: string, origin: 
     const { host } = new URL(origin);
 
     const versionSuffix = instance === 'prod' ? '' : `-${instance}`;
-    let descriptionSuffix = `\n\nBase url for all API calls: \`${origin}/api/1\``;
+    let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
     const previewToken = [...previewTokens].at(0);
     if (previewToken) {
-        descriptionSuffix += `\n\nYou can use the bearer token \`${previewToken}\` to preview API access on this instance.`;
+        descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
         const exampleApiCall = `${origin}/api/1/redirect-logs?start=-24h&format=json&token=${previewToken}`;
         queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleApiCall}](${exampleApiCall})`;
     }
 
     const nonProdWarning = computeNonProdWarning(instance);
-    if (nonProdWarning) descriptionSuffix += `\n\n**${nonProdWarning}**`;
+    if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
     const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
@@ -69,7 +69,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "token",
                             "in": "query",
-                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
                             "required": false,
                             "type": "string",
                         },
@@ -270,10 +270,6 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "time", "uuid", "hashedIpAddress", "method", "url", "edgeColo"
                 ]
             },
-        },
-        "externalDocs": {
-            "description": "Find out more about OP3",
-            "url": "https://op3.dev"
         }
     }
 );
