@@ -16,7 +16,7 @@ Deno.test({
                 throw new Error();
             }
         }
-        const res = await computeQueryRedirectLogsResponse('GET', new URLSearchParams({ url: 'https://example.com/path/to/*' }), rpcClient);
+        const res = await computeQueryRedirectLogsResponse(new Set([ 'read-data' ]), 'GET', new URLSearchParams({ url: 'https://example.com/path/to/*' }), rpcClient);
         assertEquals(res.status, 200);
     }
 });
