@@ -71,7 +71,7 @@ async function commonTurnstileValidation(hostname: string, turnstileSecretKey: s
         if (action !== 'api-key') throw new Error(`Unexpected action`);
         const age = Date.now() - new Date(challenge_ts).getTime();
         console.log({ age });
-        if (age > 30000) throw new Error(`Challenge age too old`);
+        if (age > 1000 * 60 * 60) throw new Error(`Challenge age too old`);
         if (!success) throw new Error(`Validation failed`);
     }
 }

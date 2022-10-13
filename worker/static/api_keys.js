@@ -164,7 +164,7 @@ const app = (() => {
             createdDef.textContent = created ? computeRelativeTimeString(created) : '';
             lastUsedDef.textContent = tokenLastUsed ? computeRelativeTimeString(tokenLastUsed) : 'never';
             permissionsDef.textContent = permissions ? permissions.join(', ') : '';
-            statusDef.textContent = status + (blockReason ? ` (${blockReason})` : '');
+            statusDef.textContent = status + (status === 'inactive' ? ` (no token)` : '') + (blockReason ? ` (${blockReason})` : '');
             tokenTextarea.value = token ?? '';
             formFields.style.visibility = info ? 'visible' : 'invisible';
             tokenTextarea.style.display = token ? 'block' : 'none';
