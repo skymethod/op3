@@ -3,6 +3,7 @@
 import { check, isStringRecord } from './check.ts';
 
 export type RpcRequest = 
+    | AdminApiKeyInfoRequest
     | AdminDataRequest
     | AdminGetMetricsRequest
     | AdminRebuildIndexRequest
@@ -21,6 +22,7 @@ export type RpcRequest =
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
     return isStringRecord(obj) && ( false
+        || obj.kind === 'admin-api-key-info'
         || obj.kind === 'admin-data'
         || obj.kind === 'admin-get-metrics'
         || obj.kind === 'admin-rebuild-index'
@@ -218,6 +220,12 @@ export interface GetApiKeyRequest {
     readonly apiKey: string;
 }
 
+export interface AdminApiKeyInfoRequest {
+    readonly kind: 'admin-api-key-info';
+    readonly apiKey?: string;
+    readonly apiToken?: string;
+}
+
 //
 
 export type RpcResponse = 
@@ -228,6 +236,7 @@ export type RpcResponse =
     | AdminRebuildIndexResponse
     | GetNewRedirectLogsResponse
     | ResolveApiTokenResponse
+    | AdminApiKeyInfoResponse
     | ApiKeyResponse
     ;
 
@@ -241,6 +250,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
+        || obj.kind === 'admin-api-key-info'
     );
 }
 
@@ -296,7 +306,7 @@ export function hasPermission(permissions: ReadonlySet<ApiTokenPermission>, ...a
 export interface ResolveApiTokenResponse {
     readonly kind: 'resolve-api-token';
     readonly permissions?: readonly ApiTokenPermission[];
-    readonly reason?: 'invalid';
+    readonly reason?: 'invalid' | 'blocked' | 'expired';
 }
 
 export interface ApiKeyInfo {
@@ -330,6 +340,36 @@ export interface ApiKeyResponse {
     readonly info: ApiKeyInfo;
 }
 
+export interface AdminApiKeyInfoResponse {
+    readonly kind: 'admin-api-key-info';
+    readonly apiKeyInfo: ApiKeyInfo;
+    readonly apiTokenRecord?: ApiTokenRecord;
+}
+
+export interface ApiTokenRecord {
+    readonly token: string;
+    readonly apiKey: string;
+    readonly created: string;
+    readonly updated: string;
+    readonly permissions: readonly SettableApiTokenPermission[];
+    readonly lastUsed?: string;
+    readonly expires?: string; // instant
+    readonly blockReason?: string; // if blocked
+}
+
+export function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
+    return isStringRecord(obj)
+        && typeof obj.token === 'string'
+        && typeof obj.apiKey === 'string'
+        && typeof obj.created === 'string'
+        && typeof obj.updated === 'string'
+        && Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission)
+        && (obj.lastUsed === undefined || typeof obj.lastUsed === 'string')
+        && (obj.expires === undefined || typeof obj.expires === 'string')
+        && (obj.blockReason === undefined || typeof obj.blockReason === 'string')
+        ;
+} 
+
 //
 
 export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
@@ -350,4 +390,5 @@ export interface RpcClient {
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
+    adminApiKeyInfo(request: Unkinded<AdminApiKeyInfoRequest>, target: string): Promise<AdminApiKeyInfoResponse>;
 }

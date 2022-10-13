@@ -173,6 +173,7 @@ const app = (() => {
             formFields.style.visibility = info ? 'visible' : 'invisible';
             tokenTextarea.style.display = token ? 'block' : 'none';
             copyTokenTooltip.style.display = navigator && navigator.clipboard && token ? 'block' : 'none';
+            regenerateTokenButton.style.display = (status === 'active' || status === 'inactive') ? 'block' : 'none';
             regenerateTokenButton.disabled = fetching || turnstileToken === undefined;
             deleteTokenButton.style.display = status === 'active' ? 'block' : 'none';
             deleteTokenButton.disabled = fetching || turnstileToken === undefined;

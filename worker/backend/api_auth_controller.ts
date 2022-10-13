@@ -1,7 +1,7 @@
 import { encodeBase58 } from '../base58.ts';
 import { isStringRecord } from '../check.ts';
 import { DurableObjectStorageMethods, DurableObjectStorage, setEqual } from '../deps.ts';
-import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded, isApiKeyInfo, SettableApiTokenPermission, isSettableApiTokenPermission } from '../rpc_model.ts';
+import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded, isApiKeyInfo, ApiTokenRecord, isApiTokenRecord, AdminApiKeyInfoRequest, AdminApiKeyInfoResponse } from '../rpc_model.ts';
 import { addHours } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
@@ -21,12 +21,16 @@ export class ApiAuthController {
             const rec = await findApiTokenRecord(token, tx);
             if (!rec) return { 'kind': 'resolve-api-token', reason: 'invalid' };
 
-            const { permissions, expires } = rec;
+            const { permissions, expires, blockReason } = rec;
             const now = new Date().toISOString();
             if (expires && now > expires) {
                 console.log('Expired, delete token');
                 await deleteApiTokenRecord(token, tx);
-                return { 'kind': 'resolve-api-token', reason: 'invalid' };
+                return { 'kind': 'resolve-api-token', reason: 'expired' };
+            }
+            if (typeof blockReason === 'string') {
+                console.log('Blocked!');
+                return { 'kind': 'resolve-api-token', reason: 'blocked' };
             }
 
             const newRec: ApiTokenRecord = { ...rec, lastUsed: now };
@@ -95,11 +99,19 @@ export class ApiAuthController {
                     if (status === 'blocked') {
                         keyRecord = { ...keyRecord, status: keyRecord.token ? 'active' : 'inactive', blockReason: undefined, updated: now };
                         await saveApiKeyRecord(keyRecord, tx);
+                        if (tokenRecord && tokenRecord.blockReason !== undefined) {
+                            tokenRecord = { ...tokenRecord, blockReason: undefined, updated: now };
+                            await saveApiTokenRecord(tokenRecord, tx);
+                        }
                     }
                 } else if (isStringRecord(action) && action.kind === 'block') {
                     if (status !== 'blocked' || keyRecord.blockReason !== action.reason) {
                         keyRecord = { ...keyRecord, status: 'blocked', blockReason: action.reason, updated: now };
                         await saveApiKeyRecord(keyRecord, tx);
+                        if (tokenRecord) {
+                            tokenRecord = { ...tokenRecord, blockReason: action.reason, updated: now };
+                            await saveApiTokenRecord(tokenRecord, tx);
+                        }
                     }
                 } else {
                     throw new Error(`Unsupported action: ${JSON.stringify(action)}`);
@@ -154,6 +166,29 @@ export class ApiAuthController {
         return { kind: 'api-key', info };
     }
 
+    async adminApiKeyInfo(request: Unkinded<AdminApiKeyInfoRequest>): Promise<AdminApiKeyInfoResponse> {
+        const { apiKey, apiToken } = request;
+        console.log(`ApiAuthController.getAdminApiKeyInfo: ${JSON.stringify({ apiKey, apiToken })}`);
+
+        if (apiKey && apiToken) {
+            throw new Error(`Provide either apiKey or apiToken, not both`);
+        } else if (apiKey) {
+            if (!isValidUuid(apiKey)) throw new Error(`Bad apiKey: ${apiKey}`);
+            const record = await findApiKeyRecord(apiKey, this.storage);
+            if (record === undefined) throw new Error(`Unable to find apiKey: ${apiKey}`);
+            const tokenRecord = record.token ? await findApiTokenRecord(record.token, this.storage) : undefined;
+            return { kind: 'admin-api-key-info', apiKeyInfo: record, apiTokenRecord: tokenRecord };
+        } else if (apiToken) {
+            const tokenRecord = await findApiTokenRecord(apiToken, this.storage);
+            if (tokenRecord === undefined) throw new Error(`Unable to find apiToken: ${apiToken}`);
+            const record = await findApiKeyRecord(tokenRecord.apiKey, this.storage);
+            if (record === undefined) throw new Error(`Unable to find apiKey: ${apiKey}`);
+            return { kind: 'admin-api-key-info', apiKeyInfo: record, apiTokenRecord: tokenRecord };
+        } else {
+            throw new Error(`Provide apiKey or apiToken`);
+        }
+    }
+
 }
 
 //
@@ -197,27 +232,3 @@ function same<T>(lhs: readonly T[], rhs: readonly T[]): boolean {
 function generateToken() {
     return encodeBase58(crypto.getRandomValues(new Uint8Array(32))); // 16 -> 22 chars, 32 -> 43 chars
 }
-
-//
-
-interface ApiTokenRecord {
-    readonly token: string;
-    readonly apiKey: string;
-    readonly created: string;
-    readonly updated: string;
-    readonly permissions: readonly SettableApiTokenPermission[];
-    readonly lastUsed?: string;
-    readonly expires?: string; // instant
-}
-
-function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
-    return isStringRecord(obj)
-        && typeof obj.token === 'string'
-        && typeof obj.apiKey === 'string'
-        && typeof obj.created === 'string'
-        && typeof obj.updated === 'string'
-        && Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission)
-        && (obj.lastUsed === undefined || typeof obj.lastUsed === 'string')
-        && (obj.expires === undefined || typeof obj.expires === 'string')
-        ;
-} 

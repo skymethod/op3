@@ -31,6 +31,8 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
     
         // all api endpoints require an auth token
         if (identity.kind === 'invalid' && identity.reason === 'missing-token') return newJsonResponse({ error: 'unauthorized' }, 401);
+        if (identity.kind === 'invalid' && identity.reason === 'expired-token') return newJsonResponse({ error: 'expired' }, 401);
+        if (identity.kind === 'invalid' && identity.reason === 'blocked-token') return newJsonResponse({ error: 'blocked' }, 401);
     
         // invalid token or any other invalid reason
         if (identity.kind === 'invalid') return newForbiddenJsonResponse();
@@ -44,6 +46,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
+            if (path === '/admin/api-key-info') return await computeAdminApiKeyInfoResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
@@ -80,7 +83,7 @@ interface ValidIdentityResult {
 
 interface InvalidIdentityResult {
     readonly kind: 'invalid';
-    readonly reason: 'missing-token' | 'invalid-token';
+    readonly reason: 'missing-token' | 'invalid-token' | 'blocked-token' | 'expired-token';
 }
 
 function identityResultToJson(result: IdentityResult) {
@@ -96,6 +99,8 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
     if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
     const res = await rpcClient.resolveApiToken({ token }, 'api-key-server');
     if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
+    if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
+    if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
     return { kind: 'invalid', reason: 'invalid-token' };
 }
 
@@ -137,6 +142,18 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 
     const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, 'combined-redirect-log');
     return newJsonResponse({ first, last, count, millis });
+}
+
+async function computeAdminApiKeyInfoResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+
+    const { apiKey, apiToken } = await bodyProvider();
+
+    if (apiKey !== undefined && typeof apiKey !== 'string') throw new Error(`Bad apiKey: ${apiKey}`);
+    if (apiToken !== undefined && typeof apiToken !== 'string') throw new Error(`Bad apiToken: ${apiToken}`);
+
+    const { apiKeyInfo, apiTokenRecord } = await rpcClient.adminApiKeyInfo({ apiKey, apiToken }, 'api-key-server');
+    return newJsonResponse({ apiKeyInfo, apiTokenRecord });
 }
 
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
