@@ -101,6 +101,31 @@ Deno.test({
             { kind: 'prefix', prefix: 'podkite', url: 'https://growx.podkite.com/http/D3E76IU7/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://media.blubrry.com/something/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'blubrry', url: 'https://media.blubrry.com/something/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://media.blubrry.com/something/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'blubrry', url: 'http://media.blubrry.com/something/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://chrt.fm/track/ABC123/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/ABC123/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://pdcn.co/e/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podcorn', url: 'https://pdcn.co/e/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

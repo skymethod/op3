@@ -26,11 +26,12 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://dts.podtrac.com/redirect.mp3/
+    // https://www.podtrac.com/pts/redirect.mp3/
     // http redirects to https for registered feeds
     // need to find an http example
-    m = /^https?:\/\/dts\.podtrac\.com\/redirect\.mp3\/(.*?)$/.exec(url);
+    m = /^https?:\/\/(dts\.podtrac\.com|www\.podtrac\.com\/pts)\/redirect\.mp3\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
+        const [ _, _domain, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'podtrac', url }, ...computeChainEstimate(targetUrl) ];
     }
@@ -47,10 +48,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://chrt.fm/track/CHRT123/
     // also chtbl.com/track/12345
     // http redirects to target http
-    m = /^(https?):\/\/(chrt\.fm|chtbl\.com)\/track\/[^/]+\/(.*?)$/.exec(url);
+    m = /^(https?):\/\/(chrt\.fm|chtbl\.com)\/track\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, _domain, suffix ] = m;
-        const targetUrl = `${scheme}://${suffix}`;
+        const [ _, scheme, _domain, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
         return [ { kind: 'prefix', prefix: 'chartable', url }, ...computeChainEstimate(targetUrl) ];
     }
 
@@ -75,10 +76,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://pdcn.co/e/
     // https://podcorn.com/analytics-prefix/
     // http redirects to target https
-    m = /^https?:\/\/pdcn\.co\/e\/(.*?)$/.exec(url);
+    m = /^https?:\/\/pdcn\.co\/e\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
-        const targetUrl = `https://${suffix}`;
+        const [ _, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? 'https://'}${suffix}`;
         return [ { kind: 'prefix', prefix: 'podcorn', url }, ...computeChainEstimate(targetUrl) ];
     }
 
@@ -129,6 +130,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podkite', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://media.blubrry.com/something/a.com/path/to/episode.mp3
+    // http and https endpoints are supported
+    m = /^(https?):\/\/media\.blubrry\.com\/\w+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffix ] = m;
+        const targetUrl = `${scheme}://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'blubrry', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -152,5 +162,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry';
 }
