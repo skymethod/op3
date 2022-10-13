@@ -51,6 +51,8 @@ jobs:
           CF_BACKEND_DO_NAMESPACE: backend-do-staging
           CF_AE_DATASET: dataset1-staging
           CF_ANALYTICS_TOKEN: 3c527d531d83451b8c89fba58678822a
+          TURNSTILE_SITEKEY: 0x4AAAAAAAA2w5UVs5xYhwmA
+          TURNSTILE_SECRET_KEY: ${{ secrets.STAGING_TURNSTILE_SECRET_KEY }}
           INSTANCE: staging
           ADMIN_TOKENS: ${{ secrets.STAGING_ADMIN_TOKENS }}
           PREVIEW_TOKENS: ${{ secrets.STAGING_PREVIEW_TOKENS }}
