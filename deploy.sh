@@ -44,4 +44,5 @@ ${CF_AE_DATASET:+--ae-dataset-binding dataset1:$CF_AE_DATASET} \
 ${PRODUCTION_DOMAIN:+--text-binding productionDomain:$PRODUCTION_DOMAIN} \
 ${CF_ANALYTICS_TOKEN:+--text-binding cfAnalyticsToken:$CF_ANALYTICS_TOKEN} \
 ${TURNSTILE_SITEKEY:+--text-binding turnstileSitekey:$TURNSTILE_SITEKEY} \
-${TURNSTILE_SECRET_KEY:+--text-binding turnstileSecretKey:$TURNSTILE_SECRET_KEY}
+${TURNSTILE_SECRET_KEY:+--secret-binding turnstileSecretKey:$TURNSTILE_SECRET_KEY} \
+${PODCAST_INDEX_CREDENTIALS:+--secret-binding podcastIndexCredentials:$PODCAST_INDEX_CREDENTIALS}

@@ -9,6 +9,7 @@ env:
   DEPLOY_REPOSITORY_URL: ${{ github.repositoryUrl }}
   CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
   CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+  PODCAST_INDEX_CREDENTIALS: ${{ secrets.PODCAST_INDEX_CREDENTIALS }}
   PRODUCTION_DOMAIN: op3.dev
 
 jobs:

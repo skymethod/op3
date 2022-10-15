@@ -15,4 +15,5 @@ export interface WorkerEnv {
     readonly cfAnalyticsToken?: string;
     readonly turnstileSitekey?: string;
     readonly turnstileSecretKey?: string;
+    readonly podcastIndexCredentials?: string;
 }

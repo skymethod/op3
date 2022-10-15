@@ -24,6 +24,11 @@ export function isValidSha1Hex(str: string): boolean {
     return /^[0-9a-f]{40}$/.test(str);
 }
 
+export async function hmacForSecret(data: Bytes, secret: Bytes): Promise<Bytes> {
+    const key = await crypto.subtle.importKey('raw', secret.array(), { name: 'HMAC', hash: 'SHA-1' }, false /*extractable*/, ['sign', 'verify']);
+    return await hmac(data, key);
+}
+
 // aes-gcm 256
 
 export async function generateAesKeyBytes(): Promise<Bytes> {
