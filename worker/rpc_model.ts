@@ -7,6 +7,7 @@ export type RpcRequest =
     | AdminGetMetricsRequest
     | AdminRebuildIndexRequest
     | AlarmRequest
+    | ExternalNotificationRequest
     | GenerateNewApiKeyRequest
     | GetApiKeyRequest
     | GetKeyRequest
@@ -25,6 +26,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'admin-get-metrics'
         || obj.kind === 'admin-rebuild-index'
         || obj.kind === 'alarm'
+        || obj.kind === 'external-notification'
         || obj.kind === 'generate-new-api-key'
         || obj.kind === 'get-api-key'
         || obj.kind === 'get-key' 
@@ -218,6 +220,30 @@ export interface GetApiKeyRequest {
     readonly apiKey: string;
 }
 
+export interface ExternalNotificationRequest {
+    readonly kind: 'external-notification';
+    readonly notification: ExternalNotification;
+    readonly received: string; // instant
+}
+
+export interface ExternalNotification extends Record<string, unknown> {
+    readonly type: 'feeds'; // known types
+    readonly sent: string; // instant
+    readonly sender: string;
+
+    // other props depending on type
+    // feeds: unknown[] for type: feeds
+}
+
+export function isExternalNotification(obj: unknown): obj is ExternalNotification {
+    return isStringRecord(obj)
+        && obj.type === 'feeds'
+        && typeof obj.sent === 'string'
+        && typeof obj.sender === 'string'
+        && obj.type === 'feeds' && Array.isArray(obj.feeds)
+        ;
+}
+
 //
 
 export type RpcResponse = 
@@ -370,6 +396,7 @@ export interface RpcClient {
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
+    receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;

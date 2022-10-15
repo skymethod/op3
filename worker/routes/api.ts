@@ -1,6 +1,6 @@
 import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
-import { ApiTokenPermission, hasPermission, RpcClient } from '../rpc_model.ts';
-import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse } from '../responses.ts';
+import { ApiTokenPermission, hasPermission, isExternalNotification, RpcClient } from '../rpc_model.ts';
+import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
@@ -50,6 +50,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+        if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
@@ -129,6 +130,9 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
         return newJsonResponse({ results });
+    }  else if (operationKind === 'select' && targetPath === '/feed-notifications') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
+        return newJsonResponse({ results });
     } else {
         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
     }
@@ -152,4 +156,17 @@ async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenP
     if (!hasPermission(permissions, 'admin-metrics')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
+}
+
+async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+    if (!hasPermission(permissions, 'notification')) return newForbiddenJsonResponse();
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+
+    const received = new Date().toISOString();
+    const notification = await bodyProvider();
+    if (!isExternalNotification(notification)) throw new Error(`Bad notification body`);
+
+    await rpcClient.receiveExternalNotification({ notification, received }, 'show-server');
+
+    return newTextResponse('thanks');
 }

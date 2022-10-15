@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, AdminGetMetricsRequest, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, LogRawRedirectsRequest, OkResponse, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest } from '../rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
 
@@ -45,6 +45,10 @@ export class StubRpcClient implements RpcClient {
 
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse> {
         throw new Error(`StubRpcClient: modifyApiKey not implemented`);
+    }
+
+    receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse> {
+        throw new Error(`StubRpcClient: receiveExternalNotification not implemented`);
     }
 
     //

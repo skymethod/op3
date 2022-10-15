@@ -16,6 +16,7 @@ import { packHashedIpAddress } from '../ip_addresses.ts';
 import { initCloudflareTracer } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { ApiAuthController } from './api_auth_controller.ts';
+import { ShowController } from './show_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -29,6 +30,7 @@ export class BackendDO {
 
     private keyController?: KeyController;
     private apiAuthController?: ApiAuthController;
+    private showController?: ShowController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -97,6 +99,11 @@ export class BackendDO {
                         return this.apiAuthController;
                     }
 
+                    const getOrLoadShowController = () => {
+                        if (!this.showController) this.showController = new ShowController(storage);
+                        return this.showController;
+                    }
+
                     if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
                         await getOrLoadRedirectLogController().save(obj.rawRedirects);
@@ -139,6 +146,8 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', message });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === 'api-key-server') {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
+                        } else if (targetPath === '/feed-notifications' && durableObjectName === 'show-server') {
+                            return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
                     } else if (obj.kind === 'redirect-logs-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
@@ -171,6 +180,9 @@ export class BackendDO {
                         return newRpcResponse(await getOrLoadApiAuthController().generateNewApiKey(obj));
                     } else if (obj.kind === 'get-api-key') {
                         return newRpcResponse(await getOrLoadApiAuthController().getApiKey(obj));
+                    } else if (obj.kind === 'external-notification' && durableObjectName === 'show-server') {
+                        await getOrLoadShowController().receiveExternalNotification(obj);
+                        return newRpcResponse({ kind: 'ok' });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }
