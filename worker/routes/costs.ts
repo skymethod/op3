@@ -41,6 +41,15 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2022-10-15',
+        description: 'Cloudflare invoice',
+        cost: 9.29,
+        detail: [
+            { description: 'Advanced Certificate Manager (op3.st)', cost: 8.71 },
+            { description: 'Sales Tax', cost: 0.58 },
+        ]
+    },
+    {
         date: '2022-10-10',
         description: 'Cloudflare invoice',
         cost: 70.69,
