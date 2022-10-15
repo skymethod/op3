@@ -1,7 +1,7 @@
 import { encodeBase58 } from '../base58.ts';
 import { isStringRecord } from '../check.ts';
 import { DurableObjectStorageMethods, DurableObjectStorage, setEqual } from '../deps.ts';
-import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded, isApiKeyInfo, ApiTokenRecord, isApiTokenRecord, AdminApiKeyInfoRequest, AdminApiKeyInfoResponse } from '../rpc_model.ts';
+import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded, isApiKeyInfo, ApiTokenRecord, isApiTokenRecord, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { addHours } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
@@ -166,28 +166,38 @@ export class ApiAuthController {
         return { kind: 'api-key', info };
     }
 
-    async adminApiKeyInfo(request: Unkinded<AdminApiKeyInfoRequest>): Promise<AdminApiKeyInfoResponse> {
-        const { apiKey, apiToken } = request;
-        console.log(`ApiAuthController.getAdminApiKeyInfo: ${JSON.stringify({ apiKey, apiToken })}`);
-
-        if (apiKey && apiToken) {
-            throw new Error(`Provide either apiKey or apiToken, not both`);
-        } else if (apiKey) {
-            if (!isValidUuid(apiKey)) throw new Error(`Bad apiKey: ${apiKey}`);
-            const record = await findApiKeyRecord(apiKey, this.storage);
-            if (record === undefined) throw new Error(`Unable to find apiKey: ${apiKey}`);
-            const tokenRecord = record.token ? await findApiTokenRecord(record.token, this.storage) : undefined;
-            return { kind: 'admin-api-key-info', apiKeyInfo: record, apiTokenRecord: tokenRecord };
-        } else if (apiToken) {
-            const tokenRecord = await findApiTokenRecord(apiToken, this.storage);
-            if (tokenRecord === undefined) throw new Error(`Unable to find apiToken: ${apiToken}`);
-            const record = await findApiKeyRecord(tokenRecord.apiKey, this.storage);
-            if (record === undefined) throw new Error(`Unable to find apiKey: ${apiKey}`);
-            return { kind: 'admin-api-key-info', apiKeyInfo: record, apiTokenRecord: tokenRecord };
-        } else {
-            throw new Error(`Provide apiKey or apiToken`);
+    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
+        const { operationKind, targetPath } = req;
+        if (operationKind === 'select' && targetPath === '/api-keys') {
+            const results: ApiKeyInfo[] = [];
+            const map = await this.storage.list({ prefix: 'ak.1.'});
+            for (const val of map.values()) {
+                if (isApiKeyInfo(val)) {
+                    results.push(val);
+                }
+            }
+            return { results };
         }
-    }
+        const m = /^\/api-keys\/info\/([^\/]+)$/.exec(targetPath); 
+        if (m && operationKind === 'select') {
+            const suffix = m[1];
+            if (isValidUuid(suffix)) {
+                const apiKey = suffix;
+                const record = await findApiKeyRecord(apiKey, this.storage);
+                if (record === undefined) throw new Error(`Unable to find apiKey: ${apiKey}`);
+                const tokenRecord = record.token ? await findApiTokenRecord(record.token, this.storage) : undefined;
+                return { results: [{ apiKeyInfo: record, apiTokenRecord: tokenRecord }] };
+            } else {
+                const apiToken = suffix;
+                const tokenRecord = await findApiTokenRecord(apiToken, this.storage);
+                if (tokenRecord === undefined) throw new Error(`Unable to find apiToken: ${apiToken}`);
+                const record = await findApiKeyRecord(tokenRecord.apiKey, this.storage);
+                if (record === undefined) throw new Error(`Unable to find apiKey: ${tokenRecord.apiKey}`);
+                return { results: [{ apiKeyInfo: record, apiTokenRecord: tokenRecord }] };
+            }
+        }
+        throw new Error(`Unsupported api-keys query`);
+    }   
 
 }
 

@@ -46,7 +46,6 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
-            if (path === '/admin/api-key-info') return await computeAdminApiKeyInfoResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
@@ -108,23 +107,28 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
 
     const { operationKind, targetPath, dryRun } = await bodyProvider();
-
-    if (operationKind === 'list' && targetPath === '/registry') {
-        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'registry');
-        return newJsonResponse({ listResults });
-    } else if (operationKind === 'list' && targetPath === '/keys') {
-        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
-        return newJsonResponse({ listResults });
-    } else if (operationKind === 'list' && targetPath.startsWith('/crl/')) {
-        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
-        return newJsonResponse({ listResults });
-    } else if (operationKind === 'list' && targetPath === '/crl/records') {
-        const { listResults } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
-        return newJsonResponse({ listResults });
+    if (operationKind === 'select' && targetPath === '/registry') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'registry');
+        return newJsonResponse({ results });
+    } else if (operationKind === 'select' && targetPath === '/keys') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
+        return newJsonResponse({ results });
+    } else if (operationKind === 'select' && targetPath.startsWith('/crl/')) {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        return newJsonResponse({ results });
+    } else if (operationKind === 'select' && targetPath === '/crl/records') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        return newJsonResponse({ results });
     } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
         const doName = checkDeleteDurableObjectAllowed(targetPath);
         const { message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, doName);
         return newJsonResponse({ message });
+    } else if (operationKind === 'select' && targetPath === '/api-keys') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
+        return newJsonResponse({ results });
+    } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
+        return newJsonResponse({ results });
     } else {
         throw new Error(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
     }
@@ -142,18 +146,6 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 
     const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, 'combined-redirect-log');
     return newJsonResponse({ first, last, count, millis });
-}
-
-async function computeAdminApiKeyInfoResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
-    if (method !== 'POST') return newMethodNotAllowedResponse(method);
-
-    const { apiKey, apiToken } = await bodyProvider();
-
-    if (apiKey !== undefined && typeof apiKey !== 'string') throw new Error(`Bad apiKey: ${apiKey}`);
-    if (apiToken !== undefined && typeof apiToken !== 'string') throw new Error(`Bad apiToken: ${apiToken}`);
-
-    const { apiKeyInfo, apiTokenRecord } = await rpcClient.adminApiKeyInfo({ apiKey, apiToken }, 'api-key-server');
-    return newJsonResponse({ apiKeyInfo, apiTokenRecord });
 }
 
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {

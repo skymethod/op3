@@ -115,14 +115,14 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'admin-data') {
                         const { operationKind, targetPath, dryRun = false } = obj;
-                        if (operationKind === 'list' && targetPath === '/registry' && durableObjectName === 'registry') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await listRegistry(storage) });
-                        } else if (operationKind === 'list' && targetPath === '/keys' && durableObjectName === 'key-server') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadKeyController().listKeys() });
-                        } else if (operationKind === 'list' && targetPath === '/crl/sources') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadCombinedRedirectLogController().listSources() });
-                        } else if (operationKind === 'list' && targetPath === '/crl/records') {
-                            return newRpcResponse({ kind: 'admin-data', listResults: await getOrLoadCombinedRedirectLogController().listRecords() });
+                        if (operationKind === 'select' && targetPath === '/registry' && durableObjectName === 'registry') {
+                            return newRpcResponse({ kind: 'admin-data', results: await listRegistry(storage) });
+                        } else if (operationKind === 'select' && targetPath === '/keys' && durableObjectName === 'key-server') {
+                            return newRpcResponse({ kind: 'admin-data', results: await getOrLoadKeyController().listKeys() });
+                        } else if (operationKind === 'select' && targetPath === '/crl/sources') {
+                            return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listSources() });
+                        } else if (operationKind === 'select' && targetPath === '/crl/records') {
+                            return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listRecords() });
                         } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
                             const doName = checkDeleteDurableObjectAllowed(targetPath);
                             if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
@@ -137,6 +137,8 @@ export class BackendDO {
                             }
                             console.log(message);
                             return newRpcResponse({ kind: 'admin-data', message });
+                        } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === 'api-key-server') {
+                            return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
                         }
                     } else if (obj.kind === 'redirect-logs-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
@@ -169,8 +171,6 @@ export class BackendDO {
                         return newRpcResponse(await getOrLoadApiAuthController().generateNewApiKey(obj));
                     } else if (obj.kind === 'get-api-key') {
                         return newRpcResponse(await getOrLoadApiAuthController().getApiKey(obj));
-                    } else if (obj.kind === 'admin-api-key-info') {
-                        return newRpcResponse(await getOrLoadApiAuthController().adminApiKeyInfo(obj));
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

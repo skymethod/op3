@@ -3,7 +3,6 @@
 import { check, isStringRecord } from './check.ts';
 
 export type RpcRequest = 
-    | AdminApiKeyInfoRequest
     | AdminDataRequest
     | AdminGetMetricsRequest
     | AdminRebuildIndexRequest
@@ -22,7 +21,6 @@ export type RpcRequest =
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
     return isStringRecord(obj) && ( false
-        || obj.kind === 'admin-api-key-info'
         || obj.kind === 'admin-data'
         || obj.kind === 'admin-get-metrics'
         || obj.kind === 'admin-rebuild-index'
@@ -117,7 +115,7 @@ export function isValidChange(change: any): boolean {
 
 export interface AdminDataRequest {
     readonly kind: 'admin-data';
-    readonly operationKind: 'list' | 'delete';
+    readonly operationKind: 'select' | 'delete';
     readonly targetPath: string;
     readonly dryRun?: boolean;
 }
@@ -220,12 +218,6 @@ export interface GetApiKeyRequest {
     readonly apiKey: string;
 }
 
-export interface AdminApiKeyInfoRequest {
-    readonly kind: 'admin-api-key-info';
-    readonly apiKey?: string;
-    readonly apiToken?: string;
-}
-
 //
 
 export type RpcResponse = 
@@ -236,7 +228,6 @@ export type RpcResponse =
     | AdminRebuildIndexResponse
     | GetNewRedirectLogsResponse
     | ResolveApiTokenResponse
-    | AdminApiKeyInfoResponse
     | ApiKeyResponse
     ;
 
@@ -250,7 +241,6 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
-        || obj.kind === 'admin-api-key-info'
     );
 }
 
@@ -271,7 +261,7 @@ export interface GetKeyResponse {
 
 export interface AdminDataResponse {
     readonly kind: 'admin-data';
-    readonly listResults?: unknown[];
+    readonly results?: unknown[];
     readonly message?: string;
 }
 
@@ -340,12 +330,6 @@ export interface ApiKeyResponse {
     readonly info: ApiKeyInfo;
 }
 
-export interface AdminApiKeyInfoResponse {
-    readonly kind: 'admin-api-key-info';
-    readonly apiKeyInfo: ApiKeyInfo;
-    readonly apiTokenRecord?: ApiTokenRecord;
-}
-
 export interface ApiTokenRecord {
     readonly token: string;
     readonly apiKey: string;
@@ -372,7 +356,7 @@ export function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
 
 //
 
-export type Unkinded<T extends RpcRequest> = Omit<T, 'kind'>;
+export type Unkinded<T extends RpcRequest | RpcResponse> = Omit<T, 'kind'>;
 
 export interface RpcClient {
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse>;
@@ -390,5 +374,4 @@ export interface RpcClient {
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
-    adminApiKeyInfo(request: Unkinded<AdminApiKeyInfoRequest>, target: string): Promise<AdminApiKeyInfoResponse>;
 }

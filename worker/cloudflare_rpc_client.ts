@@ -1,5 +1,5 @@
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, AdminApiKeyInfoRequest, AdminApiKeyInfoResponse } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest } from './rpc_model.ts';
 import { sleep } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
@@ -67,10 +67,6 @@ export class CloudflareRpcClient implements RpcClient {
 
     async adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response> {
         return await sendRpc<Response>({ kind: 'admin-get-metrics', ...request }, 'response', this.computeOpts(target));
-    }
-
-    async adminApiKeyInfo(request: Unkinded<AdminApiKeyInfoRequest>, target: string): Promise<AdminApiKeyInfoResponse> {
-        return await sendRpc<AdminApiKeyInfoResponse>({ kind: 'admin-api-key-info', ...request }, 'admin-api-key-info', this.computeOpts(target));
     }
 
     //
