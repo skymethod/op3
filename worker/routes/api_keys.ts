@@ -1,17 +1,17 @@
 import { importText } from '../deps.ts';
-import { computeCloudflareAnalyticsSnippet, computeHtml } from './html.ts';
+import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 
 const apiKeysHtm = await importText(import.meta.url, '../static/api_keys.htm');
 const apiKeysJs = await importText(import.meta.url, '../static/api_keys.js');
-const outputCss = await importText(import.meta.url, '../static/output.css');
 
 export function computeApiKeysResponse(opts: { instance: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, turnstileSitekey: string | undefined, previewTokens: Set<string> }): Response {
     const { instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens } = opts;
 
     const html = computeHtml(apiKeysHtm, {
         titleSuffix: instance === 'prod' ? '' : ` (${instance})`,
-        styleTag: `<style>\n${outputCss}\n</style>`,
+        styleTag: computeStyleTag(),
+        shoelaceCommon: computeShoelaceCommon(),
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,

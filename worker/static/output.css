@@ -629,11 +629,6 @@ a:hover {
   margin-bottom: 2rem;
 }
 
-.my-7 {
-  margin-top: 1.75rem;
-  margin-bottom: 1.75rem;
-}
-
 .mt-16 {
   margin-top: 4rem;
 }
@@ -676,10 +671,6 @@ a:hover {
 
 .mt-0 {
   margin-top: 0px;
-}
-
-.mb-12 {
-  margin-bottom: 3rem;
 }
 
 .inline-block {
@@ -773,10 +764,6 @@ a:hover {
 
 .whitespace-nowrap {
   white-space: nowrap;
-}
-
-.border {
-  border-width: 1px;
 }
 
 .bg-indigo-900 {
@@ -910,14 +897,6 @@ a:hover {
 
 .outline {
   outline-style: solid;
-}
-
-.transition {
-  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
 }
 
 .hover\:text-indigo-400:hover {

@@ -1,0 +1,38 @@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/dark.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/shoelace.js"></script>
+    <script type="module">
+        await Promise.allSettled([ 'sl-button', 'sl-input', 'sl-textarea', 'sl-spinner', 'sl-tooltip' ].map(v => customElements.whenDefined(v)));
+        document.querySelectorAll('.wait').forEach(v => v.classList.add('ready'));
+    </script>
+    <style>
+        .wait {
+            opacity: 0;
+        }
+
+        .wait.ready {
+            opacity: 1;
+            transition: 0.25s opacity;
+        }
+
+        :root {
+            /* use tailwind orange for shoelace primary */
+            --sl-color-primary-50: #fff7ed;
+            --sl-color-primary-100: #ffedd5;
+            --sl-color-primary-200: #fed7aa;
+            --sl-color-primary-300: #fdba74;
+            --sl-color-primary-400: #fb923c;
+            --sl-color-primary-500: #f97316;
+            --sl-color-primary-600: #ea580c;
+            --sl-color-primary-700: #c2410c;
+            --sl-color-primary-800: #9a3412;
+            --sl-color-primary-900: #7c2d12;
+            --sl-color-primary-950: #7c2d12;
+        }
+
+        .panel {
+            background-color: var(--sl-panel-background-color);
+            box-shadow: var(--sl-shadow-x-small);
+            border: solid 1px var(--sl-color-neutral-200);
+            border-radius: var(--sl-border-radius-medium);
+        }
+    </style>

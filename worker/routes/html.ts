@@ -1,3 +1,16 @@
+import { importText } from '../deps.ts';
+
+const outputCss = await importText(import.meta.url, '../static/output.css');
+const shoelaceCommonHtm = await importText(import.meta.url, '../static/shoelace_common.htm');
+
+export function computeStyleTag(): string {
+    return `<style>\n${outputCss}\n    </style>`;
+}
+
+export function computeShoelaceCommon(): string {
+    return shoelaceCommonHtm;
+}
+
 export function computeHtml(template: string, variables: Record<string, string | boolean>) {
 
     template = template.replace(/\${if (\w+)}(.*?)\${endif}/gs, (_, g1, g2) => {
@@ -7,9 +20,9 @@ export function computeHtml(template: string, variables: Record<string, string |
         return value ? g2 : '';
     });
 
-    return template.replace(/\${(\w+)}/g, (_, g1) => {
-        const value = variables[g1];
-        if (value === undefined) throw new Error(`Undefined variable: ${g1}`);
+    return template.replace(/(\/\*)?\${(\w+)}(\*\/)?/g, (_, __, g2) => {
+        const value = variables[g2];
+        if (value === undefined) throw new Error(`Undefined variable: ${g2}`);
         if (typeof value === 'boolean') return `${value}`;
         return value;
     });
