@@ -52,7 +52,7 @@ A free service for podcasters and podcast hosts to compute standard episode/show
   - Building a service like this will require a large amount of initial development (see work plan below)
   - Although the service runs on serverless infrastructure, there will still be monthly costs involved, and ongoing administration (combatting fraud and abuse, managing current IP lists)
   - [op3.dev](https://op3.dev) (and the [staging](https://staging.op3.dev) and [ci](https://ci.op3.dev) subdomains) run under a dedicated Cloudflare paid account, these are the only hosting costs
-  - Monthly bills and usage details will be published once available
+  - Monthly bills and usage details are [published](https://op3.dev/costs) as a public part of the project
   - Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships
     - For initial development, there is a [Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) as a way to gauge interest
     - Sponsors will be listed on the project page below (if desired)
