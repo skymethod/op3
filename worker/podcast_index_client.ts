@@ -28,6 +28,24 @@ export class PodcastIndexClient {
         return await this.makeApiCall(u, checkSearchPodcastsByTermResponse);
     }
 
+    async getPodcastByFeedId(id: number): Promise<GetPodcastResponse> {
+        const u = new URL('https://api.podcastindex.org/api/1.0/podcasts/byfeedid');
+        u.searchParams.set('id', id.toString());
+        return await this.makeApiCall(u, checkGetPodcastResponse);
+    }
+
+    async getPodcastByGuid(guid: string): Promise<GetPodcastResponse> {
+        const u = new URL('https://api.podcastindex.org/api/1.0/podcasts/byguid');
+        u.searchParams.set('guid', guid);
+        return await this.makeApiCall(u, checkGetPodcastResponse);
+    }
+
+    async getPodcastByFeedUrl(url: string): Promise<GetPodcastResponse> {
+        const u = new URL('https://api.podcastindex.org/api/1.0/podcasts/byfeedurl');
+        u.searchParams.set('url', url);
+        return await this.makeApiCall(u, checkGetPodcastResponse);
+    }
+
     //
 
     private async makeApiCall<T>(url: URL, responseCheck: (obj: unknown) => obj is T): Promise<T> {
@@ -38,6 +56,7 @@ export class PodcastIndexClient {
             throw new StatusError(await res.text(), res.status);
         }
         const rt = await res.json();
+        // console.log(JSON.stringify(rt, undefined, 2));
         if (!responseCheck(rt)) throw new StatusError(`Unexpected response: ${JSON.stringify(rt)}`);
         return rt;
     }
@@ -45,6 +64,23 @@ export class PodcastIndexClient {
 }
 
 //
+
+export interface GetPodcastResponse {
+    readonly status: string; // "true"
+    readonly feed: Feed | [];
+}
+
+function checkGetPodcastResponse(obj: unknown): obj is GetPodcastResponse {
+    if (!isStringRecord(obj)) throw new StatusError(`Unexpected GetPodcastResponse obj: ${JSON.stringify(obj)}`);
+    const { status, feed } = obj;
+    if (status !== 'true') throw new StatusError(`Unexpected status: ${JSON.stringify(status)}`);
+    if (Array.isArray(feed)) {
+        if (feed.length !== 0) throw new StatusError(`Unexpected feed array: ${JSON.stringify(feed)}`);
+    } else {
+        checkFeed(feed);
+    }
+    return true;
+}
 
 export interface SearchPodcastsByTermResponse {
     readonly status: string; // "true"

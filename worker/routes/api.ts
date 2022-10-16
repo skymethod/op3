@@ -6,7 +6,7 @@ import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
 import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
 import { validateSessionToken } from '../session_token.ts';
-import { isValidInstant } from '../check.ts';
+import { isValidInstant, tryParseUrl } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 
@@ -193,6 +193,24 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
     const q = typeof qFromObj === 'string' ? qFromObj.trim() : '';
     if (q === '') throw new StatusError(`Bad q: ${qFromObj}`);
 
+    if (/^\d+$/.test(q)) {
+        const { feed } = await client.getPodcastByFeedId(parseInt(q));
+        const feeds = Array.isArray(feed) ? [] : [ feed ];
+        return newJsonResponse({ feeds });
+    }
+
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q)) {
+        const { feed } = await client.getPodcastByGuid(q);
+        const feeds = Array.isArray(feed) ? [] : [ feed ];
+        return newJsonResponse({ feeds });
+    }
+
+    if (tryParseUrl(q)) {
+        const { feed } = await client.getPodcastByFeedUrl(q);
+        const feeds = Array.isArray(feed) ? [] : [ feed ];
+        return newJsonResponse({ feeds });
+    }
+    
     const res = await client.searchPodcastsByTerm(q);
     const { feeds } = res;
     
