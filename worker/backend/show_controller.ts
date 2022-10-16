@@ -21,7 +21,7 @@ export class ShowController {
         const newRecords: Record<string, FeedNotificationRecord> = {};
         feeds.forEach((feed, i) => {
             if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
-            newRecords[`fn.1.${feedNotificationSequence.next()}`] = { sent, received, sender, feed };
+            newRecords[`fn.1.${feedNotificationSequence.next()}`] = trimRecordToFit({ sent, received, sender, feed });
         });
         const newRecordsCount = Object.keys(newRecords).length;
         if (newRecordsCount === 0) return;
@@ -63,4 +63,21 @@ function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
         && typeof obj.sender === 'string'
         && isStringRecord(obj.feed)
         ;
+}
+
+function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
+    while (true) {
+        const json = JSON.stringify(record);
+        const size = new TextEncoder().encode(json).length;
+        if (size > 1024 * 128) {
+            const { items } = record.feed;
+            if (Array.isArray(items) && items.length > 0) {
+                items.pop();
+            } else {
+                return record;
+            }
+        } else {
+            return record;
+        }
+    }
 }
