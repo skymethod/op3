@@ -21,9 +21,20 @@ const sessionToken = '${sessionToken}';
         Instructions
     </h1>
 
-    <form id="form" class="wait max-w-2xl mx-auto w-80 md:w-96 mb-16" onsubmit="return false;">
-
-        TODO
+    <form id="form" class="wait mx-auto w-[32rem] mb-16" onsubmit="return false;">
+        <sl-input class="" placeholder="Podcast name or rss feed url" clearable autofocus type="text" size="medium">
+            <sl-icon slot="prefix" name="search"></sl-icon>
+        </sl-input>
+        <sl-tooltip placement="bottom" class="w-[32rem]" open trigger="manual">
+            <div slot="content" class="flex flex-col items-center">
+                 tooltip?
+            </div>
+            <sl-button class="mt-8 w-[32rem]" variant="default" size="large">
+                <div class="flex items-center">
+                    <img style="height:2.5rem" src="https://example.com/path/to.jpg"><div class="ml-4 w-[29rem] truncate text-left">Podcast name</div>
+                </div>
+            </sl-button>
+        </sl-tooltip>
     </form>
     ${cfAnalyticsSnippet}
 </body>

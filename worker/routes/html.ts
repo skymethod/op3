@@ -7,8 +7,8 @@ export function computeStyleTag(): string {
     return `<style>\n${outputCss}\n    </style>`;
 }
 
-export function computeShoelaceCommon(): string {
-    return shoelaceCommonHtm;
+export function computeShoelaceCommon(...components: string[]): string {
+    return computeHtml(shoelaceCommonHtm, { components: components.map(v => `'${v}'`).join(', ') });
 }
 
 export function computeHtml(template: string, variables: Record<string, string | boolean>) {

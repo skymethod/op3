@@ -11,7 +11,7 @@ export function computeApiKeysResponse(opts: { instance: string, origin: string,
     const html = computeHtml(apiKeysHtm, {
         titleSuffix: instance === 'prod' ? '' : ` (${instance})`,
         styleTag: computeStyleTag(),
-        shoelaceCommon: computeShoelaceCommon(),
+        shoelaceCommon: computeShoelaceCommon('sl-button', 'sl-input', 'sl-textarea', 'sl-spinner', 'sl-tooltip'),
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,
