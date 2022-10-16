@@ -49,6 +49,40 @@ export class ShowController {
 
 //
 
+export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
+    const { items } = record.feed;
+    const hasOp3Reference = (v: unknown) => Array.isArray(v) && v.some(v => typeof v === 'string' && v.includes('op3.dev')); 
+    if (Array.isArray(items)) {
+        const newItems = items.filter(v => isStringRecord(v) && (hasOp3Reference(v.enclosureUrls) || hasOp3Reference(v.alternateEnclosureUris)));
+        for (const item of newItems) {
+            const { enclosureUrls, alternateEnclosureUris } = item;
+            if (Array.isArray(enclosureUrls) && enclosureUrls.length === 0) delete item.enclosureUrls;
+            if (Array.isArray(alternateEnclosureUris) && alternateEnclosureUris.length === 0) delete item.alternateEnclosureUris;
+        }
+        record.feed.items = newItems;
+    }
+    while (true) {
+        const json = JSON.stringify(record);
+        const size = new TextEncoder().encode(json).length;
+        if (size > 1024 * 120) { // max 128 kb, but needs some headroom
+            const { items } = record.feed;
+            if (Array.isArray(items) && items.length > 0) {
+                if (items.length > 500) {
+                    items.splice(500);
+                } else {
+                    items.pop();
+                }
+            } else {
+                return record;
+            }
+        } else {
+            return record;
+        }
+    }
+}
+
+//
+
 interface FeedNotificationRecord {
     readonly sent: string;
     readonly received: string;
@@ -63,21 +97,4 @@ function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
         && typeof obj.sender === 'string'
         && isStringRecord(obj.feed)
         ;
-}
-
-function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
-    while (true) {
-        const json = JSON.stringify(record);
-        const size = new TextEncoder().encode(json).length;
-        if (size > 1024 * 128) {
-            const { items } = record.feed;
-            if (Array.isArray(items) && items.length > 0) {
-                items.pop();
-            } else {
-                return record;
-            }
-        } else {
-            return record;
-        }
-    }
 }
