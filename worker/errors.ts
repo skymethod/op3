@@ -1,5 +1,15 @@
 import { check, isStringRecord } from './check.ts';
 
+export class StatusError extends Error {
+    readonly status: number;
+    
+    constructor(message: string, status = 400) {
+        super(message);
+        this.status = status;
+    }
+
+}
+
 export class CodedError extends Error implements ErrorInterface {
     readonly code: string;
 

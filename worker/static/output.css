@@ -717,6 +717,18 @@ a:hover {
   width: 29rem;
 }
 
+.w-\[28rem\] {
+  width: 28rem;
+}
+
+.w-\[24rem\] {
+  width: 24rem;
+}
+
+.w-\[20rem\] {
+  width: 20rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -796,6 +808,11 @@ a:hover {
 .bg-neutral-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(23 23 23 / var(--tw-bg-opacity));
+}
+
+.bg-slate-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
 }
 
 .bg-opacity-50 {
@@ -945,6 +962,14 @@ a:hover {
 
   .md\:w-96 {
     width: 24rem;
+  }
+
+  .md\:w-\[32rem\] {
+    width: 32rem;
+  }
+
+  .md\:w-\[28rem\] {
+    width: 28rem;
   }
 
   .md\:max-w-2xl {

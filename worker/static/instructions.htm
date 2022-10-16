@@ -21,21 +21,26 @@ const sessionToken = '${sessionToken}';
         Instructions
     </h1>
 
-    <form id="form" class="wait mx-auto w-[32rem] mb-16" onsubmit="return false;">
+    <form id="form" class="wait mx-auto w-[24rem] md:w-[32rem] mb-16" onsubmit="return false;">
         <sl-input id="search-input" class="" placeholder="Podcast name or rss feed url" type="text" size="medium" clearable autofocus enterkeyhint="search" spellcheck="false" autocorrect="off">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
         <div class="flex ml-4 mt-4 items-center"><sl-spinner id="status-spinner" class="invisible"></sl-spinner><span id="status-message" class="truncate w-[30rem] ml-4 opacity-50 text-sm">Find your podcast</span></div>
         <div id="search-results-container">
             <template id="search-result-template">
-                <sl-button class="mt-4 w-[32rem]" variant="default" size="large">
+                <sl-button class="mt-4 w-[24rem] md:w-[32rem]" variant="default" size="large" outline>
                     <div class="flex items-center">
-                        <img style="height:2.5rem;width:2.5rem;"><span class="ml-4 w-[29rem] truncate text-left"></span>
+                        <img class="bg-slate-800" style="height:2.5rem;width:2.5rem;min-height:2.5rem;min-width:2.5rem;"><span class="ml-4 w-[20rem] md:w-[28rem] truncate text-left"></span>
                     </div>
                 </sl-button>
             </template>
         </div>
-        <div class="panel text-sm mt-4 p-4">
+        <sl-button-group id="search-results-page-button-group" class="mt-4">
+            <template id="search-results-page-button-template">
+                <sl-button size="medium" variant="default" outline>1</sl-button>
+            </template>
+        </sl-button-group>
+        <div class="panel text-sm mt-8 p-4">
             TODO
         </div>
     </form>
