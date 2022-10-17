@@ -3,9 +3,53 @@ function clearNode(n) {
     while (n.firstChild) n.removeChild(n.firstChild);
 }
 
+function computeFeedTitle(feed) {
+    return feed.title === '' ? '(untitled)' : feed.title;
+}
+
+function computeFeedHost(url) {
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return '';
+    }
+}
+
+function computeRelativeTime(from) {
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
+    const ageMillis = Date.now() - from;
+    if (ageMillis < 1000 * 60 * 60 * 24) return 'less than 24 hrs ago';
+    const ageDays = ageMillis / 1000 / 60 / 60 / 24;
+    if (ageDays < 31) {
+        return rtf.format(-Math.round(ageDays), 'day');
+    }
+    if (ageDays < 365) {
+        return rtf.format(-Math.round(ageDays / 30), 'month');
+    }
+    return rtf.format(-Math.round(ageDays / 365), 'year');
+
+}
+
+function computeEpisodesText(episodes) {
+    const qty = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][Math.max(0, episodes)] ?? episodes.toString();
+    return `${qty} episode${episodes === 1 ? '' : 's'}`;
+}
+
+function computeFeedSummary(analysis) {
+    // n episodes, latest 3 minutes ago
+    const { itemsWithEnclosures, maxPubdate } = analysis;
+    let rt = computeEpisodesText(itemsWithEnclosures);
+    rt = rt.substring(0, 1).toUpperCase() + rt.substring(1);
+    if (typeof maxPubdate === 'string') {
+        const suffix = computeRelativeTime(new Date(maxPubdate).getTime());
+        rt += `, latest ${suffix}`;
+    }
+    return rt;
+}
+
 const app = (() => {
 
-    let status;
+    let status = { message: `Find your podcast, we'll check your setup`};
     let searchTimeout = 0;
     let searchResults = [];
     let searchResultsPageIndex = 0;
@@ -38,8 +82,11 @@ const app = (() => {
         }
     }
 
-    const [ searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate, feedPanel ] = 
-        [ 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template', 'feed-panel' ].map(v => document.getElementById(v));
+    const [ searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate ] = 
+        [ 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template' ].map(v => document.getElementById(v));
+
+    const [ feedPanel, fpImg, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList ] = 
+        [ 'feed-panel', 'fp-img', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list' ].map(v => document.getElementById(v));
 
     const reset = () => {
         searchResults = [];
@@ -66,7 +113,7 @@ const app = (() => {
                 body: { q, sessionToken },
                 callback: obj => {
                     console.log(obj);
-                    searchResults = obj.feeds.map(v => ({ img: v.artwork, label: `${v.title === '' ? '(untitled)' : v.title}${v.author === '' ? '' : ` · ${v.author}`}`, feed: v }));
+                    searchResults = obj.feeds.map(v => ({ img: v.artwork, label: `${computeFeedTitle(v)}${v.author === '' ? '' : ` · ${v.author}`}`, feed: v }));
                     searchResultsPageIndex = 0;
                     searchResultsPages = 0;
                     feed = undefined;
@@ -88,35 +135,28 @@ const app = (() => {
     });
     searchInput.addEventListener('sl-input', onSearchInput)
    
-    async function analyzeFeed(feed) {
+    async function analyzeFeed() {
         await makeApiCall({ 
-            beforeMessage: 'analyzing feed...',
+            beforeMessage: 'Analyzing podcast...',
             pathname: '/api/1/feeds/analyze',
             body: { feed: feed.url, sessionToken },
             callback: obj => {
                 console.log(obj);
+                if (!feed || obj.feed !== feed.url) return;
                 feedAnalysis = obj;
                 updateApp();
             },
-            afterMessage: 'Feed analysis completed',
-            errorMessage: 'Feed analysis failed'
+            afterMessage: `Podcast analysis complete`,
+            errorMessage: 'Podcast analysis failed'
         });
-    }
-
-    function computePanelContent() {
-        if (!feed) return '';
-        let rt = [ 'url', 'author', 'ownerName' ].map(v => `${v}: ${feed[v]}`).join('\n');
-        if (feedAnalysis) {
-            rt += `\n\n${[ 'status', 'items' ].map(v => `${v}: ${feedAnalysis[v]}`).join('\n')}`;
-        }
-        return rt;
     }
 
     function update() {
         if (searchResultsContainer.searchResults !== searchResults || searchResultsContainer.searchResultsPageIndex !== searchResultsPageIndex || searchResultsContainer.searchResultsPages !== searchResultsPages) {
             clearNode(searchResultsContainer);
             const pageSize = 5;
-            searchResultsPages = Math.max(1, Math.min(10, Math.ceil(searchResults.length / pageSize)));
+            const maxPages = 8;
+            searchResultsPages = Math.max(1, Math.min(maxPages, Math.ceil(searchResults.length / pageSize)));
             for (const searchResult of searchResults.slice(searchResultsPageIndex * pageSize, (searchResultsPageIndex + 1) * pageSize)) {
                 const clone = searchResultTemplate.content.cloneNode(true);
                 clone.querySelector('img').src = searchResult.img;
@@ -127,7 +167,7 @@ const app = (() => {
                     feed = searchResult.feed;
                     feedAnalysis = undefined;
                     updateApp();
-                    analyzeFeed(feed);
+                    analyzeFeed();
                 });
                 searchResultsContainer.appendChild(clone);
             }
@@ -157,7 +197,7 @@ const app = (() => {
             if (feed === undefined && searchResults.length === 1) {
                 feed = searchResults[0].feed;
                 feedAnalysis = undefined;
-                analyzeFeed(feed);
+                analyzeFeed();
             }
             searchResultsContainer.searchResults = searchResults;
             searchResultsContainer.searchResultsPageIndex = searchResultsPageIndex;
@@ -165,7 +205,19 @@ const app = (() => {
         }
 
         if (feedPanel.feed !== feed || feedPanel.feedAnalysis !== feedAnalysis) {
-            feedPanel.textContent = computePanelContent();
+            fpImg.src = (feed && feed.artwork) ?? '#';
+            fpTitleDiv.textContent = (feed && computeFeedTitle(feed)) ?? '';
+            fpAuthorDiv.textContent = (feed && feed.author) ?? '';
+            fpFeedAnchor.href = (feed && feed.url) ?? '#';
+            fpFeedHostSpan.textContent = computeFeedHost(feed && feed.url);
+            fpSummaryDiv.textContent = !feed ? '' : !feedAnalysis ? 'Analyzing...' : computeFeedSummary(feedAnalysis);
+            fpFoundNoneDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures === 0 ? 'flex' : 'none';
+            fpFoundAllDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithEnclosures > 0 && feedAnalysis.itemsWithOp3Enclosures === feedAnalysis.itemsWithEnclosures ? 'flex' : 'none';
+            const hasSome = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures > 0 && feedAnalysis.itemsWithOp3Enclosures !== feedAnalysis.itemsWithEnclosures;
+            fpFoundSomeDiv.style.display = hasSome ? 'flex' : 'none';
+            fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeEpisodesText(feedAnalysis.itemsWithOp3Enclosures)) ?? '';
+            fpSuggestionsList.style.display = hasSome ? 'block' : 'none';
+
             feedPanel.feed = feed;
             feedPanel.feedAnalysis = feedAnalysis;
         }
@@ -173,6 +225,7 @@ const app = (() => {
         statusMessage.textContent = status && status.message ? status.message : '';
         searchResultsContainer.style.display = searchResults.length > 0 ? 'block' : 'none';
         searchResultsPageButtonGroup.style.display = searchResultsPages > 1 ? 'block' : 'none';
+
         feedPanel.style.display = feed ? 'block' : 'none';
     }
 
