@@ -6,9 +6,10 @@ import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
 import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
 import { validateSessionToken } from '../session_token.ts';
-import { isValidInstant, tryParseUrl } from '../check.ts';
+import { isStringRecord, isValidHttpUrl, isValidInstant } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
+import { computeFeedAnalysis } from '../feed_analysis.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, pathname, searchParams, headers, bodyProvider } = opts;
@@ -56,6 +57,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
         if (path === '/feeds/search') return await computeFeedsSearchResponse(method, bodyProvider, podcastIndexCredentials); 
+        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, bodyProvider, podcastIndexCredentials); 
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
@@ -100,6 +102,8 @@ function identityResultToJson(result: IdentityResult) {
 }
 
 //
+
+const USER_AGENT = 'op3.dev';
 
 async function computeIdentityResult(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient): Promise<IdentityResult> {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
@@ -180,16 +184,23 @@ async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPer
     return newTextResponse('thanks');
 }
 
-async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
-    if (method !== 'POST') return newMethodNotAllowedResponse(method);
-    if (typeof podcastIndexCredentials !== 'string') return newForbiddenJsonResponse();
-    const client = PodcastIndexClient.of({ podcastIndexCredentials, userAgent: 'op3.dev' });
-    if (!client) return newForbiddenJsonResponse();
-    const { sessionToken, q: qFromObj } = await bodyProvider();
-    if (typeof sessionToken !== 'string') return newForbiddenJsonResponse();
+async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
+    if (method !== 'POST') throw new StatusError(`${method} not allowed`, 405);
+    if (typeof podcastIndexCredentials !== 'string') throw new StatusError(`forbidden`, 403);
+    const client = PodcastIndexClient.of({ podcastIndexCredentials, userAgent: USER_AGENT });
+    if (!client) throw new StatusError(`forbidden`, 403);
+    const obj = await bodyProvider();
+    const { sessionToken } = obj;
+    if (typeof sessionToken !== 'string') throw new StatusError(`forbidden`, 403);
     const { k, t } = await validateSessionToken(sessionToken, podcastIndexCredentials);
-    if (typeof k !== 'string' || k !== 'i') return newForbiddenJsonResponse();
-    if (typeof t !== 'string' || !isValidInstant(t) || (Date.now() - new Date(t).getTime()) > 1000 * 60 * 5) return newForbiddenJsonResponse();
+    if (typeof k !== 'string' || k !== 'i') throw new StatusError(`forbidden`, 403);
+    if (typeof t !== 'string' || !isValidInstant(t) || (Date.now() - new Date(t).getTime()) > 1000 * 60 * 5) throw new StatusError(`forbidden`, 403);
+    return { client, obj };
+}
+
+async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+    const { client, obj } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
+    const { q: qFromObj } = obj;
     const q = typeof qFromObj === 'string' ? qFromObj.trim() : '';
     if (q === '') throw new StatusError(`Bad q: ${qFromObj}`);
 
@@ -205,7 +216,7 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
         return newJsonResponse({ feeds });
     }
 
-    if (tryParseUrl(q)) {
+    if (isValidHttpUrl(q)) {
         const { feed } = await client.getPodcastByFeedUrl(q);
         const feeds = Array.isArray(feed) ? [] : [ feed ];
         return newJsonResponse({ feeds });
@@ -215,4 +226,14 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
     const { feeds } = res;
     
     return newJsonResponse({ feeds });
+}
+
+async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+    const { obj } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
+    const { feed } = obj;
+    if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
+
+    const analysis = await computeFeedAnalysis(feed, { userAgent: USER_AGENT});
+    
+    return newJsonResponse(isStringRecord(analysis) ? analysis : {});
 }

@@ -5,17 +5,16 @@ function clearNode(n) {
 
 const app = (() => {
 
-    let fetching = false;
     let status;
     let searchTimeout = 0;
     let searchResults = [];
     let searchResultsPageIndex = 0;
     let searchResultsPages = 0;
     let feed = undefined;
+    let feedAnalysis = undefined;
 
     async function makeApiCall(opts) {
         const { beforeMessage, pathname, body, callback, afterMessage, errorMessage, errorCallback } = opts;
-        fetching = true;
         status = { pending: true, message: beforeMessage };
         updateApp();
         try {
@@ -35,7 +34,6 @@ const app = (() => {
             console.error(`Error making api call: ${pathname}`, e);
             status = { message: errorMessage };
         } finally {
-            fetching = false;
             updateApp();
         }
     }
@@ -43,18 +41,22 @@ const app = (() => {
     const [ searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate, feedPanel ] = 
         [ 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template', 'feed-panel' ].map(v => document.getElementById(v));
 
+    const reset = () => {
+        searchResults = [];
+        searchResultsPageIndex = 0;
+        searchResultsPages = 0;
+        status = undefined;
+        feed = undefined;
+        feedAnalysis = undefined;
+        searchInput.focus();
+        updateApp();
+    };
     const onSearchInput = () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             const q = searchInput.value.trim();
             if (q === '') {
-                searchResults = [];
-                searchResultsPageIndex = 0;
-                searchResultsPages = 0;
-                status = undefined;
-                feed = undefined;
-                searchInput.focus();
-                updateApp();
+                reset();
                 return;
             }
             console.log('search: ' + q);
@@ -64,13 +66,17 @@ const app = (() => {
                 body: { q, sessionToken },
                 callback: obj => {
                     console.log(obj);
-                    searchResults = obj.feeds.map(v => ({ img: v.artwork, label: `${v.title} · ${v.author}`, feed: v }));
+                    searchResults = obj.feeds.map(v => ({ img: v.artwork, label: `${v.title === '' ? '(untitled)' : v.title}${v.author === '' ? '' : ` · ${v.author}`}`, feed: v }));
                     searchResultsPageIndex = 0;
                     searchResultsPages = 0;
                     feed = undefined;
+                    feedAnalysis = undefined;
                 },
                 afterMessage: 'Search completed',
                 errorMessage: 'Search failed',
+                errorCallback: () => {
+                    reset();
+                }
             });
         }, searchInput.value.trim() === '' ? 0 : 500);
     };
@@ -82,6 +88,30 @@ const app = (() => {
     });
     searchInput.addEventListener('sl-input', onSearchInput)
    
+    async function analyzeFeed(feed) {
+        await makeApiCall({ 
+            beforeMessage: 'analyzing feed...',
+            pathname: '/api/1/feeds/analyze',
+            body: { feed: feed.url, sessionToken },
+            callback: obj => {
+                console.log(obj);
+                feedAnalysis = obj;
+                updateApp();
+            },
+            afterMessage: 'Feed analysis completed',
+            errorMessage: 'Feed analysis failed'
+        });
+    }
+
+    function computePanelContent() {
+        if (!feed) return '';
+        let rt = [ 'url', 'author', 'ownerName' ].map(v => `${v}: ${feed[v]}`).join('\n');
+        if (feedAnalysis) {
+            rt += `\n\n${[ 'status', 'items' ].map(v => `${v}: ${feedAnalysis[v]}`).join('\n')}`;
+        }
+        return rt;
+    }
+
     function update() {
         if (searchResultsContainer.searchResults !== searchResults || searchResultsContainer.searchResultsPageIndex !== searchResultsPageIndex || searchResultsContainer.searchResultsPages !== searchResultsPages) {
             clearNode(searchResultsContainer);
@@ -95,7 +125,9 @@ const app = (() => {
                 button.addEventListener('click', () => {
                     console.log(`click`, searchResult);
                     feed = searchResult.feed;
+                    feedAnalysis = undefined;
                     updateApp();
+                    analyzeFeed(feed);
                 });
                 searchResultsContainer.appendChild(clone);
             }
@@ -107,28 +139,35 @@ const app = (() => {
                     searchResultsContainer.appendChild(clone);
                 }
             }
-            clearNode(searchResultsPageButtonGroup);
-            for (let i = 0; i < searchResultsPages; i++) {
-                const clone = searchResultsPageButtonTemplate.content.cloneNode(true);
-                const button = clone.querySelector('sl-button');
-                button.textContent = (i + 1).toString();
-                button.addEventListener('click', () => {
-                    searchResultsPageIndex = i;
-                    updateApp();
-                });
-                searchResultsPageButtonGroup.appendChild(clone);
+            if (searchResultsContainer.searchResults !== searchResults || searchResultsContainer.searchResultsPages !== searchResultsPages) {
+                clearNode(searchResultsPageButtonGroup);
+                for (let i = 0; i < searchResultsPages; i++) {
+                    const clone = searchResultsPageButtonTemplate.content.cloneNode(true);
+                    const button = clone.querySelector('sl-button');
+                    const id = `srpb-${i}`;
+                    button.id = id;
+                    button.textContent = (i + 1).toString();
+                    button.addEventListener('click', () => {
+                        searchResultsPageIndex = i;
+                        updateApp();
+                    });
+                    searchResultsPageButtonGroup.appendChild(clone);
+                }
             }
-            if (searchResults.length === 1) {
+            if (feed === undefined && searchResults.length === 1) {
                 feed = searchResults[0].feed;
+                feedAnalysis = undefined;
+                analyzeFeed(feed);
             }
             searchResultsContainer.searchResults = searchResults;
             searchResultsContainer.searchResultsPageIndex = searchResultsPageIndex;
             searchResultsContainer.searchResultsPages = searchResultsPages;
         }
 
-        if (feedPanel.feed !== feed) {
-            feedPanel.textContent = feed ? feed.url : '';
+        if (feedPanel.feed !== feed || feedPanel.feedAnalysis !== feedAnalysis) {
+            feedPanel.textContent = computePanelContent();
             feedPanel.feed = feed;
+            feedPanel.feedAnalysis = feedAnalysis;
         }
         statusSpinner.style.visibility = status && status.pending ? 'visible' : 'hidden';
         statusMessage.textContent = status && status.message ? status.message : '';

@@ -21,7 +21,9 @@ export class ShowController {
         const newRecords: Record<string, FeedNotificationRecord> = {};
         feeds.forEach((feed, i) => {
             if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
-            newRecords[`fn.1.${feedNotificationSequence.next()}`] = trimRecordToFit({ sent, received, sender, feed });
+            const trimmed = trimRecordToFit({ sent, received, sender, feed });
+            const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;
+            newRecords[`fn.1.${feedNotificationSequence.next()}.${length}`] = trimmed;
         });
         const newRecordsCount = Object.keys(newRecords).length;
         if (newRecordsCount === 0) return;
