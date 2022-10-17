@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/instructions" />
+    <meta http-equiv="refresh" content="270" />
     ${styleTag}
     ${shoelaceCommon}
     <script type="module">
@@ -32,7 +33,7 @@ const sessionToken = '${sessionToken}';
             <template id="search-result-template">
                 <sl-button class="mt-4 w-[22rem] md:w-[32rem]" variant="default" size="large" outline>
                     <div class="flex items-center">
-                        <img class="bg-slate-800" style="height:2.5rem;width:2.5rem;min-height:2.5rem;min-width:2.5rem;"><span class="ml-4 w-[18rem] md:w-[28rem] truncate text-left"></span>
+                        <img class="bg-neutral-800 row-artwork"><figure class="bg-neutral-800 row-artwork"><sl-icon name="headphones"></sl-icon></figure><span class="ml-4 w-[18rem] md:w-[28rem] truncate text-left"></span>
                     </div>
                 </sl-button>
             </template>
@@ -44,7 +45,8 @@ const sessionToken = '${sessionToken}';
         </sl-button-group>
         <div id="feed-panel" class="panel text-sm mt-8 p-4 leading-relaxed">
             <div class="flex">
-                <img id="fp-img" class="mr-4 bg-slate-800" style="height:4rem;width:4rem;min-height:4rem;min-width:4rem;" src="#">
+                <img id="fp-img" class="mr-4 bg-neutral-900 panel-artwork" src="#">
+                <figure id="fp-img-placeholder" class="mr-4 bg-neutral-900 panel-artwork flex items-center justify-center text-xl opacity-50"><sl-icon name="headphones"></sl-icon></figure>
                 <div>
                     <div id="fp-title-div" class="opacity-75">Show name</div>
                     <div id="fp-author-div" class="opacity-50">Author</div>
@@ -52,7 +54,7 @@ const sessionToken = '${sessionToken}';
                 </div>
             </div>
             <div id="fp-summary-div" class="mt-4 opacity-50">n episodes, latest 3 minutes ago</div>
-            <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">OP3 prefix not found on any episode</span></div>
+            <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">OP3 prefix not found</span></div>
             <div id="fp-found-all-div" class="flex items-center text-green-600 md:text-lg mt-4"><sl-icon name="check-square"></sl-icon><span class="ml-2">OP3 prefix found on all episodes</span></div>
             <div id="fp-found-some-div" class="flex items-center text-neutral-300 md:text-lg mt-4"><sl-icon name="info-square"></sl-icon><span class="ml-2">OP3 prefix found on <span id="fp-found-episodes-span">n episodes</span></div>
             <ul id="fp-suggestions-list" class="list-disc list-inside mt-4 opacity-50">

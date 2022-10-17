@@ -30,12 +30,14 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
                                 items++;
                                 let hasEnclosure = false;
                                 let hasOp3Enclosure = false;
+                                let pubdate: string | undefined;
                                 for (const item of channel.item) {
                                     if (item.pubDate) {
                                         for (const pubDate of item.pubDate) {
                                             const { '#text': text } = pubDate;
                                             if (typeof text !== 'string') throw new Error(`Unexpected pubDate: ${JSON.stringify(item.pubDate)}`);
-                                            pubdates.push(parsePubdate(text));
+                                            const decoded = text.replaceAll('&#43;', '+');
+                                            pubdate = parsePubdate(decoded);
                                         }
                                     }
                                     if (item.enclosure) {
@@ -51,6 +53,7 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
                                     }
                                 }
                                 if (hasEnclosure) itemsWithEnclosures++;
+                                if (hasEnclosure && pubdate) pubdates.push(pubdate);
                                 if (hasOp3Enclosure) itemsWithOp3Enclosures++;
                             }
                         }

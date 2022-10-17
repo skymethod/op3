@@ -5,5 +5,9 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
     // Fri, 10 Jul 2020 06:00:00 -0000
     // 2022-10-13T14:56:23-07:00
     if (!/[a-z]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
-    return new Date(pubdate).toISOString();
+    try {
+        return new Date(pubdate).toISOString();
+    } catch {
+        throw new Error(`Unsupported pubdate: ${pubdate}`);
+    }
 }

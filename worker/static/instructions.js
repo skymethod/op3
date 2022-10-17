@@ -30,19 +30,19 @@ function computeRelativeTime(from) {
 
 }
 
-function computeEpisodesText(episodes) {
-    const qty = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][Math.max(0, episodes)] ?? episodes.toString();
-    return `${qty} episode${episodes === 1 ? '' : 's'}`;
+function computeQuantityText(quantity, unit) {
+    const qty = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][Math.max(0, quantity)] ?? quantity.toString();
+    return `${qty} ${unit}${quantity === 1 ? '' : 's'}`;
 }
 
 function computeFeedSummary(analysis) {
     // n episodes, latest 3 minutes ago
     const { itemsWithEnclosures, maxPubdate } = analysis;
-    let rt = computeEpisodesText(itemsWithEnclosures);
+    let rt = computeQuantityText(itemsWithEnclosures, 'episode');
     rt = rt.substring(0, 1).toUpperCase() + rt.substring(1);
     if (typeof maxPubdate === 'string') {
         const suffix = computeRelativeTime(new Date(maxPubdate).getTime());
-        rt += `, latest ${suffix}`;
+        rt += `, ${itemsWithEnclosures > 1 ? 'latest ' : ''}${suffix}`;
     }
     return rt;
 }
@@ -72,7 +72,7 @@ const app = (() => {
             // console.log(JSON.stringify(obj, undefined, 2));
             callback(obj);
 
-            status = { message: afterMessage };
+            status = { message: typeof afterMessage === 'string' ? afterMessage : afterMessage(obj) };
         } catch (e) {
             if (errorCallback) errorCallback();
             console.error(`Error making api call: ${pathname}`, e);
@@ -85,8 +85,8 @@ const app = (() => {
     const [ searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate ] = 
         [ 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template' ].map(v => document.getElementById(v));
 
-    const [ feedPanel, fpImg, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList ] = 
-        [ 'feed-panel', 'fp-img', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list' ].map(v => document.getElementById(v));
+    const [ feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList ] = 
+        [ 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list' ].map(v => document.getElementById(v));
 
     const reset = () => {
         searchResults = [];
@@ -108,7 +108,7 @@ const app = (() => {
             }
             console.log('search: ' + q);
             await makeApiCall({ 
-                beforeMessage: 'searching...',
+                beforeMessage: 'Finding podcasts...',
                 pathname: '/api/1/feeds/search',
                 body: { q, sessionToken },
                 callback: obj => {
@@ -119,7 +119,7 @@ const app = (() => {
                     feed = undefined;
                     feedAnalysis = undefined;
                 },
-                afterMessage: 'Search completed',
+                afterMessage: obj => `Found ${computeQuantityText(obj.feeds.length, 'podcast')}`,
                 errorMessage: 'Search failed',
                 errorCallback: () => {
                     reset();
@@ -146,7 +146,7 @@ const app = (() => {
                 feedAnalysis = obj;
                 updateApp();
             },
-            afterMessage: `Podcast analysis complete`,
+            afterMessage: `Finished analyzing podcast`,
             errorMessage: 'Podcast analysis failed'
         });
     }
@@ -154,12 +154,17 @@ const app = (() => {
     function update() {
         if (searchResultsContainer.searchResults !== searchResults || searchResultsContainer.searchResultsPageIndex !== searchResultsPageIndex || searchResultsContainer.searchResultsPages !== searchResultsPages) {
             clearNode(searchResultsContainer);
-            const pageSize = 5;
+            const pageSize = 4;
             const maxPages = 8;
             searchResultsPages = Math.max(1, Math.min(maxPages, Math.ceil(searchResults.length / pageSize)));
             for (const searchResult of searchResults.slice(searchResultsPageIndex * pageSize, (searchResultsPageIndex + 1) * pageSize)) {
                 const clone = searchResultTemplate.content.cloneNode(true);
-                clone.querySelector('img').src = searchResult.img;
+                if ((searchResult.img ?? '').trim() === '') {
+                    clone.querySelector('img').style.display = 'none';
+                } else {
+                    clone.querySelector('img').src = searchResult.img;
+                    clone.querySelector('figure').style.display = 'none';
+                }
                 clone.querySelector('span').textContent = searchResult.label;
                 const button = clone.querySelector('sl-button');
                 button.addEventListener('click', () => {
@@ -184,8 +189,6 @@ const app = (() => {
                 for (let i = 0; i < searchResultsPages; i++) {
                     const clone = searchResultsPageButtonTemplate.content.cloneNode(true);
                     const button = clone.querySelector('sl-button');
-                    const id = `srpb-${i}`;
-                    button.id = id;
                     button.textContent = (i + 1).toString();
                     button.addEventListener('click', () => {
                         searchResultsPageIndex = i;
@@ -205,7 +208,10 @@ const app = (() => {
         }
 
         if (feedPanel.feed !== feed || feedPanel.feedAnalysis !== feedAnalysis) {
-            fpImg.src = (feed && feed.artwork) ?? '#';
+            const artworkSrc = feed && feed.artwork && feed.artwork !== '' ? feed.artwork : undefined;
+            fpImg.src = artworkSrc ?? '#';
+            fpImg.style.display = artworkSrc ? 'block' : 'none';
+            fpImgPlaceholder.style.display = !artworkSrc ? 'flex' : 'none';
             fpTitleDiv.textContent = (feed && computeFeedTitle(feed)) ?? '';
             fpAuthorDiv.textContent = (feed && feed.author) ?? '';
             fpFeedAnchor.href = (feed && feed.url) ?? '#';
@@ -215,7 +221,7 @@ const app = (() => {
             fpFoundAllDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithEnclosures > 0 && feedAnalysis.itemsWithOp3Enclosures === feedAnalysis.itemsWithEnclosures ? 'flex' : 'none';
             const hasSome = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures > 0 && feedAnalysis.itemsWithOp3Enclosures !== feedAnalysis.itemsWithEnclosures;
             fpFoundSomeDiv.style.display = hasSome ? 'flex' : 'none';
-            fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeEpisodesText(feedAnalysis.itemsWithOp3Enclosures)) ?? '';
+            fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeQuantityText(feedAnalysis.itemsWithOp3Enclosures, 'episode')) ?? '';
             fpSuggestionsList.style.display = hasSome ? 'block' : 'none';
 
             feedPanel.feed = feed;
@@ -223,7 +229,7 @@ const app = (() => {
         }
         statusSpinner.style.visibility = status && status.pending ? 'visible' : 'hidden';
         statusMessage.textContent = status && status.message ? status.message : '';
-        searchResultsContainer.style.display = searchResults.length > 0 ? 'block' : 'none';
+        searchResultsContainer.style.display = searchResults.length > 1 ? 'block' : 'none';
         searchResultsPageButtonGroup.style.display = searchResultsPages > 1 ? 'block' : 'none';
 
         feedPanel.style.display = feed ? 'block' : 'none';
