@@ -5,7 +5,7 @@ import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IsolateId } from './isolate_id.ts';
-import { computeApiResponse, tryParseApiRequest } from './routes/api.ts';
+import { Background, computeApiResponse, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './ulid.ts';
@@ -41,7 +41,7 @@ export default {
         // handle all other requests
         let response: Response;
         try {
-            response = await computeResponse(request, env);
+            response = await computeResponse(request, env, context);
         } catch (e) {
             consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
             response = new Response('failed', { status: 500 });
@@ -140,7 +140,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
     return new Set((commaDelimitedString  ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 }
 
-async function computeResponse(request: Request, env: WorkerEnv): Promise<Response> {
+async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
         const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime } = env;
         IsolateId.log();
         const { origin, hostname, pathname, searchParams } = new URL(request.url);
@@ -162,7 +162,16 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
         if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
         const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-        const apiRequest = tryParseApiRequest({ instance, method, hostname, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials });
+        const background: Background = work => {
+            context.waitUntil((async () => {
+                try {
+                    await work();
+                } catch (e) {
+                    consoleError('background', `Error in background: ${e.stack || e}`);
+                }
+            })());
+        };
+        const apiRequest = tryParseApiRequest({ instance, method, hostname, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background });
 
         // redirect /foo/ to /foo (canonical)
         if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

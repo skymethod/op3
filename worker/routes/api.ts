@@ -24,10 +24,11 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 
 // deno-lint-ignore no-explicit-any
 export type JsonProvider = () => Promise<any>;
+export type Background = (work: () => Promise<unknown>) => void;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background }): Promise<Response> {
     const { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background } = opts;
 
     try {
         // first, we need to know who's calling
@@ -57,7 +58,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
         if (path === '/feeds/search') return await computeFeedsSearchResponse(method, bodyProvider, podcastIndexCredentials); 
-        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, bodyProvider, podcastIndexCredentials); 
+        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, bodyProvider, podcastIndexCredentials, rpcClient, background); 
         if (path === '/session-tokens') return await computeSessionTokensResponse(method, bodyProvider, podcastIndexCredentials); 
     
         // unknown api endpoint
@@ -237,7 +238,7 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
     return newJsonResponse({ feeds });
 }
 
-async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, background: Background): Promise<Response> {
     const { obj, client } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
     const { feed, id } = obj;
     if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
@@ -248,6 +249,11 @@ async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonPro
     if (analysisResult.status === 'rejected') throw new StatusError(`Failed to analyze feed: ${analysisResult.reason.message}`);
     const getResponse = getResponseResult.value;
     const analysis = analysisResult.value;
+    if (analysis.itemsWithOp3Enclosures > 0) {
+        const time = new Date().toISOString();
+        const feedInfo = { received: time, feedUrl: feed, feedPodcastId: id, foundTime: time, source: 'fa', sourceReference: time, items: [] };
+        background(() => rpcClient.receiveExternalNotification({ received: time, notification: { sent: time, sender: 'fa', type: 'feeds', feeds: [ feedInfo ] } }, 'show-server'));
+    }
     const { feed: gotFeed } = getResponse;
     const guid = !Array.isArray(gotFeed) ? gotFeed.podcastGuid : undefined;
     const rt: Record<string, unknown> = { ...analysis, guid };
