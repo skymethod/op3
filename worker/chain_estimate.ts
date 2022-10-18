@@ -15,11 +15,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     url = normalizeOrigin(url);
 
-    // https://op3.dev/e/(https?://)?
+    // https://op3.dev/e(,args)?/(https?://)?
     // no http support (.dev TLD on HSTS preload list), but clients (browsers) redirect anyway?
-    let m = /^https?:\/\/(ci\.|staging\.)?\op3\.dev(:443|:80)?\/e\/(.+?)$/.exec(url);
+    let m = /^https?:\/\/(ci\.|staging\.)?\op3\.dev(:443|:80)?\/e(,.*?)?\/(.+?)$/.exec(url);
     if (m) {
-        const [ _, _subdomain, _port, suffix ] = m;
+        const [ _, _subdomain, _port, _args, suffix ] = m;
         m = /^((https?):\/\/?).*?$/i.exec(suffix);
         const targetUrl = m ? `${m[2].toLowerCase()}://${suffix.substring(m[1].length)}` : `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'op3', url }, ...computeChainEstimate(targetUrl) ];
