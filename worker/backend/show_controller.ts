@@ -66,7 +66,7 @@ export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificatio
     while (true) {
         const json = JSON.stringify(record);
         const size = new TextEncoder().encode(json).length;
-        if (size > 1024 * 120) { // max 128 kb, but needs some headroom
+        if (size > 1024 * 90) { // max 128 kb, but needs some headroom
             const { items } = record.feed;
             if (Array.isArray(items) && items.length > 0) {
                 if (items.length > 500) {
