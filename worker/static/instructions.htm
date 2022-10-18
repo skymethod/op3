@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/instructions" />
     <meta http-equiv="refresh" content="270" />
+    <meta name="format-detection" content="telephone=no" />
     ${styleTag}
     ${shoelaceCommon}
     <script type="module">
@@ -79,16 +80,16 @@ const sessionToken = '${sessionToken}';
     <div id="details-container" class="wait mt-8 mx-auto w-[22rem] md:w-[40rem] text-sm mb-16">
         <sl-details class="w-full" summary="Typical prefix" open>
             <div class="grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
       
         <sl-details class="w-full" summary="Target HTTP enclosure">
             Including the full protocol after the prefix is only necessary when the target is <code>http</code>.
             <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">http</span>://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/http://</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">http</span>://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/http://</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
       
@@ -98,8 +99,8 @@ const sessionToken = '${sessionToken}';
             OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid">Podcast GUID</a>.
             While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above.
             <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e,pg=<span id="example-guid">00000000-0000-0000-0000-000000000000</span>/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e,pg=<span id="example-guid">00000000-0000-0000-0000-000000000000</span>/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
     </div>
