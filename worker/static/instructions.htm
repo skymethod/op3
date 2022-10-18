@@ -16,7 +16,7 @@ let sessionToken = '${sessionToken}';
     </script>
 </head>
 
-<body class="bg-neutral-900 flex flex-col">
+<body class="bg-neutral-900 text-neutral-300 flex flex-col">
     ${nonProdHeader}
 
     <h4 class="mt-16 mx-auto text-3xl font-semibold">Check your OP3 setup</h4>
@@ -65,18 +65,19 @@ let sessionToken = '${sessionToken}';
 
     <h4 class="mt-16 mx-auto text-3xl font-semibold">Instructions</h4>
 
-    <div class="mt-8 mx-auto max-w-2xl px-4">OP3 works like any other podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a>, podcasters or podcast hosting companies can prepend<br>
-        <span class="font-mono p-4 inline-block font-bold">${origin}/e/</span><br>
-        to podcast episode urls in their feed to participate and start sending us data.<br>
+    <div class="mt-8 mx-auto max-w-2xl px-4">
+        <p>OP3 works like any other podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a>, podcasters or podcast hosting companies can prepend</p>
+        <div class="font-mono p-4 inline-block font-bold text-center w-full">${origin}/e/</div>
+        <p>to podcast episode urls in their feed to participate and start sending us data.<br>
         (No need to remove existing prefixes, there can be more than one)<br><br>
         Some podcast hosting companies (like <a href="http://support.megaphone.fm/en/articles/2845162-custom-prefixes">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, 
         and some (like <a href="https://transistor.fm/changelog/open-prefix/">Transistor</a>) make it as easy as checking a box!<br><br>
-        If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.
+        If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.</p>
     </div>
 
     <h4 class="mt-16 mx-auto text-3xl font-semibold">Examples</h4>
 
-    <div id="details-container" class="wait mt-8 mx-auto w-[22rem] md:w-[40rem] text-sm mb-16">
+    <div id="details-container" class="wait mt-8 mx-auto w-[22rem] md:w-[40rem] text-sm">
         <sl-details class="w-full" summary="Typical prefix" open>
             <div class="grid grid-cols-[min-content_1fr] gap-4">
                 <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
@@ -109,6 +110,9 @@ let sessionToken = '${sessionToken}';
             [...container.querySelectorAll('sl-details')].map(details => (details.open = event.target === details));
         });
     </script>
+    <div class="max-w-xl mx-auto my-16">
+        <a href="/">Home</a>
+    </div>
     ${cfAnalyticsSnippet}
 </body>
 

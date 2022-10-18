@@ -86,13 +86,13 @@ const COST_FORMATTER = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2
 
 const computeCostHtml = ({ date, description, cost, detail }: Cost) => `
         <details open>
-            <summary class="grid grid-cols-5 gap-4 mt-0.5 md:mt-0">
+            <summary class="grid grid-cols-5 gap-4 mt-0.5 md:mt-0 cursor-pointer">
                 <div>${date}</div>
                 <div class="col-span-3">${encodeXml(description)}</div>
                 <div class="text-right">${COST_FORMATTER.format(cost)}</div>
             </summary>
 ${detail.map(({ description, cost }) => `
-            <div class="grid grid-cols-5 gap-4 text-indigo-400 mt-0.5 md:mt-0">
+            <div class="grid grid-cols-5 gap-4 text-neutral-500 mt-0.5 md:mt-0">
                 <div class="col-start-2 col-span-3">${encodeXml(description)}</div>
                 <div class="text-right">${COST_FORMATTER.format(cost)}</div>
             </div>

@@ -9,9 +9,9 @@
     ${styleTag}
 </head>
 
-<body class="bg-indigo-900 flex flex-col text-indigo-200">
+<body class="bg-neutral-900 flex flex-col text-neutral-300">
     ${nonProdHeader}
-    <div class="max-w-xl mx-auto text-6xl font-semibold mt-16">
+    <div class="max-w-xl mx-auto text-6xl font-semibold mt-16 text-neutral-400">
         <span class="text-white">O</span>pen<br>
         <span class="text-white">P</span>odcast<br>
         <span class="text-white">P</span>refix<br>
@@ -20,7 +20,7 @@
     <div class="max-w-2xl mx-auto mt-16 text-center px-8">
         The Open Podcast Prefix Project (OP3) is a free and <a href="https://github.com/skymethod/op3">open-source</a> podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a> committed to open data and listener privacy.
     </div>
-    <div class="max-w-2xl mx-auto mt-8 text-center px-8 bg-gray-900 bg-opacity-50 py-8">
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8 bg-orange-900 bg-opacity-25 py-8">
         Podcasters or podcast hosting companies can prepend<br>
         <span class="font-mono p-4 inline-block font-bold">${origin}/e/</span><br>
         to podcast episode urls in their feed to participate and start sending us data.<br>
@@ -39,13 +39,13 @@
     <div class="max-w-2xl mx-auto mt-16 text-center px-8">
         This project is still very much in early development, but is ready to receive real data from early adopters and make it available over the <a href="/api/docs">OP3 API</a>.
     </div>
-    <div class="max-w-2xl mx-auto mt-8 text-center px-8 py-8 bg-gray-900 bg-opacity-50">
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8 py-8 bg-orange-900 bg-opacity-25">
         Learn more about our future plans on the <a href="https://github.com/skymethod/op3#op3">GitHub readme →</a> 
     </div>
     <div class="max-w-2xl mx-auto mt-8 text-center px-8">
         <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> · <a href="/costs">Costs</a><br><a href="/releases">Releases</a> · <a href="mailto:john@op3.dev">Email</a> · <a href="https://github.com/skymethod/op3#commitment-to-sustainable-development">Sponsor</a>
     </div>
-    <div class="max-w-2xl mx-auto mt-8 text-center text-sm md:text-base md:px-8 text-indigo-400 mb-16">Version <a class="text-indigo-400 hover:text-indigo-400" href="https://github.com/skymethod/op3/blob/${deploySha}/.github/workflows/deploy-on-push.yml">${deploySha}</a><br>Deployed ${deployTime}</div>
+    <div class="max-w-2xl mx-auto mt-8 text-center text-sm md:text-base md:px-8 text-neutral-600 mb-16">Version <a class="text-neutral-600 hover:text-neutral-600" href="https://github.com/skymethod/op3/blob/${deploySha}/.github/workflows/deploy-on-push.yml">${deploySha}</a><br>Deployed ${deployTime}</div>
     ${cfAnalyticsSnippet}
 </body>
 
