@@ -47,6 +47,22 @@ function computeFeedSummary(analysis) {
     return rt;
 }
 
+function scheduleUpdateSessionToken() {
+    setTimeout(async () => {
+        const body = { sessionToken };
+        const res = await fetch('/api/1/session-tokens', { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify(body) });
+        if (res.status === 200) {
+            const { sessionToken: newSessionToken } = await res.json();
+            if (typeof newSessionToken === 'string') {
+                console.log('Updated sessionToken');
+                sessionToken = newSessionToken;
+            }
+        }
+        scheduleUpdateSessionToken();
+    }, 1000 * 60 * 4);
+}
+scheduleUpdateSessionToken();
+
 const app = (() => {
 
     let status = { message: `Find your podcast, we'll check your setup`};

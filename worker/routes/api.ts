@@ -5,7 +5,7 @@ import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
 import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
-import { validateSessionToken } from '../session_token.ts';
+import { computeSessionToken, validateSessionToken } from '../session_token.ts';
 import { isValidHttpUrl, isValidInstant } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
@@ -58,6 +58,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
         if (path === '/feeds/search') return await computeFeedsSearchResponse(method, bodyProvider, podcastIndexCredentials); 
         if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, bodyProvider, podcastIndexCredentials); 
+        if (path === '/session-tokens') return await computeSessionTokensResponse(method, bodyProvider, podcastIndexCredentials); 
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
@@ -184,7 +185,7 @@ async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPer
     return newTextResponse('thanks');
 }
 
-async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
+async function sessionTokenCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; claims: Record<string, string> }> {
     if (method !== 'POST') throw new StatusError(`${method} not allowed`, 405);
     if (typeof podcastIndexCredentials !== 'string') throw new StatusError(`forbidden`, 403);
     const client = PodcastIndexClient.of({ podcastIndexCredentials, userAgent: USER_AGENT });
@@ -192,9 +193,17 @@ async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIn
     const obj = await bodyProvider();
     const { sessionToken } = obj;
     if (typeof sessionToken !== 'string') throw new StatusError(`forbidden`, 403);
-    const { k, t } = await validateSessionToken(sessionToken, podcastIndexCredentials);
-    if (typeof k !== 'string' || k !== 'i') throw new StatusError(`forbidden`, 403);
+    const claims = await validateSessionToken(sessionToken, podcastIndexCredentials);
+    const { k, t } = claims;
+    if (typeof k !== 'string') throw new StatusError(`forbidden`, 403);
     if (typeof t !== 'string' || !isValidInstant(t) || (Date.now() - new Date(t).getTime()) > 1000 * 60 * 5) throw new StatusError(`forbidden`, 403);
+    return { client, obj, claims };
+}
+
+async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
+    const { client, obj, claims } = await sessionTokenCommon(method, bodyProvider, podcastIndexCredentials);
+    const { k } = claims;
+    if (k !== 'i') throw new StatusError(`forbidden`, 403);
     return { client, obj };
 }
 
@@ -243,4 +252,14 @@ async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonPro
     const guid = !Array.isArray(gotFeed) ? gotFeed.podcastGuid : undefined;
     const rt: Record<string, unknown> = { ...analysis, guid };
     return newJsonResponse(rt);
+}
+
+async function computeSessionTokensResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+    const { claims } = await sessionTokenCommon(method, bodyProvider, podcastIndexCredentials);
+    if (typeof podcastIndexCredentials !== 'string') throw new StatusError(`forbidden`, 403);
+
+    claims.t = new Date().toISOString();
+
+    const sessionToken = await computeSessionToken(claims, podcastIndexCredentials);
+    return newJsonResponse({ sessionToken });
 }
