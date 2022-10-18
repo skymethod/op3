@@ -739,6 +739,10 @@ a:hover {
   height: 4rem;
 }
 
+.h-6 {
+  height: 1.5rem;
+}
+
 .w-80 {
   width: 20rem;
 }
@@ -765,6 +769,10 @@ a:hover {
 
 .max-w-2xl {
   max-width: 42rem;
+}
+
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .cursor-pointer {
@@ -848,6 +856,23 @@ a:hover {
   word-break: break-all;
 }
 
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.border-neutral-700 {
+  --tw-border-opacity: 1;
+  border-color: rgb(64 64 64 / var(--tw-border-opacity));
+}
+
 .bg-neutral-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(23 23 23 / var(--tw-bg-opacity));
@@ -872,8 +897,24 @@ a:hover {
   --tw-bg-opacity: 0.25;
 }
 
+.bg-opacity-10 {
+  --tw-bg-opacity: 0.1;
+}
+
 .fill-neutral-500 {
   fill: #737373;
+}
+
+.fill-neutral-800 {
+  fill: #262626;
+}
+
+.fill-neutral-700 {
+  fill: #404040;
+}
+
+.fill-neutral-600 {
+  fill: #525252;
 }
 
 .stroke-transparent {
@@ -1031,6 +1072,18 @@ a:hover {
 
 .outline {
   outline-style: solid;
+}
+
+.outline-white {
+  outline-color: #fff;
+}
+
+.outline-neutral-800 {
+  outline-color: #262626;
+}
+
+.outline-neutral-700 {
+  outline-color: #404040;
 }
 
 .hover\:text-neutral-600:hover {
