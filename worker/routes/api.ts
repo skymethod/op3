@@ -6,7 +6,7 @@ import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
 import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
 import { validateSessionToken } from '../session_token.ts';
-import { isStringRecord, isValidHttpUrl, isValidInstant } from '../check.ts';
+import { isValidHttpUrl, isValidInstant } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
@@ -229,11 +229,18 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
 }
 
 async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
-    const { obj } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
-    const { feed } = obj;
+    const { obj, client } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
+    const { feed, id } = obj;
     if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
+    if (typeof id !== 'number') throw new StatusError(`Bad id: ${JSON.stringify(id)}`);
 
-    const analysis = await computeFeedAnalysis(feed, { userAgent: USER_AGENT});
-    
-    return newJsonResponse(isStringRecord(analysis) ? analysis : {});
+    const [ getResponseResult, analysisResult ] = await Promise.allSettled([client.getPodcastByFeedId(id), computeFeedAnalysis(feed, { userAgent: USER_AGENT})]);
+    if (getResponseResult.status === 'rejected') throw new StatusError(`Failed to lookup guid for id ${id}: ${getResponseResult.reason}`);
+    if (analysisResult.status === 'rejected') throw new StatusError(`Failed to analyze feed: ${analysisResult.reason.message}`);
+    const getResponse = getResponseResult.value;
+    const analysis = analysisResult.value;
+    const { feed: gotFeed } = getResponse;
+    const guid = !Array.isArray(gotFeed) ? gotFeed.podcastGuid : undefined;
+    const rt: Record<string, unknown> = { ...analysis, guid };
+    return newJsonResponse(rt);
 }

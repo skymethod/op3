@@ -56,25 +56,32 @@ const app = (() => {
     let searchResultsPages = 0;
     let feed = undefined;
     let feedAnalysis = undefined;
+    let feedAnalysisError = undefined;
 
     async function makeApiCall(opts) {
         const { beforeMessage, pathname, body, callback, afterMessage, errorMessage, errorCallback } = opts;
         status = { pending: true, message: beforeMessage };
         updateApp();
+        let obj;
         try {
             const res = await fetch(pathname, { method: 'POST', headers: { authorization: `Bearer ${previewToken}` }, body: JSON.stringify(body) });
             console.log(res);
             if (res.status !== 200) {
-                console.log(await res.text());
+                if ((res.headers.get('content-type') ?? '').includes('json')) {
+                    obj = await res.json();
+                    console.log(obj);
+                } else {
+                    console.log(await res.text());
+                }
                 throw new Error(`Unexpected status ${res.status}`);
             }
-            const obj = await res.json();
+            obj = await res.json();
             // console.log(JSON.stringify(obj, undefined, 2));
             callback(obj);
 
             status = { message: typeof afterMessage === 'string' ? afterMessage : afterMessage(obj) };
         } catch (e) {
-            if (errorCallback) errorCallback();
+            if (errorCallback) errorCallback(obj);
             console.error(`Error making api call: ${pathname}`, e);
             status = { message: errorMessage };
         } finally {
@@ -82,11 +89,11 @@ const app = (() => {
         }
     }
 
-    const [ searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate ] = 
-        [ 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template' ].map(v => document.getElementById(v));
+    const [ exampleGuidSpan, searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate ] = 
+        [ 'example-guid', 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template' ].map(v => document.getElementById(v));
 
-    const [ feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList ] = 
-        [ 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list' ].map(v => document.getElementById(v));
+    const [ feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList, fpPodcastGuidSpan ] = 
+        [ 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list', 'fp-podcast-guid' ].map(v => document.getElementById(v));
 
     const reset = () => {
         searchResults = [];
@@ -118,6 +125,7 @@ const app = (() => {
                     searchResultsPages = 0;
                     feed = undefined;
                     feedAnalysis = undefined;
+                    feedAnalysisError = undefined;
                 },
                 afterMessage: obj => `Found ${computeQuantityText(obj.feeds.length, 'podcast')}`,
                 errorMessage: 'Search failed',
@@ -139,7 +147,7 @@ const app = (() => {
         await makeApiCall({ 
             beforeMessage: 'Analyzing podcast...',
             pathname: '/api/1/feeds/analyze',
-            body: { feed: feed.url, sessionToken },
+            body: { feed: feed.url, id: feed.id, sessionToken },
             callback: obj => {
                 console.log(obj);
                 if (!feed || obj.feed !== feed.url) return;
@@ -147,7 +155,10 @@ const app = (() => {
                 updateApp();
             },
             afterMessage: `Finished analyzing podcast`,
-            errorMessage: 'Podcast analysis failed'
+            errorMessage: 'Podcast analysis failed',
+            errorCallback: obj => {
+                feedAnalysisError = obj.error ?? 'Failed';
+            }
         });
     }
 
@@ -171,6 +182,7 @@ const app = (() => {
                     console.log(`click`, searchResult);
                     feed = searchResult.feed;
                     feedAnalysis = undefined;
+                    feedAnalysisError = undefined;
                     updateApp();
                     analyzeFeed();
                 });
@@ -200,14 +212,16 @@ const app = (() => {
             if (feed === undefined && searchResults.length === 1) {
                 feed = searchResults[0].feed;
                 feedAnalysis = undefined;
+                feedAnalysisError = undefined;
                 analyzeFeed();
             }
+            
             searchResultsContainer.searchResults = searchResults;
             searchResultsContainer.searchResultsPageIndex = searchResultsPageIndex;
             searchResultsContainer.searchResultsPages = searchResultsPages;
         }
 
-        if (feedPanel.feed !== feed || feedPanel.feedAnalysis !== feedAnalysis) {
+        if (feedPanel.feed !== feed || feedPanel.feedAnalysis !== feedAnalysis || feedPanel.feedAnalysisError !== feedAnalysisError) {
             const artworkSrc = feed && feed.artwork && feed.artwork !== '' ? feed.artwork : undefined;
             fpImg.src = artworkSrc ?? '#';
             fpImg.style.display = artworkSrc ? 'block' : 'none';
@@ -216,16 +230,26 @@ const app = (() => {
             fpAuthorDiv.textContent = (feed && feed.author) ?? '';
             fpFeedAnchor.href = (feed && feed.url) ?? '#';
             fpFeedHostSpan.textContent = computeFeedHost(feed && feed.url);
-            fpSummaryDiv.textContent = !feed ? '' : !feedAnalysis ? 'Analyzing...' : computeFeedSummary(feedAnalysis);
+            fpSummaryDiv.textContent = feedAnalysisError ? feedAnalysisError : !feed ? '' : !feedAnalysis ? 'Analyzing...' : computeFeedSummary(feedAnalysis);
             fpFoundNoneDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures === 0 ? 'flex' : 'none';
             fpFoundAllDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithEnclosures > 0 && feedAnalysis.itemsWithOp3Enclosures === feedAnalysis.itemsWithEnclosures ? 'flex' : 'none';
             const hasSome = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures > 0 && feedAnalysis.itemsWithOp3Enclosures !== feedAnalysis.itemsWithEnclosures;
             fpFoundSomeDiv.style.display = hasSome ? 'flex' : 'none';
+            if ([fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv].every(v => v.style.display === 'none')) {
+                // maintain spacing
+                fpFoundNoneDiv.style.visibility = 'hidden';
+                fpFoundNoneDiv.style.display = 'flex';
+            } else {
+                fpFoundNoneDiv.style.visibility = 'visible';
+            }
             fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeQuantityText(feedAnalysis.itemsWithOp3Enclosures, 'episode')) ?? '';
             fpSuggestionsList.style.display = hasSome ? 'block' : 'none';
+            exampleGuidSpan.textContent = feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : '00000000-0000-0000-0000-000000000000';
+            fpPodcastGuidSpan.textContent = feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : 'unknown';
 
             feedPanel.feed = feed;
             feedPanel.feedAnalysis = feedAnalysis;
+            feedPanel.feedAnalysisError = feedAnalysisError;
         }
         statusSpinner.style.visibility = status && status.pending ? 'visible' : 'hidden';
         statusMessage.textContent = status && status.message ? status.message : '';

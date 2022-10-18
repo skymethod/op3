@@ -18,13 +18,10 @@ const sessionToken = '${sessionToken}';
 
 <body class="bg-neutral-900 flex flex-col">
     ${nonProdHeader}
-    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
-        Instructions
-    </h1>
 
-    <h4 class="mx-auto text-3xl font-semibold">Check your OP3 setup</h4>
+    <h4 class="mt-16 mx-auto text-3xl font-semibold">Check your OP3 setup</h4>
 
-    <form id="form" class="wait mx-auto w-[22rem] md:w-[32rem] mt-8 mb-16" onsubmit="return false;">
+    <form id="form" class="wait mx-auto w-[22rem] md:w-[32rem] mt-8" onsubmit="return false;">
         <sl-input id="search-input" class="" placeholder="Podcast name or rss feed url" type="text" size="medium" clearable autofocus enterkeyhint="search" spellcheck="false" autocorrect="off">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
@@ -43,25 +40,75 @@ const sessionToken = '${sessionToken}';
                 <sl-button size="medium" variant="default" outline>1</sl-button>
             </template>
         </sl-button-group>
-        <div id="feed-panel" class="panel text-sm mt-8 p-4 leading-relaxed">
-            <div class="flex">
-                <img id="fp-img" class="mr-4 bg-neutral-900 panel-artwork" src="#">
-                <figure id="fp-img-placeholder" class="mr-4 bg-neutral-900 panel-artwork flex items-center justify-center text-xl opacity-50"><sl-icon name="headphones"></sl-icon></figure>
-                <div>
-                    <div id="fp-title-div" class="opacity-75">Show name</div>
-                    <div id="fp-author-div" class="opacity-50">Author</div>
-                    <a id="fp-feed-anchor" href="#" target="_blank"><span id="fp-feed-host-span">example.com</span> rss feed →</a>
+        <div id="feed-panel" class="panel text-sm mt-8 leading-relaxed divide-y divide-neutral-700">
+            <div class="p-4">
+                <div class="flex">
+                    <img id="fp-img" class="mr-4 bg-neutral-900 panel-artwork" src="#">
+                    <figure id="fp-img-placeholder" class="mr-4 bg-neutral-900 panel-artwork flex items-center justify-center text-xl opacity-50"><sl-icon name="headphones"></sl-icon></figure>
+                    <div>
+                        <div id="fp-title-div" class="opacity-75">Show name</div>
+                        <div id="fp-author-div" class="opacity-50">Author</div>
+                        <a id="fp-feed-anchor" href="#" target="_blank"><span id="fp-feed-host-span">example.com</span> rss feed →</a>
+                    </div>
                 </div>
+                <div id="fp-summary-div" class="mt-4 opacity-50">n episodes, latest 3 minutes ago</div>
+                <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">OP3 prefix not found</span></div>
+                <div id="fp-found-all-div" class="flex items-center text-green-600 md:text-lg mt-4"><sl-icon name="check-square"></sl-icon><span class="ml-2">OP3 prefix found on all episodes</span></div>
+                <div id="fp-found-some-div" class="flex items-center text-neutral-300 md:text-lg mt-4"><sl-icon name="info-square"></sl-icon><span class="ml-2">OP3 prefix found on <span id="fp-found-episodes-span">n episodes</span></div>
+                <ul id="fp-suggestions-list" class="list-disc list-inside mt-4 opacity-50">
+                    <li>Did you want to add it to every episode?</li>
+                </ul>
             </div>
-            <div id="fp-summary-div" class="mt-4 opacity-50">n episodes, latest 3 minutes ago</div>
-            <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">OP3 prefix not found</span></div>
-            <div id="fp-found-all-div" class="flex items-center text-green-600 md:text-lg mt-4"><sl-icon name="check-square"></sl-icon><span class="ml-2">OP3 prefix found on all episodes</span></div>
-            <div id="fp-found-some-div" class="flex items-center text-neutral-300 md:text-lg mt-4"><sl-icon name="info-square"></sl-icon><span class="ml-2">OP3 prefix found on <span id="fp-found-episodes-span">n episodes</span></div>
-            <ul id="fp-suggestions-list" class="list-disc list-inside mt-4 opacity-50">
-                <li>Did you want to add it to every episode?</li>
-            </ul>
+            <div class="px-4 py-2 opacity-50">Podcast Guid: <span id="fp-podcast-guid">unknown</span></div>
         </div>
     </form>
+
+    <h4 class="mt-16 mx-auto text-3xl font-semibold">Instructions</h4>
+
+    <div class="mt-8 mx-auto max-w-2xl px-4">OP3 works like any other podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a>, podcasters or podcast hosting companies can prepend<br>
+        <span class="font-mono p-4 inline-block font-bold">${origin}/e/</span><br>
+        to podcast episode urls in their feed to participate and start sending us data.<br>
+        (No need to remove existing prefixes, there can be more than one)<br><br>
+        Some podcast hosting companies (like <a href="http://support.megaphone.fm/en/articles/2845162-custom-prefixes">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, 
+        and some (like <a href="https://transistor.fm/changelog/open-prefix/">Transistor</a>) make it as easy as checking a box!<br><br>
+        If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.
+    </div>
+
+    <h4 class="mt-16 mx-auto text-3xl font-semibold">Examples</h4>
+
+    <div id="details-container" class="wait mt-8 mx-auto w-[22rem] md:w-[40rem] text-sm mb-16">
+        <sl-details class="w-full" summary="Typical prefix" open>
+            <div class="grid grid-cols-[min-content_1fr] gap-4">
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+            </div>
+        </sl-details>
+      
+        <sl-details class="w-full" summary="Target HTTP enclosure">
+            Including the full protocol after the prefix is only necessary when the target is <code>http</code>.
+            <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">http</span>://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/http://</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+            </div>
+        </sl-details>
+      
+        <sl-details class="w-full" summary="Optional prefix arguments">
+            Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>.<br><br>
+
+            OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid">Podcast GUID</a>.
+            While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above.
+            <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
+                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e,pg=<span id="example-guid">00000000-0000-0000-0000-000000000000</span>/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="6929476" type="audio/mpeg" /&gt;</code>
+            </div>
+        </sl-details>
+    </div>
+    <script>
+        const container = document.getElementById('details-container');
+        container.addEventListener('sl-show', event => {
+            [...container.querySelectorAll('sl-details')].map(details => (details.open = event.target === details));
+        });
+    </script>
     ${cfAnalyticsSnippet}
 </body>
 

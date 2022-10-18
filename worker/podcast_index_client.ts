@@ -110,6 +110,7 @@ export interface Feed {
     readonly originalUrl: string; // feed url
     readonly image: string; // url ("The channel-level image element")
     readonly artwork: string; // url ("The seemingly best artwork we can find for the feed. Might be the same as image in most instances")
+    readonly podcastGuid?: string; // not set in search!
 }
 
 function checkFeed(obj: unknown): obj is Feed {
