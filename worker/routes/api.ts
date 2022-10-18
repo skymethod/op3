@@ -203,7 +203,7 @@ async function sessionTokenCommon(method: string, bodyProvider: JsonProvider, po
 async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
     const { client, obj, claims } = await sessionTokenCommon(method, bodyProvider, podcastIndexCredentials);
     const { k } = claims;
-    if (k !== 'i') throw new StatusError(`forbidden`, 403);
+    if (k !== 's') throw new StatusError(`forbidden`, 403);
     return { client, obj };
 }
 

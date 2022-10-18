@@ -23,7 +23,7 @@ import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
-import { computeInstructionsResponse } from './routes/instructions.ts';
+import { computeSetupResponse } from './routes/setup.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -153,7 +153,7 @@ async function computeResponse(request: Request, env: WorkerEnv): Promise<Respon
         if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/instructions') return computeInstructionsResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
+        if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
         if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
         if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
         if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });

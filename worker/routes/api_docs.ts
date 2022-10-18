@@ -48,7 +48,6 @@ const html = (origin: string, titleSuffix: string, cfAnalyticsSnippet: string) =
               color: '#ea580c',
             }
           }
-
         }
       }, document.getElementById('redoc-container'));
     </script>
