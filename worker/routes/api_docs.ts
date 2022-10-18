@@ -16,17 +16,42 @@ const html = (origin: string, titleSuffix: string, cfAnalyticsSnippet: string) =
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/api/docs" />
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet" />
     <style>
       body {
         margin: 0;
         padding: 0;
+        background-color: #d4d4d4;
       }
     </style>
   </head>
   <body>
-    <redoc spec-url="/api/docs/swagger.json"></redoc>
+    <div id="redoc-container"></div>
     <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+    <script>
+      Redoc.init('/api/docs/swagger.json', {
+        theme: {
+          rightPanel: {
+            backgroundColor: '#171717',
+          },
+          sidebar: {
+            backgroundColor: '#171717',
+            textColor: '#d4d4d4',
+            activeTextColor: '#ea580c',
+          },
+          colors: {
+            primary: {
+              main: '#c2410c', // links
+            },
+          },
+          typography: {
+            code: {
+              color: '#ea580c',
+            }
+          }
+
+        }
+      }, document.getElementById('redoc-container'));
+    </script>
     ${cfAnalyticsSnippet}
   </body>
 </html>

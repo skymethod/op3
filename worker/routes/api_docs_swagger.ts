@@ -28,12 +28,12 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
     {
         "swagger": "2.0",
         "info": {
-            "description": `The [Open Podcast Prefix Project](https://op3.dev) is an open-source [podcast prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.\n\nThis API serves as an interface to access the data collected in a privacy-preserving way.${descriptionSuffix}`,
+            "description": `The [Open Podcast Prefix Project](${origin}) is an open-source [podcast prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.\n\nThis API serves as an interface to access the data collected in a privacy-preserving way.${descriptionSuffix}`,
             "version": `0.0.1${versionSuffix}`,
             "title": "OP3 API",
-            "termsOfService": "https://op3.dev/terms/",
+            "termsOfService": `${origin}/terms/`,
             "contact": {
-                "email": "apiteam@op3.dev"
+                "email": "john@op3.dev"
             },
             "license": {
                 "name": "MIT",
