@@ -61,7 +61,7 @@ const RELEASES: Release[] = [
         title: '2022-10-18: New Setup page, API keys, optional prefix arguments',
         bulletPoints: [
             ({ origin }) => `Published a new [Setup page](${origin}/setup) with instructions, examples, and an easy-to-use feed checker to sanity-check your OP3 setup.`,
-            ({ origin }) => `Introduced proper [API key management](${origin}/keys). Existing API users should switch over to these more stable credentials instead of hardcoding the shared preview tokens.`,
+            ({ origin }) => `Introduced proper [API key management](${origin}/api/keys). Existing API users should switch over to these more stable credentials instead of hardcoding the shared preview tokens.`,
             ({ origin }) => `Introduced a way to pass optional arguments in the prefix url using comma-delimited name=value pairs. Can be used to pass your Podcast Guid as part of the redirect (see [Examples](${origin}/setup#examples)).`,
         ]
     },
