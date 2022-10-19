@@ -226,21 +226,41 @@ export interface ExternalNotificationRequest {
     readonly received: string; // instant
 }
 
-export interface ExternalNotification extends Record<string, unknown> {
-    readonly type: 'feeds'; // known types
+export interface BaseExternalNotification extends Record<string, unknown> {
     readonly sent: string; // instant
     readonly sender: string;
+}
 
-    // other props depending on type
-    // feeds: unknown[] for type: feeds
+export type ExternalNotification = FeedsExternalNotification | UrlsExternalNotification;
+
+export interface FeedsExternalNotification extends BaseExternalNotification {
+    readonly type: 'feeds';
+    readonly feeds: readonly unknown[];
+}
+
+export interface UrlsExternalNotification extends BaseExternalNotification {
+    readonly type: 'urls';
+    readonly urls: readonly UrlInfo[];
+}
+
+export interface UrlInfo {
+    readonly url: string;
+    readonly found: string;
+}
+
+export function isUrlInfo(obj: unknown): obj is UrlInfo {
+    return isStringRecord(obj)
+        && typeof obj.url === 'string'
+        && typeof obj.found === 'string'
+        ;
 }
 
 export function isExternalNotification(obj: unknown): obj is ExternalNotification {
     return isStringRecord(obj)
-        && obj.type === 'feeds'
+        && (obj.type === 'feeds' || obj.type === 'urls')
         && typeof obj.sent === 'string'
         && typeof obj.sender === 'string'
-        && obj.type === 'feeds' && Array.isArray(obj.feeds)
+        && (obj.type === 'feeds' && Array.isArray(obj.feeds) || obj.type === 'urls' && Array.isArray(obj.urls))
         ;
 }
 

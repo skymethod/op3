@@ -145,7 +145,10 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
         return newJsonResponse({ results });
-    }  else if (operationKind === 'select' && targetPath === '/feed-notifications') {
+    } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
+        return newJsonResponse({ results });
+    } else if (operationKind === 'select' && targetPath === '/show/urls') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
         return newJsonResponse({ results });
     } else {

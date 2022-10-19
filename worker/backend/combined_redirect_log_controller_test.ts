@@ -2,7 +2,7 @@ import { assertEquals, assertNotEquals } from '../tests/deps.ts';
 import { InMemoryDurableObjectStorage, assert } from '../tests/deps.ts';
 import { CombinedRedirectLogController, IndexId } from './combined_redirect_log_controller.ts';
 import { StubRpcClient } from '../tests/stub_rpc_client.ts';
-import { Unkinded,GetNewRedirectLogsRequest,GetNewRedirectLogsResponse } from '../rpc_model.ts';
+import { Unkinded,GetNewRedirectLogsRequest,GetNewRedirectLogsResponse, ExternalNotificationRequest, OkResponse, isUrlInfo } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { generateUuid } from '../uuid.ts';
@@ -53,8 +53,17 @@ Deno.test({
                 }
                 throw new Error(JSON.stringify({ request, target }));
             }
+            async receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse> {
+                await Promise.resolve();
+                if (target === 'show-server' && request.notification.type === 'urls') {
+                    assertEquals(request.notification.urls.length, 1);
+                    assertEquals(request.notification.urls[0].url, url);
+                    return { kind: 'ok' };
+                }
+                throw new Error(JSON.stringify({ request, target }));
+            }
         }
-        const controller = new CombinedRedirectLogController(storage, rpcClient);
+        const controller = new CombinedRedirectLogController(storage, rpcClient, 'controller-test');
         await controller.process();
 
         {
@@ -71,7 +80,7 @@ Deno.test({
             // ensure saved row count
             const data = await storage.list();
             // console.log(data);
-            assertEquals(data.size, 10 /* index records: 12 - DoColo (not in test) - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */);
+            assertEquals(data.size, 10 /* index records: 12 - DoColo (not in test) - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */ + 1 /* url record (pending was sent) */);
 
             // ensure attnums
             const namesToNums = data.get('crl.attNums');
@@ -93,6 +102,11 @@ Deno.test({
             assert(isStringRecord(expectedDayUrlValue));
             const { key: actualDayUrlValueKey } = expectedDayUrlValue;
             assertEquals(actualDayUrlValueKey, expectedDayUrlValueKey);
+
+            // ensure url record
+            const urlRecord = data.get(`crl.u0.${url}`);
+            assert(isUrlInfo(urlRecord));
+            assertEquals(urlRecord.url, url);
         }
 
         {

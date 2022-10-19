@@ -1,6 +1,7 @@
-import { isStringRecord } from '../check.ts';
+import { isStringRecord, isValidInstant } from '../check.ts';
 import { DurableObjectStorage } from '../deps.ts';
-import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded, UrlInfo } from '../rpc_model.ts';
+import { consoleWarn } from '../tracer.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 
 export class ShowController {
@@ -13,34 +14,73 @@ export class ShowController {
     }
 
     async receiveExternalNotification({ notification, received } : Unkinded<ExternalNotificationRequest>): Promise<void> {
-        const { type, sent, sender, feeds } = notification;
+        const { type, sent, sender } = notification;
         const { storage, feedNotificationSequence } = this;
 
-        if (type !== 'feeds') throw new Error(`We only care about feeds notifications`);
-        if (!Array.isArray(feeds)) throw new Error(`Expected feeds array`);
-        const newRecords: Record<string, FeedNotificationRecord> = {};
-        feeds.forEach((feed, i) => {
-            if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
-            const trimmed = trimRecordToFit({ sent, received, sender, feed });
-            const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;
-            newRecords[`fn.1.${feedNotificationSequence.next()}.${length}`] = trimmed;
-        });
-        const newRecordsCount = Object.keys(newRecords).length;
-        if (newRecordsCount === 0) return;
-        console.log(`ShowController: Saving ${newRecordsCount} new feed notification records`);
-        await storage.put(newRecords);
+        if (type === 'feeds') {
+            const { feeds } = notification;
+            if (!Array.isArray(feeds)) throw new Error(`Expected feeds array`);
+
+            const newRecords: Record<string, FeedNotificationRecord> = {};
+            feeds.forEach((feed, i) => {
+                if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
+                const trimmed = trimRecordToFit({ sent, received, sender, feed });
+                const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;
+                newRecords[`fn.1.${feedNotificationSequence.next()}.${length}`] = trimmed;
+            });
+            const newRecordsCount = Object.keys(newRecords).length;
+            if (newRecordsCount === 0) return;
+            console.log(`ShowController: Saving ${newRecordsCount} new feed notification records`);
+            await storage.put(newRecords);
+        }
+
+        if (type === 'urls') {
+            const { urls } = notification;
+            if (!Array.isArray(urls)) throw new Error(`Expected urls array`);
+            const validUrls: UrlInfo[] = [];
+            for (const info of urls) {
+                const { url, found } = info;
+                if (typeof url !== 'string' || typeof found !== 'string' || !isValidInstant(found)) {
+                    consoleWarn('sc-bad-url-not', `ShowController: Bad url notification: ${JSON.stringify(info)}`);
+                    continue;
+                }
+                validUrls.push({ url, found });
+            }
+
+            const map = await storage.get(validUrls.map(v => computeUrlKey(v.url)));
+            const newRecords: Record<string, UrlRecord> = {};
+            for (const { url, found } of validUrls) {
+                const key = computeUrlKey(url);
+                const val = map.get(key);
+                const existing = isUrlRecord(val) && val;
+                if (existing && existing.found < found) {
+                    // already found it
+                    continue;
+                }
+                const foundSource = notification.sender;
+                newRecords[key] = existing ? { ...existing, found, foundSource } : { url, found, foundSource };
+            }
+            const newRecordsCount = Object.keys(newRecords).length;
+            if (newRecordsCount > 0) {
+                console.log(`ShowController: saving ${newRecordsCount} url records`);
+                await storage.put(newRecords);
+            }
+        }
+
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         const { operationKind, targetPath } = req;
+        
         if (operationKind === 'select' && targetPath === '/feed-notifications') {
-            const results: FeedNotificationRecord[] = [];
             const map = await this.storage.list({ prefix: 'fn.1.'});
-            for (const val of map.values()) {
-                if (isFeedNotificationRecord(val)) {
-                    results.push(val);
-                }
-            }
+            const results = [...map.values()].filter(isFeedNotificationRecord);
+            return { results };
+        }
+
+        if (operationKind === 'select' && targetPath === '/show/urls') {
+            const map = await this.storage.list({ prefix: 'sc.u0.'});
+            const results = [...map.values()].filter(isUrlRecord);
             return { results };
         }
         
@@ -85,6 +125,12 @@ export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificatio
 
 //
 
+function computeUrlKey(url: string): string {
+    return `sc.u0.${url.substring(0, 1024)}`;
+}
+
+//
+
 interface FeedNotificationRecord {
     readonly sent: string;
     readonly received: string;
@@ -98,5 +144,19 @@ function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
         && typeof obj.received === 'string'
         && typeof obj.sender === 'string'
         && isStringRecord(obj.feed)
+        ;
+}
+
+interface UrlRecord {
+    readonly url: string;
+    readonly found: string; // earliest time seen
+    readonly foundSource: string; // responsible for earliest time seen
+}
+
+function isUrlRecord(obj: unknown): obj is UrlRecord {
+    return isStringRecord(obj)
+        && typeof obj.url === 'string'
+        && typeof obj.found === 'string'
+        && typeof obj.foundSource === 'string'
         ;
 }

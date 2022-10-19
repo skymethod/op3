@@ -1,6 +1,6 @@
 import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { checkMatches, isStringRecord } from '../check.ts';
-import { AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -13,16 +13,19 @@ import { newTextResponse } from '../responses.ts';
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
 
+    private readonly durableObjectName: string;
     private readonly storage: DurableObjectStorage;
     private readonly rpcClient: RpcClient;
     private readonly sourceStateCache = new Map<string, SourceState>();
 
     private attNums?: AttNums;
     private mostBehindTimestampId?: string;
+    private urlNotificationsLastSent?: string; // instant
 
-    constructor(storage: DurableObjectStorage, rpcClient: RpcClient) {
+    constructor(storage: DurableObjectStorage, rpcClient: RpcClient, durableObjectName: string) {
         this.storage = storage;
         this.rpcClient = rpcClient;
+        this.durableObjectName = durableObjectName;
     }
 
     async receiveNotification(opts: { doName: string; timestampId: string; fromColo: string; }) {
@@ -56,6 +59,8 @@ export class CombinedRedirectLogController {
         for (const state of sourceStates) {
             await processSource(state, rpcClient, attNums, storage, v => this.updateSourceStateCache(v));
         }
+
+        await this.sendPendingUrlNotifications();
     }
 
     async listSources(): Promise<Record<string, unknown>[]> {
@@ -158,6 +163,39 @@ export class CombinedRedirectLogController {
         this.mostBehindTimestampId = rt;
     }
 
+    private async sendPendingUrlNotifications() {
+        const { storage, rpcClient, durableObjectName, urlNotificationsLastSent } = this;
+        
+        // only flush them once a minute
+        if (typeof urlNotificationsLastSent === 'string' && (Date.now() - new Date(urlNotificationsLastSent).getTime() < 1000 * 60)) return;
+
+        const time = new Date().toISOString();
+        this.urlNotificationsLastSent = time;
+
+        try {
+            const map = await storage.list({ prefix: 'crl.un0.', limit: 50 });
+            if (map.size > 0) {
+                const urls = [...map.values()].filter(isUrlInfo);
+                const notification: UrlsExternalNotification = {
+                    type: 'urls',
+                    sender: durableObjectName,
+                    sent: time,
+                    urls,
+                };
+                console.log(`CombinedRedirectLogController: Sending notification with ${urls.length} urls`);
+                await rpcClient.receiveExternalNotification({ received: time, notification }, 'show-server');
+                const newUrlRecords = Object.fromEntries(urls.map(v => [ computeUrlKey(v.url), v ]));
+                await storage.transaction(async tx => {
+                    await tx.put(newUrlRecords);
+                    await tx.delete([...map.keys()]);
+                });
+            }
+        } catch (e) {
+            const msg = `CombinedRedirectLogController: Error sending pending url notifications: ${e.stack || e}`;
+            console.error(msg);
+            consoleError('crlc-send-url-not', msg);
+        }
+    }
 }
 
 //
@@ -211,6 +249,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
     const maxBefore = attNums.max();
     const newRecords: Record<string, string> = {};
     const newIndexRecords = new Map<IndexId, Record<string, DurableObjectStorageValue>>();
+    const newPendingUrlNotificationRecords: Record<string, UrlInfo> = {};
     let maxTimestampId = startAfterTimestampId;
     for (const [ timestampId, sourceRecord ] of Object.entries(records)) {
         if (maxTimestampId === undefined || timestampId > maxTimestampId) maxTimestampId = timestampId;
@@ -229,21 +268,26 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
         await computeIndexRecords(obj, timestamp, timestampAndUuid, key, newIndexRecords);
+        await computePendingUrlNotificationRecords(obj, timestamp, storage, newPendingUrlNotificationRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
     if (attNums.max() > maxBefore) {
         await storage.put('crl.attNums', attNums.toJson());
     }
-    if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId ) {
+    if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId || Object.keys(newPendingUrlNotificationRecords).length > 0) {
         // two transactions to stay under 128
         // it's ok if this first transaction runs more than once
 
-        // first, save data records
+        // first, save data records and pending url notifications
         await storage.transaction(async txn => {
             if (Object.keys(newRecords).length > 0) {
                 console.log(`CombinedRedirectLogController: Saving ${Object.keys(newRecords).length} imported records from ${doName}`);
                 await txn.put(newRecords);
+            }
+            if (Object.keys(newPendingUrlNotificationRecords).length > 0) {
+                console.log(`CombinedRedirectLogController: Saving ${Object.keys(newPendingUrlNotificationRecords).length} pending url notifications`);
+                await txn.put(newPendingUrlNotificationRecords);
             }
         });
 
@@ -370,4 +414,28 @@ async function computeIndexRecords(record: Record<string, string>, timestamp: st
         const indexRecords = getOrInit(outIndexRecords, indexId, () => ({} as Record<string, DurableObjectStorageValue>));
         indexRecords[`crl.i0.${indexId}.${indexValue}.${timestampAndUuid}`] = { key };
     }
+}
+
+async function computePendingUrlNotificationRecords(record: Record<string, string>, timestamp: string, storage: DurableObjectStorage, outPendingUrlNotificationRecords: Record<string, UrlInfo>) {
+    const { url } = record;
+    if (url !== undefined && typeof url !== 'string') {
+        consoleWarn('crlc-bad-source-obj-url', `CombinedRedirectLogController: Skipping pending url for bad source obj (invalid url): ${JSON.stringify(record)}`);
+        return;
+    }
+    const alreadyPending = Object.values(outPendingUrlNotificationRecords).some(v => v.url === url);
+    if (alreadyPending) return;
+
+    const existing = await storage.get(computeUrlKey(url));
+    if (existing === undefined) {
+        const unKey = `crl.un0.${url.substring(0, 1024)}`;
+        const existing = await storage.get(unKey); 
+        if (existing === undefined) {
+            const found = timestampToInstant(timestamp);
+            outPendingUrlNotificationRecords[unKey] = { url, found };
+        }
+    }
+}
+
+function computeUrlKey(url: string): string {
+    return `crl.u0.${url.substring(0, 1024)}`;
 }
