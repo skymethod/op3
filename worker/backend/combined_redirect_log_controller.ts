@@ -93,7 +93,9 @@ export class CombinedRedirectLogController {
             await processSource(state, rpcClient, attNums, storage, knownExistingUrls, v => this.updateSourceStateCache(v));
         }
 
-        await this.sendPendingUrlNotifications();
+        if (this.urlNotificationsEnabled) {
+            await this.sendPendingUrlNotifications();
+        }
     }
 
     async listSources(): Promise<Record<string, unknown>[]> {
@@ -224,9 +226,7 @@ export class CombinedRedirectLogController {
                 });
             }
         } catch (e) {
-            const msg = `CombinedRedirectLogController: Error sending pending url notifications: ${e.stack || e}`;
-            console.error(msg);
-            consoleError('crlc-send-url-not', msg);
+            consoleError('crlc-send-url-not', `CombinedRedirectLogController: Error sending pending url notifications: ${e.stack || e}`);
         }
     }
 }
