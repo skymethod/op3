@@ -29,36 +29,41 @@ export { BackendDO } from './backend/backend_do.ts';
 export default {
     
     async fetch(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-        const requestTime = Date.now();
-
-        initCloudflareTracer(env.dataset1);
-       
-        // first, handle redirects - the most important function
-        // be careful here: must never throw
-        const redirectResponse = tryComputeRedirectResponse(request, { env, context, requestTime });
-        if (redirectResponse) return redirectResponse;
-
-        // handle all other requests
-        let response: Response;
         try {
-            response = await computeResponse(request, env, context);
-        } catch (e) {
-            consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
-            response = new Response('failed', { status: 500 });
-        }
-        
-        // request/response metrics
-        writeTraceEvent(() => {
-            const millis = Date.now() - requestTime;
-            const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-            const { method } = request;
-            const { status } = response;
-            const { pathname } = new URL(request.url);
-            const contentType = response.headers.get('content-type') ?? '<unspecified>';
-            return { kind: 'worker-request', colo, pathname, country, method, contentType, millis, status };
-        });
+            const requestTime = Date.now();
 
-        return response;
+            initCloudflareTracer(env.dataset1);
+        
+            // first, handle redirects - the most important function
+            // be careful here: must never throw
+            const redirectResponse = tryComputeRedirectResponse(request, { env, context, requestTime });
+            if (redirectResponse) return redirectResponse;
+
+            // handle all other requests
+            let response: Response;
+            try {
+                response = await computeResponse(request, env, context);
+            } catch (e) {
+                consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
+                response = new Response('failed', { status: 500 });
+            }
+            
+            // request/response metrics
+            writeTraceEvent(() => {
+                const millis = Date.now() - requestTime;
+                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+                const { method } = request;
+                const { status } = response;
+                const { pathname } = new URL(request.url);
+                const contentType = response.headers.get('content-type') ?? '<unspecified>';
+                return { kind: 'worker-request', colo, pathname, country, method, contentType, millis, status };
+            });
+
+            return response;
+        } catch (e) {
+            consoleError('worker-unhandled', `Unhandled error in worker fetch: ${e.stack || e}`);
+            return new Response('failed', { status: 500 });
+        }
     }
     
 }
