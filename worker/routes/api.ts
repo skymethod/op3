@@ -122,7 +122,7 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
 async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
 
-    const { operationKind, targetPath, dryRun } = await bodyProvider();
+    const { operationKind, targetPath, dryRun, parameters } = await bodyProvider();
     if (operationKind === 'select' && targetPath === '/registry') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'registry');
         return newJsonResponse({ results });
@@ -153,7 +153,7 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         if (operationKind === 'delete') {
             checkDeleteDurableObjectAllowed(doName);
         }
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, doName);
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
         return newJsonResponse({ results });
     }
 

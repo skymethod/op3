@@ -21,12 +21,44 @@ export class CombinedRedirectLogController {
 
     private attNums?: AttNums;
     private mostBehindTimestampId?: string;
+    private urlNotificationsEnabled = true;
     private urlNotificationsLastSent?: string; // instant
 
     constructor(storage: DurableObjectStorage, rpcClient: RpcClient, durableObjectName: string) {
         this.storage = storage;
         this.rpcClient = rpcClient;
         this.durableObjectName = durableObjectName;
+    }
+
+    getState() {
+        const { knownExistingUrls, mostBehindTimestampId, urlNotificationsEnabled, urlNotificationsLastSent } = this;
+        return { 
+            knownExistingUrlsSize: knownExistingUrls.size,
+            mostBehindTimestampId,
+            urlNotificationsEnabled,
+            urlNotificationsLastSent,
+        }
+    }
+
+    updateState(state: Record<string, string>): string[] {
+        const { urlNotificationsEnabled } = state;
+        const rt: string[] = [];
+        if (urlNotificationsEnabled === 'true') {
+            if (!this.urlNotificationsEnabled) {
+                this.urlNotificationsEnabled = true;
+                this.urlNotificationsLastSent = undefined;
+                this.knownExistingUrls.clear();
+                rt.push('Enabled url notifications');
+            }
+        } else if (urlNotificationsEnabled === 'false') {
+            if (this.urlNotificationsEnabled) {
+                this.urlNotificationsEnabled = false;
+                this.urlNotificationsLastSent = undefined;
+                this.knownExistingUrls.clear();
+                rt.push('Disabled url notifications');
+            }
+        }
+        return rt;
     }
 
     async receiveNotification(opts: { doName: string; timestampId: string; fromColo: string; }) {

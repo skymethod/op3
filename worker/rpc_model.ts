@@ -117,8 +117,9 @@ export function isValidChange(change: any): boolean {
 
 export interface AdminDataRequest {
     readonly kind: 'admin-data';
-    readonly operationKind: 'select' | 'delete';
+    readonly operationKind: 'select' | 'delete' | 'update';
     readonly targetPath: string;
+    readonly parameters?: Record<string, string>;
     readonly dryRun?: boolean;
 }
 

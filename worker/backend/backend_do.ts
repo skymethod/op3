@@ -121,7 +121,7 @@ export class BackendDO {
                         await register(obj.info, storage);
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'admin-data') {
-                        const { operationKind, targetPath, dryRun = false } = obj;
+                        const { operationKind, targetPath, parameters, dryRun = false } = obj;
                         if (operationKind === 'select' && targetPath === '/registry' && durableObjectName === 'registry') {
                             return newRpcResponse({ kind: 'admin-data', results: await listRegistry(storage) });
                         } else if (operationKind === 'select' && targetPath === '/keys' && durableObjectName === 'key-server') {
@@ -155,7 +155,13 @@ export class BackendDO {
                             } else if (operationKind === 'select') {
                                 const ageInSeconds = IsolateId.ageInSeconds();
                                 const { id, name, colo } = doInfo;
-                                return newRpcResponse({ kind: 'admin-data', results: [ { id, name, colo, deploySha, deployTime, ageInSeconds } ] });
+                                const state = this.combinedRedirectLogController ? this.combinedRedirectLogController.getState() : undefined;
+                                return newRpcResponse({ kind: 'admin-data', results: [ { id, name, colo, deploySha, deployTime, ageInSeconds, state } ] });
+                            } else if (operationKind === 'update') {
+                                if (this.combinedRedirectLogController) {
+                                    const messages = this.combinedRedirectLogController.updateState(parameters ?? {});
+                                    return newRpcResponse({ kind: 'admin-data', results: messages });
+                                }
                             }
                         }
                     } else if (obj.kind === 'redirect-logs-notification') {
