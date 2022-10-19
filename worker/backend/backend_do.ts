@@ -216,24 +216,28 @@ export class BackendDO {
     }
 
     async alarm() {
-        const { storage } = this.state;
-        const payload = await storage.get('alarm.payload');
-        console.log(`BackendDO.alarm: ${JSON.stringify(payload)}`);
-        if (isValidAlarmPayload(payload)) {
-            // workaround no logs for alarm handlers
-            // make an rpc call back to this object
-            const { backendNamespace } = this.env;
-            const rpcClient = new CloudflareRpcClient(backendNamespace, 0 /* alarm handler will retry for us */);
-            const fromIsolateId = IsolateId.get();
-            const info = this.info ?? await loadDOInfo(storage);
-            if (!info) {
-                consoleError('backend-do-alarm-do-name', `BackendDO: unable to compute name!`);
-                return;
-            }
-            const { id: durableObjectId, name: durableObjectName, colo } = info;
-            writeTraceEvent({ kind: 'do-alarm', colo, durableObjectClass: 'BackendDO', durableObjectId, durableObjectName: durableObjectName, isolateId: fromIsolateId });
+        try {
+            const { storage } = this.state;
+            const payload = await storage.get('alarm.payload');
+            console.log(`BackendDO.alarm: ${JSON.stringify(payload)}`);
+            if (isValidAlarmPayload(payload)) {
+                // workaround no logs for alarm handlers
+                // make an rpc call back to this object
+                const { backendNamespace } = this.env;
+                const rpcClient = new CloudflareRpcClient(backendNamespace, 0 /* alarm handler will retry for us */);
+                const fromIsolateId = IsolateId.get();
+                const info = this.info ?? await loadDOInfo(storage);
+                if (!info) {
+                    consoleError('backend-do-alarm-do-name', `BackendDO: unable to compute name!`);
+                    return;
+                }
+                const { id: durableObjectId, name: durableObjectName, colo } = info;
+                writeTraceEvent({ kind: 'do-alarm', colo, durableObjectClass: 'BackendDO', durableObjectId, durableObjectName: durableObjectName, isolateId: fromIsolateId });
 
-            await rpcClient.sendAlarm({ payload, fromIsolateId }, durableObjectName);
+                await rpcClient.sendAlarm({ payload, fromIsolateId }, durableObjectName);
+            }
+        } catch (e) {
+            consoleError('backend-do-alarm-unhandled', `BackendDO: Unhandled error in alarm: ${e.stack || e}`);
         }
     }
 
