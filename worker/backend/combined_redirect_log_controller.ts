@@ -437,8 +437,8 @@ async function computePendingUrlNotificationRecords(record: Record<string, strin
             const found = timestampToInstant(timestamp);
             outPendingUrlNotificationRecords[unKey] = { url, found };
         }
-    } else if (!knownExistingUrls.has(url)) {
-        if (knownExistingUrls.size >= 1000) knownExistingUrls.clear(); // only keep a limited number of the latest urls around in memory
+    } else {
+        if (knownExistingUrls.size >= 200) knownExistingUrls.clear(); // only keep a limited number of the latest urls around in memory
         knownExistingUrls.add(url);
     }
 }

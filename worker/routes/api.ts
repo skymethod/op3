@@ -1,4 +1,4 @@
-import { checkDeleteDurableObjectAllowed } from './admin_api.ts';
+import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest } from './admin_api.ts';
 import { ApiTokenPermission, hasPermission, isExternalNotification, RpcClient } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
@@ -135,10 +135,6 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else if (operationKind === 'select' && targetPath === '/crl/records') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
         return newJsonResponse({ results });
-    } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
-        const doName = checkDeleteDurableObjectAllowed(targetPath);
-        const { message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, doName);
-        return newJsonResponse({ message });
     } else if (operationKind === 'select' && targetPath === '/api-keys') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
         return newJsonResponse({ results });
@@ -151,9 +147,17 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else if (operationKind === 'select' && targetPath === '/show/urls') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
         return newJsonResponse({ results });
-    } else {
-        throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
     }
+    const doName = tryParseDurableObjectRequest(targetPath);
+    if (doName) {
+        if (operationKind === 'delete') {
+            checkDeleteDurableObjectAllowed(doName);
+        }
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, doName);
+        return newJsonResponse({ results });
+    }
+
+    throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
 }
 
 async function computeAdminRebuildResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

@@ -8,7 +8,7 @@ import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
-import { checkDeleteDurableObjectAllowed } from '../routes/admin_api.ts';
+import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest } from '../routes/admin_api.ts';
 import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
 import { tryParseInt } from '../check.ts';
@@ -53,10 +53,10 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-            await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
+            const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
 
             if (method === 'POST' && pathname === '/rpc') {
                 try {
@@ -130,24 +130,33 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listSources() });
                         } else if (operationKind === 'select' && targetPath === '/crl/records') {
                             return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listRecords() });
-                        } else if (operationKind === 'delete' && targetPath.startsWith('/durable-object/')) {
-                            const doName = checkDeleteDurableObjectAllowed(targetPath);
-                            if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
-                            let message = '';
-                            if (dryRun) {
-                                message = `DRY RUN: Would delete all storage for ${doName}`;
-                            } else {
-                                console.log(`Deleting all storage for ${doName}`);
-                                const start = Date.now();
-                                await storage.deleteAll();
-                                message = `Deleted all storage for ${doName} in ${Date.now() - start}ms`;
-                            }
-                            console.log(message);
-                            return newRpcResponse({ kind: 'admin-data', message });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === 'api-key-server') {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
                         } else if ((targetPath === '/feed-notifications' || targetPath === '/show/urls') && durableObjectName === 'show-server') {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
+                        }
+
+                        const doName = tryParseDurableObjectRequest(targetPath);
+                        if (doName) {
+                            if (operationKind === 'delete') {
+                                checkDeleteDurableObjectAllowed(targetPath);
+                                if (doName !== durableObjectName) throw new Error(`Not allowed to delete ${doName}: routed to ${durableObjectName}`);
+                                let message = '';
+                                if (dryRun) {
+                                    message = `DRY RUN: Would delete all storage for ${doName}`;
+                                } else {
+                                    console.log(`Deleting all storage for ${doName}`);
+                                    const start = Date.now();
+                                    await storage.deleteAll();
+                                    message = `Deleted all storage for ${doName} in ${Date.now() - start}ms`;
+                                }
+                                console.log(message);
+                                return newRpcResponse({ kind: 'admin-data', message });
+                            } else if (operationKind === 'select') {
+                                const ageInSeconds = IsolateId.ageInSeconds();
+                                const { id, name, colo } = doInfo;
+                                return newRpcResponse({ kind: 'admin-data', results: [ { id, name, colo, deploySha, deployTime, ageInSeconds } ] });
+                            }
                         }
                     } else if (obj.kind === 'redirect-logs-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);
