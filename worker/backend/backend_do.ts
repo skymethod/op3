@@ -39,15 +39,15 @@ export class BackendDO {
     }
 
     async fetch(request: Request): Promise<Response> {
-        const isolateId = IsolateId.log();
-        console.log(request.url);
-        const colo = await BackendDOColo.get();
-        const durableObjectName = request.headers.get('do-name');
-        const durableObjectId = this.state.id.toString();
-        const durableObjectClass = 'BackendDO';
-        console.log('logprops:', { colo, durableObjectClass, durableObjectId, durableObjectName });
-
         try {
+            const isolateId = IsolateId.log();
+            console.log(request.url);
+            const colo = await BackendDOColo.get();
+            const durableObjectName = request.headers.get('do-name');
+            const durableObjectId = this.state.id.toString();
+            const durableObjectClass = 'BackendDO';
+            console.log('logprops:', { colo, durableObjectClass, durableObjectId, durableObjectName });
+
             const { method } = request;
             const { pathname } = new URL(request.url);
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
@@ -155,7 +155,7 @@ export class BackendDO {
                             } else if (operationKind === 'select') {
                                 const ageInSeconds = IsolateId.ageInSeconds();
                                 const { id, name, colo } = doInfo;
-                                const state = this.combinedRedirectLogController ? this.combinedRedirectLogController.getState() : undefined;
+                                const state = this.combinedRedirectLogController ? await this.combinedRedirectLogController.getState() : undefined;
                                 return newRpcResponse({ kind: 'admin-data', results: [ { id, name, colo, deploySha, deployTime, ageInSeconds, state } ] });
                             } else if (operationKind === 'update') {
                                 if (this.combinedRedirectLogController) {

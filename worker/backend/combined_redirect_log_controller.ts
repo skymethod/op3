@@ -30,13 +30,21 @@ export class CombinedRedirectLogController {
         this.durableObjectName = durableObjectName;
     }
 
-    getState() {
+    async getState() {
         const { knownExistingUrls, mostBehindTimestampId, urlNotificationsEnabled, urlNotificationsLastSent } = this;
+        let unsentNotifcations = undefined;
+        try {
+            const map = await this.storage.list({ prefix: 'crl.un0.' });
+            unsentNotifcations = map.size;
+        } catch {
+            // noop
+        }
         return { 
             knownExistingUrlsSize: knownExistingUrls.size,
             mostBehindTimestampId,
             urlNotificationsEnabled,
             urlNotificationsLastSent,
+            unsentNotifcations,
         }
     }
 
