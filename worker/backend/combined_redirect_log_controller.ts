@@ -87,7 +87,7 @@ export class CombinedRedirectLogController {
     }
 
     async process(): Promise<void> {
-        const { storage, rpcClient, knownExistingUrls } = this;
+        const { storage, rpcClient, knownExistingUrls, urlNotificationsEnabled } = this;
 
         // load and save new records from all sources
         const sourceStates = await loadSourceStates(storage);
@@ -98,7 +98,7 @@ export class CombinedRedirectLogController {
         const attNums = await this.getOrLoadAttNums();
 
         for (const state of sourceStates) {
-            await processSource(state, rpcClient, attNums, storage, knownExistingUrls, v => this.updateSourceStateCache(v));
+            await processSource(state, rpcClient, attNums, storage, knownExistingUrls, urlNotificationsEnabled, v => this.updateSourceStateCache(v));
         }
 
         if (this.urlNotificationsEnabled) {
@@ -274,7 +274,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     return new AttNums();
 }
 
-async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, stateUpdated: (state: SourceState) => void) {
+async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, urlNotificationsEnabled: boolean, stateUpdated: (state: SourceState) => void) {
     const { doName } = state;
     const nothingNew = typeof state.notificationTimestampId === 'string' && typeof state.haveTimestampId === 'string' && state.haveTimestampId >= state.notificationTimestampId;
     if (nothingNew) return;
@@ -309,7 +309,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
         await computeIndexRecords(obj, timestamp, timestampAndUuid, key, newIndexRecords);
-        await computePendingUrlNotificationRecords(obj, timestamp, storage, knownExistingUrls, newPendingUrlNotificationRecords);
+        if (urlNotificationsEnabled) await computePendingUrlNotificationRecords(obj, timestamp, storage, knownExistingUrls, newPendingUrlNotificationRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
