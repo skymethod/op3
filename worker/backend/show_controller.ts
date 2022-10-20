@@ -1,5 +1,5 @@
 import { isStringRecord, isValidInstant } from '../check.ts';
-import { DurableObjectStorage } from '../deps.ts';
+import { DurableObjectStorage, DurableObjectStorageListOptions } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded, UrlInfo } from '../rpc_model.ts';
 import { consoleWarn } from '../tracer.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
@@ -70,7 +70,7 @@ export class ShowController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
-        const { operationKind, targetPath } = req;
+        const { operationKind, targetPath, parameters } = req;
         
         if (operationKind === 'select' && targetPath === '/feed-notifications') {
             const map = await this.storage.list({ prefix: 'fn.1.'});
@@ -79,7 +79,7 @@ export class ShowController {
         }
 
         if (operationKind === 'select' && targetPath === '/show/urls') {
-            const map = await this.storage.list({ prefix: 'sc.u0.'});
+            const map = await this.storage.list(computeListOpts('sc.u0.', parameters));
             const results = [...map.values()].filter(isUrlRecord);
             return { results };
         }
@@ -98,6 +98,17 @@ export class ShowController {
 }
 
 //
+
+function computeListOpts(prefix: string, parameters: Record<string, string> = {}): DurableObjectStorageListOptions {
+    let rt: DurableObjectStorageListOptions = { prefix };
+    const { limit, start, startAfter, end, reverse } = parameters;
+    if (typeof limit === 'string') rt = { ...rt, limit: parseInt(limit) };
+    if (typeof start === 'string') rt = { ...rt, start: `${prefix}${start}` };
+    if (typeof startAfter === 'string') rt = { ...rt, startAfter: `${prefix}${startAfter}` };
+    if (typeof end === 'string') rt = { ...rt, end: `${prefix}${end}` };
+    if (reverse === 'true' || reverse === 'false') rt = { ...rt, reverse: reverse === 'true' };
+    return rt;
+}
 
 export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
     const { items } = record.feed;

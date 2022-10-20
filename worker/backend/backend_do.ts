@@ -224,7 +224,7 @@ export class BackendDO {
                 // workaround no logs for alarm handlers
                 // make an rpc call back to this object
                 const { backendNamespace } = this.env;
-                const rpcClient = new CloudflareRpcClient(backendNamespace, 0 /* alarm handler will retry for us */);
+                const rpcClient = new CloudflareRpcClient(backendNamespace, 5); // alarm will retry for us, but we don't want to rely on that
                 const fromIsolateId = IsolateId.get();
                 const info = this.info ?? await loadDOInfo(storage);
                 if (!info) {
@@ -238,6 +238,7 @@ export class BackendDO {
             }
         } catch (e) {
             consoleError('backend-do-alarm-unhandled', `BackendDO: Unhandled error in alarm: ${e.stack || e}`);
+            throw e; // trigger a retry
         }
     }
 
