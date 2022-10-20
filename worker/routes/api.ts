@@ -124,28 +124,28 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
 
     const { operationKind, targetPath, dryRun, parameters } = await bodyProvider();
     if (operationKind === 'select' && targetPath === '/registry') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'registry');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'registry');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'key-server');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath.startsWith('/crl/')) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'combined-redirect-log');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/crl/records') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'combined-redirect-log');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'combined-redirect-log');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/api-keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'api-key-server');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'api-key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'api-key-server');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && (targetPath === '/show/urls' || targetPath.startsWith('/show/urls/'))) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, dryRun }, 'show-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
         return newJsonResponse({ results });
     }
     const doName = tryParseDurableObjectRequest(targetPath);
