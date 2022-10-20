@@ -28,11 +28,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://dts.podtrac.com/redirect.mp3/
     // https://www.podtrac.com/pts/redirect.mp3/
     // http redirects to https for registered feeds
-    // need to find an http example
-    m = /^https?:\/\/(dts\.podtrac\.com|www\.podtrac\.com\/pts)\/redirect\.mp3\/(.*?)$/.exec(url);
+    // supports explicit protocol as well: https://dts.podtrac.com/redirect.mp3/http://example.com/path-to-file.mp3
+    m = /^https?:\/\/(dts\.podtrac\.com|www\.podtrac\.com\/pts)\/redirect\.mp3\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, _domain, suffix ] = m;
-        const targetUrl = `https://${suffix}`;
+        const [ _, _domain, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
         return [ { kind: 'prefix', prefix: 'podtrac', url }, ...computeChainEstimate(targetUrl) ];
     }
 
@@ -139,6 +139,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'blubrry', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://mgln.ai/track/a.com/path/to/episode.mp3
+    // http and https endpoints are supported, but suffix protocol must be used for https
+    m = /^https?:\/\/mgln\.ai\/track\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'magellan', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -162,5 +171,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry' | 'magellan';
 }

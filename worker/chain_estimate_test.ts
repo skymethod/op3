@@ -127,6 +127,27 @@ Deno.test({
             { kind: 'prefix', prefix: 'podtrac', url: 'https://www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/http://dts.podtrac.com/redirect.mp3/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/http://dts.podtrac.com/redirect.mp3/http://a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podtrac', url: 'http://dts.podtrac.com/redirect.mp3/http://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://mgln.ai/track/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'https://mgln.ai/track/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://mgln.ai/track/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'http://mgln.ai/track/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://mgln.ai/track/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'https://mgln.ai/track/http://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
