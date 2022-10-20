@@ -159,7 +159,7 @@ export class BackendDO {
                                 return newRpcResponse({ kind: 'admin-data', results: [ { id, name, colo, deploySha, deployTime, ageInSeconds, state } ] });
                             } else if (operationKind === 'update') {
                                 if (this.combinedRedirectLogController) {
-                                    const messages = this.combinedRedirectLogController.updateState(parameters ?? {});
+                                    const messages = await this.combinedRedirectLogController.updateState(parameters ?? {});
                                     return newRpcResponse({ kind: 'admin-data', results: messages });
                                 }
                             }
@@ -186,7 +186,7 @@ export class BackendDO {
                         const { first, last, count, millis } = await getOrLoadCombinedRedirectLogController().rebuildIndex(obj);
                         return newRpcResponse({ kind: 'admin-rebuild-index', first, last, count, millis });
                     } else if (obj.kind === 'admin-get-metrics') {
-                        return await getOrLoadCombinedRedirectLogController().getMetrics();
+                        return getOrLoadCombinedRedirectLogController().getMetrics();
                     } else if (obj.kind === 'resolve-api-token') {
                         return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
                     } else if (obj.kind === 'modify-api-key') {

@@ -23,6 +23,8 @@ export class CombinedRedirectLogController {
     private mostBehindTimestampId?: string;
     private urlNotificationsEnabled = true;
     private urlNotificationsLastSent?: string; // instant
+    private knownExistingUrlsMax = 200;
+    private init = false;
 
     constructor(storage: DurableObjectStorage, rpcClient: RpcClient, durableObjectName: string) {
         this.storage = storage;
@@ -31,7 +33,8 @@ export class CombinedRedirectLogController {
     }
 
     async getState() {
-        const { knownExistingUrls, mostBehindTimestampId, urlNotificationsEnabled, urlNotificationsLastSent } = this;
+        await this.ensureInit();
+        const { knownExistingUrls, knownExistingUrlsMax, mostBehindTimestampId, urlNotificationsEnabled, urlNotificationsLastSent } = this;
         let unsentNotifcations = undefined;
         try {
             const map = await this.storage.list({ prefix: 'crl.un0.' });
@@ -41,6 +44,7 @@ export class CombinedRedirectLogController {
         }
         return { 
             knownExistingUrlsSize: knownExistingUrls.size,
+            knownExistingUrlsMax,
             mostBehindTimestampId,
             urlNotificationsEnabled,
             urlNotificationsLastSent,
@@ -48,11 +52,16 @@ export class CombinedRedirectLogController {
         }
     }
 
-    updateState(state: Record<string, string>): string[] {
-        const { urlNotificationsEnabled } = state;
+    async updateState(state: Record<string, string>): Promise<string[]> {
+        await this.ensureInit();
+        const { storage } = this;
+        const stateObj = await storage.get('state') ?? {};
+        if (!isStringRecord(stateObj)) throw new Error(`Unexpected state obj; ${JSON.stringify(stateObj)}`);
+        const { urlNotificationsEnabled, knownExistingUrlsMax } = state;
         const rt: string[] = [];
         if (urlNotificationsEnabled === 'true') {
             if (!this.urlNotificationsEnabled) {
+                stateObj.urlNotificationsEnabled = true;
                 this.urlNotificationsEnabled = true;
                 this.urlNotificationsLastSent = undefined;
                 this.knownExistingUrls.clear();
@@ -60,16 +69,31 @@ export class CombinedRedirectLogController {
             }
         } else if (urlNotificationsEnabled === 'false') {
             if (this.urlNotificationsEnabled) {
+                stateObj.urlNotificationsEnabled = false;
                 this.urlNotificationsEnabled = false;
                 this.urlNotificationsLastSent = undefined;
                 this.knownExistingUrls.clear();
                 rt.push('Disabled url notifications');
             }
         }
+        if (/^\d+$/.test(knownExistingUrlsMax)) {
+            const oldValue = this.knownExistingUrlsMax;
+            const newValue = parseInt(knownExistingUrlsMax);
+            if (newValue !== oldValue) {
+                stateObj.knownExistingUrlsMax = newValue;
+                this.knownExistingUrlsMax = newValue;
+                this.knownExistingUrls.clear();
+                rt.push(`Changed knownExistingUrlsMax from ${oldValue} to ${newValue}`);
+            }
+        }
+        if (rt.length > 0) {
+            await storage.put('state', stateObj);
+        }
         return rt;
     }
 
     async receiveNotification(opts: { doName: string; timestampId: string; fromColo: string; }) {
+        await this.ensureInit();
         const { doName, timestampId, fromColo } = opts;
         const { storage } = this;
 
@@ -87,7 +111,8 @@ export class CombinedRedirectLogController {
     }
 
     async process(): Promise<void> {
-        const { storage, rpcClient, knownExistingUrls, urlNotificationsEnabled } = this;
+        await this.ensureInit();
+        const { storage, rpcClient, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled } = this;
 
         // load and save new records from all sources
         const sourceStates = await loadSourceStates(storage);
@@ -98,7 +123,7 @@ export class CombinedRedirectLogController {
         const attNums = await this.getOrLoadAttNums();
 
         for (const state of sourceStates) {
-            await processSource(state, rpcClient, attNums, storage, knownExistingUrls, urlNotificationsEnabled, v => this.updateSourceStateCache(v));
+            await processSource(state, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled, v => this.updateSourceStateCache(v));
         }
 
         if (this.urlNotificationsEnabled) {
@@ -107,11 +132,13 @@ export class CombinedRedirectLogController {
     }
 
     async listSources(): Promise<Record<string, unknown>[]> {
+        await this.ensureInit();
         const map = await this.storage.list({ prefix: 'crl.ss.' });
         return [...map.values()].filter(isStringRecord);
     }
 
     async listRecords(): Promise<Record<string, unknown>[]> {
+        await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
 
         const map = await this.storage.list({ prefix: 'crl.r.', limit: 200 });
@@ -130,17 +157,20 @@ export class CombinedRedirectLogController {
     }
 
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>): Promise<Response> {
+        await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
         const mostBehindTimestamp = typeof this.mostBehindTimestampId === 'string' ? this.mostBehindTimestampId.substring(0, 15) : undefined;
         return await queryCombinedRedirectLogs(request, mostBehindTimestamp, attNums, this.storage);
     }
 
     async rebuildIndex(request: Unkinded<AdminRebuildIndexRequest>): Promise<AdminRebuildIndexResponse> {
+        await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
         return computeRebuildIndexResponse(request, attNums, this.storage);
     }
 
     async getMetrics(): Promise<Response> {
+        await this.ensureInit();
         if (this.sourceStateCache.size === 0) {
             const states = await loadSourceStates(this.storage);
             this.updateSourceStateCache(states);
@@ -176,6 +206,21 @@ export class CombinedRedirectLogController {
     }
 
     //
+
+    private async ensureInit() {
+        if (this.init) return;
+        const obj = await this.storage.get('state');
+        if (isStringRecord(obj)) {
+            const { urlNotificationsEnabled, knownExistingUrlsMax } = obj;
+            if (typeof urlNotificationsEnabled === 'boolean') {
+                this.urlNotificationsEnabled = urlNotificationsEnabled;
+            }
+            if (typeof knownExistingUrlsMax === 'number') {
+                this.knownExistingUrlsMax = knownExistingUrlsMax;
+            }
+        }
+        this.init = true;
+    }
 
     private async getOrLoadAttNums(): Promise<AttNums> {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
@@ -274,7 +319,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     return new AttNums();
 }
 
-async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, urlNotificationsEnabled: boolean, stateUpdated: (state: SourceState) => void) {
+async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, knownExistingUrlsMax: number, urlNotificationsEnabled: boolean, stateUpdated: (state: SourceState) => void) {
     const { doName } = state;
     const nothingNew = typeof state.notificationTimestampId === 'string' && typeof state.haveTimestampId === 'string' && state.haveTimestampId >= state.notificationTimestampId;
     if (nothingNew) return;
@@ -309,7 +354,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
         await computeIndexRecords(obj, timestamp, timestampAndUuid, key, newIndexRecords);
-        if (urlNotificationsEnabled) await computePendingUrlNotificationRecords(obj, timestamp, storage, knownExistingUrls, newPendingUrlNotificationRecords);
+        if (urlNotificationsEnabled) await computePendingUrlNotificationRecords(obj, timestamp, storage, knownExistingUrls, knownExistingUrlsMax, newPendingUrlNotificationRecords);
         const record = attNums.packRecord(obj);
         newRecords[key] = record;
     }
@@ -457,7 +502,7 @@ async function computeIndexRecords(record: Record<string, string>, timestamp: st
     }
 }
 
-async function computePendingUrlNotificationRecords(record: Record<string, string>, timestamp: string, storage: DurableObjectStorage, knownExistingUrls: Set<string>, outPendingUrlNotificationRecords: Record<string, UrlInfo>) {
+async function computePendingUrlNotificationRecords(record: Record<string, string>, timestamp: string, storage: DurableObjectStorage, knownExistingUrls: Set<string>, knownExistingUrlsMax: number, outPendingUrlNotificationRecords: Record<string, UrlInfo>) {
     const { url } = record;
     if (url !== undefined && typeof url !== 'string') {
         consoleWarn('crlc-bad-source-obj-url', `CombinedRedirectLogController: Skipping pending url for bad source obj (invalid url): ${JSON.stringify(record)}`);
@@ -478,7 +523,7 @@ async function computePendingUrlNotificationRecords(record: Record<string, strin
             outPendingUrlNotificationRecords[unKey] = { url, found };
         }
     } else {
-        if (knownExistingUrls.size >= 200) knownExistingUrls.clear(); // only keep a limited number of the latest urls around in memory
+        if (knownExistingUrls.size >= knownExistingUrlsMax) knownExistingUrls.clear(); // only keep a limited number of the latest urls around in memory
         knownExistingUrls.add(url);
     }
 }

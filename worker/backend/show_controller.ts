@@ -62,7 +62,7 @@ export class ShowController {
             }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
-                console.log(`ShowController: saving ${newRecordsCount} url records`);
+                console.log(`ShowController: saving ${newRecordsCount} url records (${Object.values(newRecords).map(v => `${v.url} at ${v.found} by ${v.foundSource}`).join(', ')})`);
                 await storage.put(newRecords);
             }
         }
