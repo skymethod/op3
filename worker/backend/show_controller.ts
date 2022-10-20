@@ -53,7 +53,7 @@ export class ShowController {
                 const key = computeUrlKey(url);
                 const val = map.get(key);
                 const existing = isUrlRecord(val) && val;
-                if (existing && existing.found < found) {
+                if (existing && existing.found <= found) {
                     // already found it
                     continue;
                 }
