@@ -56,6 +56,15 @@ interface Release {
 
 const RELEASES: Release[] = [
     {
+        id: '2022-10-20',
+        time: '2022-10-20T21:40:00.000Z',
+        title: '2022-10-20: Saving more request attributes, updated Privacy Policy',
+        bulletPoints: [
+            () => `Saving more non-listener-identifying fields on each request, after arriving at a consensus in a [project disussion](https://github.com/skymethod/op3/discussions/7).`,
+            ({ origin }) => `Updated the [Privacy Policy](${origin}/privacy) detailing the new fields captured: Country, Continent, Region, Timezone, Metro, ASN.`,
+        ]
+    },
+    {
         id: '2022-10-18',
         time: '2022-10-18T22:27:00.000Z',
         title: '2022-10-18: New Setup page, API keys, optional prefix arguments',

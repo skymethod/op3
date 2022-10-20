@@ -14,7 +14,11 @@ export function computeRawIpAddress(headers: Headers): string | undefined {
 export function computeOther(request: Request): Record<string, string> | undefined {
     const req = request as IncomingRequestCf;
     if (typeof req.cf !== 'object') return undefined;
-    const rt = Object.fromEntries(Object.entries(req.cf).filter(v => /^(colo|country)$/.test(v[0]) && typeof v[1] === 'string' && v[1] !== ''));
+    const rt = Object.fromEntries(Object.entries(req.cf).filter(v => /^(colo|country|continent|metroCode|region|regionCode|timezone)$/.test(v[0]) && typeof v[1] === 'string' && v[1] !== ''));
+    const { asn } = req.cf;
+    if (typeof asn === 'number' && Number.isInteger(asn) && asn > 0) {
+        rt.asn = asn.toString();
+    }
     return Object.keys(rt).length > 0 ? rt : undefined;
 }
 

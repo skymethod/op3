@@ -265,6 +265,24 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "edgeColo": {
                         "type": "string",
                     },
+                    "continent": {
+                        "type": "string",
+                    },
+                    "country": {
+                        "type": "string",
+                    },
+                    "timezone": {
+                        "type": "string",
+                    },
+                    "regionCode": {
+                        "type": "string",
+                    },
+                    "region": {
+                        "type": "string",
+                    },
+                    "metroCode": {
+                        "type": "string",
+                    },
                 },
                 "required": [
                     "time", "uuid", "hashedIpAddress", "method", "url", "edgeColo"

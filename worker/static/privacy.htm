@@ -15,7 +15,7 @@
         Privacy Policy
     </h1>
     <div class="basic max-w-2xl mx-auto px-8">
-        <p>Last updated September 17, 2022</p>
+        <p>Last updated October 20, 2022</p>
 
         <h2>Overview</h2>
         <p>The Open Podcast Prefix Project (OP3) is a free and open-source podcast prefix analytics service committed to open data and listener privacy.</p>
@@ -46,6 +46,12 @@
             <li><b>Range</b>: HTTP Range header (if present)</li>
             <li><b>ULID</b>: <a href="https://podcastlistening.com/">ULID</a> query parameter (if present)</li>
             <li><b>Edge Colo</b>: airport code of the edge datacenter that processed the request</li>
+            <li><b>Country</b>: derived from IP Address</li>
+            <li><b>Continent</b>: derived from Country</li>
+            <li><b>Region</b>: (e.g. US state) derived from IP Address</li>
+            <li><b>Timezone</b>: derived from IP Address</li>
+            <li><b>Metro</b>: Nielsen <a href="https://www.spstechnical.com/DMACodes.htm">DMA code</a> for large metro area (e.g. DFW) in North America, derived from IP Address</li>
+            <li><b>ASN</b>: <a href="https://en.wikipedia.org/wiki/Autonomous_system_(Internet)">autonomous system</a> ID representing the network operator of a large range of IP addresses (e.g. <a href="https://www.peeringdb.com/net/3592">T-Mobile USA</a>), derived from IP Address, used for internal traffic tagging, never returned in the API directly</li>
         </ul>
         <p>No cookies are used.</p>
 
@@ -81,6 +87,7 @@
 
         <h2>History</h2>
         <p>2022-09-17: Published initial version.</p>
+        <p>2022-10-20: Documented new list of captured request attributes, consensus derived from a <a href="https://github.com/skymethod/op3/discussions/7">project discussion</a>.</p>
 
     </div>
    
