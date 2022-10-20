@@ -83,6 +83,14 @@ export class ShowController {
             const results = [...map.values()].filter(isUrlRecord);
             return { results };
         }
+
+        if (operationKind === 'select' && targetPath.startsWith('/show/urls/')) {
+            const url = targetPath.substring('/show/urls/'.length);
+            const key = computeUrlKey(url);
+            const result = await this.storage.get(key);
+            const results = isUrlRecord(result) ? [ result ] : [];
+            return { results };
+        }
         
         throw new Error(`Unsupported show-related query`);
     }   
