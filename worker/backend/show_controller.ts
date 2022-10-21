@@ -44,6 +44,10 @@ export class ShowController {
                     consoleWarn('sc-bad-url-not', `ShowController: Bad url notification: ${JSON.stringify(info)}`);
                     continue;
                 }
+                if (!/^https?:\/\//i.test(url)) {
+                    consoleWarn('sc-bad-url-not-url', `ShowController: Bad url notification url: ${JSON.stringify(info)}`);
+                    continue;
+                }
                 validUrls.push({ url, found });
             }
 
