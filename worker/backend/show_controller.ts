@@ -88,12 +88,17 @@ export class ShowController {
             return { results };
         }
 
-        if (operationKind === 'select' && targetPath.startsWith('/show/urls/')) {
+        if (targetPath.startsWith('/show/urls/')) {
             const url = targetPath.substring('/show/urls/'.length);
             const key = computeUrlKey(url);
-            const result = await this.storage.get(key);
-            const results = isUrlRecord(result) ? [ result ] : [];
-            return { results };
+            if (operationKind === 'select') {
+                const result = await this.storage.get(key);
+                const results = isUrlRecord(result) ? [ result ] : [];
+                return { results };
+            } else if (operationKind === 'delete') {
+                const existed = await this.storage.delete(key);
+                return { message: existed ? 'Deleted one record' : 'Record not found' };
+            }
         }
         
         throw new Error(`Unsupported show-related query`);
