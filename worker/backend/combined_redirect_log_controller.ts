@@ -9,6 +9,7 @@ import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
 import { consoleError, consoleWarn } from '../tracer.ts';
 import { newTextResponse } from '../responses.ts';
+import { computeServerUrl } from '../client_params.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -473,7 +474,7 @@ export enum IndexId {
 }
 
 export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string) => string | undefined | Promise<string | undefined> ][] = [
-    [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(v).sha256()).hex() ],
+    [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(computeServerUrl(v)).sha256()).hex() ],
     [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
     [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
     [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
@@ -484,7 +485,7 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
     [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
     [ 'uuid', IndexId.Uuid, v => v ],
-    [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${v.substring(0, 1024)}` ],
+    [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${computeServerUrl(v).substring(0, 1024)}` ],
 ];
 
 //
@@ -503,12 +504,13 @@ async function computeIndexRecords(record: Record<string, string>, timestamp: st
 }
 
 async function computePendingUrlNotificationRecords(record: Record<string, string>, timestamp: string, storage: DurableObjectStorage, knownExistingUrls: Set<string>, knownExistingUrlsMax: number, outPendingUrlNotificationRecords: Record<string, UrlInfo>) {
-    const { url } = record;
-    if (url !== undefined && typeof url !== 'string') {
+    const { url: clientUrl } = record;
+    if (clientUrl !== undefined && typeof clientUrl !== 'string') {
         consoleWarn('crlc-bad-source-obj-url', `CombinedRedirectLogController: Skipping pending url for bad source obj (invalid url): ${JSON.stringify(record)}`);
         return;
     }
 
+    const url = computeServerUrl(clientUrl);
     if (knownExistingUrls.has(url)) return;
 
     const alreadyPending = Object.values(outPendingUrlNotificationRecords).some(v => v.url === url);

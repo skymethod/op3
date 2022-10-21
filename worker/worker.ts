@@ -8,7 +8,7 @@ import { IsolateId } from './isolate_id.ts';
 import { Background, computeApiResponse, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
-import { tryParseUlid } from './ulid.ts';
+import { tryParseUlid } from './client_params.ts';
 import { RawRedirect } from './rpc_model.ts';
 import { computeApiDocsResponse } from './routes/api_docs.ts';
 import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
@@ -133,8 +133,9 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
 
 function computeRawRedirect(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRedirect {
     const { time, method, rawIpAddress, other } = opts;
+    const { url } = request;
     const uuid = generateUuid();
-    const { url, ulid } = tryParseUlid(request.url);
+    const ulid = tryParseUlid(url);
     const userAgent = request.headers.get('user-agent') ?? undefined;
     const referer = request.headers.get('referer') ?? undefined;
     const range = request.headers.get('range') ?? undefined;
