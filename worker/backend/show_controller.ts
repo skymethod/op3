@@ -77,7 +77,7 @@ export class ShowController {
         const { operationKind, targetPath, parameters } = req;
         
         if (operationKind === 'select' && targetPath === '/feed-notifications') {
-            const map = await this.storage.list({ prefix: 'fn.1.'});
+            const map = await this.storage.list(computeListOpts('fn.1.', parameters));
             const results = [...map.values()].filter(isFeedNotificationRecord);
             return { results };
         }
@@ -107,17 +107,6 @@ export class ShowController {
 }
 
 //
-
-function computeListOpts(prefix: string, parameters: Record<string, string> = {}): DurableObjectStorageListOptions {
-    let rt: DurableObjectStorageListOptions = { prefix };
-    const { limit, start, startAfter, end, reverse } = parameters;
-    if (typeof limit === 'string') rt = { ...rt, limit: parseInt(limit) };
-    if (typeof start === 'string') rt = { ...rt, start: `${prefix}${start}` };
-    if (typeof startAfter === 'string') rt = { ...rt, startAfter: `${prefix}${startAfter}` };
-    if (typeof end === 'string') rt = { ...rt, end: `${prefix}${end}` };
-    if (reverse === 'true' || reverse === 'false') rt = { ...rt, reverse: reverse === 'true' };
-    return rt;
-}
 
 export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
     const { items } = record.feed;
@@ -151,22 +140,14 @@ export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificatio
     }
 }
 
-//
-
-function computeUrlKey(url: string): string {
-    return `sc.u0.${url.substring(0, 1024)}`;
-}
-
-//
-
-interface FeedNotificationRecord {
+export interface FeedNotificationRecord {
     readonly sent: string;
     readonly received: string;
     readonly sender: string;
     readonly feed: Record<string, unknown>;
 }
 
-function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
+export function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
     return isStringRecord(obj)
         && typeof obj.sent === 'string'
         && typeof obj.received === 'string'
@@ -174,6 +155,25 @@ function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationRecord {
         && isStringRecord(obj.feed)
         ;
 }
+
+//
+
+function computeListOpts(prefix: string, parameters: Record<string, string> = {}): DurableObjectStorageListOptions {
+    let rt: DurableObjectStorageListOptions = { prefix };
+    const { limit, start, startAfter, end, reverse } = parameters;
+    if (typeof limit === 'string') rt = { ...rt, limit: parseInt(limit) };
+    if (typeof start === 'string') rt = { ...rt, start: `${prefix}${start}` };
+    if (typeof startAfter === 'string') rt = { ...rt, startAfter: `${prefix}${startAfter}` };
+    if (typeof end === 'string') rt = { ...rt, end: `${prefix}${end}` };
+    if (reverse === 'true' || reverse === 'false') rt = { ...rt, reverse: reverse === 'true' };
+    return rt;
+}
+
+function computeUrlKey(url: string): string {
+    return `sc.u0.${url.substring(0, 1024)}`;
+}
+
+//
 
 interface UrlRecord {
     readonly url: string;
