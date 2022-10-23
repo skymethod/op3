@@ -1,5 +1,5 @@
 import { assertEquals, assertNotEquals } from '../tests/deps.ts';
-import { trimRecordToFit } from './show_controller.ts';
+import { trimRecordToFit } from './show_controller_notifications.ts';
 
 Deno.test({
     name: 'trimRecordToFit',
