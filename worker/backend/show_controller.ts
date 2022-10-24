@@ -104,7 +104,7 @@ export class ShowController {
                 }
             }
         } finally {
-            consoleInfo('sc-work', infos.join('; ')); // for now, keep an eye on every call
+            consoleInfo('sc-work', `ShowController: ${infos.join('; ')}`); // for now, keep an eye on every call
         }
     }
 }

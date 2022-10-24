@@ -1,7 +1,7 @@
 import { isStringRecord, isValidInstant } from '../check.ts';
 import { DurableObjectStorage } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded, UrlInfo } from '../rpc_model.ts';
-import { consoleWarn } from '../tracer.ts';
+import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { tryParsePrefixArguments } from './prefix_arguments.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { tryCleanUrl } from '../urls.ts';
@@ -30,9 +30,11 @@ export class ShowControllerNotifications {
 
             const newRecords: Record<string, FeedNotificationRecord> = {};
             const feedUrls = new Set<string>();
+            const feedUrlsFromFa = new Set<string>();
             feeds.forEach((feed, i) => {
                 if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
                 const { feedUrl } = feed;
+                if (typeof feedUrl === 'string' && sender === 'fa') feedUrlsFromFa.add(feedUrl);
                 const cleanFeedUrl = typeof feedUrl === 'string' && tryCleanUrl(feedUrl);
                 if (typeof cleanFeedUrl === 'string') {
                     feedUrls.add(cleanFeedUrl);
@@ -41,6 +43,9 @@ export class ShowControllerNotifications {
                 const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;
                 newRecords[`fn.1.${feedNotificationSequence.next()}.${length}`] = trimmed;
             });
+            if (feedUrlsFromFa.size > 0) {
+                consoleInfo('sc-feed-not-fa', `ShowController: feedUrlsFromFa: ${[...feedUrlsFromFa].join(', ')}`);
+            }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
                 console.log(`ShowController: Saving ${newRecordsCount} new feed notification records`);
@@ -91,7 +96,7 @@ export class ShowControllerNotifications {
             }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
-                console.log(`ShowController: saving ${newRecordsCount} url records (${Object.values(newRecords).map(v => `${v.url} at ${v.found} by ${v.foundSource}`).join(', ')})`);
+                consoleInfo('sc-not',`ShowController: saving ${newRecordsCount} url records (${Object.values(newRecords).map(v => `${v.url} at ${v.found} by ${v.foundSource}`).join(', ')})`);
                 await storage.put(newRecords);
             }
             if (podcastGuids.size > 0) {
