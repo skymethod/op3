@@ -1,10 +1,11 @@
 import { isStringRecord, isValidInstant } from '../check.ts';
-import { DurableObjectStorage, DurableObjectStorageListOptions } from '../deps.ts';
+import { DurableObjectStorage } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded, UrlInfo } from '../rpc_model.ts';
 import { consoleWarn } from '../tracer.ts';
 import { tryParsePrefixArguments } from './prefix_arguments.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { tryCleanUrl } from '../urls.ts';
+import { computeListOpts } from './storage.ts';
 
 export class ShowControllerNotifications {
 
@@ -189,17 +190,6 @@ export interface ShowControllerNotificationsCallbacks {
 }
 
 //
-
-function computeListOpts(prefix: string, parameters: Record<string, string> = {}): DurableObjectStorageListOptions {
-    let rt: DurableObjectStorageListOptions = { prefix };
-    const { limit, start, startAfter, end, reverse } = parameters;
-    if (typeof limit === 'string') rt = { ...rt, limit: parseInt(limit) };
-    if (typeof start === 'string') rt = { ...rt, start: `${prefix}${start}` };
-    if (typeof startAfter === 'string') rt = { ...rt, startAfter: `${prefix}${startAfter}` };
-    if (typeof end === 'string') rt = { ...rt, end: `${prefix}${end}` };
-    if (reverse === 'true' || reverse === 'false') rt = { ...rt, reverse: reverse === 'true' };
-    return rt;
-}
 
 function computeUrlKey(url: string): string {
     return `sc.u0.${url.substring(0, 1024)}`;

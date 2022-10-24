@@ -145,7 +145,7 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
         return newJsonResponse({ results });
-    } else if (targetPath === '/show/urls' || targetPath.startsWith('/show/urls/')) {
+    } else if (targetPath.startsWith('/show/')) {
         const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
         return newJsonResponse({ results, message });
     }

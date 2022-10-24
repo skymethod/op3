@@ -141,7 +141,7 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listRecords() });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === 'api-key-server') {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
-                        } else if ((targetPath === '/feed-notifications' || targetPath === '/show/urls' || targetPath.startsWith('/show/urls/')) && durableObjectName === 'show-server') {
+                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === 'show-server') {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 
