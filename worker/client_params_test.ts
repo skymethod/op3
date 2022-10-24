@@ -50,5 +50,6 @@ Deno.test({
         assertEquals(computeServerUrl('https://a.com/foo,pg=ebeccf3f-bac0-47e1-ab29-650709e91708/episode.mp3?='), 'https://a.com/foo,pg=ebeccf3f-bac0-47e1-ab29-650709e91708/episode.mp3');
         assertEquals(computeServerUrl('https://a.com:443/foo'), 'https://a.com/foo');
         assertEquals(computeServerUrl('http://sub.a.com:80/foo?a=b'), 'http://sub.a.com/foo?a=b');
+        assertEquals(computeServerUrl('http://a.com/foo?fbclid=trackinu'), 'http://a.com/foo');
     }
 });
