@@ -32,6 +32,11 @@ export function tryParseUrl(url: string): URL | undefined {
     }
 }
 
+export function isValidOrigin(origin: string): boolean {
+    const u = tryParseUrl(origin);
+    return u !== undefined && u.origin === origin;
+}
+
 export function tryParseInt(str: string | undefined): number | undefined {
     if (typeof str !== 'string') return undefined;
     try {
@@ -44,4 +49,8 @@ export function tryParseInt(str: string | undefined): number | undefined {
 
 export function isNotBlank(str: string): boolean {
     return str !== '';
+}
+
+export function isValidGuid(str: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(str);
 }

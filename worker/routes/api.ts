@@ -10,16 +10,17 @@ import { isValidHttpUrl, isValidInstant } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
+import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 
-export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
-    const { instance, method, hostname, pathname, searchParams, headers, bodyProvider } = opts;
+export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
+    const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
     const m = /^\/api\/1(\/[a-z\/-]+(\/.+?)?)$/.exec(pathname);
     if (!m) return undefined;
     const [ _, path ] = m;
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
     const bearerToken = m2 ? m2[1] : undefined;
     const rawIpAddress = computeRawIpAddress(headers);
-    return { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider };
+    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider };
 }
 
 // deno-lint-ignore no-explicit-any
@@ -27,7 +28,7 @@ export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
 export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background }): Promise<Response> {
-    const { instance, method, hostname, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
+    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
     const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background } = opts;
 
     try {
@@ -57,9 +58,9 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
-        if (path === '/feeds/search') return await computeFeedsSearchResponse(method, bodyProvider, podcastIndexCredentials); 
-        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, bodyProvider, podcastIndexCredentials, rpcClient, background); 
-        if (path === '/session-tokens') return await computeSessionTokensResponse(method, bodyProvider, podcastIndexCredentials); 
+        if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
+        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
+        if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
@@ -78,6 +79,7 @@ export interface ApiRequest {
     readonly instance: string;
     readonly method: string;
     readonly hostname: string;
+    readonly origin: string;
     readonly path: string;
     readonly searchParams: URLSearchParams;
     readonly bearerToken?: string;
@@ -105,7 +107,6 @@ function identityResultToJson(result: IdentityResult) {
 
 //
 
-const USER_AGENT = 'op3.dev';
 
 async function computeIdentityResult(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient): Promise<IdentityResult> {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
@@ -193,10 +194,10 @@ async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPer
     return newTextResponse('thanks');
 }
 
-async function sessionTokenCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; claims: Record<string, string> }> {
+async function sessionTokenCommon(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; claims: Record<string, string> }> {
     if (method !== 'POST') throw new StatusError(`${method} not allowed`, 405);
     if (typeof podcastIndexCredentials !== 'string') throw new StatusError(`forbidden`, 403);
-    const client = PodcastIndexClient.of({ podcastIndexCredentials, userAgent: USER_AGENT });
+    const client = newPodcastIndexClient({ podcastIndexCredentials, origin });
     if (!client) throw new StatusError(`forbidden`, 403);
     const obj = await bodyProvider();
     const { sessionToken } = obj;
@@ -208,15 +209,15 @@ async function sessionTokenCommon(method: string, bodyProvider: JsonProvider, po
     return { client, obj, claims };
 }
 
-async function feedsCommon(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
-    const { client, obj, claims } = await sessionTokenCommon(method, bodyProvider, podcastIndexCredentials);
+async function feedsCommon(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<{ client: PodcastIndexClient; obj: Record<string, unknown>; }> {
+    const { client, obj, claims } = await sessionTokenCommon(method, origin, bodyProvider, podcastIndexCredentials);
     const { k } = claims;
     if (k !== 's') throw new StatusError(`forbidden`, 403);
     return { client, obj };
 }
 
-async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
-    const { client, obj } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
+async function computeFeedsSearchResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+    const { client, obj } = await feedsCommon(method, origin, bodyProvider, podcastIndexCredentials);
     const { q: qFromObj } = obj;
     const q = typeof qFromObj === 'string' ? qFromObj.trim() : '';
     if (q === '') throw new StatusError(`Bad q: ${qFromObj}`);
@@ -245,13 +246,13 @@ async function computeFeedsSearchResponse(method: string, bodyProvider: JsonProv
     return newJsonResponse({ feeds });
 }
 
-async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, background: Background): Promise<Response> {
-    const { obj, client } = await feedsCommon(method, bodyProvider, podcastIndexCredentials);
+async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, background: Background): Promise<Response> {
+    const { obj, client } = await feedsCommon(method, origin, bodyProvider, podcastIndexCredentials);
     const { feed, id } = obj;
     if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
     if (typeof id !== 'number') throw new StatusError(`Bad id: ${JSON.stringify(id)}`);
 
-    const [ getResponseResult, analysisResult ] = await Promise.allSettled([client.getPodcastByFeedId(id), computeFeedAnalysis(feed, { userAgent: USER_AGENT})]);
+    const [ getResponseResult, analysisResult ] = await Promise.allSettled([client.getPodcastByFeedId(id), computeFeedAnalysis(feed, { userAgent: computeUserAgent({ origin })})]);
     if (getResponseResult.status === 'rejected') throw new StatusError(`Failed to lookup guid for id ${id}: ${getResponseResult.reason}`);
     if (analysisResult.status === 'rejected') throw new StatusError(`Failed to analyze feed: ${analysisResult.reason.message}`);
     const getResponse = getResponseResult.value;
@@ -267,8 +268,8 @@ async function computeFeedsAnalyzeResponse(method: string, bodyProvider: JsonPro
     return newJsonResponse(rt);
 }
 
-async function computeSessionTokensResponse(method: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
-    const { claims } = await sessionTokenCommon(method, bodyProvider, podcastIndexCredentials);
+async function computeSessionTokensResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined): Promise<Response> {
+    const { claims } = await sessionTokenCommon(method, origin, bodyProvider, podcastIndexCredentials);
     if (typeof podcastIndexCredentials !== 'string') throw new StatusError(`forbidden`, 403);
 
     claims.t = new Date().toISOString();

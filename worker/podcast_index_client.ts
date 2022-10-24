@@ -1,11 +1,14 @@
 import { isStringRecord } from './check.ts';
 import { Bytes } from './deps.ts';
 import { StatusError } from './errors.ts';
+import { sleep } from './sleep.ts';
 
 export class PodcastIndexClient {
     private readonly apiKey: string;
     private readonly apiSecret: string;
     private readonly userAgent: string;
+
+    private lastCallTime = 0;
     
     constructor({ apiKey, apiSecret, userAgent }: { apiKey: string, apiSecret: string, userAgent: string }) {
         this.apiKey = apiKey;
@@ -51,7 +54,10 @@ export class PodcastIndexClient {
     private async makeApiCall<T>(url: URL, responseCheck: (obj: unknown) => obj is T): Promise<T> {
         const time = Math.round(Date.now() / 1000);
         const authorization = (await Bytes.ofUtf8(`${this.apiKey}${this.apiSecret}${time}`).sha1()).hex();
+        const wait = 500 - (Date.now() - this.lastCallTime);
+        if (wait > 0) await sleep(wait);
         const res = await fetch(url.toString(), { headers: { 'user-agent': this.userAgent, 'x-auth-key': this.apiKey, 'x-auth-date': time.toString(), authorization } });
+        this.lastCallTime = Date.now();
         if (res.status !== 200) {
             throw new StatusError(await res.text(), res.status);
         }

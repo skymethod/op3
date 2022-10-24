@@ -3,3 +3,4 @@ export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.
 export { importText } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.9/common/import_text.ts';
 export { encodeXml } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.9/common/xml_util.ts';
 export { setEqual, setIntersect } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.9/common/sets.ts';
+export { chunk } from 'https://deno.land/std@0.160.0/collections/chunk.ts';

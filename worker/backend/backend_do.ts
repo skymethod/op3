@@ -17,6 +17,8 @@ import { initCloudflareTracer } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { ApiAuthController } from './api_auth_controller.ts';
 import { ShowController } from './show_controller.ts';
+import { newPodcastIndexClient } from '../outbound.ts';
+import { isValidOrigin } from '../check.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -53,7 +55,7 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -100,7 +102,14 @@ export class BackendDO {
                     }
 
                     const getOrLoadShowController = () => {
-                        if (!this.showController) this.showController = new ShowController(storage);
+                        if (!this.showController) {
+                            if (typeof origin !== 'string') throw new Error(`'origin' is required to init ShowController`);
+                            if (!isValidOrigin(origin)) throw new Error(`Valid 'origin' is required to init ShowController`);
+                            if (typeof podcastIndexCredentials !== 'string') throw new Error(`'podcastIndexCredentials' is required to init ShowController`);
+                            const podcastIndexClient = newPodcastIndexClient({ podcastIndexCredentials, origin });
+                            if (!podcastIndexClient) throw new Error(`Valid 'podcastIndexCredentials' are required to init ShowController`);
+                            this.showController = new ShowController(storage, podcastIndexClient, origin);
+                        }
                         return this.showController;
                     }
 
@@ -178,6 +187,8 @@ export class BackendDO {
                             await RedirectLogController.sendNotification(payload, { storage, rpcClient, fromColo });
                         } else if (alarmKind === CombinedRedirectLogController.processAlarmKind) {
                             await getOrLoadCombinedRedirectLogController().process();
+                        } else if (alarmKind === ShowController.processAlarmKind && durableObjectName === 'show-server') {
+                            await getOrLoadShowController().work();
                         }
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'query-redirect-logs') {

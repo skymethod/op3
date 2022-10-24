@@ -6,6 +6,11 @@ export function isValidTimestamp(timestamp: string): boolean {
     return /^\d{15}$/.test(timestamp);
 }
 
+export function computeStartOfYearTimestamp(year: number): string {
+    if (year < 2000 || year > 2099) throw new Error(`Bad year for timestamp: ${year}`);
+    return `${(year % 100).toString().padStart(2, '0')}0101000000000`;
+}
+
 export function computeTimestamp(time: number | Date | string = Date.now()): string {
     const instant = typeof time === 'number' ? new Date(time).toISOString() 
         : typeof time === 'string' ? time 

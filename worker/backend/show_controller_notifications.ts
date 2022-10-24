@@ -2,28 +2,40 @@ import { isStringRecord, isValidInstant } from '../check.ts';
 import { DurableObjectStorage, DurableObjectStorageListOptions } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, ExternalNotificationRequest, Unkinded, UrlInfo } from '../rpc_model.ts';
 import { consoleWarn } from '../tracer.ts';
+import { tryParsePrefixArguments } from './prefix_arguments.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
+import { tryCleanUrl } from '../urls.ts';
 
 export class ShowControllerNotifications {
 
     private readonly storage: DurableObjectStorage;
+    private readonly origin: string;
     private readonly feedNotificationSequence = new TimestampSequence(3);
+    
+    callbacks?: ShowControllerNotificationsCallbacks;
 
-    constructor(storage: DurableObjectStorage) {
+    constructor(storage: DurableObjectStorage, origin: string) {
         this.storage = storage;
+        this.origin = origin;
     }
 
     async receiveExternalNotification({ notification, received } : Unkinded<ExternalNotificationRequest>): Promise<boolean> {
         const { type, sent, sender } = notification;
-        const { storage, feedNotificationSequence } = this;
+        const { storage, feedNotificationSequence, callbacks, origin } = this;
 
         if (type === 'feeds') {
             const { feeds } = notification;
             if (!Array.isArray(feeds)) throw new Error(`Expected feeds array`);
 
             const newRecords: Record<string, FeedNotificationRecord> = {};
+            const feedUrls = new Set<string>();
             feeds.forEach((feed, i) => {
                 if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
+                const { feedUrl } = feed;
+                const cleanFeedUrl = typeof feedUrl === 'string' && tryCleanUrl(feedUrl);
+                if (typeof cleanFeedUrl === 'string') {
+                    feedUrls.add(cleanFeedUrl);
+                }
                 const trimmed = trimRecordToFit({ sent, received, sender, feed });
                 const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;
                 newRecords[`fn.1.${feedNotificationSequence.next()}.${length}`] = trimmed;
@@ -32,6 +44,9 @@ export class ShowControllerNotifications {
             if (newRecordsCount > 0) {
                 console.log(`ShowController: Saving ${newRecordsCount} new feed notification records`);
                 await storage.put(newRecords);
+            }
+            if (feedUrls.size > 0) {
+                await callbacks?.onFeedUrls(feedUrls);
             }
             return true;
         }
@@ -55,6 +70,7 @@ export class ShowControllerNotifications {
 
             const map = await storage.get(validUrls.map(v => computeUrlKey(v.url)));
             const newRecords: Record<string, UrlRecord> = {};
+            const podcastGuids = new Set<string>();
             for (const { url, found } of validUrls) {
                 const key = computeUrlKey(url);
                 const val = map.get(key);
@@ -65,11 +81,20 @@ export class ShowControllerNotifications {
                 }
                 const foundSource = notification.sender;
                 newRecords[key] = existing ? { ...existing, found, foundSource } : { url, found, foundSource };
+                if (!existing) {
+                    const { pg } = tryParsePrefixArguments(url, { origin }) ?? {};
+                    if (typeof pg === 'string') {
+                        podcastGuids.add(pg);
+                    }
+                }
             }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
                 console.log(`ShowController: saving ${newRecordsCount} url records (${Object.values(newRecords).map(v => `${v.url} at ${v.found} by ${v.foundSource}`).join(', ')})`);
                 await storage.put(newRecords);
+            }
+            if (podcastGuids.size > 0) {
+                await callbacks?.onPodcastGuids(podcastGuids);
             }
             return true;
         }
@@ -156,6 +181,11 @@ export function isFeedNotificationRecord(obj: unknown): obj is FeedNotificationR
         && typeof obj.sender === 'string'
         && isStringRecord(obj.feed)
         ;
+}
+
+export interface ShowControllerNotificationsCallbacks {
+    onPodcastGuids(podcastGuids: Set<string>): Promise<void>;
+    onFeedUrls(feedUrls: Set<string>): Promise<void>;
 }
 
 //

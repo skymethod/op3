@@ -30,7 +30,7 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
     } else if (kind === 'do-alarm') {
         const { colo, durableObjectName, durableObjectClass, durableObjectId, isolateId } = event;
         return ({ blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId ], doubles: [ 1 ], indexes: [ kind ] });
-    } else if (kind === 'console-warning' || kind === 'console-error') {
+    } else if (kind === 'console-info' || kind === 'console-warning' || kind === 'console-error') {
         const { spot, message } = event;
         return ({ blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] });
     } else {

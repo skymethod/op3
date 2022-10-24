@@ -20,6 +20,11 @@ export function writeTraceEvent(event: TraceEvent | (() => TraceEvent)) {
     }
 }
 
+export function consoleInfo(spot: string, message: string) {
+    console.info(message);
+    writeTraceEvent({ kind: 'console-info', spot, message });
+}
+
 export function consoleWarn(spot: string, message: string) {
     console.warn(message);
     writeTraceEvent({ kind: 'console-warning', spot, message });
@@ -44,6 +49,7 @@ export type TraceEvent =
     | WorkerRequest
     | DurableObjectFetchRequest
     | DurableObjectAlarmRequest
+    | ConsoleInfo
     | ConsoleWarning
     | ConsoleError
     ;
@@ -107,6 +113,12 @@ export interface DurableObjectAlarmRequest {
     readonly durableObjectId: string;
     readonly durableObjectClass: string;
     readonly isolateId: string;
+}
+
+export interface ConsoleInfo {
+    readonly kind: 'console-info',
+    readonly spot: string;
+    readonly message: string;
 }
 
 export interface ConsoleWarning {
