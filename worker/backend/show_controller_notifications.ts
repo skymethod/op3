@@ -34,10 +34,14 @@ export class ShowControllerNotifications {
             feeds.forEach((feed, i) => {
                 if (!isStringRecord(feed)) throw new Error(`Bad feed at index ${i}`);
                 const { feedUrl } = feed;
-                if (typeof feedUrl === 'string' && sender === 'fa') feedUrlsFromFa.add(feedUrl);
-                const cleanFeedUrl = typeof feedUrl === 'string' && tryCleanUrl(feedUrl);
-                if (typeof cleanFeedUrl === 'string') {
-                    feedUrls.add(cleanFeedUrl);
+                if (typeof feedUrl === 'string') {
+                    if (sender === 'fa') feedUrlsFromFa.add(feedUrl);
+                    const cleanFeedUrl = tryCleanUrl(feedUrl);
+                    if (typeof cleanFeedUrl === 'string') {
+                        feedUrls.add(cleanFeedUrl);
+                    } else {
+                        consoleWarn('sc-feed-not-unclean', `Uncleanable feed url: ${feedUrl}`);
+                    }
                 }
                 const trimmed = trimRecordToFit({ sent, received, sender, feed });
                 const length = new TextEncoder().encode(JSON.stringify(trimmed)).length;

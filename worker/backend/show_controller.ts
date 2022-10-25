@@ -6,7 +6,7 @@ import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } fro
 import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { tryCleanUrl } from '../urls.ts';
 import { generateUuid } from '../uuid.ts';
-import { FeedRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
+import { FeedRecord, FeedWorkRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 
@@ -23,15 +23,47 @@ export class ShowController {
         this.notifications = new ShowControllerNotifications(storage, origin);
         this.notifications.callbacks = {
             onPodcastGuids: async podcastGuids => {
+                // for guids we've never seen before, insert pending index records and enqueue lookup-pg work
                 const newPodcastGuids = await computeNewPodcastGuids(podcastGuids, storage);
                 if (newPodcastGuids.size === 0) return;
                 consoleInfo('sc-on-pg', `ShowController: onPodcastGuids: ${[...newPodcastGuids].join(', ')}`);
                 await savePodcastGuidIndexRecords(newPodcastGuids, storage);
                 await enqueueWork([...newPodcastGuids].map(v => ({ uuid: generateUuid(), kind: 'lookup-pg', podcastGuid: v, attempt: 1 })), storage);
             },
-            onFeedUrls: async _feedUrls => {
-                // TODO
-                await Promise.resolve();
+            onFeedUrls: async feedUrls => {
+                // update associated feed records, and enqueue lookup-feed work if necessary
+                const work: FeedWorkRecord[] = [];
+                for (const batch of chunk([...feedUrls], 128)) {
+                    const feedRecordIds = await Promise.all(batch.map(async v => await computeFeedRecordId(v)));
+                    const keys = feedRecordIds.map(computeFeedRecordKey);
+                    const map = await storage.get(keys);
+                    const newRecords: Record<string, FeedRecord> = {};
+                    for (let i = 0; i < keys.length; i++) {
+                        const feedRecordId = feedRecordIds[i];
+                        const key = keys[i];
+                        const feedUrl = batch[i];
+                        const existing = map.get(key);
+                        if (existing) {
+                            if (isFeedRecord(existing)) {
+                                const { piCheckedInstant } = existing;
+                                if (typeof piCheckedInstant !== 'string' || (Date.now() - new Date(piCheckedInstant).getTime()) > 1000 * 60 * 60 * 24) { // only recheck pi at most once a day
+                                    work.push({ kind: 'lookup-feed', feedUrl, uuid: generateUuid(), attempt: 1 });
+                                }
+                            } else {
+                                consoleWarn('sc-on-feed-urls', `ShowController: bad FeedRecord: ${JSON.stringify(existing)}`);
+                            }
+                        } else {
+                            const insert: FeedRecord = { id: feedRecordId, state: 'new', url: feedUrl };
+                            newRecords[key] = insert;
+                            work.push({ kind: 'lookup-feed', feedUrl, uuid: generateUuid(), attempt: 1 });
+                            consoleInfo('sc-on-feed-urls', `Inserted new FeedRecord: ${insert.url}`);
+                        }
+                    }
+                    if (Object.keys(newRecords).length > 0) {
+                        await storage.put(newRecords);
+                    }
+                }
+                await enqueueWork(work, storage);
             }
         }
     }
@@ -80,6 +112,8 @@ export class ShowController {
                     infos.push(r.kind);
                     if (r.kind === 'lookup-pg') {
                         await lookupPodcastGuid(r.podcastGuid, storage, podcastIndexClient);
+                    } else if (r.kind == 'lookup-feed') {
+                        await lookupFeed(r.feedUrl, storage, podcastIndexClient);
                     } else {
                         consoleWarn('sc-work', `Unsupported work kind: ${JSON.stringify(record)}`);
                     }
@@ -141,19 +175,24 @@ function computeWorkRecordKey(record: WorkRecord): string {
     return `sc.work0.${notBeforeTimestamp}.${uuid}`;
 }
 
+async function getPodcastIndexFeed(type: 'podcastGuid' | 'feedUrl', value: string, client: PodcastIndexClient ): Promise<PodcastIndexFeed | undefined> {
+    const { feed } = type === 'podcastGuid' ? await client.getPodcastByGuid(value) : await client.getPodcastByFeedUrl(value);
+    if (typeof feed === 'object' && !Array.isArray(feed)) {
+        const { id, podcastGuid: podcastGuidRaw } = feed;
+        const tag = `${type} ${value}`;
+        if (typeof id !== 'number' || id <= 0) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`);
+        const url = tryCleanUrl(feed.url);
+        if (typeof url !== 'string') throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`);
+        const podcastGuidCleaned = typeof podcastGuidRaw === 'string' ? podcastGuidRaw.trim().toLowerCase() : undefined;
+        if (typeof podcastGuidCleaned === 'string' && !isValidGuid(podcastGuidCleaned)) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`); 
+        return { id, url, podcastGuid: podcastGuidCleaned };
+    }
+}
+
 async function lookupPodcastGuid(podcastGuid: string, storage: DurableObjectStorage, client: PodcastIndexClient) {
     let piFeed: PodcastIndexFeed | undefined;
     try {
-        const { feed } = await client.getPodcastByGuid(podcastGuid);
-        if (typeof feed === 'object' && !Array.isArray(feed)) {
-            const { id, podcastGuid: podcastGuidRaw } = feed;
-            if (typeof id !== 'number' || id <= 0) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for podcastGuid ${podcastGuid}`);
-            const url = tryCleanUrl(feed.url);
-            if (typeof url !== 'string') throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for podcastGuid ${podcastGuid}`);
-            const podcastGuidCleaned = typeof podcastGuidRaw === 'string' ? podcastGuidRaw.trim().toLowerCase() : undefined;
-            if (typeof podcastGuidCleaned === 'string' && !isValidGuid(podcastGuidCleaned)) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for podcastGuid ${podcastGuid}`); 
-            piFeed = { id, url, podcastGuid: podcastGuidCleaned };
-        }
+        piFeed = await getPodcastIndexFeed('podcastGuid', podcastGuid, client);
     } catch (e) {
         consoleWarn('sc-lookup-podcast-guid', `Error calling getPodcastByGuid: ${e.stack || e}`);
         await storage.put(computePodcastGuidIndexKey(podcastGuid), { podcastGuid, state: 'error' });
@@ -181,6 +220,38 @@ async function lookupPodcastGuid(podcastGuid: string, storage: DurableObjectStor
                 consoleInfo('sc-lookup-podcast-guid', `Inserted new FeedRecord: ${insert.url}`);
             }
         }
+    });
+    // TODO enqueue update-feed if necessary
+}
+
+async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client: PodcastIndexClient) {
+    let piFeed: PodcastIndexFeed | undefined;
+    try {
+        piFeed = await getPodcastIndexFeed('feedUrl', feedUrl, client);
+    } catch (e) {
+        consoleWarn('sc-lookup-podcast-feed', `Error calling getPodcastByFeedUrl: ${e.stack || e}`);
+        return;
+    }
+    if (piFeed === undefined) {
+        consoleWarn('sc-lookup-podcast-feed', `Feed url not found: ${feedUrl}`);
+        return;
+    }
+
+    const feedRecordId = await computeFeedRecordId(feedUrl);
+    
+    await storage.transaction(async tx => {
+        const existing = await tx.get(computeFeedRecordKey(feedRecordId));
+        if (!existing) {
+            consoleWarn(`sc-lookup-podcast-feed`, `FeedRecord not found: ${feedUrl}`);
+            return;
+        }
+        if (!isFeedRecord(existing)) {
+            consoleWarn(`sc-lookup-podcast-feed`, `Bad FeedRecord found: ${JSON.stringify(existing)}`);
+            return;
+        }
+        const piCheckedInstant = new Date().toISOString();
+        const update: FeedRecord = { ...existing, piFeed, piCheckedInstant };
+        await tx.put(computeFeedRecordKey(feedRecordId), update);
     });
     // TODO enqueue update-feed if necessary
 }

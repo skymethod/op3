@@ -1,11 +1,7 @@
 import { isStringRecord } from '../check.ts';
 import { ErrorInterface, isErrorInterface } from '../errors.ts';
 
-export type WorkRecord = (FeedWorkRecord | PodcastGuidWorkRecord) & {
-    readonly uuid: string;
-    readonly attempt: number;
-    readonly notBeforeInstant?: string;
-};
+export type WorkRecord = FeedWorkRecord | PodcastGuidWorkRecord;
 
 export function isWorkRecord(obj: unknown): obj is WorkRecord {
     return isStringRecord(obj)
@@ -17,12 +13,18 @@ export function isWorkRecord(obj: unknown): obj is WorkRecord {
         ;
 }
 
-export interface FeedWorkRecord {
+interface BaseWorkRecord {
+    readonly uuid: string;
+    readonly attempt: number;
+    readonly notBeforeInstant?: string;
+}
+
+export interface FeedWorkRecord extends BaseWorkRecord {
     readonly kind: 'update-feed' | 'lookup-feed' | 'index-items';
     readonly feedUrl: string;
 }
 
-export interface PodcastGuidWorkRecord {
+export interface PodcastGuidWorkRecord extends BaseWorkRecord {
     readonly kind: 'lookup-pg';
     readonly podcastGuid: string;
 }
