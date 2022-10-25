@@ -3,7 +3,7 @@ import { isStringRecord } from '../check.ts';
 import { DurableObjectStorageMethods, DurableObjectStorage, setEqual } from '../deps.ts';
 import { ModifyApiKeyRequest, ApiKeyInfo, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, Unkinded, isApiKeyInfo, ApiTokenRecord, isApiTokenRecord, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { addHours } from '../timestamp.ts';
-import { consoleWarn } from '../tracer.ts';
+import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 
 export class ApiAuthController {
@@ -146,6 +146,8 @@ export class ApiAuthController {
             const tokenRecord: ApiTokenRecord = { token, apiKey, created, updated: created, permissions: info.permissions };
             await saveApiTokenRecord(tokenRecord, tx);
         });
+
+        consoleInfo('aac-gen', `Generated new apiKey: ${apiKey}`);
 
         return { kind: 'api-key', info };
     }
