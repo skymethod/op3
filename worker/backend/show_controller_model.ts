@@ -66,8 +66,10 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
 export interface FetchInfo {
     readonly requestInstant: string; // instant
     readonly responseInstant: string; // instant
+    readonly status?: number;
     readonly headers?: string[][];
-    readonly body?: string; // r2 pointer
+    readonly body?: string; // r2 pointer, or storage if small enough?
+    readonly bodyLength?: number; // since we're buffering
     readonly error?: ErrorInterface;
 }
 
@@ -75,10 +77,22 @@ export function isFetchInfo(obj: unknown): obj is FetchInfo {
     return isStringRecord(obj)
         && typeof obj.requestInstant === 'string'
         && typeof obj.responseInstant === 'string'
+        &&  (obj.status === undefined || typeof obj.status === 'number')
         && (obj.headers === undefined || Array.isArray(obj.headers) && obj.headers.every(v => Array.isArray(v) && v.every(w => typeof w === 'string')))
         && (obj.body === undefined || typeof obj.body === 'string')
+        && (obj.bodyLength === undefined || typeof obj.bodyLength === 'number')
         && (obj.error === undefined || isErrorInterface(obj.error))
         ;
+}
+
+export function getHeader(headers: Headers | string[][] | undefined, name: string): string | undefined {
+    if (headers === undefined) return undefined;
+    const nameLower = name.toLowerCase();
+    if (Array.isArray(headers)) {
+        const rt = headers.find(v => v[0].toLowerCase() === nameLower);
+        return rt ? rt[1] : undefined;
+    }
+    return headers.get(name) ?? undefined;
 }
 
 export interface PodcastIndexFeed {

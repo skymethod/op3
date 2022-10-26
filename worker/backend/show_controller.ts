@@ -4,11 +4,14 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
 import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
-import { tryCleanUrl } from '../urls.ts';
+import { cleanUrl, tryCleanUrl } from '../urls.ts';
 import { generateUuid } from '../uuid.ts';
-import { FeedRecord, FeedWorkRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
+import { FeedRecord, FeedWorkRecord, getHeader, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
+import { computeUserAgent } from '../outbound.ts';
+import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
+import { Blobs } from './blobs.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -16,10 +19,14 @@ export class ShowController {
     private readonly storage: DurableObjectStorage;
     private readonly podcastIndexClient: PodcastIndexClient;
     private readonly notifications: ShowControllerNotifications;
+    private readonly origin: string;
+    private readonly feedBlobs: Blobs;
 
-    constructor(storage: DurableObjectStorage, podcastIndexClient: PodcastIndexClient, origin: string) {
+    constructor(storage: DurableObjectStorage, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs) {
         this.storage = storage;
         this.podcastIndexClient = podcastIndexClient;
+        this.origin = origin;
+        this.feedBlobs = feedBlobs;
         this.notifications = new ShowControllerNotifications(storage, origin);
         this.notifications.callbacks = {
             onPodcastGuids: async podcastGuids => {
@@ -73,27 +80,69 @@ export class ShowController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
-        const res = await this.notifications.adminExecuteDataQuery(req);
+        const { notifications, storage, origin, feedBlobs } = this;
+        const res = await notifications.adminExecuteDataQuery(req);
         if (res) return res;
 
-        const { operationKind, targetPath, parameters } = req;
+        const { operationKind, targetPath, parameters = {} } = req;
         
         if (operationKind === 'select' && targetPath === '/show/feeds') {
-            const map = await this.storage.list(computeListOpts('sc.fr0.', parameters));
+            const map = await storage.list(computeListOpts('sc.fr0.', parameters));
             const results = [...map.values()].filter(isFeedRecord);
             return { results };
         }
 
         if (operationKind === 'select' && targetPath === '/show/work') {
-            const map = await this.storage.list(computeListOpts('sc.work0.', parameters));
+            const map = await storage.list(computeListOpts('sc.work0.', parameters));
             const results = [...map.values()].filter(isWorkRecord);
             return { results };
         }
 
         if (operationKind === 'select' && targetPath === '/show/index/podcast-guid') {
-            const map = await this.storage.list(computeListOpts(`sc.i0.${IndexType.PodcastGuid}.`, parameters));
+            const map = await storage.list(computeListOpts(`sc.i0.${IndexType.PodcastGuid}.`, parameters));
             const results = [...map.values()].filter(isStringRecord);
             return { results };
+        }
+    
+        {
+            const m = /^\/show\/feeds\/(.*?)$/.exec(targetPath);
+            if (m && (operationKind === 'select' || operationKind === 'update')) {
+                const feedUrl = m[1];
+                const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
+                const result = await storage.get(computeFeedRecordKey(feedRecordId));
+                if (operationKind === 'select') {
+                    if (!isFeedRecord(result)) return { results: [] };
+
+                    const { sub } = parameters;
+                    if (typeof sub === 'string'){
+                        if (sub === 'ok') {
+                            const { lastOkFetch } = result;
+                            if (lastOkFetch && lastOkFetch.body) {
+                                const blobKey = tryParseBlobKey(lastOkFetch.body);
+                                if (blobKey) {
+                                    const text = await feedBlobs.get(blobKey, 'text');
+                                    if (text) {
+                                        return { results: [ { text } ] }
+                                    }
+                                }
+                            }
+                        } else {
+                            return { message: `Unknown sub: ${sub}` };
+                        }
+                    }
+                    return { results: [ result ] };
+                } else if (operationKind === 'update') {
+                    if (!isFeedRecord(result)) return { message: `Feed record not found` };
+                    const { action, disable = '' } = parameters;
+                    if (action === 'update-feed') {
+                        const disableConditional = disable.includes('conditional');
+                        const disableGzip = disable.includes('gzip');
+                        const message = await updateFeed(result.url, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
+                        return { message };
+                    }
+                    return { message: 'Unknown update action' };
+                }
+            }
         }
 
         throw new Error(`Unsupported show-related query`);
@@ -254,6 +303,63 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
         await tx.put(computeFeedRecordKey(feedRecordId), update);
     });
     // TODO enqueue update-feed if necessary
+}
+
+async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, disableConditional?: boolean, disableGzip?: boolean }): Promise<string> {
+    const { storage, origin, blobs, disableConditional = false, disableGzip = false } = opts;
+    const feedRecord = typeof feedUrlOrRecord === 'string' ? await storage.get(computeFeedRecordKey(await computeFeedRecordId(feedUrlOrRecord))) : feedUrlOrRecord;
+    if (feedRecord === undefined) return `FeedRecord not found: ${feedUrlOrRecord}`;
+    if (!isFeedRecord(feedRecord)) return `Bad FeedRecord found: ${JSON.stringify(feedRecord)}`;
+    const { url: feedUrl } = feedRecord;
+
+    const rt = [ feedUrl ];
+
+    // try to make a conditional request, based on last ok response received
+    const headers = new Headers({ 
+        'user-agent': computeUserAgent({ origin }), 
+    });
+    if (!disableGzip) {
+        rt.push('gzip');
+        headers.set('accept-encoding', 'gzip');
+    }
+    const { lastOkFetch } = feedRecord;
+    if (lastOkFetch && !disableConditional) {
+        const lastOkFetchHeaders = new Headers(lastOkFetch.headers ?? []);
+        const etag = lastOkFetchHeaders.get('etag');
+        const lastModified = lastOkFetchHeaders.get('last-modified');
+        if (typeof etag === 'string') {
+            headers.set('if-none-match', etag);
+            rt.push(`if-none-match: ${etag}`);
+        } else if (typeof lastModified === 'string') {
+            headers.set('if-modified-since', lastModified);
+            rt.push(`if-modified-since: ${lastModified}`);
+        }
+    }
+    const fetchUrl = `${feedUrl}${feedUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`; // cache buster query param
+    const blobKeyBase = (await Bytes.ofUtf8(fetchUrl).sha256()).hex();
+    const fetchInfo = await computeFetchInfo(feedUrl, headers, blobKeyBase, blobs);
+    const feedRecordKey = computeFeedRecordKey(feedRecord.id);
+    await storage.transaction(async tx => {
+        const existing = await tx.get(feedRecordKey);
+        if (!isFeedRecord(existing)) return; // deleted?
+        let update = existing;
+        if (fetchInfo.status === 200) {
+            rt.push('200');
+            update = { ...update, lastOkFetch: fetchInfo };
+        } else if (fetchInfo.status === 304) { // not modified
+            rt.push('304');
+            update = { ...update, lastNotModifiedInstant: fetchInfo.responseInstant };
+        } else {
+            if (typeof fetchInfo.status === 'number') rt.push(fetchInfo.status.toString());
+            if (fetchInfo.error !== undefined) rt.push(JSON.stringify(fetchInfo.error));
+            update = { ...update, lastErrorFetch: fetchInfo };
+        }
+        await tx.put(feedRecordKey, update);
+    });
+    const contentType = getHeader(fetchInfo.headers, 'content-type');
+    if (contentType) rt.push(contentType);
+    if (fetchInfo.bodyLength) rt.push(Bytes.formatSize(fetchInfo.bodyLength));
+    return rt.join(', ');
 }
 
 function computeFeedRecordKey(feedRecordId: string): string {

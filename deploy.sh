@@ -46,4 +46,5 @@ ${PRODUCTION_DOMAIN:+--text-binding productionDomain:$PRODUCTION_DOMAIN} \
 ${CF_ANALYTICS_TOKEN:+--text-binding cfAnalyticsToken:$CF_ANALYTICS_TOKEN} \
 ${TURNSTILE_SITEKEY:+--text-binding turnstileSitekey:$TURNSTILE_SITEKEY} \
 ${TURNSTILE_SECRET_KEY:+--secret-binding turnstileSecretKey:$TURNSTILE_SECRET_KEY} \
-${PODCAST_INDEX_CREDENTIALS:+--secret-binding podcastIndexCredentials:$PODCAST_INDEX_CREDENTIALS}
+${PODCAST_INDEX_CREDENTIALS:+--secret-binding podcastIndexCredentials:$PODCAST_INDEX_CREDENTIALS} \
+${BLOBS_BUCKET:+--r2-bucket-binding blobsBucket:$BLOBS_BUCKET}
