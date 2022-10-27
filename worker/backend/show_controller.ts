@@ -12,6 +12,7 @@ import { computeListOpts } from './storage.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { Blobs } from './blobs.ts';
+import { parseFeed } from '../feed_parser.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -137,7 +138,10 @@ export class ShowController {
                     if (action === 'update-feed') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
-                        const message = await updateFeed(result.url, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
+                        const message = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
+                        return { message };
+                    } else if (action === 'index-items') {
+                        const message = await indexItems(result, { storage, blobs: feedBlobs });
                         return { message };
                     }
                     return { message: 'Unknown update action' };
@@ -307,9 +311,7 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
 
 async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, disableConditional?: boolean, disableGzip?: boolean }): Promise<string> {
     const { storage, origin, blobs, disableConditional = false, disableGzip = false } = opts;
-    const feedRecord = typeof feedUrlOrRecord === 'string' ? await storage.get(computeFeedRecordKey(await computeFeedRecordId(feedUrlOrRecord))) : feedUrlOrRecord;
-    if (feedRecord === undefined) return `FeedRecord not found: ${feedUrlOrRecord}`;
-    if (!isFeedRecord(feedRecord)) return `Bad FeedRecord found: ${JSON.stringify(feedRecord)}`;
+    const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl } = feedRecord;
 
     const rt = [ feedUrl ];
@@ -359,6 +361,42 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const contentType = getHeader(fetchInfo.headers, 'content-type');
     if (contentType) rt.push(contentType);
     if (fetchInfo.bodyLength) rt.push(Bytes.formatSize(fetchInfo.bodyLength));
+    return rt.join(', ');
+}
+
+async function loadFeedRecord(feedUrlOrRecord: string | FeedRecord, storage: DurableObjectStorage): Promise<FeedRecord> {
+    const feedRecord = typeof feedUrlOrRecord === 'string' ? await storage.get(computeFeedRecordKey(await computeFeedRecordId(feedUrlOrRecord))) : feedUrlOrRecord;
+    if (feedRecord === undefined) throw new Error(`FeedRecord not found: ${feedUrlOrRecord}`);
+    if (!isFeedRecord(feedRecord)) throw new Error(`Bad FeedRecord found: ${JSON.stringify(feedRecord)}`);
+    return feedRecord;
+}
+
+async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs }): Promise<string> {
+    const { storage, blobs } = opts;
+    const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
+    const { url: feedUrl } = feedRecord;
+
+    const rt = [ feedUrl ];
+
+    const { lastOkFetch } = feedRecord;
+    if (!lastOkFetch) return [ ...rt, 'no ok response' ].join(', ');
+
+    const { body } = lastOkFetch;
+    if (!body) return [ ...rt, 'no ok response body' ].join(', ');
+
+    const blobKey = tryParseBlobKey(body);
+    if (!blobKey) return [ ...rt, `unknown ok response body: ${body}` ].join(', ');
+        
+    const buffer = await blobs.get(blobKey, 'buffer');
+    if (!buffer) return [ ...rt, `ok response body blob not found: ${body}` ].join(', ');
+
+    const feed = parseFeed(buffer);
+    console.log(JSON.stringify(feed, undefined, 2));
+
+    rt.push(`${feed.items.length} items`);
+    
+    // TODO
+
     return rt.join(', ');
 }
 

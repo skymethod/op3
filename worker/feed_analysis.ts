@@ -1,4 +1,4 @@
-import { XMLParser } from 'https://cdn.skypack.dev/fast-xml-parser@4.0.11?dts';
+import { XMLParser } from './deps.ts';
 import { parsePubdate } from './pubdates.ts';
 
 export async function computeFeedAnalysis(feed: string, opts: { userAgent: string }): Promise<FeedAnalysis> {
