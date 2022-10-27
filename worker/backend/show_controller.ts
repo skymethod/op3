@@ -4,9 +4,9 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
 import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
-import { cleanUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
+import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid } from '../uuid.ts';
-import { FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isFeedItemRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
+import { FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -89,6 +89,25 @@ export class ShowController {
         const { operationKind, targetPath, parameters = {} } = req;
         
         if (operationKind === 'select' && targetPath === '/show/feeds') {
+            const { match } = parameters;
+            if (typeof match === 'string') {
+                const matchUrl = computeMatchUrl(match, { queryless: true });
+                const rt: string[] = [ matchUrl ];
+                const map = await storage.list({ prefix: `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.`});
+                const feedItemRecordKeys = [...map.values()].filter(isFeedItemIndexRecord).map(v => v.feedItemRecordKey);
+                rt.push(`${feedItemRecordKeys.length} feedItemRecordKeys`);
+                const feedRecordIds = new Set<string>();
+                for (const batch of chunk(feedItemRecordKeys, 128)) {
+                    const map2 = await storage.get(batch);
+                    for (const feedItemRecord of [...map2.values()].filter(isFeedItemRecord)) {
+                        feedRecordIds.add(feedItemRecord.feedRecordId);
+                    }
+                }
+                rt.push(`${feedRecordIds.size} feedRecordIds`);
+                const map3 = await storage.get([...feedRecordIds].map(computeFeedRecordKey));
+                const results = [...map3.values()].filter(isFeedRecord);
+                return { results, message: rt.join(', ') };
+            }
             const map = await storage.list(computeListOpts('sc.fr0.', parameters));
             const results = [...map.values()].filter(isFeedRecord);
             return { results };
@@ -417,7 +436,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     rt.push(`${Object.keys(itemsByGuid).length} unique non-empty item guids`);
 
     const newRecords: Record<string, FeedItemRecord> = {};
-    const newIndexRecords: Record<string, { feedItemRecordKey: string }> = {};
+    const newIndexRecords: Record<string, FeedItemIndexRecord> = {};
     if (forceResave) rt.push('forceResave');
     for (const batch of chunk(Object.entries(itemsByGuid), 128)) {
         const feedItemRecordIds = await Promise.all(batch.map(v => computeFeedItemRecordId(v[1].guid!)));
@@ -445,11 +464,11 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
                     if (destinationUrl) {
                         const matchUrl = tryComputeMatchUrl(destinationUrl);
                         if (matchUrl) {
-                            newIndexRecords[computeMatchUrlToFeedItemIndexKey(matchUrl)] = { feedItemRecordKey };
+                            newIndexRecords[computeMatchUrlToFeedItemIndexKey(matchUrl, feedRecordId, feedItemRecordId)] = { feedItemRecordKey };
                             if (matchUrl.includes('?')) {
                                 const querylessMatchUrl = tryComputeMatchUrl(destinationUrl, { queryless: true });
                                 if (querylessMatchUrl) {
-                                    newIndexRecords[computeQuerylessMatchUrlToFeedItemIndexKey(querylessMatchUrl)] = { feedItemRecordKey };
+                                    newIndexRecords[computeQuerylessMatchUrlToFeedItemIndexKey(querylessMatchUrl, feedRecordId, feedItemRecordId)] = { feedItemRecordKey };
                                 }
                             }
                         }
@@ -541,10 +560,10 @@ function computePodcastGuidIndexKey(podcastGuid: string) {
     return `sc.i0.${IndexType.PodcastGuid}.${podcastGuid}`;
 }
 
-function computeMatchUrlToFeedItemIndexKey(matchUrl: string) {
-    return `sc.i0.${IndexType.MatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}`;
+function computeMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: string, feedItemRecordId: string) {
+    return `sc.i0.${IndexType.MatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
 }
 
-function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string) {
-    return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}`;
+function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: string, feedItemRecordId: string) {
+    return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
 }

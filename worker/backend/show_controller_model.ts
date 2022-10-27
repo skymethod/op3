@@ -138,3 +138,51 @@ export function isFeedItemRecord(obj: unknown): obj is FeedItemRecord {
         && isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string')
         ;
 }
+
+export interface ShowRecord {
+    readonly uuid: string;
+    readonly podcastGuid?: string;
+    readonly title?: string;
+}
+
+export function isShowRecord(obj: unknown): obj is ShowRecord {
+    return isStringRecord(obj)
+        && typeof obj.uuid === 'string'
+        && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
+        && (obj.title === undefined || typeof obj.title === 'string')
+        ;
+}
+
+export interface EpisodeRecord {
+    readonly showUuid: string;
+    readonly id: string; // sha256(itemGuid)
+    readonly itemGuid: string; // trimmed substring 8k, must be non-empty unique within the show
+    readonly title?: string;
+    readonly pubdate?: string;
+    readonly pubdateInstant?: string;
+    readonly firstSeenInstant?: string;
+    readonly lastSeenInstant?: string;
+}
+
+export function isEpisodeRecord(obj: unknown): obj is EpisodeRecord {
+    return isStringRecord(obj)
+        && typeof obj.showUuid === 'string'
+        && typeof obj.id === 'string'
+        && typeof obj.itemGuid === 'string'
+        && (obj.title === undefined || typeof obj.title === 'string')
+        && (obj.pubdate === undefined || typeof obj.pubdate === 'string')
+        && (obj.pubdateInstant === undefined || typeof obj.pubdateInstant === 'string')
+        && (obj.firstSeenInstant === undefined || typeof obj.firstSeenInstant === 'string')
+        && (obj.lastSeenInstant === undefined || typeof obj.lastSeenInstant === 'string')
+        ;
+}
+
+export interface FeedItemIndexRecord {
+    readonly feedItemRecordKey: string;
+}
+
+export function isFeedItemIndexRecord(obj: unknown): obj is FeedItemIndexRecord {
+    return isStringRecord(obj)
+        && typeof obj.feedItemRecordKey === 'string'
+        ;
+}
