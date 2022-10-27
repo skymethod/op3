@@ -43,6 +43,7 @@ export interface FeedRecord {
     readonly nextLookupFeedWorkKey?: string;
     readonly relevantUrls?: Record<string, string>;  // jpath string (image.0.url): <op3 url>
     readonly showUuid?: string;
+    readonly title?: string;
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -60,6 +61,7 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.nextLookupFeedWorkKey === undefined || typeof obj.nextLookupFeedWorkKey === 'string')
         && (obj.relevantUrls === undefined || isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string'))
         && (obj.showUuid === undefined || typeof obj.showUuid === 'string')
+        && (obj.title === undefined || typeof obj.title === 'string')
         ;
 }
 
@@ -106,5 +108,33 @@ export function isPodcastIndexFeed(obj: unknown): obj is PodcastIndexFeed {
         && typeof obj.id === 'number'
         && typeof obj.url === 'string'
         && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
+        ;
+}
+
+export interface FeedItemRecord {
+    readonly feedRecordId: string; // fk
+    readonly id: string; // sha256(trimmed guid node value)
+    readonly guid: string; // non-empty raw guid substring to 8k
+    readonly title?: string;
+    readonly pubdate?: string;
+    readonly pubdateInstant?: string;
+    readonly firstSeenInstant: string;
+    readonly lastSeenInstant: string;
+    readonly lastOkFetch?: FetchInfo;
+    readonly relevantUrls: Record<string, string>; // tiny jpath string (e.0.url or ae.0.s.0.uri) -> op3 url
+}
+
+export function isFeedItemRecord(obj: unknown): obj is FeedItemRecord {
+    return isStringRecord(obj)
+        && typeof obj.feedRecordId === 'string'
+        && typeof obj.id === 'string'
+        && typeof obj.guid === 'string'
+        && (obj.title === undefined || typeof obj.title === 'string')
+        && (obj.pubdate === undefined || typeof obj.pubdate === 'string')
+        && (obj.pubdateInstant === undefined || typeof obj.pubdateInstant === 'string')
+        && typeof obj.firstSeenInstant === 'string'
+        && typeof obj.lastSeenInstant === 'string'
+        && (obj.lastOkFetch === undefined || isFetchInfo(obj.lastOkFetch))
+        && isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string')
         ;
 }

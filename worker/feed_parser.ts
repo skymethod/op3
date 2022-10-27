@@ -1,40 +1,40 @@
-import { tryParseUrl } from './check.ts';
 import { Callback, parseXml } from './xml_parser.ts';
+import { tryParsePubdate } from './pubdates.ts';
 
 export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
     let itemGuid: string | undefined;
     let itemTitle: string | undefined;
     const items: Item[] = [];
-    let enclosureUrls: string[] | undefined;
-    let alternateEnclosureUrls: string[] | undefined;
+    let enclosures: Enclosure[] | undefined;
+    let alternateEnclosures: AlternateEnclosure[] | undefined;
+    let pubdate: string | undefined;
+    let sources: Source[] | undefined;
     const callback: Callback = {
         onStartElement: (path, attributes, findNamespaceUri) => {
             const xpath = '/' + path.join('/');
             if (xpath === '/rss/channel/item') {
                 itemGuid = undefined;
                 itemTitle = undefined;
-                enclosureUrls = undefined;
-                alternateEnclosureUrls = undefined;
+                enclosures = undefined;
+                alternateEnclosures = undefined;
+                pubdate = undefined;
             }
             if (xpath === '/rss/channel/item/enclosure') {
                 const url = attributes.get('url');
-                if (typeof url === 'string') {
-                    enclosureUrls = enclosureUrls ?? [];
-                    enclosureUrls.push(url);
+                enclosures = enclosures ?? [];
+                enclosures.push({ url });
+            }
+            if (xpath === '/rss/channel/item/podcast:alternateEnclosure') {
+                if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                    sources = undefined;
                 }
             }
             if (xpath === '/rss/channel/item/podcast:alternateEnclosure/podcast:source') {
                 if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
                     const uri = attributes.get('uri');
-                    if (typeof uri === 'string') {
-                        const url = tryParseUrl(uri);
-                        if (url) {
-                            alternateEnclosureUrls = alternateEnclosureUrls ?? [];
-                            alternateEnclosureUrls.push(uri);
-    
-                        }
-                    }
+                    sources = sources ?? [];
+                    sources.push({ uri });
                 }
             }
         },
@@ -43,11 +43,18 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/title') feedTitle = text;
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
             if (xpath === '/rss/channel/item/title') itemTitle = text;
+            if (xpath === '/rss/channel/item/pubDate') pubdate = text;
         },
-        onEndElement: (path) => {
+        onEndElement: (path, _attributes, findNamespaceUri) => {
             const xpath = '/' + path.join('/');
+            if (xpath === '/rss/channel/item/podcast:alternateEnclosure') {
+                if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                    alternateEnclosures = alternateEnclosures ?? [];
+                    alternateEnclosures.push({ sources });
+                }
+            }
             if (xpath === '/rss/channel/item') {
-                items.push({ guid: itemGuid, title: itemTitle, enclosureUrls, alternateEnclosureUrls });
+                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? '') });
             }
         },
     };
@@ -65,8 +72,22 @@ export interface Feed {
 export interface Item {
     readonly title?: string;
     readonly guid?: string;
-    readonly enclosureUrls?: string[];
-    readonly alternateEnclosureUrls?: string[];
+    readonly pubdate?: string;
+    readonly pubdateInstant?: string;
+    readonly enclosures?: Enclosure[];
+    readonly alternateEnclosures?: AlternateEnclosure[];
+}
+
+export interface Enclosure {
+    readonly url?: string;
+}
+
+export interface AlternateEnclosure {
+    readonly sources?: Source[];
+}
+
+export interface Source {
+    readonly uri?: string;
 }
 
 //

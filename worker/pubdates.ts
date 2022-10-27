@@ -11,3 +11,12 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
         throw new Error(`Unsupported pubdate: ${pubdate}`);
     }
 }
+
+export function tryParsePubdate(pubdate: string): string | undefined {
+    if (pubdate === '') return undefined;
+    try {
+        return parsePubdate(pubdate);
+    } catch {
+        // noop
+    }
+}

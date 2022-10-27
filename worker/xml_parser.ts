@@ -4,7 +4,7 @@ import { XMLParser } from './deps.ts';
 export interface Callback {
     onStartElement?(path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
     onText?(text: string, path: string[], attributes: ReadonlyMap<string, string>): void;
-    onEndElement?(path: string[]): void;
+    onEndElement?(path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
 }
 
 export function parseXml(contents: BufferSource | string, callback: Callback): void {
@@ -93,7 +93,7 @@ class NodeVisitor {
             }
         }
 
-        if (elementContext && callback.onEndElement) callback.onEndElement(this.path);
+        if (elementContext && callback.onEndElement) callback.onEndElement(this.path, attributes ?? EMPTY_STRING_MAP, v => this.namespaces.findNamespaceUri(v));
 
         this.namespaces.pop();
         if (this.namespaces.stackSize !== nsBefore) throw new Error(`Unbalanced namespace stack`);

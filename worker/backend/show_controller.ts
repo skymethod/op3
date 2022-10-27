@@ -4,15 +4,16 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
 import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
-import { cleanUrl, tryCleanUrl } from '../urls.ts';
+import { cleanUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid } from '../uuid.ts';
-import { FeedRecord, FeedWorkRecord, getHeader, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
+import { FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isFeedItemRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { Blobs } from './blobs.ts';
-import { parseFeed } from '../feed_parser.ts';
+import { Item, parseFeed } from '../feed_parser.ts';
+import { computeChainDestinationUrl } from '../chain_estimate.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -99,10 +100,18 @@ export class ShowController {
             return { results };
         }
 
-        if (operationKind === 'select' && targetPath === '/show/index/podcast-guid') {
-            const map = await storage.list(computeListOpts(`sc.i0.${IndexType.PodcastGuid}.`, parameters));
-            const results = [...map.values()].filter(isStringRecord);
-            return { results };
+        {
+            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url)$/.exec(targetPath);
+            if (m && operationKind === 'select') {
+                const indexType = {
+                    'podcast-guid': IndexType.PodcastGuid,
+                    'match-url': IndexType.MatchUrlToFeedItem,
+                    'queryless-match-url': IndexType.QuerylessMatchUrlToFeedItem,
+                }[m[1]];
+                const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
+                const results = [...map].filter(v => isStringRecord(v[1])).map(v => ({ _key: v[0], ...v[1] as Record<string, unknown> }));
+                return { results };
+            }
         }
     
         {
@@ -134,14 +143,15 @@ export class ShowController {
                     return { results: [ result ] };
                 } else if (operationKind === 'update') {
                     if (!isFeedRecord(result)) return { message: `Feed record not found` };
-                    const { action, disable = '' } = parameters;
+                    const { action, disable = '', force = '' } = parameters;
                     if (action === 'update-feed') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
                         const message = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
                         return { message };
                     } else if (action === 'index-items') {
-                        const message = await indexItems(result, { storage, blobs: feedBlobs });
+                        const forceResave = force.includes('resave');
+                        const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave });
                         return { message };
                     }
                     return { message: 'Unknown update action' };
@@ -371,8 +381,8 @@ async function loadFeedRecord(feedUrlOrRecord: string | FeedRecord, storage: Dur
     return feedRecord;
 }
 
-async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs }): Promise<string> {
-    const { storage, blobs } = opts;
+async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean }): Promise<string> {
+    const { storage, blobs, forceResave = false } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl } = feedRecord;
 
@@ -393,11 +403,97 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const feed = parseFeed(text);
     console.log(JSON.stringify(feed, undefined, 2));
 
-    rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosureUrls ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosureUrls ?? []).length} alternate enclosures`);
+    rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosures ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosures ?? []).length} alternate enclosures`);
     
-    // TODO
+    const feedRecordId = feedRecord.id;
+    if (feedRecord.title !== feed.title) {
+        const update: FeedRecord = { ...feedRecord, title: feed.title };
+        await storage.put(computeFeedRecordKey(feedRecordId), update);
+        rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
+    }
 
+    const itemsByGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim(), v ]));
+    delete itemsByGuid[''];
+    rt.push(`${Object.keys(itemsByGuid).length} unique non-empty item guids`);
+
+    const newRecords: Record<string, FeedItemRecord> = {};
+    const newIndexRecords: Record<string, { feedItemRecordKey: string }> = {};
+    if (forceResave) rt.push('forceResave');
+    for (const batch of chunk(Object.entries(itemsByGuid), 128)) {
+        const feedItemRecordIds = await Promise.all(batch.map(v => computeFeedItemRecordId(v[1].guid!)));
+        const feedItemRecordKeys = feedItemRecordIds.map(v => computeFeedItemRecordKey(feedRecord.id, v));
+        const map = await storage.get(feedItemRecordKeys);
+        for (let i = 0; i < batch.length; i++) {
+            const feedItemRecordId = feedItemRecordIds[i];
+            const feedItemRecordKey = feedItemRecordKeys[i];
+            const item = batch[i][1];
+            let existing = map.get(feedItemRecordKey);
+            if (existing !== undefined && !isFeedItemRecord(existing)) {
+                consoleWarn('sc-index-items', `Overwriting bad FeedItemRecord(${feedItemRecordKey}): ${JSON.stringify(existing)}`);
+                existing = undefined;
+            }
+            let record = existing;
+            const instant = lastOkFetch.responseInstant;
+            if (!record) {
+                const guid = item.guid!.substring(0, 8 * 1024);
+                record = { feedRecordId, id: feedItemRecordId, guid, firstSeenInstant: instant, lastSeenInstant: instant, relevantUrls: {} };
+            }
+            if (record.lastOkFetch === undefined || instant > record.lastSeenInstant || forceResave) {
+                const relevantUrls = computeRelevantUrls(item);
+                for (const relevantUrl of Object.values(relevantUrls)) {
+                    const destinationUrl = computeChainDestinationUrl(relevantUrl);
+                    if (destinationUrl) {
+                        const matchUrl = tryComputeMatchUrl(destinationUrl);
+                        if (matchUrl) {
+                            newIndexRecords[computeMatchUrlToFeedItemIndexKey(matchUrl)] = { feedItemRecordKey };
+                            if (matchUrl.includes('?')) {
+                                const querylessMatchUrl = tryComputeMatchUrl(destinationUrl, { queryless: true });
+                                if (querylessMatchUrl) {
+                                    newIndexRecords[computeQuerylessMatchUrlToFeedItemIndexKey(querylessMatchUrl)] = { feedItemRecordKey };
+                                }
+                            }
+                        }
+                    }
+                }
+                const { title, pubdate, pubdateInstant } = item;
+                const update: FeedItemRecord = { ...record, lastOkFetch, lastSeenInstant: instant, relevantUrls, title, pubdate, pubdateInstant };
+                newRecords[feedItemRecordKey] = update;
+            }
+        }
+    }
+    rt.push(`${Object.keys(newRecords).length} FeedItemRecord updates`);
+    for (const batch of chunk(Object.entries(newRecords), 128)) {
+        await storage.put(Object.fromEntries(batch));
+    }
+    rt.push(`${Object.keys(newIndexRecords).length} index updates`);
+    for (const batch of chunk(Object.entries(newIndexRecords), 128)) {
+        await storage.put(Object.fromEntries(batch));
+    }
     return rt.join(', ');
+}
+
+function computeRelevantUrls(item: Item): Record<string, string> {
+    const hasOp3Reference = (v: string) => v.includes('op3.dev');
+    const rt: Record<string, string> = {};
+    if (item.enclosures) {
+        item.enclosures.forEach((v, i) => {
+            if (v.url && hasOp3Reference(v.url)) {
+                rt[`e.${i}.url`] = v.url;
+            }
+        });
+    }
+    if (item.alternateEnclosures) {
+        item.alternateEnclosures.forEach((v, i) => {
+            if (v.sources) {
+                v.sources.forEach((w, j) => {
+                    if (w.uri && hasOp3Reference(w.uri)) {
+                        rt[`ae.${i}.s.${j}.uri`] = w.uri;
+                    }
+                });
+            }
+        });
+    }
+    return rt;
 }
 
 function computeFeedRecordKey(feedRecordId: string): string {
@@ -406,6 +502,14 @@ function computeFeedRecordKey(feedRecordId: string): string {
 
 async function computeFeedRecordId(feedUrl: string): Promise<string> {
     return (await Bytes.ofUtf8(feedUrl).sha256()).hex();
+}
+
+function computeFeedItemRecordKey(feedRecordId: string, feedItemRecordId: string): string {
+    return `sc.fir0.${feedRecordId}.${feedItemRecordId}`;
+}
+
+async function computeFeedItemRecordId(guid: string): Promise<string> {
+    return (await Bytes.ofUtf8(guid).sha256()).hex();
 }
 
 async function computeNewPodcastGuids(podcastGuids: Set<string>, storage: DurableObjectStorage): Promise<Set<string>> {
@@ -429,8 +533,18 @@ async function savePodcastGuidIndexRecords(podcastGuids: Set<string>, storage: D
 
 enum IndexType {
     PodcastGuid = 1,
+    MatchUrlToFeedItem = 2,
+    QuerylessMatchUrlToFeedItem = 3,
 }
 
 function computePodcastGuidIndexKey(podcastGuid: string) {
     return `sc.i0.${IndexType.PodcastGuid}.${podcastGuid}`;
+}
+
+function computeMatchUrlToFeedItemIndexKey(matchUrl: string) {
+    return `sc.i0.${IndexType.MatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}`;
+}
+
+function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string) {
+    return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}`;
 }

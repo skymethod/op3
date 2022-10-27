@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from './tests/deps.ts';
-import { cleanUrl } from './urls.ts';
+import { cleanUrl, computeMatchUrl } from './urls.ts';
 
 Deno.test({
     name: 'cleanUrl',
@@ -22,6 +22,36 @@ Deno.test({
         }
         for (const [ input, expected ] of Object.entries(cleaned)) {
             assertEquals(cleanUrl(input), expected);
+        }
+
+        const bad = [
+            'ftp://a.com',
+            'a.com',
+        ];
+        for (const input of bad) {
+            assertThrows(() => cleanUrl(input));
+        }
+    }
+});
+
+
+Deno.test({
+    name: 'computeMatchUrl',
+    fn: () => {
+        const good = {
+            'HTTPS://a.com': 'a.com',
+            'HTTPS://a.com/FOO/': 'a.com/foo',
+            'HTTPS://a.com/FOO/#a': 'a.com/foo',
+        }
+        for (const [ input, expected ] of Object.entries(good)) {
+            assertEquals(computeMatchUrl(input), expected);
+        }
+
+        const queryless = {
+            'HTTPS://a.com/foo?a=b': 'a.com/foo',
+        }
+        for (const [ input, expected ] of Object.entries(queryless)) {
+            assertEquals(computeMatchUrl(input, { queryless: true }), expected);
         }
 
         const bad = [

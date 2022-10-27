@@ -147,7 +147,7 @@ export class ShowControllerNotifications {
 
 export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
     const { items } = record.feed;
-    const hasOp3Reference = (v: unknown) => Array.isArray(v) && v.some(v => typeof v === 'string' && v.includes('op3.dev')); 
+    const hasOp3Reference = (v: unknown) => Array.isArray(v) && v.some(v => typeof v === 'string' && v.includes('op3.dev'));
     if (Array.isArray(items)) {
         const newItems = items.filter(v => isStringRecord(v) && (hasOp3Reference(v.enclosureUrls) || hasOp3Reference(v.alternateEnclosureUris)));
         for (const item of newItems) {

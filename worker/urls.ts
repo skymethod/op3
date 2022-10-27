@@ -19,3 +19,32 @@ export function cleanUrl(url: string): string {
     const portPart = typeof port === 'string' && ((schemeLower === 'http' && port !== ':80') || (schemeLower === 'https' && port !== ':443')) ? port : '';
     return `${schemeLower}://${hostnameLower}${portPart}${pathAndQuery ?? ''}`;
 }
+
+export function tryComputeMatchUrl(url: string, opts: { queryless?: boolean } = {}): string | undefined {
+    try {
+        return computeMatchUrl(url, opts);
+    } catch {
+        // noop
+    }
+}
+
+export function computeMatchUrl(url: string, opts: { queryless?: boolean } = {}): string {
+    // a matchurl is a lowercased clean url without the protocol or trailing slashes
+    const { queryless = false } = opts;
+    let rt = cleanUrl(url);
+    if (queryless) {
+        const i = rt.indexOf('?');
+        if (i > -1) {
+            rt = rt.substring(0, i);
+        }
+    }
+    if (!rt.includes('?')) {
+        while (rt.endsWith('/')) {
+            rt = rt.substring(0, rt.length - 1);
+        }
+    }
+    rt = rt.toLowerCase();
+    const m = /^https?:\/\/(.+?)$/.exec(rt);
+    if (!m) throw new Error(`Unable to compute match url for: ${url}`);
+    return m[1];
+}
