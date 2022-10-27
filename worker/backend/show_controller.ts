@@ -387,13 +387,13 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const blobKey = tryParseBlobKey(body);
     if (!blobKey) return [ ...rt, `unknown ok response body: ${body}` ].join(', ');
         
-    const buffer = await blobs.get(blobKey, 'buffer');
-    if (!buffer) return [ ...rt, `ok response body blob not found: ${body}` ].join(', ');
+    const text = await blobs.get(blobKey, 'text'); // assumes utf-8
+    if (!text) return [ ...rt, `ok response body text not found: ${body}` ].join(', ');
 
-    const feed = parseFeed(buffer);
+    const feed = parseFeed(text);
     console.log(JSON.stringify(feed, undefined, 2));
 
-    rt.push(`${feed.items.length} items`);
+    rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosureUrls ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosureUrls ?? []).length} alternate enclosures`);
     
     // TODO
 

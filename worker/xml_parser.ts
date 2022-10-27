@@ -2,13 +2,13 @@ import { isStringRecord } from './check.ts';
 import { XMLParser } from './deps.ts';
 
 export interface Callback {
-    onStartElement?(path: string[]): void;
+    onStartElement?(path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
     onText?(text: string, path: string[], attributes: ReadonlyMap<string, string>): void;
     onEndElement?(path: string[]): void;
 }
 
-export function parseXml(bytes: BufferSource, callback: Callback): void {
-    const text = new TextDecoder().decode(bytes);
+export function parseXml(contents: BufferSource | string, callback: Callback): void {
+    const text = typeof contents === 'string' ? contents : new TextDecoder().decode(contents);
     const p = new XMLParser({
         processEntities: false,
         ignoreAttributes: false,
@@ -75,6 +75,8 @@ class NodeVisitor {
         const nsBefore = this.namespaces.stackSize;
         this.namespaces.push(attributes ?? EMPTY_STRING_MAP);
 
+        if (elementContext && callback.onStartElement) callback.onStartElement(this.path, attributes ?? EMPTY_STRING_MAP, v => this.namespaces.findNamespaceUri(v));
+
         // process text if found
         if (text !== undefined && callback.onText) {
             callback.onText(text, this.path, attributes ?? EMPTY_STRING_MAP);
@@ -86,12 +88,12 @@ class NodeVisitor {
             const values = Array.isArray(value) ? value : [ value ];
             for (const item of values) {
                 this.path.push(element);
-                if (callback.onStartElement) callback.onStartElement(this.path);
                 this.visit(item, element);
-                if (callback.onEndElement) callback.onEndElement(this.path);
                 this.path.pop();
             }
         }
+
+        if (elementContext && callback.onEndElement) callback.onEndElement(this.path);
 
         this.namespaces.pop();
         if (this.namespaces.stackSize !== nsBefore) throw new Error(`Unbalanced namespace stack`);
