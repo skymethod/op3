@@ -181,6 +181,24 @@ export class ShowController {
             }
         }
 
+        {
+            const m = /^\/show\/shows\/(.+?)(\/episodes)?$/.exec(targetPath);
+            if (m && operationKind === 'select') {
+                const [ _, input, episodes ] = m;
+                const showUuid = input;
+                check('showUuid', showUuid, isValidUuid);
+                if (episodes) {
+                    const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
+                    const results = [...map.values()].filter(isEpisodeRecord);
+                    return { results };
+                } else {
+                    const result = await storage.get(computeShowKey(showUuid));
+                    const results = isShowRecord(result) ? [ result ] : [];
+                    return { results }
+                }
+            }
+        }
+
         throw new Error(`Unsupported show-related query`);
     }
 
@@ -434,7 +452,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
     }
 
-    const itemsByTrimmedGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim().substring(8 * 1024), v ]));
+    const itemsByTrimmedGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim().substring(0, 8 * 1024), v ]));
     delete itemsByTrimmedGuid['']; // only save items with non-empty guids
     rt.push(`${Object.keys(itemsByTrimmedGuid).length} unique non-empty item guids`);
 
@@ -493,6 +511,9 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     }
 
     if (showUuid !== undefined) {
+        // update show attributes if necessary
+        await setShowAttributesFromFeed(feedRecord, storage, rt);
+
         // ensure show episodes exist for all feed items
         const { inserts, updates } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, storage });
         if (inserts > 0) rt.push(`${inserts} ep inserts`);
@@ -553,6 +574,20 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     return rt.join(', ');
 }
 
+async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: DurableObjectStorage, messages: string[]): Promise<void> {
+    const { showUuid } = feedRecord;
+    if (!showUuid) return;
+    const showKey = computeShowKey(showUuid);
+    const show = await storage.get(showKey);
+    if (!isShowRecord(show)) return;
+    const { title } = feedRecord;
+    if (show.title !== title) {
+        const update: ShowRecord = { ...show, title };
+        await storage.put(showKey, update);
+        messages.push(`show.title ${show.title} -> ${ title }`);
+    }
+}
+
 async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number }> {
     const { feedRecordId, showUuid, storage } = opts;
     const map = await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) });
@@ -594,6 +629,9 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
 }
 
 async function lookupShow(url: string, storage: DurableObjectStorage, message: string[]): Promise<{ showUuid: string, episodeId?: string } | undefined> {
+    const destinationUrl = computeChainDestinationUrl(url);
+    if (!destinationUrl) return undefined;
+    url = destinationUrl;
     for (const queryless of [ false, true ]) {
         const matchUrl = computeMatchUrl(url, { queryless });
         message.push(`${queryless ? 'querylessMatchUrl' : 'matchUrl'}: ${matchUrl}`);
@@ -720,4 +758,9 @@ async function computeEpisodeId(itemGuid: string): Promise<string> {
 function computeEpisodeKey(opts: { showUuid: string, id: string }): string {
     const { showUuid, id } = opts;
     return `sc.ep0.${showUuid}.${id}`;
+}
+
+function computeEpisodeKeyPrefix(opts: { showUuid: string }): string {
+    const { showUuid } = opts;
+    return `sc.ep0.${showUuid}.`;
 }
