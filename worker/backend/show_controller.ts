@@ -446,16 +446,21 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosures ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosures ?? []).length} alternate enclosures`);
     
     const feedRecordId = feedRecord.id;
-    if (feedRecord.title !== feed.title) {
-        const update: FeedRecord = { ...feedRecord, title: feed.title };
+
+    // update feed-level attributes if necessary
+    if (feedRecord.title !== feed.title || feedRecord.podcastGuid !== feed.podcastGuid) {
+        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
-        rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
+        if (feedRecord.title !== feed.title) rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
+        if (feedRecord.podcastGuid !== feed.podcastGuid) rt.push(`updated podcastGuid from ${feedRecord.podcastGuid} -> ${feed.podcastGuid}`);
     }
 
+    // collect items by trimmed item guid
     const itemsByTrimmedGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim().substring(0, 8 * 1024), v ]));
     delete itemsByTrimmedGuid['']; // only save items with non-empty guids
     rt.push(`${Object.keys(itemsByTrimmedGuid).length} unique non-empty item guids`);
 
+    // compute and save new/updated feed item records and matchurl index records
     const newRecords: Record<string, FeedItemRecord> = {};
     const newIndexRecords: Record<string, FeedItemIndexRecord> = {};
     if (forceResave) rt.push('forceResave');

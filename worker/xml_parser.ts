@@ -3,7 +3,7 @@ import { XMLParser } from './deps.ts';
 
 export interface Callback {
     onStartElement?(path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
-    onText?(text: string, path: string[], attributes: ReadonlyMap<string, string>): void;
+    onText?(text: string, path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
     onEndElement?(path: string[], attributes: ReadonlyMap<string, string>, findNamespaceUri: (prefix: string) => string | undefined): void;
 }
 
@@ -79,7 +79,7 @@ class NodeVisitor {
 
         // process text if found
         if (text !== undefined && callback.onText) {
-            callback.onText(text, this.path, attributes ?? EMPTY_STRING_MAP);
+            callback.onText(text, this.path, attributes ?? EMPTY_STRING_MAP, v => this.namespaces.findNamespaceUri(v));
         }
 
         // process elements if found

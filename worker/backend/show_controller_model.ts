@@ -44,6 +44,7 @@ export interface FeedRecord {
     readonly relevantUrls?: Record<string, string>;  // jpath string (image.0.url): <op3 url>
     readonly showUuid?: string;
     readonly title?: string;
+    readonly podcastGuid?: string;
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -62,6 +63,7 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.relevantUrls === undefined || isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string'))
         && (obj.showUuid === undefined || typeof obj.showUuid === 'string')
         && (obj.title === undefined || typeof obj.title === 'string')
+        && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
         ;
 }
 
