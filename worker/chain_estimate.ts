@@ -148,6 +148,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'magellan', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://p.podderapp.com/1234567890/
+    // http redirects to self https, suffix protocol supported
+    m = /^https?:\/\/p\.podderapp\.com\/\d+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podder', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -171,5 +180,5 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry' | 'magellan';
+    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry' | 'magellan' | 'podder';
 }
