@@ -43,7 +43,7 @@ class NodeVisitor {
 
     visit(node: unknown, elementContext?: string) {
         const { callback } = this;
-        if (!isStringRecord(node)) throw new Error(`Unexpected node: ${JSON.stringify(node)}`);
+        if (!isStringRecord(node)) throw new Error(`Unexpected node: ${JSON.stringify(node)}, elementContext=${elementContext}`);
         let attributes: Map<string, string> | undefined;
         const elements: string[] = [];
         let text: string | undefined;
@@ -64,7 +64,9 @@ class NodeVisitor {
                 if (typeof value !== 'string') throw new Error(`Unsupported text value: ${JSON.stringify(value)}`);
                 text = value;
             } else if (name === '#cdata') {
-                this.visit(value, elementContext);
+                for (const item of Array.isArray(value) ? value : [ value ]) {
+                    this.visit(item, elementContext);
+                }
             } else if (name === '#comment') {
                 // ignore for now
             } else if (name.startsWith('#')) {
