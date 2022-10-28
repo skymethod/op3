@@ -65,8 +65,10 @@ class NodeVisitor {
                 text = value;
             } else if (name === '#cdata') {
                 this.visit(value, elementContext);
+            } else if (name === '#comment') {
+                // ignore for now
             } else if (name.startsWith('#')) {
-                throw new Error(`Unsupported node: ${JSON.stringify(node)}`);
+                throw new Error(`Unsupported name ${name} in node: ${JSON.stringify(node)}`);
             } else {
                 elements.push(name);
             }
