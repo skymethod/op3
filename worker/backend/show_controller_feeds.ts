@@ -2,7 +2,7 @@ import { packError } from '../errors.ts';
 import { ErrorInterface } from '../errors.ts';
 import { computeTimestamp } from '../timestamp.ts';
 import { Blobs } from './blobs.ts';
-import { FetchInfo } from './show_controller_model.ts';
+import { FetchInfo, ResponseInfo } from './show_controller_model.ts';
 
 export function tryParseBlobKey(body: string): string | undefined {
     const m = /^bk0:(.+?)$/.exec(body);
@@ -18,9 +18,25 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
     let buffer: ArrayBuffer;
     let body: string | undefined;
     let bodyLength: number | undefined;
+    let responses: ResponseInfo[] | undefined;
 
     try {
-        res = await fetch(url, { headers });
+        let redirectNum = 0;
+        let fetchUrl = url;
+        while (true) {
+            res = await fetch(fetchUrl, { headers, redirect: 'manual' });
+            responses = responses ?? [];
+            const { url, status } = res;
+            responses.push({ url, status });
+            const location = res.headers.get('location');
+            if (typeof location === 'string' && (status === 301 || status === 302 || status === 307 || status === 308)) {
+                if (redirectNum >= 10) throw new Error(`Max ${redirectNum} redirects reached`);
+                fetchUrl = new URL(location, url).toString();
+                redirectNum++;
+            } else {
+                break;
+            }
+        }
 
         // TypeError: Provided readable stream must have a known length (request/response body or readable half of FixedLengthStream)
         // not really possible to stream arbitrary responses directly to R2, so buffer it all for now
@@ -42,7 +58,7 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
         bodyLength = buffer.byteLength;
     }
 
-    return { requestInstant, responseInstant, status, headers: interestingHeaders, body, bodyLength }; 
+    return { requestInstant, responseInstant, status, headers: interestingHeaders, body, bodyLength, responses }; 
 }
 
 export function trimToInterestingHeaders(headers: Headers): string[][] {

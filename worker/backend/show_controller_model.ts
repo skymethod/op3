@@ -75,6 +75,7 @@ export interface FetchInfo {
     readonly body?: string; // r2 pointer, or storage if small enough?
     readonly bodyLength?: number; // since we're buffering
     readonly error?: ErrorInterface;
+    readonly responses?: ResponseInfo[];
 }
 
 export function isFetchInfo(obj: unknown): obj is FetchInfo {
@@ -86,6 +87,19 @@ export function isFetchInfo(obj: unknown): obj is FetchInfo {
         && (obj.body === undefined || typeof obj.body === 'string')
         && (obj.bodyLength === undefined || typeof obj.bodyLength === 'number')
         && (obj.error === undefined || isErrorInterface(obj.error))
+        && (obj.responses === undefined || Array.isArray(obj.responses) && obj.responses.every(isResponseInfo))
+        ;
+}
+
+export interface ResponseInfo {
+    readonly url: string;
+    readonly status: number;
+}
+
+export function isResponseInfo(obj: unknown): obj is ResponseInfo {
+    return isStringRecord(obj)
+        && typeof obj.url === 'string'
+        && typeof obj.status === 'number'
         ;
 }
 
