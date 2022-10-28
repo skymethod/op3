@@ -5,3 +5,4 @@ export { encodeXml } from 'https://raw.githubusercontent.com/skymethod/denoflare
 export { setEqual, setIntersect, setSubtract } from 'https://raw.githubusercontent.com/skymethod/denoflare/v0.5.9/common/sets.ts';
 export { chunk } from 'https://deno.land/std@0.160.0/collections/chunk.ts';
 export { XMLParser } from 'https://cdn.skypack.dev/fast-xml-parser@4.0.11?dts';
+export { distinct } from 'https://deno.land/std@0.160.0/collections/distinct.ts';

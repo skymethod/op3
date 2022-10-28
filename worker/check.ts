@@ -54,3 +54,7 @@ export function isNotBlank(str: string): boolean {
 export function isValidGuid(str: string): boolean {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(str);
 }
+
+export function isString(obj: unknown): obj is string {
+    return typeof obj === 'string';
+}

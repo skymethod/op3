@@ -1,12 +1,12 @@
-import { isStringRecord, isValidGuid } from '../check.ts';
-import { Bytes, chunk, DurableObjectStorage } from '../deps.ts';
+import { check, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
 import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
-import { generateUuid } from '../uuid.ts';
-import { FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isWorkRecord, PodcastIndexFeed, WorkRecord } from './show_controller_model.ts';
+import { generateUuid, isValidUuid } from '../uuid.ts';
+import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isShowRecord, isWorkRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -89,27 +89,26 @@ export class ShowController {
         const { operationKind, targetPath, parameters = {} } = req;
         
         if (operationKind === 'select' && targetPath === '/show/feeds') {
-            const { match } = parameters;
-            if (typeof match === 'string') {
-                const matchUrl = computeMatchUrl(match, { queryless: true });
-                const rt: string[] = [ matchUrl ];
-                const map = await storage.list({ prefix: `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.`});
-                const feedItemRecordKeys = [...map.values()].filter(isFeedItemIndexRecord).map(v => v.feedItemRecordKey);
-                rt.push(`${feedItemRecordKeys.length} feedItemRecordKeys`);
-                const feedRecordIds = new Set<string>();
-                for (const batch of chunk(feedItemRecordKeys, 128)) {
-                    const map2 = await storage.get(batch);
-                    for (const feedItemRecord of [...map2.values()].filter(isFeedItemRecord)) {
-                        feedRecordIds.add(feedItemRecord.feedRecordId);
-                    }
-                }
-                rt.push(`${feedRecordIds.size} feedRecordIds`);
-                const map3 = await storage.get([...feedRecordIds].map(computeFeedRecordKey));
-                const results = [...map3.values()].filter(isFeedRecord);
-                return { results, message: rt.join(', ') };
-            }
             const map = await storage.list(computeListOpts('sc.fr0.', parameters));
             const results = [...map.values()].filter(isFeedRecord);
+            return { results };
+        }
+        if (operationKind === 'select' && targetPath === '/show/shows') {
+            const { lookup } = parameters;
+            if (typeof lookup === 'string') {
+                const rt: string[] = [];
+                const result = await lookupShow(lookup, storage, rt);
+                const results: unknown[] = [];
+                if (result) {
+                    const { showUuid, episodeId } = result;
+                    const show = await storage.get(computeShowKey(showUuid));
+                    if (!isShowRecord(show)) throw new Error(`Bad show record`);
+                    results.push({ ...show, episodeId })
+                }
+                return { results, message: rt.join(', ') };
+            }
+            const map = await storage.list(computeListOpts('sc.show0.', parameters));
+            const results = [...map.values()].filter(isShowRecord);
             return { results };
         }
 
@@ -171,6 +170,10 @@ export class ShowController {
                     } else if (action === 'index-items') {
                         const forceResave = force.includes('resave');
                         const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave });
+                        return { message };
+                    } else if (action == 'set-show-uuid') {
+                        const { 'show-uuid': showUuid = generateUuid() } = parameters;
+                        const message = await setShowUuid(result, showUuid, { storage });
                         return { message };
                     }
                     return { message: 'Unknown update action' };
@@ -403,7 +406,7 @@ async function loadFeedRecord(feedUrlOrRecord: string | FeedRecord, storage: Dur
 async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean }): Promise<string> {
     const { storage, blobs, forceResave = false } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
-    const { url: feedUrl } = feedRecord;
+    const { url: feedUrl, showUuid } = feedRecord;
 
     const rt = [ feedUrl ];
 
@@ -431,20 +434,21 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
     }
 
-    const itemsByGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim(), v ]));
-    delete itemsByGuid[''];
-    rt.push(`${Object.keys(itemsByGuid).length} unique non-empty item guids`);
+    const itemsByTrimmedGuid = Object.fromEntries(feed.items.map(v => [ (v.guid ?? '').trim().substring(8 * 1024), v ]));
+    delete itemsByTrimmedGuid['']; // only save items with non-empty guids
+    rt.push(`${Object.keys(itemsByTrimmedGuid).length} unique non-empty item guids`);
 
     const newRecords: Record<string, FeedItemRecord> = {};
     const newIndexRecords: Record<string, FeedItemIndexRecord> = {};
     if (forceResave) rt.push('forceResave');
-    for (const batch of chunk(Object.entries(itemsByGuid), 128)) {
+    for (const batch of chunk(Object.entries(itemsByTrimmedGuid), 128)) {
         const feedItemRecordIds = await Promise.all(batch.map(v => computeFeedItemRecordId(v[1].guid!)));
         const feedItemRecordKeys = feedItemRecordIds.map(v => computeFeedItemRecordKey(feedRecord.id, v));
         const map = await storage.get(feedItemRecordKeys);
         for (let i = 0; i < batch.length; i++) {
             const feedItemRecordId = feedItemRecordIds[i];
             const feedItemRecordKey = feedItemRecordKeys[i];
+            const trimmedGuid = batch[i][0];
             const item = batch[i][1];
             let existing = map.get(feedItemRecordKey);
             if (existing !== undefined && !isFeedItemRecord(existing)) {
@@ -454,8 +458,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             let record = existing;
             const instant = lastOkFetch.responseInstant;
             if (!record) {
-                const guid = item.guid!.substring(0, 8 * 1024);
-                record = { feedRecordId, id: feedItemRecordId, guid, firstSeenInstant: instant, lastSeenInstant: instant, relevantUrls: {} };
+                record = { feedRecordId, id: feedItemRecordId, guid: trimmedGuid, firstSeenInstant: instant, lastSeenInstant: instant, relevantUrls: {} };
             }
             if (record.lastOkFetch === undefined || instant > record.lastSeenInstant || forceResave) {
                 const relevantUrls = computeRelevantUrls(item);
@@ -488,6 +491,14 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     for (const batch of chunk(Object.entries(newIndexRecords), 128)) {
         await storage.put(Object.fromEntries(batch));
     }
+
+    if (showUuid !== undefined) {
+        // ensure show episodes exist for all feed items
+        const { inserts, updates } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, storage });
+        if (inserts > 0) rt.push(`${inserts} ep inserts`);
+        if (updates > 0) rt.push(`${updates} ep updates`);
+    }
+
     return rt.join(', ');
 }
 
@@ -515,6 +526,132 @@ function computeRelevantUrls(item: Item): Record<string, string> {
     return rt;
 }
 
+async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: string, opts: { storage: DurableObjectStorage }): Promise<string> {
+    const { storage } = opts;
+    const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
+    check('showUuid', showUuid, isValidUuid);
+    if (feedRecord.showUuid !== undefined) throw new Error(`Feed is already show ${feedRecord.showUuid}`);
+    if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
+    const { podcastGuid } = feedRecord.piFeed;
+    if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
+    const rt: string[] = [];
+    rt.push(`showGuid: ${showUuid}`);
+
+    // save feed and show record
+    const update: FeedRecord = { ...feedRecord, showUuid };
+    const showRecord: ShowRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
+    await storage.put(Object.fromEntries([
+        [ computeFeedRecordKey(update.id), update ],
+        [ computeShowKey(showRecord.uuid), showRecord ],
+    ]));
+
+    // ensure show episodes exist for all feed items
+    const { inserts, updates } = await ensureEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, storage });
+    if (inserts > 0) rt.push(`${inserts} ep inserts`);
+    if (updates > 0) rt.push(`${updates} ep updates`);
+
+    return rt.join(', ');
+}
+
+async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number }> {
+    const { feedRecordId, showUuid, storage } = opts;
+    const map = await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) });
+    let inserts = 0;
+    let updates = 0;
+    const epRecords: Record<string, EpisodeRecord> = {};
+    for (const batch of chunk([...map.values()].filter(isFeedItemRecord), 128)) {
+        const itemGuids = batch.map(v => v.guid);
+        const episodeIds = await Promise.all(itemGuids.map(computeEpisodeId));
+        const episodeKeys = episodeIds.map(v => computeEpisodeKey({ showUuid, id: v }));
+        const map = await storage.get(episodeKeys);
+        for (let i = 0; i < batch.length; i++) {
+            const feedItem = batch[i];
+            const itemGuid = itemGuids[i];
+            const episodeId = episodeIds[i];
+            const episodeKey = episodeKeys[i];
+            const existing = map.get(episodeKey);
+            const { title, pubdate, pubdateInstant } = feedItem;
+            if (isEpisodeRecord(existing)) {
+                const firstSeenInstant = [ feedItem.firstSeenInstant, existing.firstSeenInstant ].filter(isString).sort()[0];
+                const lastSeenInstant = [ feedItem.lastSeenInstant, existing.lastSeenInstant ].filter(isString).sort().reverse()[0];
+                if (title !== existing.title || pubdate !== existing.pubdate || pubdateInstant !== existing.pubdateInstant || firstSeenInstant !== existing.firstSeenInstant || lastSeenInstant !== existing.lastSeenInstant) {
+                    const update: EpisodeRecord = { ...existing, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant };
+                    epRecords[computeEpisodeKey(update)] = update;
+                    updates++;
+                }
+            } else {
+                const { firstSeenInstant, lastSeenInstant } = feedItem;
+                const insert: EpisodeRecord = { showUuid, id: episodeId, itemGuid, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant };
+                epRecords[computeEpisodeKey(insert)] = insert;
+                inserts++;
+            }
+        }
+    }
+    for (const batch of chunk(Object.entries(epRecords), 128)) {
+        await storage.put(Object.fromEntries(batch));
+    }
+    return { inserts, updates };
+}
+
+async function lookupShow(url: string, storage: DurableObjectStorage, message: string[]): Promise<{ showUuid: string, episodeId?: string } | undefined> {
+    for (const queryless of [ false, true ]) {
+        const matchUrl = computeMatchUrl(url, { queryless });
+        message.push(`${queryless ? 'querylessMatchUrl' : 'matchUrl'}: ${matchUrl}`);
+        const indexType = queryless ? IndexType.QuerylessMatchUrlToFeedItem : IndexType.MatchUrlToFeedItem;
+        const map = await storage.list({ prefix: `sc.i0.${indexType}.${matchUrl.substring(0, 1024)}.`});
+        const feedItemRecordKeys = [...map.values()].filter(isFeedItemIndexRecord).map(v => v.feedItemRecordKey);
+        message.push(`${feedItemRecordKeys.length} feedItemRecordKeys`);
+        if (feedItemRecordKeys.length === 0) continue;
+
+        // load matching feed item records
+        const feedItemRecords = new Map<string, FeedItemRecord>();
+        for (const batch of chunk(feedItemRecordKeys, 128)) {
+            for (const [ key, value ] of await storage.get(batch)) {
+                if (isFeedItemRecord(value)) {
+                    feedItemRecords.set(key, value);
+                }
+            }
+        }
+        message.push(`${feedItemRecords.size} FeedItemRecords`);
+        
+        // and associated feed records (with shows)
+        const feedRecordKeys = distinct([...feedItemRecords.values()].map(v => computeFeedRecordKey(v.feedRecordId)));
+        message.push(`${feedRecordKeys.length} feedRecordKeys`);
+        const showFeedRecords = new Map<string, FeedRecord>();
+        for (const batch of chunk(feedRecordKeys, 128)) {
+            for (const [ key, value ] of await storage.get(batch)) {
+                if (isFeedRecord(value) && typeof value.showUuid === 'string') {
+                    showFeedRecords.set(key, value);
+                }
+            }
+        }
+        message.push(`${showFeedRecords.size} showFeedRecords`);
+
+        const showUuids = new Set([...showFeedRecords.values()].map(v => v.showUuid!));
+        if (showUuids.size === 0) continue;
+        if (showUuids.size === 1) {
+            // bingo
+            const showUuid = [...showUuids][0];
+            const feedRecord = [...showFeedRecords.values()].find(v => v.showUuid === showUuid)!;
+            const itemGuids = [...feedItemRecords.values()].filter(v => v.feedRecordId === feedRecord.id).map(v => v.guid);
+            let episodeId: string | undefined;
+            if (itemGuids.length === 1) {
+                const [ itemGuid ] = itemGuids;
+                message.push(`itemGuid: ${itemGuid}`);
+                const candidateEpisodeId = await computeEpisodeId(itemGuid);
+                const episode = await storage.get(computeEpisodeKey({ showUuid, id: candidateEpisodeId }));
+                if (isEpisodeRecord(episode)) {
+                    episodeId = candidateEpisodeId;
+                }
+
+            }
+            return { showUuid, episodeId };
+        }
+        throw new Error(`Matches multiple shows: ${[...showUuids].join(', ')}`);
+    }
+
+}
+
 function computeFeedRecordKey(feedRecordId: string): string {
     return `sc.fr0.${feedRecordId}`;
 }
@@ -525,6 +662,10 @@ async function computeFeedRecordId(feedUrl: string): Promise<string> {
 
 function computeFeedItemRecordKey(feedRecordId: string, feedItemRecordId: string): string {
     return `sc.fir0.${feedRecordId}.${feedItemRecordId}`;
+}
+
+function computeFeedItemRecordKeyPrefix(feedRecordId: string): string {
+    return `sc.fir0.${feedRecordId}.`;
 }
 
 async function computeFeedItemRecordId(guid: string): Promise<string> {
@@ -566,4 +707,17 @@ function computeMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: strin
 
 function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: string, feedItemRecordId: string) {
     return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
+}
+
+function computeShowKey(uuid: string): string {
+    return `sc.show0.${uuid}`;
+}
+
+async function computeEpisodeId(itemGuid: string): Promise<string> {
+    return (await Bytes.ofUtf8(itemGuid).sha256()).hex();
+}
+
+function computeEpisodeKey(opts: { showUuid: string, id: string }): string {
+    const { showUuid, id } = opts;
+    return `sc.ep0.${showUuid}.${id}`;
 }
