@@ -464,6 +464,8 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const newRecords: Record<string, FeedItemRecord> = {};
     const newIndexRecords: Record<string, FeedItemIndexRecord> = {};
     if (forceResave) rt.push('forceResave');
+    let updates = 0;
+    let inserts = 0;
     for (const batch of chunk(Object.entries(itemsByTrimmedGuid), 128)) {
         const feedItemRecordIds = await Promise.all(batch.map(v => computeFeedItemRecordId(v[1].guid!)));
         const feedItemRecordKeys = feedItemRecordIds.map(v => computeFeedItemRecordKey(feedRecord.id, v));
@@ -480,6 +482,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             }
             let record = existing;
             const instant = lastOkFetch.responseInstant;
+            const isInsert = !record;
             if (!record) {
                 record = { feedRecordId, id: feedItemRecordId, guid: trimmedGuid, firstSeenInstant: instant, lastSeenInstant: instant, relevantUrls: {} };
             }
@@ -503,16 +506,27 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
                 const { title, pubdate, pubdateInstant } = item;
                 const update: FeedItemRecord = { ...record, lastOkFetch, lastSeenInstant: instant, relevantUrls, title, pubdate, pubdateInstant };
                 newRecords[feedItemRecordKey] = update;
+                if (isInsert) {
+                    inserts++;
+                } else {
+                    updates++;
+                }
             }
         }
     }
-    rt.push(`${Object.keys(newRecords).length} FeedItemRecord updates`);
-    for (const batch of chunk(Object.entries(newRecords), 128)) {
-        await storage.put(Object.fromEntries(batch));
+
+    if (inserts > 0) rt.push(`${inserts} FeedItemRecord inserts`);
+    if (updates > 0) rt.push(`${updates} FeedItemRecord updates`);
+    if (Object.keys(newRecords).length > 0) {
+        for (const batch of chunk(Object.entries(newRecords), 128)) {
+            await storage.put(Object.fromEntries(batch));
+        }
     }
-    rt.push(`${Object.keys(newIndexRecords).length} index updates`);
-    for (const batch of chunk(Object.entries(newIndexRecords), 128)) {
-        await storage.put(Object.fromEntries(batch));
+    if (Object.keys(newIndexRecords).length > 0) {
+        rt.push(`${Object.keys(newIndexRecords).length} index updates`);
+        for (const batch of chunk(Object.entries(newIndexRecords), 128)) {
+            await storage.put(Object.fromEntries(batch));
+        }
     }
 
     if (showUuid !== undefined) {
