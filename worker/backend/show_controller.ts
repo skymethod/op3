@@ -162,11 +162,17 @@ export class ShowController {
                 } else if (operationKind === 'update') {
                     if (!isFeedRecord(result)) return { message: `Feed record not found` };
                     const { action, disable = '', force = '' } = parameters;
-                    if (action === 'update-feed') {
+                    if (action === 'update-feed' || action === 'update-feed-and-index-items') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
-                        const message = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
-                        return { message };
+                        const { message, updated, fetchStatus } = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
+                        if (action === 'update-feed-and-index-items' && updated && fetchStatus === 200) {
+                            const forceResave = force.includes('resave');
+                            const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave });
+                            return { message: [message, indexItemsMessage ].join(', ') };
+                        } else {
+                            return { message };
+                        }
                     } else if (action === 'index-items') {
                         const forceResave = force.includes('resave');
                         const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave });
@@ -359,7 +365,7 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
     // TODO enqueue update-feed if necessary
 }
 
-async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, disableConditional?: boolean, disableGzip?: boolean }): Promise<string> {
+async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, disableConditional?: boolean, disableGzip?: boolean }): Promise<{ message: string, updated?: FeedRecord, fetchStatus?: number }> {
     const { storage, origin, blobs, disableConditional = false, disableGzip = false } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl } = feedRecord;
@@ -391,7 +397,7 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const blobKeyBase = (await Bytes.ofUtf8(fetchUrl).sha256()).hex();
     const fetchInfo = await computeFetchInfo(feedUrl, headers, blobKeyBase, blobs);
     const feedRecordKey = computeFeedRecordKey(feedRecord.id);
-    await storage.transaction(async tx => {
+    const updated = await storage.transaction(async tx => {
         const existing = await tx.get(feedRecordKey);
         if (!isFeedRecord(existing)) return; // deleted?
         let update = existing;
@@ -407,11 +413,13 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             update = { ...update, lastErrorFetch: fetchInfo };
         }
         await tx.put(feedRecordKey, update);
+        return update;
     });
     const contentType = getHeader(fetchInfo.headers, 'content-type');
     if (contentType) rt.push(contentType);
     if (fetchInfo.bodyLength) rt.push(Bytes.formatSize(fetchInfo.bodyLength));
-    return rt.join(', ');
+    const message = rt.join(', ');
+    return { message, updated, fetchStatus: fetchInfo.status };
 }
 
 async function loadFeedRecord(feedUrlOrRecord: string | FeedRecord, storage: DurableObjectStorage): Promise<FeedRecord> {
