@@ -43,7 +43,7 @@ export class R2BucketBlobs implements Blobs {
     async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
         const { bucket, prefix } = this;
         const { keyPrefix, afterKey } = opts;
-        let listOpts: R2ListOptions & { startAfter?: string } = { prefix };
+        let listOpts: R2ListOptions = { prefix };
         if (typeof keyPrefix === 'string') listOpts = { ...listOpts, prefix: prefix + keyPrefix };
         if (typeof afterKey === 'string') listOpts = { ...listOpts, startAfter: prefix + afterKey };
         const res = await r2(() => bucket.list(listOpts));
