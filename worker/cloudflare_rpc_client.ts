@@ -1,6 +1,6 @@
 import { DurableObjectNamespace } from './deps.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, GetNewRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest } from './rpc_model.ts';
-import { sleep } from './sleep.ts';
+import { executeWithRetries } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
@@ -86,26 +86,7 @@ export class CloudflareRpcClient implements RpcClient {
 
 async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number }): Promise<T> {
     const { maxRetries } = opts;
-
-    let retries = 0;
-    while (true) {
-        try {
-            if (retries > 0) {
-                const waitMillis = retries * 1000;
-                await sleep(waitMillis);
-            }
-            return await sendSingleRpc(request, expectedResponseKind, opts);
-        } catch (e) {
-            if (isRetryable(e)) {
-                if (retries >= maxRetries) {
-                    throw new Error(`sendRpc: Out of retries (max=${maxRetries}): ${e.stack || e}`);
-                }
-                retries++;
-            } else {
-                throw e;
-            }
-        }
-    }
+    return await executeWithRetries(() => sendSingleRpc(request, expectedResponseKind, opts), { tag: 'sendRpc', isRetryable, maxRetries });
 }
 
 async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }) {

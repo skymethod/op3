@@ -19,7 +19,7 @@ import { ApiAuthController } from './api_auth_controller.ts';
 import { ShowController } from './show_controller.ts';
 import { newPodcastIndexClient } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
-import { R2BucketBlobs } from './blobs.ts';
+import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
