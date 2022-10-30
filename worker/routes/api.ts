@@ -11,6 +11,7 @@ import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
+import { DoNames } from '../do_names.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -113,7 +114,7 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
     if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
     if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
     if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
-    const res = await rpcClient.resolveApiToken({ token }, 'api-key-server');
+    const res = await rpcClient.resolveApiToken({ token }, DoNames.apiKeyServer);
     if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
     if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
     if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
@@ -125,28 +126,25 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
 
     const { operationKind, targetPath = '', dryRun, parameters } = await bodyProvider();
     if (operationKind === 'select' && targetPath === '/registry') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'registry');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.registry);
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.keyServer);
         return newJsonResponse({ results });
-    } else if (operationKind === 'select' && targetPath.startsWith('/crl/')) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'combined-redirect-log');
-        return newJsonResponse({ results });
-    } else if (operationKind === 'select' && targetPath === '/crl/records') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'combined-redirect-log');
-        return newJsonResponse({ results });
+    } else if (targetPath.startsWith('/crl/')) {
+        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.combinedRedirectLog);
+        return newJsonResponse({ results, message });
     } else if (operationKind === 'select' && targetPath === '/api-keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'api-key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'api-key-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
         return newJsonResponse({ results });
     } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
+        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
         return newJsonResponse({ results });
     } else if (targetPath.startsWith('/show/')) {
-        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, 'show-server');
+        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
         return newJsonResponse({ results, message });
     }
     const doName = tryParseDurableObjectRequest(targetPath);
@@ -171,14 +169,14 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
     if (typeof inclusive !== 'boolean') throw new StatusError(`Bad inclusive: ${inclusive}`);
     if (typeof limit !== 'number') throw new StatusError(`Bad limit: ${limit}`);
 
-    const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, 'combined-redirect-log');
+    const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, DoNames.combinedRedirectLog);
     return newJsonResponse({ first, last, count, millis });
 }
 
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
     if (!hasPermission(permissions, 'admin-metrics')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    return await rpcClient.adminGetMetrics({}, 'combined-redirect-log');
+    return await rpcClient.adminGetMetrics({}, DoNames.combinedRedirectLog);
 }
 
 async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
@@ -189,7 +187,7 @@ async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPer
     const notification = await bodyProvider();
     if (!isExternalNotification(notification)) throw new StatusError(`Bad notification body`);
 
-    await rpcClient.receiveExternalNotification({ notification, received }, 'show-server');
+    await rpcClient.receiveExternalNotification({ notification, received }, DoNames.showServer);
 
     return newTextResponse('thanks');
 }
@@ -260,7 +258,7 @@ async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyP
     if (analysis.itemsWithOp3Enclosures > 0) {
         const time = new Date().toISOString();
         const feedInfo = { received: time, feedUrl: feed, feedPodcastId: id, foundTime: time, source: 'fa', sourceReference: time, items: [] };
-        background(() => rpcClient.receiveExternalNotification({ received: time, notification: { sent: time, sender: 'fa', type: 'feeds', feeds: [ feedInfo ] } }, 'show-server'));
+        background(() => rpcClient.receiveExternalNotification({ received: time, notification: { sent: time, sender: 'fa', type: 'feeds', feeds: [ feedInfo ] } }, DoNames.showServer));
     }
     const { feed: gotFeed } = getResponse;
     const guid = !Array.isArray(gotFeed) ? gotFeed.podcastGuid : undefined;

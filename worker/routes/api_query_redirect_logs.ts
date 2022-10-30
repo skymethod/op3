@@ -8,6 +8,7 @@ import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient,
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
+import { DoNames } from '../do_names.ts';
 
 export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
@@ -100,5 +101,5 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
     }
-    return await rpcClient.queryRedirectLogs(request, 'combined-redirect-log');
+    return await rpcClient.queryRedirectLogs(request, DoNames.combinedRedirectLog);
 }

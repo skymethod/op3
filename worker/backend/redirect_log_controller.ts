@@ -5,6 +5,7 @@ import { computeTimestamp } from '../timestamp.ts';
 import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect } from '../rpc_model.ts';
 import { check } from '../check.ts';
 import { consoleError } from '../tracer.ts';
+import { DoNames } from '../do_names.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -72,7 +73,7 @@ export class RedirectLogController {
         if (typeof doName === 'string') {
             const timestampId = await queryLatestTimestampId(storage);
             if (timestampId) {
-                await rpcClient.sendRedirectLogsNotification({ doName, timestampId, fromColo }, 'combined-redirect-log');
+                await rpcClient.sendRedirectLogsNotification({ doName, timestampId, fromColo }, DoNames.combinedRedirectLog);
             }
         }
     }

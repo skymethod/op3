@@ -24,6 +24,7 @@ import { initCloudflareTracer } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
 import { computeSetupResponse } from './routes/setup.ts';
+import { DoNames } from './do_names.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -99,7 +100,7 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
             }
             
             if (rawRedirects.length > 0) {
-                const doName = `redirect-log-${colo}`;
+                const doName = DoNames.redirectLogForColo(colo);
                 const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
                 await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }

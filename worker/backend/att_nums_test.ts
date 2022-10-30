@@ -18,6 +18,7 @@ Deno.test({
         assertEquals(attNums.packRecord({ id: 'a' }), '\t0:a\t');
         assertEquals(attNums.packRecord({ name: 'foo', id: 'a' }), '\t1:foo\t0:a\t');
         assertEquals(attNums.packRecord({ id: 'a\tb' }), '\t0:ab\t');
+        assertEquals(attNums.removingPackedAtt('\t1:foo\t0:a\t', 'name'), '\t0:a\t')
         // deno-lint-ignore no-explicit-any
         assertThrows(() => attNums.packRecord({ foo: 2 } as any));
 

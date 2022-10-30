@@ -12,6 +12,10 @@ export class AttNums {
         }
     }
 
+    find(name: string): number | undefined {
+        return this.namesToNums[name];
+    }
+
     get(name: string): number {
         let rt = this.namesToNums[name];
         if (typeof rt !== 'number') {
@@ -71,6 +75,15 @@ export class AttNums {
             }
         }
         return rt;
+    }
+
+    removingPackedAtt(record: string, name: string): string {
+        const num = this.find(name);
+        if (num === undefined) return record;
+        const start = record.indexOf(`\t${num}:`);
+        if (start < 0) return record;
+        const end = record.indexOf('\t', start + 1);
+        return record.substring(0, start) + record.substring(end);
     }
 
 }

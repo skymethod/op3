@@ -13,6 +13,7 @@ import { generateHmacKeyBytes } from '../crypto.ts';
 import { packHashedIpAddress, unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { importHmacKey } from '../crypto.ts';
 import { isStringRecord } from '../check.ts';
+import { DoNames } from '../do_names.ts';
 
 Deno.test({
     name: 'process -> queryRedirectLogs -> index-and-record-storage',
@@ -55,7 +56,7 @@ Deno.test({
             }
             async receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse> {
                 await Promise.resolve();
-                if (target === 'show-server' && request.notification.type === 'urls') {
+                if (target === DoNames.showServer && request.notification.type === 'urls') {
                     assertEquals(request.notification.urls.length, 1);
                     assertEquals(request.notification.urls[0].url, url);
                     return { kind: 'ok' };

@@ -20,6 +20,7 @@ import { ShowController } from './show_controller.ts';
 import { newPodcastIndexClient } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
 import { R2BucketBlobs } from './r2_bucket_blobs.ts';
+import { DoNames } from '../do_names.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -133,18 +134,17 @@ export class BackendDO {
                         await register(obj.info, storage);
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'admin-data') {
-                        const { operationKind, targetPath, parameters, dryRun = false } = obj;
-                        if (operationKind === 'select' && targetPath === '/registry' && durableObjectName === 'registry') {
+                        const { operationKind, targetPath = '', parameters, dryRun = false } = obj;
+                        if (operationKind === 'select' && targetPath === '/registry' && durableObjectName === DoNames.registry) {
                             return newRpcResponse({ kind: 'admin-data', results: await listRegistry(storage) });
-                        } else if (operationKind === 'select' && targetPath === '/keys' && durableObjectName === 'key-server') {
+                        } else if (operationKind === 'select' && targetPath === '/keys' && durableObjectName === DoNames.keyServer) {
                             return newRpcResponse({ kind: 'admin-data', results: await getOrLoadKeyController().listKeys() });
-                        } else if (operationKind === 'select' && targetPath === '/crl/sources') {
-                            return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listSources() });
-                        } else if (operationKind === 'select' && targetPath === '/crl/records') {
-                            return newRpcResponse({ kind: 'admin-data', results: await getOrLoadCombinedRedirectLogController().listRecords() });
-                        } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === 'api-key-server') {
+                        } else if (targetPath.startsWith('/crl/') && durableObjectName === DoNames.combinedRedirectLog) {
+                            const { results, message } = await getOrLoadCombinedRedirectLogController().adminExecuteDataQuery(obj);
+                            return newRpcResponse({ kind: 'admin-data', results, message });
+                        } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === DoNames.apiKeyServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
-                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === 'show-server') {
+                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === DoNames.showServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 
@@ -190,7 +190,7 @@ export class BackendDO {
                             await RedirectLogController.sendNotification(payload, { storage, rpcClient, fromColo });
                         } else if (alarmKind === CombinedRedirectLogController.processAlarmKind) {
                             await getOrLoadCombinedRedirectLogController().process();
-                        } else if (alarmKind === ShowController.processAlarmKind && durableObjectName === 'show-server') {
+                        } else if (alarmKind === ShowController.processAlarmKind && durableObjectName === DoNames.showServer) {
                             await getOrLoadShowController().work();
                         }
                         return newRpcResponse({ kind: 'ok' });
@@ -209,7 +209,7 @@ export class BackendDO {
                         return newRpcResponse(await getOrLoadApiAuthController().generateNewApiKey(obj));
                     } else if (obj.kind === 'get-api-key') {
                         return newRpcResponse(await getOrLoadApiAuthController().getApiKey(obj));
-                    } else if (obj.kind === 'external-notification' && durableObjectName === 'show-server') {
+                    } else if (obj.kind === 'external-notification' && durableObjectName === DoNames.showServer) {
                         await getOrLoadShowController().receiveExternalNotification(obj);
                         return newRpcResponse({ kind: 'ok' });
                     } else {
@@ -294,7 +294,7 @@ export class BackendDO {
         (async () => {
             try {
                 console.log(`ensureInitialized: registering`);
-                await rpcClient.registerDO({ info }, 'registry');
+                await rpcClient.registerDO({ info }, DoNames.registry);
                 console.log(`ensureInitialized: registered`);
             } catch (e) {
                 consoleWarn('backend-do-register', `Error registering do: ${e.stack || e}`);
@@ -313,7 +313,7 @@ function newKeyClient(rpcClient: RpcClient): KeyClient {
     const keyFetcher: KeyFetcher = async (keyKind: KeyKind, timestamp: string, id?: string) => {
         const importKey = keyKind === 'ip-address-hmac' ? importHmacKey : keyKind === 'ip-address-aes' ? importAesKey : undefined;
         if (!importKey) throw new Error(`Unsupported keyKind: ${keyKind}`);
-        const res = await rpcClient.getKey({ keyKind, timestamp, id }, 'key-server');
+        const res = await rpcClient.getKey({ keyKind, timestamp, id }, DoNames.keyServer);
         const key = await importKey(Bytes.ofBase64(res.rawKeyBase64));
         return { id: res.keyId, key };
     }

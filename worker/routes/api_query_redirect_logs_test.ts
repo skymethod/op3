@@ -2,6 +2,7 @@ import { assertEquals } from '../tests/deps.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { StubRpcClient } from '../tests/stub_rpc_client.ts';
+import { DoNames } from '../do_names.ts';
 
 Deno.test({
     name: 'computeQueryRedirectLogsResponse',
@@ -9,7 +10,7 @@ Deno.test({
         const rpcClient = new class extends StubRpcClient {
             async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
                 await Promise.resolve();
-                if (request.urlStartsWith === 'https://example.com/path/to/' && target === 'combined-redirect-log') {
+                if (request.urlStartsWith === 'https://example.com/path/to/' && target === DoNames.combinedRedirectLog) {
                     return new Response('ok!');
                 }
                 console.log(request, target);

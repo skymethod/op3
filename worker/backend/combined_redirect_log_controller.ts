@@ -1,6 +1,6 @@
 import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { checkMatches, isStringRecord } from '../check.ts';
-import { AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -10,6 +10,8 @@ import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
 import { consoleError, consoleWarn } from '../tracer.ts';
 import { newTextResponse } from '../responses.ts';
 import { computeServerUrl } from '../client_params.ts';
+import { computeListOpts } from './storage.ts';
+import { DoNames } from '../do_names.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -132,29 +134,45 @@ export class CombinedRedirectLogController {
         }
     }
 
-    async listSources(): Promise<Record<string, unknown>[]> {
+    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         await this.ensureInit();
-        const map = await this.storage.list({ prefix: 'crl.ss.' });
-        return [...map.values()].filter(isStringRecord);
-    }
-
-    async listRecords(): Promise<Record<string, unknown>[]> {
-        await this.ensureInit();
-        const attNums = await this.getOrLoadAttNums();
-
-        const map = await this.storage.list({ prefix: 'crl.r.', limit: 200 });
-        const rt: Record<string, unknown>[] = [];
-        for (const [ key, record ] of map) {
-            if (typeof record === 'string') {
-                const obj = attNums.unpackRecord(record);
-                rt.push({ 
-                    key: key.substring('crl.r.'.length),
-                    time: timestampToInstant(obj.timestamp),
-                    ...obj,
-                    encryptedIpAddress: undefined });
-            }
+        const { operationKind, targetPath, parameters = {} } = req;
+     
+        if (operationKind === 'select' && targetPath === '/crl/sources') {
+            const map = await this.storage.list(computeListOpts('crl.ss.', parameters));
+            const results = [...map.values()].filter(isStringRecord);
+            return { results };
         }
-        return rt;
+
+        if (operationKind === 'select' && targetPath === '/crl/attnums') {
+            const attNums = await this.getOrLoadAttNums();
+            return { results: [ attNums.toJson() ] };
+        }
+
+        if (operationKind === 'select' && targetPath === '/crl/records') {
+            const { format } = parameters;
+            const formatPacked = format === 'packed';
+            const attNums = await this.getOrLoadAttNums();
+            const map = await this.storage.list(computeListOpts('crl.r.', parameters));
+            const results: unknown[] = [];
+            for (const [ key, record ] of map) {
+                if (typeof record === 'string') {
+                    if (formatPacked) {
+                        results.push(attNums.removingPackedAtt(record, 'encryptedIpAddress'));
+                    } else {
+                        const obj = attNums.unpackRecord(record);
+                        results.push({ 
+                            _key: key.substring('crl.r.'.length),
+                            time: timestampToInstant(obj.timestamp),
+                            ...obj,
+                            encryptedIpAddress: undefined });
+                    }
+                }
+            }
+            return { results };
+        }
+
+        throw new Error(`Unsupported crl-related query`);
     }
 
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>): Promise<Response> {
@@ -272,7 +290,7 @@ export class CombinedRedirectLogController {
                     urls,
                 };
                 console.log(`CombinedRedirectLogController: Sending notification with ${urls.length} urls`);
-                await rpcClient.receiveExternalNotification({ received: time, notification }, 'show-server');
+                await rpcClient.receiveExternalNotification({ received: time, notification }, DoNames.showServer);
                 const newUrlRecords = Object.fromEntries(urls.map(v => [ computeUrlKey(v.url), v ]));
                 await storage.transaction(async tx => {
                     await tx.put(newUrlRecords);

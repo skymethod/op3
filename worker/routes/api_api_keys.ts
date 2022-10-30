@@ -1,3 +1,4 @@
+import { DoNames } from '../do_names.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { isUnkindedModifyApiKeyRequest, RpcClient } from '../rpc_model.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -15,7 +16,7 @@ export async function computeApiKeysResponse({ instance, method, hostname, bodyP
     await commonTurnstileValidation(hostname, turnstileSecretKey, turnstileToken, rawIpAddress!);
 
     // looks good, generate or lookup an api key
-    const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, 'api-key-server') : await rpcClient.generateNewApiKey({ }, 'api-key-server');
+    const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, DoNames.apiKeyServer) : await rpcClient.generateNewApiKey({ }, DoNames.apiKeyServer);
     const { info: { apiKey, status, created, permissions, name, token, tokenLastUsed, blockReason } } = res;
 
     return newJsonResponse({ apiKey, status, created, permissions, name, token, tokenLastUsed, blockReason });
@@ -37,7 +38,7 @@ export async function computeApiKeyResponse(apiKeyInput: string, isAdmin: boolea
     }
 
     // looks good, modify the api key
-    const { info: { apiKey, created, updated, name, permissions, status, token, tokenLastUsed, blockReason } } = await rpcClient.modifyApiKey(req, 'api-key-server');
+    const { info: { apiKey, created, updated, name, permissions, status, token, tokenLastUsed, blockReason } } = await rpcClient.modifyApiKey(req, DoNames.apiKeyServer);
 
     return newJsonResponse({ apiKey, created, updated, name, permissions, status, token, tokenLastUsed, blockReason });
 }
