@@ -159,6 +159,16 @@ Deno.test({
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://r.zen.ai/r/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'zencastr', url: 'https://r.zen.ai/r/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://r.zen.ai/r/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'zencastr', url: 'http://r.zen.ai/r/http://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 

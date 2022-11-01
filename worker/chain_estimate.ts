@@ -157,6 +157,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podder', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://r.zen.ai/r/a.com/path/to/episode.mp3
+    // http redirects to self https, suffix protocol supported, but not used! always https
+    m = /^https?:\/\/r\.zen\.ai\/r\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, _suffixProtocol, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'zencastr', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -180,5 +189,20 @@ export type ChainEstimate = readonly ChainItem[];
 export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
-    readonly prefix?: 'op3' | 'podtrac' | 'podsights' | 'chartable' | 'veritonic' | 'artsai' | 'podcorn' | 'gumball' | 'podscribe' | 'claritas' | 'podkite' | 'blubrry' | 'magellan' | 'podder';
+    readonly prefix?: 'op3'
+        | 'artsai'
+        | 'blubrry'
+        | 'chartable'
+        | 'claritas'
+        | 'gumball'
+        | 'magellan'
+        | 'podcorn'
+        | 'podder'
+        | 'podkite'
+        | 'podscribe'
+        | 'podsights'
+        | 'podtrac'
+        | 'veritonic'
+        | 'zencastr'
+        ;
 }
