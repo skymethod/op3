@@ -13,7 +13,11 @@ export class R2BucketBlobs implements Blobs {
 
     async put(key: string, body: string | ReadableStream<Uint8Array> | ArrayBuffer): Promise<void> {
         const { bucket, prefix } = this;
-        await bucket.put(prefix + key, body);
+        if (body instanceof ReadableStream) {
+            await bucket.put(prefix + key, body);
+        } else {
+            await r2(() => bucket.put(prefix + key, body));
+        }
     }
 
     get(key: string, as: 'stream'): Promise<ReadableStream<Uint8Array> | undefined>;
