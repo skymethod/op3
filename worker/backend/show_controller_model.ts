@@ -45,6 +45,8 @@ export interface FeedRecord {
     readonly showUuid?: string;
     readonly title?: string;
     readonly podcastGuid?: string;
+    readonly created?: string; // instant
+    readonly updated?: string; // instant
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -64,6 +66,8 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.showUuid === undefined || typeof obj.showUuid === 'string')
         && (obj.title === undefined || typeof obj.title === 'string')
         && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
+        && (obj.created === undefined || typeof obj.created === 'string')
+        && (obj.updated === undefined || typeof obj.updated === 'string')
         ;
 }
 

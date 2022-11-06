@@ -316,15 +316,16 @@ async function lookupPodcastGuid(podcastGuid: string, storage: DurableObjectStor
 
         if (feedRecordId && piFeedUrl) {
             const existing = await tx.get(computeFeedRecordKey(feedRecordId));
+            const time = new Date().toISOString();
             if (existing) {
                 if (isFeedRecord(existing)) {
-                    const update: FeedRecord = { ...existing, piFeed, piCheckedInstant };
+                    const update: FeedRecord = { ...existing, piFeed, piCheckedInstant, updated: time };
                     await tx.put(computeFeedRecordKey(feedRecordId), update);
                 } else {
                     consoleWarn(`sc-lookup-podcast-guid`, `Failed update bad FeedRecord: ${JSON.stringify(existing)}`);
                 }
             } else {
-                const insert: FeedRecord = { id: feedRecordId, url: piFeedUrl, state: 'new', piFeed, piCheckedInstant };
+                const insert: FeedRecord = { id: feedRecordId, url: piFeedUrl, state: 'new', piFeed, piCheckedInstant, created: time, updated: time };
                 await tx.put(computeFeedRecordKey(feedRecordId), insert);
                 consoleInfo('sc-lookup-podcast-guid', `Inserted new FeedRecord: ${insert.url}`);
             }
@@ -358,8 +359,8 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
             consoleWarn(`sc-lookup-podcast-feed`, `Bad FeedRecord found: ${JSON.stringify(existing)}`);
             return;
         }
-        const piCheckedInstant = new Date().toISOString();
-        const update: FeedRecord = { ...existing, piFeed, piCheckedInstant };
+        const time = new Date().toISOString();
+        const update: FeedRecord = { ...existing, piFeed, piCheckedInstant: time, updated: time };
         await tx.put(computeFeedRecordKey(feedRecordId), update);
     });
     // TODO enqueue update-feed if necessary
@@ -399,7 +400,7 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const feedRecordKey = computeFeedRecordKey(feedRecord.id);
     const updated = await storage.transaction(async tx => {
         const existing = await tx.get(feedRecordKey);
-        if (!isFeedRecord(existing)) return; // deleted?
+        if (!isFeedRecord(existing)) return undefined; // deleted?
         let update = existing;
         if (fetchInfo.status === 200) {
             rt.push('200');
@@ -412,6 +413,7 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             if (fetchInfo.error !== undefined) rt.push(JSON.stringify(fetchInfo.error));
             update = { ...update, lastErrorFetch: fetchInfo };
         }
+        update = { ...update, updated: new Date().toISOString() };
         await tx.put(feedRecordKey, update);
         return update;
     });
@@ -457,7 +459,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
 
     // update feed-level attributes if necessary
     if (feedRecord.title !== feed.title || feedRecord.podcastGuid !== feed.podcastGuid) {
-        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid };
+        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid, updated: new Date().toISOString() };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
         if (feedRecord.title !== feed.title) rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
         if (feedRecord.podcastGuid !== feed.podcastGuid) rt.push(`updated podcastGuid from ${feedRecord.podcastGuid} -> ${feed.podcastGuid}`);
@@ -586,7 +588,7 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     rt.push(`showGuid: ${showUuid}`);
 
     // save feed and show record
-    const update: FeedRecord = { ...feedRecord, showUuid };
+    const update: FeedRecord = { ...feedRecord, showUuid, updated: new Date().toISOString() };
     const showRecord: ShowRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
     await storage.put(Object.fromEntries([
         [ computeFeedRecordKey(update.id), update ],
