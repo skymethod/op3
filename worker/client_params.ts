@@ -40,7 +40,9 @@ export function tryParseClientParams(url: string): { serverUrl: string, clientPa
     for (const stub of valueless) {
         qp = qp.replace(`=${stub}`, '');
     }
-    const serverUrl = url.substring(0, i) + (qp === '' ? '' : `?${qp}`);
+    let prefix = url.substring(0, i);
+    if (tunein && prefix.endsWith('/;')) prefix = prefix.substring(0, prefix.length - 2); // .mp3/;?DIST=TuneIn&TGT=TuneIn&maxServers=2
+    const serverUrl = prefix + (qp === '' ? '' : `?${qp}`);
     return { serverUrl, clientParams };
 }
 

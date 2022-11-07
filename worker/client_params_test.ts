@@ -51,5 +51,6 @@ Deno.test({
         assertEquals(computeServerUrl('https://a.com:443/foo'), 'https://a.com/foo');
         assertEquals(computeServerUrl('http://sub.a.com:80/foo?a=b'), 'http://sub.a.com/foo?a=b');
         assertEquals(computeServerUrl('http://a.com/foo?fbclid=trackinu'), 'http://a.com/foo');
+        assertEquals(computeServerUrl('https://a.com/foo.mp3/;?DIST=TuneIn&TGT=TuneIn&maxServers=2'), 'https://a.com/foo.mp3');
     }
 });
