@@ -64,14 +64,14 @@ Basic request-level data is available in the API, all other future features will
 ## Work plan
  - ✅ Launch highly-available, performant prefix redirect service
  - ✅ Make low-level minimized **request** data available in the API
- - 👨‍💻 Identify podcast show and episode information for each episode url using the service
- - 🔜 Publish documentation site with setup guides for every podcast hosting company and FAQs on how to audit the project claims and policies
- - 🔜 Make high-quality podcast and episode **download** data available in the API
+ - ✅ Identify podcast show and episode information for each episode url using the service
+ - 👨‍💻 Make high-quality podcast and episode **download** data available in the API
    - (This will be the most useful data for podcast use cases such as verifying downloads for advertisers or comparing shows)
    - Filter out duplicate requests from the same listener
    - Distinguish apps from bots by User-Agent, building on the [public OPAWG User agent list](https://github.com/opawg/user-agents)
    - Categorize request IPs using known IP ranges of cloud services, vpns, tor traffic, etc, and exclude ranges representing automated traffic
    - Implement a solid first-pass calculation along the lines of the [Open Downloads](https://github.com/open-downloads/odl) criteria
+ - 🔜 Publish documentation site with setup guides for every podcast hosting company and FAQs on how to audit the project claims and policies
  - 🔜 Build user-friendly charts and widgets for podcasters to easily reference and/or integrate into their own sites
  - 🔜 Build useful data exports to Google Sheets, Zapier, etc
  - 🔜 Build operational tools to support ongoing maintenance, data management, and abuse/fraud detection with minimal staffing needs
