@@ -2,6 +2,7 @@
     "deno.enable": true,
     "deno.unstable": true,
     "files.exclude": {
-        "deno-*": true
+        "deno-*": true,
+        "deno.lock": true,
     }
 }
