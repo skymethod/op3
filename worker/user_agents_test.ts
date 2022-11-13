@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@c7260ad284c0a7a6ba171ddd0a58f4e541f6d413 (2022-11-13T15:07:14Z)
+// from user-agents-v2@3f00c1a3718d513b3d195579ea1dec6d8cc3bb67 (2022-11-13T18:24:17Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -218,6 +218,7 @@ const appTests = {
     'Podcastit/1660.5 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Apple Podcasts` },
     'Podkaster/1710.17 CFNetwork/1399 Darwin/22.1.0': { type: 'app', name: `Apple Podcasts` },
     'Balados/1660.5 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Apple Podcasts` },
+    'Podcast/1660.5 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Apple Podcasts` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Askoyvaringen Hermes/90.0.0 _app_': { type: 'app', name: `Askoyvaringen iOS app` },
     'Audacious/3.10.1 neon/0.30.2': { type: 'app', name: `Audacious` },
     'Radio.com/12.2.0 (com.cbsradio.cbsradioplayer; build:1; iOS 14.6.0) Alamofire/4.8.1': { type: 'app', name: `Audacy` },
@@ -615,6 +616,7 @@ const appTests = {
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
     'radio.de/4671 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `radio.de` },
     'Radioline%202/5.8.4 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Radioline` },
+    'Radioline': { type: 'app', name: `Radioline` },
     'RadioPublic/android-2.2': { type: 'app', name: `RadioPublic` },
     'RadioPublic/iOS-2.0': { type: 'app', name: `RadioPublic` },
     'RadioPublicDraper/81b12be Faraday/0.15.2 ruby/2.3.8': { type: 'app', name: `RadioPublic` },
