@@ -176,6 +176,12 @@ Deno.test({
             { kind: 'destination', url: 'https://traffic.megaphone.fm/episode.mp3?updated=1668088535' }
         ]);
 
+        assertEquals(computeChainEstimate('https://op3.dev/e/https://chtbl.com/track/12345/dts.podtrac.com/redirect.m4a/a.com/path/to/episode.m4a'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/https://chtbl.com/track/12345/dts.podtrac.com/redirect.m4a/a.com/path/to/episode.m4a' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chtbl.com/track/12345/dts.podtrac.com/redirect.m4a/a.com/path/to/episode.m4a' },
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://dts.podtrac.com/redirect.m4a/a.com/path/to/episode.m4a' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.m4a' }
+        ]);
     }
 });
 
