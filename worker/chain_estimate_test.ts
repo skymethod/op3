@@ -182,6 +182,14 @@ Deno.test({
             { kind: 'prefix', prefix: 'podtrac', url: 'https://dts.podtrac.com/redirect.m4a/a.com/path/to/episode.m4a' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.m4a' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/https://play.podtrac.com/ABC-Whatever/chrt.fm/track/12345/pdst.fm/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/https://play.podtrac.com/ABC-Whatever/chrt.fm/track/12345/pdst.fm/e/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://play.podtrac.com/ABC-Whatever/chrt.fm/track/12345/pdst.fm/e/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/12345/pdst.fm/e/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
