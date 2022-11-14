@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@878a0b6b9f8222d091239b2c015bbe1bb8f61fae (2022-11-14T00:42:00Z)
+// from user-agents-v2@8e0dd32286ec15075bec29102ef620d93db6a6e7 (2022-11-14T01:06:42Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -606,6 +606,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/:\/\/www\.audible(\.com|\.co\.uk)\//.test(referer)) return { name: `Audible`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.buzzsprout\.com\//.test(referer)) return { name: `Buzzsprout Web Player`, type: 'referrer', category: 'host' };
     if (/:\/\/player\.captivate\.fm\//.test(referer)) return { name: `Captivate Web Player`, type: 'referrer', category: 'host' };
+    if (/:\/\/castamatic\.com\//.test(referer)) return { name: `Castamatic`, type: 'referrer', category: 'app' };
     if (/^https:\/\/castbox\.fm\//.test(referer)) return { name: `CastBox`, type: 'referrer', category: 'app' };
     if (/^https:\/\/castro\.fm\//.test(referer)) return { name: `Castro`, type: 'referrer', category: 'app' };
     if (/:\/\/link\.chtbl\.com\//.test(referer)) return { name: `Chartable`, type: 'referrer' };
@@ -614,22 +615,26 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/^https:\/\/www\.deezer\.com\//.test(referer)) return { name: `Deezer`, type: 'referrer', category: 'app' };
     if (/^https?:\/\/(lm|m|www|l)\.facebook\.com\//.test(referer)) return { name: `Facebook`, type: 'referrer', category: 'app' };
     if (/:\/\/feedly\.com\//.test(referer)) return { name: `Feedly`, type: 'referrer', category: 'app' };
+    if (/:\/\/[^.\/]+\.feedspot\.com\//.test(referer)) return { name: `Feedspot`, type: 'referrer', category: 'app' };
     if (/:\/\/fountain\.fm\//.test(referer)) return { name: `Fountain`, type: 'referrer', category: 'app' };
     if (/^https:\/\/gaana\.com\//.test(referer)) return { name: `Gaana`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(www\.)?goodpods\.com/.test(referer)) return { name: `Goodpods`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podcasts\.google\.com\//.test(referer)) return { name: `Google Podcasts`, type: 'referrer', category: 'app' };
     if (/^https\:\/\/make\.headliner\.app\//.test(referer)) return { name: `Headliner`, type: 'referrer', category: 'app' };
     if (/^https:\/\/www\.iheart\.com\//.test(referer)) return { name: `iHeartRadio`, type: 'referrer', category: 'app' };
+    if (/:\/\/www\.inoreader\.com\//.test(referer)) return { name: `Inoreader`, type: 'referrer', category: 'app' };
     if (/:\/\/www\.jam\.ai\//.test(referer)) return { name: `Jam`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.justcast\.com\//.test(referer)) return { name: `JustCast`, type: 'referrer', category: 'host' };
     if (/kajabi\.com\/?$/.test(referer)) return { name: `Kajabi`, type: 'referrer', category: 'host' };
     if (/^https:\/\/www\.linkedin\.com\//.test(referer)) return { name: `LinkedIn`, type: 'referrer', category: 'app' };
     if (/^https:\/\/www\.listennotes\.com\//.test(referer)) return { name: `Listen Notes`, type: 'referrer' };
+    if (/:\/\/luminarypodcasts\.com\//.test(referer)) return { name: `Luminary`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.megaphone\.fm\//.test(referer)) return { name: `Megaphone`, type: 'referrer', category: 'host' };
     if (/^https:\/\/www\.mixcloud\.com\//.test(referer)) return { name: `Mixcloud`, type: 'referrer', category: 'app' };
     if (/^https:\/\/overcast\.fm\//.test(referer)) return { name: `Overcast`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(\w*\.)?pandora\.com\//.test(referer)) return { name: `Pandora`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(www\.|app\.)?parler\.com/.test(referer)) return { name: `Parler`, type: 'referrer', category: 'app' };
+    if (/:\/\/playapod\.com\//.test(referer)) return { name: `Playapod`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(\w*\.)?player\.fm\//.test(referer)) return { name: `Player FM`, type: 'referrer', category: 'app' };
     if (/:\/\/play\.pocketcasts\.com\/|:\/\/pca\.st\//.test(referer)) return { name: `Pocket Casts`, type: 'referrer', category: 'app' };
     if (/^https?:\/\/(old\.)?podbay\.fm\//.test(referer)) return { name: `Podbay`, type: 'referrer', category: 'app' };
@@ -639,13 +644,15 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/^https:\/\/podcast\.app\//.test(referer)) return { name: `Podcast.app`, type: 'referrer', category: 'app' };
     if (/https:\/\/www\.podchaser\.com\//.test(referer)) return { name: `Podchaser`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.podfriend\.com\//.test(referer)) return { name: `Podfriend`, type: 'referrer', category: 'app' };
+    if (/:\/\/podgrabber\.com\//.test(referer)) return { name: `PodGrabber`, type: 'referrer', category: 'app' };
     if (/\/\/pod\.link\//.test(referer)) return { name: `PodLink`, type: 'referrer', category: 'app' };
     if (/podplay\.com/.test(referer)) return { name: `Podplay`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podtail\.com\//.test(referer)) return { name: `Podtail`, type: 'referrer' };
     if (/:\/\/podverse\.fm\//.test(referer)) return { name: `Podverse`, type: 'referrer', category: 'app' };
     if (/:\/\/podvine\.com\//.test(referer)) return { name: `Podvine`, type: 'referrer', category: 'host' };
     if (/^https:\/\/podyssey\.fm\//.test(referer)) return { name: `Podyssey`, type: 'referrer', category: 'app' };
-    if (/^https:\/\/radiopublic\.com\//.test(referer)) return { name: `RadioPublic`, type: 'referrer', category: 'app' };
+    if (/:\/\/(embed\.)?radiopublic\.com\//.test(referer)) return { name: `RadioPublic`, type: 'referrer', category: 'app' };
+    if (/:\/\/player\.simplecast\.com\//.test(referer)) return { name: `Simplecast`, type: 'referrer', category: 'host' };
     if (/https:\/\/(open|api-partner)\.spotify\.com/.test(referer)) return { name: `Spotify`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(www|app|classic)\.stitcher\.com\//.test(referer)) return { name: `Stitcher`, type: 'referrer', category: 'app' };
     if (/:\/\/([^.\/]+\.)?transistor\.fm\//.test(referer)) return { name: `Transistor Web Player`, type: 'referrer', category: 'host' };

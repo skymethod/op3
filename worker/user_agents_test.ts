@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@878a0b6b9f8222d091239b2c015bbe1bb8f61fae (2022-11-14T00:42:00Z)
+// from user-agents-v2@8e0dd32286ec15075bec29102ef620d93db6a6e7 (2022-11-14T01:06:42Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -807,6 +807,7 @@ const referrerTests = {
     'https://asdf.buzzsprout.com/': { type: 'referrer', name: `Buzzsprout Web Player` },
     'https://www.buzzsprout.com/': { type: 'referrer', name: `Buzzsprout Web Player` },
     'https://player.captivate.fm/': { type: 'referrer', name: `Captivate Web Player` },
+    'https://castamatic.com/': { type: 'referrer', name: `Castamatic` },
     'https://castbox.fm/': { type: 'referrer', name: `CastBox` },
     'https://castro.fm/': { type: 'referrer', name: `Castro` },
     'https://link.chtbl.com/': { type: 'referrer', name: `Chartable` },
@@ -818,18 +819,22 @@ const referrerTests = {
     'https://lm.facebook.com/': { type: 'referrer', name: `Facebook` },
     'https://l.facebook.com/': { type: 'referrer', name: `Facebook` },
     'https://feedly.com/': { type: 'referrer', name: `Feedly` },
+    'https://www.feedspot.com/': { type: 'referrer', name: `Feedspot` },
+    'https://blog.feedspot.com/': { type: 'referrer', name: `Feedspot` },
     'https://fountain.fm/': { type: 'referrer', name: `Fountain` },
     'https://www.goodpods.com': { type: 'referrer', name: `Goodpods` },
     'https://goodpods.com': { type: 'referrer', name: `Goodpods` },
     'https://podcasts.google.com/': { type: 'referrer', name: `Google Podcasts` },
     'https://make.headliner.app/': { type: 'referrer', name: `Headliner` },
     'https://www.iheart.com/': { type: 'referrer', name: `iHeartRadio` },
+    'https://www.inoreader.com/': { type: 'referrer', name: `Inoreader` },
     'https://www.jam.ai/': { type: 'referrer', name: `Jam` },
     'https://widget.justcast.com/': { type: 'referrer', name: `JustCast` },
     'https://melisa-liberman.mykajabi.com/': { type: 'referrer', name: `Kajabi` },
     'https://creativityfound.mykajabi.com/': { type: 'referrer', name: `Kajabi` },
     'https://www.linkedin.com/': { type: 'referrer', name: `LinkedIn` },
     'https://www.listennotes.com/': { type: 'referrer', name: `Listen Notes` },
+    'https://luminarypodcasts.com/': { type: 'referrer', name: `Luminary` },
     'https://playlist.megaphone.fm/': { type: 'referrer', name: `Megaphone` },
     'https://www.mixcloud.com/': { type: 'referrer', name: `Mixcloud` },
     'https://overcast.fm/': { type: 'referrer', name: `Overcast` },
@@ -840,6 +845,7 @@ const referrerTests = {
     'https://parler.com/': { type: 'referrer', name: `Parler` },
     'https://www.parler.com/': { type: 'referrer', name: `Parler` },
     'https://app.parler.com/': { type: 'referrer', name: `Parler` },
+    'https://playapod.com/': { type: 'referrer', name: `Playapod` },
     'https://player.fm/': { type: 'referrer', name: `Player FM` },
     'https://es.player.fm/': { type: 'referrer', name: `Player FM` },
     'https://play.pocketcasts.com/': { type: 'referrer', name: `Pocket Casts` },
@@ -858,6 +864,7 @@ const referrerTests = {
     'https://www.podchaser.com/something': { type: 'referrer', name: `Podchaser` },
     'https://web.podfriend.com/': { type: 'referrer', name: `Podfriend` },
     'https://widget.podfriend.com/': { type: 'referrer', name: `Podfriend` },
+    'https://podgrabber.com/': { type: 'referrer', name: `PodGrabber` },
     'https://pod.link/': { type: 'referrer', name: `PodLink` },
     'https://www.podplay.com/': { type: 'referrer', name: `Podplay` },
     'https://podtail.com/': { type: 'referrer', name: `Podtail` },
@@ -865,6 +872,8 @@ const referrerTests = {
     'https://podverse.fm/livestreams': { type: 'referrer', name: `Podverse` },
     'https://podvine.com/': { type: 'referrer', name: `Podvine` },
     'https://radiopublic.com/': { type: 'referrer', name: `RadioPublic` },
+    'https://embed.radiopublic.com/': { type: 'referrer', name: `RadioPublic` },
+    'https://player.simplecast.com/': { type: 'referrer', name: `Simplecast` },
     'https://open.spotify.com/show/3vhBp6pPJEYgGfOXGU8ogu': { type: 'referrer', name: `Spotify` },
     'https://open.spotify.com/': { type: 'referrer', name: `Spotify` },
     'https://api-partner.spotify.com/': { type: 'referrer', name: `Spotify` },
