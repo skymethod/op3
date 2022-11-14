@@ -169,6 +169,13 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://op3.dev/e/chrt.fm/track/12345/https:/verifi.podscribe.com/rss/p/traffic.megaphone.fm/episode.mp3?updated=1668088535'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/chrt.fm/track/12345/https:/verifi.podscribe.com/rss/p/traffic.megaphone.fm/episode.mp3?updated=1668088535' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/12345/https:/verifi.podscribe.com/rss/p/traffic.megaphone.fm/episode.mp3?updated=1668088535' },
+            { kind: 'prefix', prefix: 'podscribe', url: 'https://verifi.podscribe.com/rss/p/traffic.megaphone.fm/episode.mp3?updated=1668088535' },
+            { kind: 'destination', url: 'https://traffic.megaphone.fm/episode.mp3?updated=1668088535' }
+        ]);
+
     }
 });
 
