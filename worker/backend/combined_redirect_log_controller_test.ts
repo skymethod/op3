@@ -2,7 +2,7 @@ import { assertEquals, assertNotEquals } from '../tests/deps.ts';
 import { InMemoryDurableObjectStorage, assert } from '../tests/deps.ts';
 import { CombinedRedirectLogController, IndexId } from './combined_redirect_log_controller.ts';
 import { StubRpcClient } from '../tests/stub_rpc_client.ts';
-import { Unkinded,GetNewRedirectLogsRequest,GetNewRedirectLogsResponse, ExternalNotificationRequest, OkResponse, isUrlInfo } from '../rpc_model.ts';
+import { Unkinded, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, ExternalNotificationRequest, OkResponse, isUrlInfo } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { generateUuid } from '../uuid.ts';
@@ -37,7 +37,7 @@ Deno.test({
         const range = 'bytes: 0-1';
         const edgeColo = 'TST';
         const rpcClient = new class extends StubRpcClient {
-            async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse> {
+            async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
                 await Promise.resolve();
                 if (target === 'test') {
                     const seq = new TimestampSequence(3);
@@ -47,7 +47,7 @@ Deno.test({
                     const records: Record<string, string> = {};
                     records[key1] = packed;
                     return {
-                        kind: 'get-new-redirect-logs',
+                        kind: 'packed-redirect-logs',
                         namesToNums: attNums.toJson(),
                         records,
                     }

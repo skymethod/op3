@@ -124,7 +124,7 @@ export class BackendDO {
                     } else if (obj.kind === 'get-new-redirect-logs') {
                         const { limit, startAfterTimestampId } = obj;
                         const { namesToNums, records } = await getOrLoadRedirectLogController().getNewRedirectLogs({ limit, startAfterTimestampId });
-                        return newRpcResponse({ kind: 'get-new-redirect-logs', namesToNums, records });
+                        return newRpcResponse({ kind: 'packed-redirect-logs', namesToNums, records });
                     } else if (obj.kind === 'get-key') {
                         // get or generate key
                         const { keyKind, timestamp, id } = obj;

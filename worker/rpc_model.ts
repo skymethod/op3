@@ -14,6 +14,7 @@ export type RpcRequest =
     | GetNewRedirectLogsRequest
     | LogRawRedirectsRequest 
     | ModifyApiKeyRequest
+    | QueryPackedRedirectLogsRequest
     | QueryRedirectLogsRequest
     | RedirectLogsNotificationRequest
     | RegisterDORequest 
@@ -33,6 +34,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'log-raw-redirects' 
         || obj.kind === 'modify-api-key'
+        || obj.kind === 'query-packed-redirect-logs'
         || obj.kind === 'query-redirect-logs'
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'register-do' 
@@ -156,6 +158,15 @@ export interface GetNewRedirectLogsRequest {
     readonly startAfterTimestampId?: string;
 }
 
+export interface QueryPackedRedirectLogsRequest {
+    readonly kind: 'query-packed-redirect-logs';
+    readonly limit: number;
+
+    readonly startTimeInclusive?: string; // instant
+    readonly startTimeExclusive?: string; // instant
+    readonly endTimeExclusive?: string; // instant
+}
+
 export interface QueryRedirectLogsRequest {
     readonly kind: 'query-redirect-logs';
 
@@ -273,7 +284,7 @@ export type RpcResponse =
     | GetKeyResponse 
     | AdminDataResponse
     | AdminRebuildIndexResponse
-    | GetNewRedirectLogsResponse
+    | PackedRedirectLogsResponse
     | ResolveApiTokenResponse
     | ApiKeyResponse
     ;
@@ -285,7 +296,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'get-key'
         || obj.kind === 'admin-data'
         || obj.kind === 'admin-rebuild-index'
-        || obj.kind === 'get-new-redirect-logs'
+        || obj.kind === 'packed-redirect-logs'
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
     );
@@ -325,8 +336,8 @@ export interface PackedRedirectLogs {
     readonly records: Record<string, string>; // timestampId -> packed record
 }
 
-export interface GetNewRedirectLogsResponse extends PackedRedirectLogs {
-    readonly kind: 'get-new-redirect-logs';
+export interface PackedRedirectLogsResponse extends PackedRedirectLogs {
+    readonly kind: 'packed-redirect-logs';
 }
 
 export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics';
@@ -411,7 +422,8 @@ export interface RpcClient {
     sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse>;
     logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse>;
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
-    getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<GetNewRedirectLogsResponse>;
+    getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
+    queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
