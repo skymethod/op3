@@ -112,7 +112,8 @@ export class BackendDO {
                             if (!podcastIndexClient) throw new Error(`Valid 'podcastIndexCredentials' are required to init ShowController`);
                             if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init ShowController`);
                             const feedBlobs = new R2BucketBlobs(blobsBucket, 'feed/');
-                            this.showController = new ShowController(storage, podcastIndexClient, origin, feedBlobs);
+                            const statsBlobs = new R2BucketBlobs(blobsBucket, 'stats/');
+                            this.showController = new ShowController({ storage, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient });
                         }
                         return this.showController;
                     }
@@ -144,7 +145,7 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === DoNames.apiKeyServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
-                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === DoNames.showServer) {
+                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/') || /^\/stats(\/.*)?$/.test(targetPath)) && durableObjectName === DoNames.showServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 
@@ -212,6 +213,8 @@ export class BackendDO {
                     } else if (obj.kind === 'external-notification' && durableObjectName === DoNames.showServer) {
                         await getOrLoadShowController().receiveExternalNotification(obj);
                         return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.combinedRedirectLog) {
+                        return newRpcResponse(await getOrLoadCombinedRedirectLogController().queryPackedRedirectLogs(obj));
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

@@ -1,8 +1,8 @@
-import { check, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { check, isString, isStringRecord, isValidGuid, isValidInstant } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, Unkinded } from '../rpc_model.ts';
-import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { addHours, computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
@@ -14,6 +14,7 @@ import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { Blobs } from './blobs.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
+import { DoNames } from '../do_names.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -23,12 +24,16 @@ export class ShowController {
     private readonly notifications: ShowControllerNotifications;
     private readonly origin: string;
     private readonly feedBlobs: Blobs;
+    private readonly statsBlobs: Blobs;
+    private readonly rpcClient: RpcClient;
 
-    constructor(storage: DurableObjectStorage, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs) {
+    constructor({ storage, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
         this.storage = storage;
         this.podcastIndexClient = podcastIndexClient;
         this.origin = origin;
         this.feedBlobs = feedBlobs;
+        this.statsBlobs = statsBlobs;
+        this.rpcClient = rpcClient;
         this.notifications = new ShowControllerNotifications(storage, origin);
         this.notifications.callbacks = {
             onPodcastGuids: async podcastGuids => {
@@ -202,6 +207,18 @@ export class ShowController {
                     const results = isShowRecord(result) ? [ result ] : [];
                     return { results }
                 }
+            }
+        }
+
+        if (targetPath === '/stats' && operationKind === 'update') {
+            const { hour } = parameters;
+            if (typeof hour === 'string') {
+                const startInstant = `${hour}:00:00.000Z`;
+                if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
+                const endInstant = addHours(startInstant, 1).toISOString();
+                const limit = 100;
+                const _packed = await this.rpcClient.queryPackedRedirectLogs({ limit, startTimeInclusive: startInstant, endTimeExclusive: endInstant }, DoNames.combinedRedirectLog);
+                // TODO
             }
         }
 

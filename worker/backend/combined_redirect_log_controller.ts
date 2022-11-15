@@ -1,6 +1,6 @@
 import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { checkMatches, isStringRecord } from '../check.ts';
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -180,6 +180,22 @@ export class CombinedRedirectLogController {
         const attNums = await this.getOrLoadAttNums();
         const mostBehindTimestamp = typeof this.mostBehindTimestampId === 'string' ? this.mostBehindTimestampId.substring(0, 15) : undefined;
         return await queryCombinedRedirectLogs(request, mostBehindTimestamp, attNums, this.storage);
+    }
+
+    async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
+        await this.ensureInit();
+        const attNums = await this.getOrLoadAttNums();
+        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive } = request;
+        const records: Record<string, string> = {}; // timestampId -> packed record
+        const prefix = 'crl.r.';
+        const map = await this.storage.list({ prefix, limit, start: startTimeInclusive, startAfter: startTimeExclusive, end: endTimeExclusive });
+        for (const [ key, record ] of map) {
+            if (typeof record === 'string') {
+                const timestampId = key.substring(prefix.length);
+                records[timestampId] = record;
+            }
+        }
+        return { kind: 'packed-redirect-logs', namesToNums: attNums.toJson(), records };
     }
 
     async rebuildIndex(request: Unkinded<AdminRebuildIndexRequest>): Promise<AdminRebuildIndexResponse> {
