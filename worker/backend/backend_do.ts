@@ -8,7 +8,7 @@ import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
 import { listRegistry, register } from './registry_controller.ts';
-import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest } from '../routes/admin_api.ts';
+import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest, tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
 import { tryParseInt } from '../check.ts';
@@ -176,6 +176,11 @@ export class BackendDO {
                                     return newRpcResponse({ kind: 'admin-data', results: messages });
                                 }
                             }
+                        }
+
+                        const req = tryParseRedirectLogRequest(targetPath);
+                        if (req && durableObjectName === DoNames.redirectLogForColo(req.colo)) {
+                            return newRpcResponse({ kind: 'admin-data', ...await getOrLoadRedirectLogController().adminExecuteDataQuery(obj) });
                         }
                     } else if (obj.kind === 'redirect-logs-notification') {
                         console.log(`notification received: ${JSON.stringify(obj)}`);

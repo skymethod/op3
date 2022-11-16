@@ -2,10 +2,12 @@ import { DurableObjectStorage } from '../deps.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { computeTimestamp } from '../timestamp.ts';
-import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect } from '../rpc_model.ts';
+import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect, Unkinded, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { check } from '../check.ts';
 import { consoleError } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
+import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
+import { computeListOpts } from "./storage.ts";
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -76,6 +78,22 @@ export class RedirectLogController {
                 await rpcClient.sendRedirectLogsNotification({ doName, timestampId, fromColo }, DoNames.combinedRedirectLog);
             }
         }
+    }
+
+    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
+        const { operationKind, targetPath, parameters } = req;
+        const r = tryParseRedirectLogRequest(targetPath);
+        if (r) {
+            const { subpath } = r;
+            if (operationKind === 'select' && subpath === '/records') {
+                const start = Date.now();
+                const map = await this.storage.list(computeListOpts('rl.r.', parameters));
+                const results = [...map].map(v => ({ _key: v[0], value: v[1] }));
+                const message = `storage.list took ${Date.now() - start}ms for ${results.length} results`;
+                return { results, message };
+            }
+        }
+        throw new Error(`Unsupported rl-related query`);
     }
 
     //

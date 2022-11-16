@@ -1,4 +1,4 @@
-import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest } from './admin_api.ts';
+import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest, tryParseRedirectLogRequest } from './admin_api.ts';
 import { ApiTokenPermission, hasPermission, isExternalNotification, RpcClient } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
@@ -154,6 +154,12 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         }
         const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
         return newJsonResponse({ results });
+    }
+
+    const req = tryParseRedirectLogRequest(targetPath);
+    if (req) {
+        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.redirectLogForColo(req.colo));
+        return newJsonResponse({ results, message });
     }
 
     throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
