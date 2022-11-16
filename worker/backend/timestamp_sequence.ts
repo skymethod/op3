@@ -1,4 +1,4 @@
-import { computeTimestamp } from '../timestamp.ts';
+import { computeTimestamp, isValidTimestamp } from '../timestamp.ts';
 
 export class TimestampSequence {
 
@@ -51,6 +51,13 @@ export class TimestampSequence {
         }
     }
 
+}
+
+export function unpackTimestampId(timestampId: string): { timestamp: string, extraDigits: string } {
+    const timestamp = timestampId.substring(0, 15);
+    if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestampId: ${timestampId}`);
+    const extraDigits = timestamp.substring(15);
+    return { timestamp, extraDigits };
 }
 
 //

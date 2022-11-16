@@ -1,13 +1,14 @@
 import { DurableObjectStorage } from '../deps.ts';
 import { AttNums } from './att_nums.ts';
-import { TimestampSequence } from './timestamp_sequence.ts';
-import { computeTimestamp } from '../timestamp.ts';
+import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
+import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect, Unkinded, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
-import { check } from '../check.ts';
+import { check, tryParseInt } from '../check.ts';
 import { consoleError } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { computeListOpts } from "./storage.ts";
+import { chunk } from 'https://deno.land/std@0.163.0/collections/chunk.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -21,6 +22,7 @@ export class RedirectLogController {
 
     private readonly timestampSequence = new TimestampSequence(3);
     private attNums: AttNums | undefined;
+    private latestStartAfterTimestampId?: string;
 
     constructor(opts: { storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, notificationDelaySeconds?: number }) {
         const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 5 } = opts;
@@ -65,6 +67,17 @@ export class RedirectLogController {
         }
         const attNums = await this.getOrLoadAttNums();
         const namesToNums = attNums.toJson();
+
+        // update state.latestStartAfterTimestampId if necessary
+        if (typeof startAfterTimestampId === 'string') {
+            const latestStartAfterTimestampId = await this.getOrLoadLatestStartAfterTimestampId();
+            if (latestStartAfterTimestampId !== startAfterTimestampId) {
+                console.log(`RedirectLogController.latestStartAfterTimestampId ${latestStartAfterTimestampId} -> ${startAfterTimestampId}`);
+                await storage.put('state.latestStartAfterTimestampId', startAfterTimestampId);
+                this.latestStartAfterTimestampId = startAfterTimestampId;
+            }
+        }
+
         return { namesToNums, records };
     }
 
@@ -81,7 +94,7 @@ export class RedirectLogController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
-        const { operationKind, targetPath, parameters } = req;
+        const { operationKind, targetPath, parameters = {} } = req;
         const r = tryParseRedirectLogRequest(targetPath);
         if (r) {
             const { subpath } = r;
@@ -92,6 +105,21 @@ export class RedirectLogController {
                 const message = `storage.list took ${Date.now() - start}ms for ${results.length} results`;
                 return { results, message };
             }
+            if (operationKind === 'delete' && subpath === '/records') {
+                const { limit: limitStr } = parameters;
+                const limit = tryParseInt(limitStr);
+                if (typeof limit !== 'number') throw new Error(`Bad limit: ${JSON.stringify(limitStr)}`);
+                const latestStartAfterTimestampId = await this.getOrLoadLatestStartAfterTimestampId();
+                if (latestStartAfterTimestampId === undefined) return { message: 'No latestStartAfterTimestampId' };
+
+                const result = await deleteImportedRecords(latestStartAfterTimestampId, limit, this.storage);
+                return { results: [ result ] };
+            }
+            if (operationKind === 'select' && subpath === '/state') {
+                const latestStartAfterTimestampId = await this.getOrLoadLatestStartAfterTimestampId();
+                const state = { latestStartAfterTimestampId };
+                return { results: [ state ] };
+            }
         }
         throw new Error(`Unsupported rl-related query`);
     }
@@ -101,6 +129,14 @@ export class RedirectLogController {
     private async getOrLoadAttNums(): Promise<AttNums> {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
         return this.attNums;
+    }
+
+    private async getOrLoadLatestStartAfterTimestampId() {
+        if (this.latestStartAfterTimestampId === undefined) {
+            const v = await this.storage.get('state.latestStartAfterTimestampId');
+            if (typeof v === 'string') this.latestStartAfterTimestampId = v;
+        }
+        return this.latestStartAfterTimestampId;
     }
 
 }
@@ -134,6 +170,33 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
         consoleError('rlc-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
     }
     return new AttNums();
+}
+
+async function deleteImportedRecords(latestStartAfterTimestampId: string, limit: number, storage: DurableObjectStorage): Promise<{ deleted: number, maxInstantToDelete: string, minDeletedInstant?: string, maxDeletedInstant?: string, error?: string, took: number }> {
+    const start = Date.now();
+    const maxInstantToDelete = addHours(timestampToInstant(unpackTimestampId(latestStartAfterTimestampId).timestamp), -24).toISOString();
+    const maxTimestampToDelete = computeTimestamp(maxInstantToDelete);
+    const map = await storage.list({ prefix: 'rl.r.', limit, end: 'rl.r.' + maxTimestampToDelete });
+    let deleted = 0;
+    let minDeletedInstant: string | undefined;
+    let maxDeletedInstant: string | undefined;
+    let error: string | undefined;
+    for (const batch of chunk([...map.keys()], 128)) {
+        try {
+            await storage.delete(batch);
+        } catch (e) {
+            error = `${e.stack || e}`;
+            break;
+        }
+        deleted += batch.length;
+        if (minDeletedInstant === undefined) {
+            const minKey = batch[0];
+            minDeletedInstant = timestampToInstant(unpackTimestampId(minKey.substring('rl.r.'.length)).timestamp);
+        }
+        const maxKey = batch.at(-1)!;
+        maxDeletedInstant = timestampToInstant(unpackTimestampId(maxKey.substring('rl.r.'.length)).timestamp);
+    }
+    return { deleted,maxInstantToDelete, minDeletedInstant, maxDeletedInstant, error, took: Date.now() - start };
 }
 
 //
