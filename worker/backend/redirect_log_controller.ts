@@ -8,7 +8,7 @@ import { consoleError } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { computeListOpts } from "./storage.ts";
-import { chunk } from 'https://deno.land/std@0.163.0/collections/chunk.ts';
+import { chunk } from 'https://deno.land/std@0.165.0/collections/chunk.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
