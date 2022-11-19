@@ -33,6 +33,9 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
     const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background } = opts;
 
     try {
+        // handle cors pre-flight
+        if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } });
+
         // first, we need to know who's calling
         const identity = await computeIdentityResult(bearerToken, searchParams, adminTokens, previewTokens, rpcClient);
         console.log(`computeApiResponse`, { method, path, identity: identityResultToJson(identity) });
