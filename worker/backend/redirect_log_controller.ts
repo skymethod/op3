@@ -1,4 +1,4 @@
-import { DurableObjectStorage } from '../deps.ts';
+import { DurableObjectStorage, chunk } from '../deps.ts';
 import { AttNums } from './att_nums.ts';
 import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
 import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
@@ -7,8 +7,7 @@ import { check, tryParseInt } from '../check.ts';
 import { consoleError } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
-import { computeListOpts } from "./storage.ts";
-import { chunk } from 'https://deno.land/std@0.165.0/collections/chunk.ts';
+import { computeListOpts } from './storage.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
