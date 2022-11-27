@@ -41,7 +41,7 @@ export class InMemoryBlobs implements Blobs {
         const keys = [...this.data.keys()]
             .sort()
             .filter(v => keyPrefix === undefined || v.startsWith(keyPrefix))
-            .filter(v => afterKey === undefined || v.localeCompare(afterKey) > 0)
+            .filter(v => afterKey === undefined || v > afterKey)
             ;
         return { keys };
     }

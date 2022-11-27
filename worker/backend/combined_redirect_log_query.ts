@@ -1,5 +1,5 @@
 import { isStringRecord } from '../check.ts';
-import { DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
+import { DurableObjectStorage, DurableObjectStorageValue, sortBy } from '../deps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { setAll } from '../maps.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
@@ -149,19 +149,23 @@ async function computeUrlStartsWithIndexValues({ urlStartsWith, limit, startTime
         const prefix = `crl.i0.${index}.${indexValue}`;
         const start = `crl.i0.${index}.${indexValue.substring(0, 6)}`;
         const end = `crl.i0.${index}.${computeTimestamp(addDays(date, 1)).substring(0, 6)}`;
-        console.log(`computeUrlStartsWithIndexValues: list storage: ${JSON.stringify({ prefix, index, limit, start, end })}`);
-        const results = await storage.list({ prefix, limit, start, end });
+        console.log(`computeUrlStartsWithIndexValues: list storage: ${JSON.stringify({ prefix, index, start, end })}`);
+        const results = await storage.list({ prefix, start, end }); // no limit, index sorts by url first, then timestamp - we need to do a full scan of the day
+        const filteredResults = new Map<string, [string, DurableObjectStorageValue]>();
         for (const [ key, value ] of results) {
-            if (rt.size >= limit) return rt;
             const timestampAndUuid = key.split('.').at(-1)!;
             const keyTimestamp = tryParseTimestampFromTimestampAndUuid(timestampAndUuid);
             if (!keyTimestamp) continue;
             if (startTimestamp && keyTimestamp < startTimestamp) continue;
             if (startAfterTimestamp && keyTimestamp <= startAfterTimestamp) continue;
             if (endTimestamp && keyTimestamp >= endTimestamp) continue;
-            rt.set(key, value);
+            filteredResults.set(key, [keyTimestamp, value]);
         }
         // TODO there may be more if the limit is high enough
+        for (const [ key, [ _keyTimestamp, value ] ] of sortBy([...filteredResults], v => v[1][0])) { // order by timestamp asc
+            if (rt.size >= limit) return rt;
+            rt.set(key, value);
+        }
     }
     return rt;
 }

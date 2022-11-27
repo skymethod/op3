@@ -1,5 +1,5 @@
 import { hmacForSecret } from './crypto.ts';
-import { Bytes } from './deps.ts';
+import { Bytes, sortBy } from './deps.ts';
 
 export async function computeSessionToken(claims: Record<string, string>, secret: string): Promise<string> {
     if (claims.v !== undefined) throw new Error(`Claims must not include 'v'`);
@@ -36,5 +36,5 @@ export async function tryValidateSessionToken(sessionToken: string, secret: stri
 //
 
 function computeCanonicalPayload(claims: Record<string, string>): string {
-    return JSON.stringify(Object.fromEntries(Object.entries(claims).sort((lhs, rhs) => lhs[0].localeCompare(rhs[0]))));
+    return JSON.stringify(Object.fromEntries(sortBy(Object.entries(claims), v => v[0])));
 }
