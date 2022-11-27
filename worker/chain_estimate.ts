@@ -40,10 +40,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://pdst.fm/e/
     // http redirects to target http
-    m = /^(https?):\/\/pdst\.fm\/e\/(.*?)$/.exec(url);
+    m = /^(https?):\/\/pdst\.fm\/e\/(.*?)(\?.*?)?$/.exec(url);
     if (m) {
-        const [ _, scheme, suffix ] = m;
-        const targetUrl = `${scheme}://${suffix}`;
+        const [ _, scheme, suffix, qs = '' ] = m;
+        const unescapedSuffix = suffix.replaceAll('%2F', '/');
+        const targetUrl = `${scheme}://${unescapedSuffix}${qs === '?' ? '' : qs}`;
         return [ { kind: 'prefix', prefix: 'podsights', url }, ...computeChainEstimate(targetUrl) ];
     }
 
@@ -174,7 +175,7 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
 export function normalizeOrigin(url: string): string {
     // htTps://HoSTname:443/patH -> https://hostname/patH
-    const m = /^(https?):\/\/([^:\/]+)(:(\d+))?(\/.*?)?$/i.exec(url);
+    const m = /^(https?):\/\/([a-zA-Z0-9.-]+)(:(\d+))?(\/.*?)?$/i.exec(url);
     if (!m) return url;
     const [ _, scheme, hostname, __, portNumStr, path = '' ] = m;
     const schemeLower = scheme.toLowerCase();

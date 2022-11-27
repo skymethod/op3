@@ -190,6 +190,16 @@ Deno.test({
             { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://pdst.fm/e/a.com%2Fpath%2Fto%2Fepisode.mp3?a=%2F'), [
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/a.com%2Fpath%2Fto%2Fepisode.mp3?a=%2F' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3?a=%2F' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://pdst.fm/e/a.com%2Fpath%2Fto%2Fepisode.mp3?'), [
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/a.com%2Fpath%2Fto%2Fepisode.mp3?' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
