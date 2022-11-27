@@ -16,7 +16,12 @@ export function isStringRecord(obj: any): obj is Record<string, unknown> {
 }
 
 export function isValidInstant(instant: string): boolean {
-    return /^(\d{2})(\d{2})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.test(instant);
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(instant);
+}
+
+export function tryNormalizeInstant(instantWithVariableDecimals: string): string | undefined {
+    const m = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(\.\d+)?Z$/.exec(instantWithVariableDecimals);
+    return m ? `${m[1]}${(m[2] ?? '.000').substring(0, 4).padEnd(4, '0')}Z` : undefined;
 }
 
 export function isValidHttpUrl(url: string): boolean {

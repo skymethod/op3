@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isNotBlank, isValidHttpUrl, isValidInstant, tryParseInt, tryParseUrl } from '../check.ts';
+import { check, checkMatches, isNotBlank, isValidHttpUrl, isValidInstant, tryNormalizeInstant, tryParseInt, tryParseUrl } from '../check.ts';
 import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { Bytes } from '../deps.ts';
 import { tryParseDurationMillis } from '../duration.ts';
@@ -26,6 +26,8 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
             if (typeof duration === 'number') {
                 value = new Date(Date.now() + duration).toISOString();
             }
+            const norm = tryNormalizeInstant(value);
+            if (norm) value = norm;
             check(name, value, isValidInstant);
             return value;
         }
