@@ -10,8 +10,8 @@ if [ -z "$INSTANCE" ] || [ -z "$CF_ACCOUNT_ID" ] || [ -z "$CF_API_TOKEN" ] || [ 
 fi
 
 # install deno
-DENO_VERSION="v1.28.1"
-DENOFLARE_VERSION="1c3987026f70deede00ee5754d729107bae7b09a"
+DENO_VERSION="v1.28.2"
+DENOFLARE_VERSION="v0.5.11"
 curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VERSION sh -s $DENO_VERSION
 
 # exit early if already deployed
