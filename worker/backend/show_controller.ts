@@ -216,40 +216,79 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, limit = '100' } = parameters;
+            const { hour, limit: limitStr = '100', batch: batchStr = '100', max: maxStr = '10', output = 'default' } = parameters;
             if (typeof hour === 'string') {
+                const limit = parseInt(limitStr);
+                const batch = parseInt(batchStr);
+                const max = parseInt(maxStr);
+                const start = Date.now();
+
                 const startInstant = `${hour}:00:00.000Z`;
                 if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
                 const endInstant = addHours(startInstant, 1).toISOString();
-                const { namesToNums, records } = await this.rpcClient.queryPackedRedirectLogs({ limit: parseInt(limit), startTimeInclusive: startInstant, endTimeExclusive: endInstant }, DoNames.combinedRedirectLog);
-                const attNums = new AttNums(namesToNums);
+                let startAfterRecordKey: string | undefined;
                 const downloads = new Set<string>();
-                const lines: string[] = [];
-                lines.push(['serverUrl', 'audienceId', 'time', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t'));
-                for (const [ _timestampId, record ] of Object.entries(records)) {
-                    const obj = attNums.unpackRecord(record);
-                    const { method, range, ulid, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
-                    if (method !== 'GET') continue; // ignore all non-GET requests
-                    const ranges = range ? tryParseRangeHeader(range) : undefined;
-                    if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
-                    const serverUrl = computeServerUrl(url);
-                    const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|${ulid ?? ''}`).sha256()).hex();
-                    const download = `${serverUrl}|${audienceId}`;
-                    if (downloads.has(download)) continue;
-                    const time = timestampToInstant(timestamp);
-                    const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
-                    const agentType = result?.type;
-                    const agentName = result?.name ?? userAgent;
-                    const deviceType = result?.device?.category;
-                    const deviceName = result?.device?.name;
-                    const referrerType = result?.referrer?.category ?? (referer ? 'domain' : undefined);
-                    const referrerName = result?.referrer?.name ?? (referer ? findPublicSuffix(referer, 1) : undefined);
-                    const line = [ serverUrl, audienceId, time, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t');
-                    lines.push(line);
-                    downloads.add(download);
+                const key = `hourly/${output}.tsv`;
+                const encoder = new TextEncoder();
+                const chunks: Uint8Array[] = [];
+                chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', '\n' ].join('\t')));
+                let queries = 0;
+                let read = 0;
+                while (true && 'go' in parameters) {
+                    if (queries >= max) break;
+                    const { namesToNums, records } = await this.rpcClient.queryPackedRedirectLogs({ limit: batch, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, DoNames.combinedRedirectLog);
+                    queries++;
+                    const attNums = new AttNums(namesToNums);
+                    const entries =  Object.entries(records);
+                    for (const [ recordKey, record ] of entries) {
+                        if (read >= limit) break;
+                        read++;
+                        if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
+                        const obj = attNums.unpackRecord(record);
+                        const { method, range, ulid, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
+                        if (method !== 'GET') continue; // ignore all non-GET requests
+                        const ranges = range ? tryParseRangeHeader(range) : undefined;
+                        if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
+                        const serverUrl = computeServerUrl(url);
+                        const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|${ulid ?? ''}`).sha256()).hex();
+                        const download = `${serverUrl}|${audienceId}`;
+                        if (downloads.has(download)) continue;
+                        const time = timestampToInstant(timestamp);
+                        const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
+                        const agentType = result?.type;
+                        const agentName = result?.name ?? userAgent;
+                        const deviceType = result?.device?.category;
+                        const deviceName = result?.device?.name;
+                        const referrerType = result?.referrer?.category ?? (referer ? 'domain' : undefined);
+                        const referrerName = result?.referrer?.name ?? (referer ? findPublicSuffix(referer, 1) : undefined);
+                        const line = [ serverUrl, audienceId, time, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, '\n' ].map(v => v ?? '').join('\t');
+                        chunks.push(encoder.encode(line));
+                        downloads.add(download);
+                    }
+                    if (entries.length < batch || read >= limit) {
+                        break;
+                    }
                 }
-                const results = lines;
-                return { results };
+               
+                let error: string | undefined;
+                const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
+                try {
+                    // deno-lint-ignore no-explicit-any
+                    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+                    const putPromise = this.statsBlobs.put(key, readable);
+                    const writer = writable.getWriter();
+                    for (const chunk of chunks) {
+                        writer.write(chunk);
+                    }
+                    await writer.close();
+                    // await writable.close(); // will throw on cf
+                    await putPromise;
+                } catch (e) {
+                    consoleWarn('show-stats-hourly', `Error in close: ${e.stack || e}`);
+                    error = `${e.stack || e}`;
+                }
+                const result = { hour, limit, batch, queries, read, downloads: downloads.size, millis: Date.now() - start, error, contentLength };
+                return { results: [ result ] };
             }
         }
 
