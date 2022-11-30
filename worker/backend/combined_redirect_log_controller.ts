@@ -188,8 +188,8 @@ export class CombinedRedirectLogController {
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
         const records: Record<string, string> = {}; // timestampId -> packed record
         const prefix = 'crl.r.';
-        const start = startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined;
         const startAfter = startAfterRecordKey ? `${prefix}${startAfterRecordKey}` : startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
+        const start = startAfter ? undefined : startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined; // list() cannot be called with both start and startAfter values
         const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
         const map = await this.storage.list({ prefix, limit, start, startAfter, end });
         for (const [ key, record ] of map) {
