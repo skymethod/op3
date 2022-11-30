@@ -2,7 +2,7 @@ import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.
 import { checkMatches, isStringRecord } from '../check.ts';
 import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
-import { isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
+import { computeTimestamp, isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
@@ -185,10 +185,13 @@ export class CombinedRedirectLogController {
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
         await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
-        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive } = request;
+        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
         const records: Record<string, string> = {}; // timestampId -> packed record
         const prefix = 'crl.r.';
-        const map = await this.storage.list({ prefix, limit, start: startTimeInclusive, startAfter: startTimeExclusive, end: endTimeExclusive });
+        const start = startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined;
+        const startAfter = startAfterRecordKey ? `${prefix}${startAfterRecordKey}` : startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
+        const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
+        const map = await this.storage.list({ prefix, limit, start, startAfter, end });
         for (const [ key, record ] of map) {
             if (typeof record === 'string') {
                 const timestampId = key.substring(prefix.length);

@@ -15,6 +15,11 @@ import { Blobs } from './blobs.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { DoNames } from '../do_names.ts';
+import { AttNums } from './att_nums.ts';
+import { computeServerUrl } from '../client_params.ts';
+import { computeUserAgentEntityResult } from '../user_agents.ts';
+import { findPublicSuffix } from '../public_suffixes.ts';
+import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -210,15 +215,41 @@ export class ShowController {
             }
         }
 
-        if (targetPath === '/stats' && operationKind === 'update') {
-            const { hour } = parameters;
+        if (targetPath === '/show/stats' && operationKind === 'update') {
+            const { hour, limit = '100' } = parameters;
             if (typeof hour === 'string') {
                 const startInstant = `${hour}:00:00.000Z`;
                 if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
                 const endInstant = addHours(startInstant, 1).toISOString();
-                const limit = 100;
-                const _packed = await this.rpcClient.queryPackedRedirectLogs({ limit, startTimeInclusive: startInstant, endTimeExclusive: endInstant }, DoNames.combinedRedirectLog);
-                // TODO
+                const { namesToNums, records } = await this.rpcClient.queryPackedRedirectLogs({ limit: parseInt(limit), startTimeInclusive: startInstant, endTimeExclusive: endInstant }, DoNames.combinedRedirectLog);
+                const attNums = new AttNums(namesToNums);
+                const downloads = new Set<string>();
+                const lines: string[] = [];
+                lines.push(['serverUrl', 'audienceId', 'time', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t'));
+                for (const [ _timestampId, record ] of Object.entries(records)) {
+                    const obj = attNums.unpackRecord(record);
+                    const { method, range, ulid, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
+                    if (method !== 'GET') continue; // ignore all non-GET requests
+                    const ranges = range ? tryParseRangeHeader(range) : undefined;
+                    if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
+                    const serverUrl = computeServerUrl(url);
+                    const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|${ulid ?? ''}`).sha256()).hex();
+                    const download = `${serverUrl}|${audienceId}`;
+                    if (downloads.has(download)) continue;
+                    const time = timestampToInstant(timestamp);
+                    const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
+                    const agentType = result?.type;
+                    const agentName = result?.name ?? userAgent;
+                    const deviceType = result?.device?.category;
+                    const deviceName = result?.device?.name;
+                    const referrerType = result?.referrer?.category ?? (referer ? 'domain' : undefined);
+                    const referrerName = result?.referrer?.name ?? (referer ? findPublicSuffix(referer, 1) : undefined);
+                    const line = [ serverUrl, audienceId, time, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t');
+                    lines.push(line);
+                    downloads.add(download);
+                }
+                const results = lines;
+                return { results };
             }
         }
 

@@ -165,6 +165,8 @@ export interface QueryPackedRedirectLogsRequest {
     readonly startTimeInclusive?: string; // instant
     readonly startTimeExclusive?: string; // instant
     readonly endTimeExclusive?: string; // instant
+
+    readonly startAfterRecordKey?: string; // from previous call
 }
 
 export interface QueryRedirectLogsRequest {
