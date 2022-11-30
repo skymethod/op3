@@ -231,7 +231,7 @@ export class ShowController {
                 const key = `hourly/${output}.tsv`;
                 const encoder = new TextEncoder();
                 const chunks: Uint8Array[] = [];
-                chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', '\n' ].join('\t')));
+                chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', '\n' ].join('\t')));
                 let queries = 0;
                 let read = 0;
                 while (true && 'go' in parameters) {
@@ -255,13 +255,13 @@ export class ShowController {
                         if (downloads.has(download)) continue;
                         const time = timestampToInstant(timestamp);
                         const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
-                        const agentType = result?.type;
+                        const agentType = result?.type ?? 'unknown';
                         const agentName = result?.name ?? userAgent;
                         const deviceType = result?.device?.category;
                         const deviceName = result?.device?.name;
                         const referrerType = result?.referrer?.category ?? (referer ? 'domain' : undefined);
-                        const referrerName = result?.referrer?.name ?? (referer ? findPublicSuffix(referer, 1) : undefined);
-                        const line = [ serverUrl, audienceId, time, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, '\n' ].map(v => v ?? '').join('\t');
+                        const referrerName = result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined);
+                        const line = [ serverUrl, audienceId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, '\n' ].map(v => v ?? '').join('\t');
                         chunks.push(encoder.encode(line));
                         downloads.add(download);
                     }
