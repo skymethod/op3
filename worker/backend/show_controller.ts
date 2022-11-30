@@ -259,8 +259,8 @@ export class ShowController {
                         const agentName = result?.name ?? userAgent;
                         const deviceType = result?.device?.category;
                         const deviceName = result?.device?.name;
-                        const referrerType = result?.referrer?.category ?? (referer ? 'domain' : undefined);
-                        const referrerName = result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined);
+                        const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
+                        const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
                         const line = [ serverUrl, audienceId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, '\n' ].map(v => v ?? '').join('\t');
                         chunks.push(encoder.encode(line));
                         downloads.add(download);
