@@ -11,7 +11,7 @@ import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 
-export async function computeHourlyDownloads(hour: string, { statsBlobs, go, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, go: boolean, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
+export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
 
     const startInstant = `${hour}:00:00.000Z`;
@@ -24,7 +24,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, go, rpc
     chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n'));
     let queries = 0;
     let hits = 0;
-    while (true && go) {
+    while (true) {
         if (queries >= maxQueries) break;
         const { namesToNums, records } = await rpcClient.queryPackedRedirectLogs({ limit: querySize, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, DoNames.combinedRedirectLog);
         queries++;
@@ -59,36 +59,34 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, go, rpc
             break;
         }
     }
+
+    const { error, contentLength } = await write('write-hourly-downloads', chunks, statsBlobs, computeHourlyKey(hour));
     
-    let error: string | undefined;
-    const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
-    try {
-        // deno-lint-ignore no-explicit-any
-        const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-        const key = computeHourlyKey(hour);
-        const putPromise = statsBlobs.put(key, readable);
-        const writer = writable.getWriter();
-        for (const chunk of chunks) {
-            writer.write(chunk);
-        }
-        await writer.close();
-        // await writable.close(); // will throw on cf
-        await putPromise;
-    } catch (e) {
-        consoleWarn('show-stats-hourly', `Error in close: ${e.stack || e}`);
-        error = `${e.stack || e}`;
-    }
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, error, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { statsBlobs } : { statsBlobs: Blobs }) {
+export async function computeDailyDownloads(date: string, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
 
+    const lookupShowCached = (function() {
+        const cache = new Map<string, { showUuid?: string, episodeId?: string }>();
+        return async (url: string) => {
+            const existing = cache.get(url);
+            if (existing) return existing;
+            const result = await lookupShow(url);
+            cache.set(url, result ?? {});
+            return result ?? {};
+        }
+    })();
+
     let hours = 0;
     let rows = 0;
     const downloads = new Set<string>();
+    const encoder = new TextEncoder();
+    const chunks: Uint8Array[] = [];
+    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n'));
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
         const key = computeHourlyKey(hour);
@@ -100,24 +98,57 @@ export async function computeDailyDownloads(date: string, { statsBlobs } : { sta
             .pipeThrough(new TextLineStream());
 
         let headers: string[] | undefined;
-        for await (const line of lines) {
-            const values = headers = line.split('\t');
+        for await (const hourlyLine of lines) {
+            if (hourlyLine === '') continue;
+            const values = hourlyLine.split('\t');
             if (!headers) {
                 headers = values;
                 continue;
             }
             rows++;
-            const { serverUrl, audienceId } = Object.fromEntries(zip(headers, values));
+            const obj = Object.fromEntries(zip(headers, values));
+            const { serverUrl, audienceId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
             const download = `${serverUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             downloads.add(download);
+            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+            const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
+            chunks.push(encoder.encode(line));
         }
     }
-    return { millis: Date.now() - start, hours, rows, downloads: downloads.size, date };
+
+    const { error, contentLength } = await write('write-daily-downloads', chunks, statsBlobs, computeDailyKey(date));
+
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, error, contentLength };
 }
 
 //
 
 function computeHourlyKey(hour: string): string {
     return `downloads/hourly/${hour}.tsv`;
+}
+
+function computeDailyKey(date: string): string {
+    return `downloads/daily/${date}.tsv`;
+}
+
+async function write(spot: string, chunks: Uint8Array[], blobs: Blobs, key: string): Promise<{ contentLength: number, error?: string }> {
+    const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
+    try {
+        // deno-lint-ignore no-explicit-any
+        const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+        const putPromise = blobs.put(key, readable);
+        const writer = writable.getWriter();
+        for (const chunk of chunks) {
+            writer.write(chunk);
+        }
+        await writer.close();
+        // await writable.close(); // will throw on cf
+        await putPromise;
+        return { contentLength };
+    } catch (e) {
+        consoleWarn(spot, `Error in write: ${e.stack || e}`);
+        const error = `${e.stack || e}`;
+        return { contentLength, error };
+    }
 }

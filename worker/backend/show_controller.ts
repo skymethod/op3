@@ -215,20 +215,19 @@ export class ShowController {
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
-                const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10', goStr = 'false' } = parameters;
+                const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10' } = parameters;
                 const maxHits = parseInt(maxHitsStr);
                 const querySize = parseInt(querySizeStr);
                 const maxQueries = parseInt(maxQueriesStr);
-                const go = goStr === 'true';
                 const { rpcClient, statsBlobs } = this;
-                const result = await computeHourlyDownloads(hour, { statsBlobs, go, maxHits, maxQueries, querySize, rpcClient });
+                const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
                 return { results: [ result ] };
             }
             
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const result = await computeDailyDownloads(date, { statsBlobs });
+                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow: v => lookupShow(v, storage, []) });
                 return { results: [ result ] };
             }
         }
