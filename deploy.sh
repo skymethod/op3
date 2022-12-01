@@ -11,7 +11,7 @@ fi
 
 # install deno
 DENO_VERSION="v1.28.2"
-DENOFLARE_VERSION="v0.5.11"
+DENOFLARE_VERSION="d9369380c4b1ed0f15f03ec1ee0d46d251069ee8"
 curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VERSION sh -s $DENO_VERSION
 
 # exit early if already deployed
@@ -31,6 +31,7 @@ NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./d
 # denoflare push the worker script to cloudflare
 NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno run --unstable --allow-all https://raw.githubusercontent.com/skymethod/denoflare/$DENOFLARE_VERSION/cli/cli.ts \
 push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --custom-domain $CF_CUSTOM_DOMAIN --name $CF_SCRIPT_NAME --logpush \
+--compatibility-date 2022-11-30 \
 --text-binding instance:$INSTANCE \
 --text-binding deployTime:$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 --text-binding deployRepositoryUrl:$DEPLOY_REPOSITORY_URL \

@@ -24,6 +24,10 @@ export function tryNormalizeInstant(instantWithVariableDecimals: string): string
     return m ? `${m[1]}${(m[2] ?? '.000').substring(0, 4).padEnd(4, '0')}Z` : undefined;
 }
 
+export function isValidDate(date: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}$/.test(date);
+}
+
 export function isValidHttpUrl(url: string): boolean {
     const u = tryParseUrl(url);
     return !!u && /^https?:$/.test(u.protocol);

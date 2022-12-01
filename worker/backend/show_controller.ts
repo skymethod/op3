@@ -1,25 +1,20 @@
-import { check, isString, isStringRecord, isValidGuid, isValidInstant } from '../check.ts';
+import { computeChainDestinationUrl } from '../chain_estimate.ts';
+import { check, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
+import { Item, parseFeed } from '../feed_parser.ts';
+import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
-import { addHours, computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
+import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
+import { Blobs } from './blobs.ts';
+import { computeDailyDownloads, computeHourlyDownloads } from './downloads.ts';
+import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isShowRecord, isWorkRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
-import { computeUserAgent } from '../outbound.ts';
-import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
-import { Blobs } from './blobs.ts';
-import { Item, parseFeed } from '../feed_parser.ts';
-import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { DoNames } from '../do_names.ts';
-import { AttNums } from './att_nums.ts';
-import { computeServerUrl } from '../client_params.ts';
-import { computeUserAgentEntityResult } from '../user_agents.ts';
-import { findPublicSuffix } from '../public_suffixes.ts';
-import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -216,78 +211,24 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, limit: limitStr = '100', batch: batchStr = '100', max: maxStr = '10', output = 'default' } = parameters;
-            if (typeof hour === 'string') {
-                const limit = parseInt(limitStr);
-                const batch = parseInt(batchStr);
-                const max = parseInt(maxStr);
-                const start = Date.now();
+            const { hour, date } = parameters;
 
-                const startInstant = `${hour}:00:00.000Z`;
-                if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
-                const endInstant = addHours(startInstant, 1).toISOString();
-                let startAfterRecordKey: string | undefined;
-                const downloads = new Set<string>();
-                const key = `hourly/${output}.tsv`;
-                const encoder = new TextEncoder();
-                const chunks: Uint8Array[] = [];
-                chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', '\n' ].join('\t')));
-                let queries = 0;
-                let read = 0;
-                while (true && 'go' in parameters) {
-                    if (queries >= max) break;
-                    const { namesToNums, records } = await this.rpcClient.queryPackedRedirectLogs({ limit: batch, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, DoNames.combinedRedirectLog);
-                    queries++;
-                    const attNums = new AttNums(namesToNums);
-                    const entries =  Object.entries(records);
-                    for (const [ recordKey, record ] of entries) {
-                        if (read >= limit) break;
-                        read++;
-                        if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
-                        const obj = attNums.unpackRecord(record);
-                        const { method, range, ulid, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
-                        if (method !== 'GET') continue; // ignore all non-GET requests
-                        const ranges = range ? tryParseRangeHeader(range) : undefined;
-                        if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
-                        const serverUrl = computeServerUrl(url);
-                        const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|${ulid ?? ''}`).sha256()).hex();
-                        const download = `${serverUrl}|${audienceId}`;
-                        if (downloads.has(download)) continue;
-                        const time = timestampToInstant(timestamp);
-                        const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
-                        const agentType = result?.type ?? 'unknown';
-                        const agentName = result?.name ?? userAgent;
-                        const deviceType = result?.device?.category;
-                        const deviceName = result?.device?.name;
-                        const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
-                        const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
-                        const line = [ serverUrl, audienceId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, '\n' ].map(v => v ?? '').join('\t');
-                        chunks.push(encoder.encode(line));
-                        downloads.add(download);
-                    }
-                    if (entries.length < batch || read >= limit) {
-                        break;
-                    }
-                }
-               
-                let error: string | undefined;
-                const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
-                try {
-                    // deno-lint-ignore no-explicit-any
-                    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-                    const putPromise = this.statsBlobs.put(key, readable);
-                    const writer = writable.getWriter();
-                    for (const chunk of chunks) {
-                        writer.write(chunk);
-                    }
-                    await writer.close();
-                    // await writable.close(); // will throw on cf
-                    await putPromise;
-                } catch (e) {
-                    consoleWarn('show-stats-hourly', `Error in close: ${e.stack || e}`);
-                    error = `${e.stack || e}`;
-                }
-                const result = { hour, limit, batch, queries, read, downloads: downloads.size, millis: Date.now() - start, error, contentLength };
+            // compute hourly download tsv
+            if (typeof hour === 'string') {
+                const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10', goStr = 'false' } = parameters;
+                const maxHits = parseInt(maxHitsStr);
+                const querySize = parseInt(querySizeStr);
+                const maxQueries = parseInt(maxQueriesStr);
+                const go = goStr === 'true';
+                const { rpcClient, statsBlobs } = this;
+                const result = await computeHourlyDownloads(hour, { statsBlobs, go, maxHits, maxQueries, querySize, rpcClient });
+                return { results: [ result ] };
+            }
+            
+            // compute daily download tsv
+            if (typeof date === 'string') {
+                const { statsBlobs } = this;
+                const result = await computeDailyDownloads(date, { statsBlobs });
                 return { results: [ result ] };
             }
         }
