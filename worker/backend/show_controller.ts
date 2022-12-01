@@ -67,7 +67,8 @@ export class ShowController {
                                 consoleWarn('sc-on-feed-urls', `ShowController: bad FeedRecord: ${JSON.stringify(existing)}`);
                             }
                         } else {
-                            const insert: FeedRecord = { id: feedRecordId, state: 'new', url: feedUrl };
+                            const created = new Date().toISOString();
+                            const insert: FeedRecord = { id: feedRecordId, state: 'new', url: feedUrl, created, updated: created };
                             newRecords[key] = insert;
                             work.push({ kind: 'lookup-feed', feedUrl, uuid: generateUuid(), attempt: 1 });
                             consoleInfo('sc-on-feed-urls', `Inserted new FeedRecord: ${insert.url}`);
