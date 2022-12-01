@@ -101,8 +101,8 @@ export class ShowController {
         if (operationKind === 'select' && targetPath === '/show/shows') {
             const { lookup } = parameters;
             if (typeof lookup === 'string') {
-                const rt: string[] = [];
-                const result = await lookupShow(lookup, storage, rt);
+                const metrics = newLookupShowMetrics();
+                const result = await lookupShow(lookup, storage, metrics);
                 const results: unknown[] = [];
                 if (result) {
                     const { showUuid, episodeId } = result;
@@ -110,7 +110,7 @@ export class ShowController {
                     if (!isShowRecord(show)) throw new Error(`Bad show record`);
                     results.push({ ...show, episodeId })
                 }
-                return { results, message: rt.join(', ') };
+                return { results, message: metrics.messages.join(', ') };
             }
             const map = await storage.list(computeListOpts('sc.show0.', parameters));
             const results = [...map.values()].filter(isShowRecord);
@@ -227,8 +227,20 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow: v => lookupShow(v, storage, []) });
-                return { results: [ result ] };
+                const lookupShowMetrics = newLookupShowMetrics();
+                let lookupShowCalls = 0;
+                let lookupShowMillis = 0;
+                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow: async v => {
+                    lookupShowCalls++;
+                    const start = Date.now();
+                    try {
+                        return await lookupShow(v, storage, lookupShowMetrics);
+                    } finally {
+                        lookupShowMetrics.messages.splice(0);
+                        lookupShowMillis += (Date.now() - start);
+                    }
+                } });
+                return { results: [ {...result, lookupShowCalls, lookupShowMillis, lookupShowMetrics } ] };
             }
         }
 
@@ -684,42 +696,54 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
     return { inserts, updates };
 }
 
-async function lookupShow(url: string, storage: DurableObjectStorage, message: string[]): Promise<{ showUuid: string, episodeId?: string } | undefined> {
+type LookupShowMetrics = { messages: string[], storageListCalls: number, indexRecordsScanned: number, feedItemGetCalls: number, feedGetCalls: number, episodeGetCalls: number };
+
+function newLookupShowMetrics(): LookupShowMetrics {
+    return { messages: [], storageListCalls: 0, indexRecordsScanned: 0, feedItemGetCalls: 0, feedGetCalls: 0, episodeGetCalls: 0 };
+}
+
+async function lookupShow(url: string, storage: DurableObjectStorage, metrics: LookupShowMetrics): Promise<{ showUuid: string, episodeId?: string } | undefined> {
     const destinationUrl = computeChainDestinationUrl(url);
     if (!destinationUrl) return undefined;
     url = destinationUrl;
+    const { messages } = metrics;
     for (const queryless of [ false, true ]) {
         const matchUrl = computeMatchUrl(url, { queryless });
-        message.push(`${queryless ? 'querylessMatchUrl' : 'matchUrl'}: ${matchUrl}`);
+        messages.push(`${queryless ? 'querylessMatchUrl' : 'matchUrl'}: ${matchUrl}`);
         const indexType = queryless ? IndexType.QuerylessMatchUrlToFeedItem : IndexType.MatchUrlToFeedItem;
+        
         const map = await storage.list({ prefix: `sc.i0.${indexType}.${matchUrl.substring(0, 1024)}.`});
+        metrics.storageListCalls++;
+        metrics.indexRecordsScanned += map.size;
         const feedItemRecordKeys = [...map.values()].filter(isFeedItemIndexRecord).map(v => v.feedItemRecordKey);
-        message.push(`${feedItemRecordKeys.length} feedItemRecordKeys`);
+        messages.push(`${feedItemRecordKeys.length} feedItemRecordKeys`);
         if (feedItemRecordKeys.length === 0) continue;
 
         // load matching feed item records
         const feedItemRecords = new Map<string, FeedItemRecord>();
         for (const batch of chunk(feedItemRecordKeys, 128)) {
+            metrics.feedItemGetCalls++;
             for (const [ key, value ] of await storage.get(batch)) {
                 if (isFeedItemRecord(value)) {
                     feedItemRecords.set(key, value);
                 }
             }
         }
-        message.push(`${feedItemRecords.size} FeedItemRecords`);
+        messages.push(`${feedItemRecords.size} FeedItemRecords`);
         
         // and associated feed records (with shows)
         const feedRecordKeys = distinct([...feedItemRecords.values()].map(v => computeFeedRecordKey(v.feedRecordId)));
-        message.push(`${feedRecordKeys.length} feedRecordKeys`);
+        messages.push(`${feedRecordKeys.length} feedRecordKeys`);
         const showFeedRecords = new Map<string, FeedRecord>();
         for (const batch of chunk(feedRecordKeys, 128)) {
+            metrics.feedGetCalls++;
             for (const [ key, value ] of await storage.get(batch)) {
                 if (isFeedRecord(value) && typeof value.showUuid === 'string') {
                     showFeedRecords.set(key, value);
                 }
             }
         }
-        message.push(`${showFeedRecords.size} showFeedRecords`);
+        messages.push(`${showFeedRecords.size} showFeedRecords`);
 
         const showUuids = new Set([...showFeedRecords.values()].map(v => v.showUuid!));
         if (showUuids.size === 0) continue;
@@ -731,19 +755,18 @@ async function lookupShow(url: string, storage: DurableObjectStorage, message: s
             let episodeId: string | undefined;
             if (itemGuids.length === 1) {
                 const [ itemGuid ] = itemGuids;
-                message.push(`itemGuid: ${itemGuid}`);
+                messages.push(`itemGuid: ${itemGuid}`);
                 const candidateEpisodeId = await computeEpisodeId(itemGuid);
+                metrics.episodeGetCalls++;
                 const episode = await storage.get(computeEpisodeKey({ showUuid, id: candidateEpisodeId }));
                 if (isEpisodeRecord(episode)) {
                     episodeId = candidateEpisodeId;
                 }
-
             }
             return { showUuid, episodeId };
         }
         throw new Error(`Matches multiple shows: ${[...showUuids].join(', ')}`);
     }
-
 }
 
 function computeFeedRecordKey(feedRecordId: string): string {
