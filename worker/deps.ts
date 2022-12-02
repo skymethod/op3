@@ -7,5 +7,5 @@ export { chunk } from 'https://deno.land/std@0.167.0/collections/chunk.ts';
 export { sortBy } from 'https://deno.land/std@0.167.0/collections/sort_by.ts';
 export { XMLParser } from 'https://cdn.skypack.dev/fast-xml-parser@4.0.11?dts';
 export { distinct } from 'https://deno.land/std@0.167.0/collections/distinct.ts';
-export { TextLineStream } from 'https://deno.land/std@0.167.0/streams/delimiter.ts';
+export { TextLineStream } from 'https://deno.land/std@0.167.0/streams/text_line_stream.ts';
 export { zip } from 'https://deno.land/std@0.167.0/collections/zip.ts';
