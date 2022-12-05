@@ -15,7 +15,7 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
     if (kind === 'error-saving-redirect') {
         const { colo, error, country, uuids } = event;
         return { blobs: [ kind, colo, trim(error), country, trim(uuids.join(',')) ], doubles: [ 1 ], indexes: [ kind ] };
-    } else if (kind === 'valid-redirect' || kind === 'invalid-redirect') {
+    } else if (kind === 'valid-redirect' || kind === 'invalid-redirect' || kind === 'banned-redirect') {
         const { colo, url, country, destinationHostname, userAgent, referer } = event;
         return { blobs: [ kind, colo, trim(url), country, trim(destinationHostname), trim(userAgent), trim(referer) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'error-computing-trace-event') {

@@ -83,6 +83,11 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
 
     const { env, context, requestTime } = opts;
     const rawRedirects = pendingRawRedirects.splice(0);
+
+    // ban check is the only awaited thing, it needs to be in the direct line of the response
+    // a trivial in-memory lookup for a running worker, falls back to colo cache api (fast) or kv (fast-ish) in the worst case
+    const banned = redirectRequest.kind === 'valid' && await banlist?.isBanned(redirectRequest.targetUrl);
+
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
         const { backendNamespace } = env;
@@ -92,7 +97,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             IsolateId.log();
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
             
-            if (redirectRequest.kind === 'valid') {
+            if (redirectRequest.kind === 'valid' && !banned) {
                 const rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
@@ -122,18 +127,16 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
                 const userAgent = headers.get('user-agent') ?? '<missing>';
                 const referer = headers.get('referer') ?? '<missing>';
-                return { kind: redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer };
+                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer };
             });
         }
     })());
-    if (redirectRequest.kind === 'valid') {
-        if (await banlist?.isBanned(redirectRequest.targetUrl)) {
-            console.log(`Non-podcast redirect url: ${request.url}`);
-            return new Response('Non-podcast redirect url', { status: 400 });
-        } else {
-            console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
-            return computeRedirectResponse(redirectRequest);
-        }
+    if (banned) {
+        console.log(`Non-podcast redirect url: ${request.url}`);
+        return new Response('Non-podcast redirect url', { status: 400 });
+    } else if (redirectRequest.kind === 'valid') {
+        console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
+        return computeRedirectResponse(redirectRequest);
     } else {
         console.log(`Invalid redirect url: ${request.url}`);
         return new Response('Invalid redirect url', { status: 400 });

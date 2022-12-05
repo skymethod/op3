@@ -45,6 +45,7 @@ export type TraceEvent =
     ErrorSavingRedirect
     | ValidRedirect
     | InvalidRedirect
+    | BannedRedirect
     | ErrorComputingTraceEvent
     | WorkerRequest
     | DurableObjectFetchRequest
@@ -77,6 +78,10 @@ export interface ValidRedirect extends Redirect {
 
 export interface InvalidRedirect extends Redirect {
     readonly kind: 'invalid-redirect',
+}
+
+export interface BannedRedirect extends Redirect {
+    readonly kind: 'banned-redirect',
 }
 
 export interface ErrorComputingTraceEvent {
