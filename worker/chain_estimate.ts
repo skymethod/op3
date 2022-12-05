@@ -107,9 +107,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://verifi.podscribe.com/rss/p/
     // https://podscribe.com/blog/impression-verification-mb45x
     // http not supported
-    m = /^https:\/\/verifi\.podscribe\.com\/rss\/p\/(.*?)$/.exec(url);
+    // 2022-12-05: alt https://pscrb.fm/rss/p/
+    m = /^https:\/\/(verifi\.podscribe\.com|pscrb\.fm)\/rss\/p\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
+        const [ _, _hostname, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'podscribe', url }, ...computeChainEstimate(targetUrl) ];
     }
