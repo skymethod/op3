@@ -25,6 +25,7 @@ import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
 import { computeSetupResponse } from './routes/setup.ts';
 import { DoNames } from './do_names.ts';
+import { Banlist } from './banlist.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -34,10 +35,11 @@ export default {
             const requestTime = Date.now();
 
             initCloudflareTracer(env.dataset1);
+            if (!banlist) banlist = new Banlist(env.kvNamespace);
         
             // first, handle redirects - the most important function
             // be careful here: must never throw
-            const redirectResponse = tryComputeRedirectResponse(request, { env, context, requestTime });
+            const redirectResponse = await tryComputeRedirectResponse(request, { env, context, requestTime });
             if (redirectResponse) return redirectResponse;
 
             // handle all other requests
@@ -72,8 +74,9 @@ export default {
 //
 
 const pendingRawRedirects: RawRedirect[] = [];
+let banlist: Banlist | undefined;
 
-function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Response | undefined {
+async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Promise<Response | undefined> {
     // must never throw!
     const redirectRequest = tryParseRedirectRequest(request.url);
     if (!redirectRequest) return undefined;
@@ -124,8 +127,13 @@ function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, co
         }
     })());
     if (redirectRequest.kind === 'valid') {
-        console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
-        return computeRedirectResponse(redirectRequest);
+        if (await banlist?.isBanned(redirectRequest.targetUrl)) {
+            console.log(`Non-podcast redirect url: ${request.url}`);
+            return new Response('Non-podcast redirect url', { status: 400 });
+        } else {
+            console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
+            return computeRedirectResponse(redirectRequest);
+        }
     } else {
         console.log(`Invalid redirect url: ${request.url}`);
         return new Response('Invalid redirect url', { status: 400 });
@@ -148,44 +156,43 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-        const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime } = env;
-        IsolateId.log();
-        const { origin, hostname, pathname, searchParams } = new URL(request.url);
-        const { method, headers } = request;
-        const adminTokens = parseStringSet(env.adminTokens);
-        const previewTokens = parseStringSet(env.previewTokens);
-        const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
+    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime } = env;
+    IsolateId.log();
+    const { origin, hostname, pathname, searchParams } = new URL(request.url);
+    const { method, headers } = request;
+    const adminTokens = parseStringSet(env.adminTokens);
+    const previewTokens = parseStringSet(env.previewTokens);
+    const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
 
-        if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
-        if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
-        if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
-        if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
-        if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
-        const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
-        if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
-        if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
-        const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-        const background: Background = work => {
-            context.waitUntil((async () => {
-                try {
-                    await work();
-                } catch (e) {
-                    consoleError('background', `Error in background: ${e.stack || e}`);
-                }
-            })());
-        };
-        const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background });
+    if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
+    if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
+    if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
+    if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
+    if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
+    const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
+    if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
+    const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+    const background: Background = work => {
+        context.waitUntil((async () => {
+            try {
+                await work();
+            } catch (e) {
+                consoleError('background', `Error in background: ${e.stack || e}`);
+            }
+        })());
+    };
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background });
 
-        // redirect /foo/ to /foo (canonical)
-        if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
+    // redirect /foo/ to /foo (canonical)
+    if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
 
-        // not found
-        if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+    // not found
+    if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
 
-        return newMethodNotAllowedResponse(method);
-
+    return newMethodNotAllowedResponse(method);
 }

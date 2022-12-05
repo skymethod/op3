@@ -41,6 +41,15 @@ export function tryParseUrl(url: string): URL | undefined {
     }
 }
 
+// deno-lint-ignore no-explicit-any
+export function tryParseJson(text: string): any | undefined {
+    try {
+        return JSON.parse(text);
+    } catch  {
+        return undefined;
+    }
+}
+
 export function isValidOrigin(origin: string): boolean {
     const u = tryParseUrl(origin);
     return u !== undefined && u.origin === origin;
