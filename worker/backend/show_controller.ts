@@ -797,8 +797,8 @@ function computeFeedItemRecordKeyPrefix(feedRecordId: string): string {
     return `sc.fir0.${feedRecordId}.`;
 }
 
-async function computeFeedItemRecordId(guid: string): Promise<string> {
-    return (await Bytes.ofUtf8(guid).sha256()).hex();
+async function computeFeedItemRecordId(itemGuid: string): Promise<string> {
+    return (await Bytes.ofUtf8(itemGuid).sha256()).hex();
 }
 
 async function computeNewPodcastGuids(podcastGuids: Set<string>, storage: DurableObjectStorage): Promise<Set<string>> {

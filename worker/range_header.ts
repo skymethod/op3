@@ -19,7 +19,7 @@ export function parseRangeHeader(range: string): ByteRange[] {
         m = /^(\d+)?-(\d+)?$/.exec(spec);
         if (!m) throw new Error(`Unsupported range: ${range}`);
         const [ _, startStr, endStr ] = m;
-        console.log({ spec, startStr, endStr });
+        // console.log({ spec, startStr, endStr });
         const [ start, end ] = [ startStr, endStr ].map(v => typeof v === 'string' ? parseInt(v) : undefined);
         if (typeof start === 'number') {
             if (typeof end === 'number') {
