@@ -214,18 +214,26 @@ export class ShowController {
 
         {
             const m = /^\/show\/shows\/(.+?)(\/episodes)?$/.exec(targetPath);
-            if (m && operationKind === 'select') {
+            if (m) {
                 const [ _, input, episodes ] = m;
                 const showUuid = input;
                 check('showUuid', showUuid, isValidUuid);
                 if (episodes) {
-                    const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
-                    const results = [...map.values()].filter(isEpisodeRecord);
-                    return { results };
+                    if (operationKind === 'select') {
+                        const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
+                        const results = [...map.values()].filter(isEpisodeRecord);
+                        return { results };
+                    }
                 } else {
-                    const result = await storage.get(computeShowKey(showUuid));
-                    const results = isShowRecord(result) ? [ result ] : [];
-                    return { results }
+                    if (operationKind === 'select') {
+                        const result = await storage.get(computeShowKey(showUuid));
+                        const results = isShowRecord(result) ? [ result ] : [];
+                        return { results }
+                    }
+                    if (operationKind === 'delete') {
+                        const result = await deleteShow(showUuid, storage);
+                        return { results: [ result ] };
+                    }
                 }
             }
         }
@@ -798,6 +806,28 @@ async function lookupShow(url: string, storage: DurableObjectStorage, metrics: L
     }
 }
 
+async function deleteShow(showUuid: string, storage: DurableObjectStorage) {
+    check('showUuid', showUuid, isValidUuid);
+    const map = await storage.list({ prefix: 'sc.fr0.' });
+    const feed = [...map.values()].filter(isFeedRecord).find(v => v.showUuid === showUuid);
+    if (feed) throw new Error(`Cannot delete show ${showUuid} referenced by ${feed.id} (${feed.url})`);
+
+    const showKey = computeShowKey(showUuid);
+    const show = await storage.get(showKey);
+    const showKeys = show ? [ showKey ] : [];
+    const indexKeys = Object.keys(await storage.list({ prefix: computeShowEpisodesIndexKeyPrefix({ showUuid })}));
+    const episodeKeys = Object.keys(await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })}));
+    const keysToDelete = [
+        ...indexKeys,
+        ...episodeKeys,
+        ...showKeys,
+    ];
+    for (const batch of chunk(keysToDelete, 128)) {
+        await storage.delete(batch);
+    }
+    return { deletedIndexRecords: indexKeys.length, deletedEpisodeKeys: episodeKeys.length, deletedShowRecords: showKeys.length };
+}
+
 function computeFeedRecordKey(feedRecordId: string): string {
     return `sc.fr0.${feedRecordId}`;
 }
@@ -865,6 +895,10 @@ function computeShowEpisodesIndexKey(showUuid: string, episodeId: string) {
     return `sc.i0.${IndexType.ShowEpisodes}.${showUuid}.${episodeId}`;
 }
 
+function computeShowEpisodesIndexKeyPrefix({ showUuid }: { showUuid: string }) {
+    return `sc.i0.${IndexType.ShowEpisodes}.${showUuid}.`;
+}
+
 function computeShowKey(uuid: string): string {
     return `sc.show0.${uuid}`;
 }
@@ -873,12 +907,10 @@ async function computeEpisodeId(itemGuid: string): Promise<string> {
     return (await Bytes.ofUtf8(itemGuid).sha256()).hex();
 }
 
-function computeEpisodeKey(opts: { showUuid: string, id: string }): string {
-    const { showUuid, id } = opts;
+function computeEpisodeKey({ showUuid, id }: { showUuid: string, id: string }): string {
     return `sc.ep0.${showUuid}.${id}`;
 }
 
-function computeEpisodeKeyPrefix(opts: { showUuid: string }): string {
-    const { showUuid } = opts;
+function computeEpisodeKeyPrefix({ showUuid }: { showUuid: string }): string {
     return `sc.ep0.${showUuid}.`;
 }
