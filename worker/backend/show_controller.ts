@@ -125,16 +125,24 @@ export class ShowController {
         }
 
         {
-            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url)$/.exec(targetPath);
+            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes)$/.exec(targetPath);
             if (m && operationKind === 'select') {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
                     'match-url': IndexType.MatchUrlToFeedItem,
                     'queryless-match-url': IndexType.QuerylessMatchUrlToFeedItem,
+                    'feed-to-show': IndexType.FeedRecordIdToShowUuid,
+                    'show-episodes': IndexType.ShowEpisodes,
                 }[m[1]];
                 const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
-                const results = [...map].filter(v => isStringRecord(v[1])).map(v => ({ _key: v[0], ...v[1] as Record<string, unknown> }));
-                return { results };
+                const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
+                if (expectStringValues) {
+                    const results = [...map].filter(v => typeof v[1] === 'string').map(v => ({ _key: v[0], _value: v[1] as string }));
+                    return { results };
+                } else {
+                    const results = [...map].filter(v => isStringRecord(v[1])).map(v => ({ _key: v[0], ...v[1] as Record<string, unknown> }));
+                    return { results };
+                }
             }
         }
 
@@ -595,9 +603,10 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         await setShowAttributesFromFeed(feedRecord, storage, rt);
 
         // ensure show episodes exist for all feed items
-        const { inserts, updates } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, storage });
+        const { inserts, updates, indexWrites } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, storage });
         if (inserts > 0) rt.push(`${inserts} ep inserts`);
         if (updates > 0) rt.push(`${updates} ep updates`);
+        if (indexWrites > 0) rt.push(`${indexWrites} ep index writes`);
     }
 
     return rt.join(', ');
@@ -631,7 +640,6 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     const { storage } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     check('showUuid', showUuid, isValidUuid);
-    if (feedRecord.showUuid !== undefined) throw new Error(`Feed is already show ${feedRecord.showUuid}`);
     if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
     const { podcastGuid } = feedRecord.piFeed;
     if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
@@ -644,12 +652,14 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     await storage.put(Object.fromEntries([
         [ computeFeedRecordKey(update.id), update ],
         [ computeShowKey(showRecord.uuid), showRecord ],
+        [ computeFeedRecordIdToShowUuidIndexKey(feedRecord.id), showUuid ],
     ]));
 
     // ensure show episodes exist for all feed items
-    const { inserts, updates } = await ensureEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, storage });
+    const { inserts, updates, indexWrites } = await ensureEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, storage });
     if (inserts > 0) rt.push(`${inserts} ep inserts`);
     if (updates > 0) rt.push(`${updates} ep updates`);
+    if (indexWrites > 0) rt.push(`${indexWrites} ep index writes`);
 
     return rt.join(', ');
 }
@@ -668,11 +678,13 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     }
 }
 
-async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number }> {
+async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number, indexWrites: number }> {
     const { feedRecordId, showUuid, storage } = opts;
     const map = await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) });
     let inserts = 0;
     let updates = 0;
+    let indexWrites = 0;
+    const indexRecords: Record<string, Record<string, unknown>> = {};
     const epRecords: Record<string, EpisodeRecord> = {};
     for (const batch of chunk([...map.values()].filter(isFeedItemRecord), 128)) {
         const itemGuids = batch.map(v => v.guid);
@@ -700,12 +712,17 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
                 epRecords[computeEpisodeKey(insert)] = insert;
                 inserts++;
             }
+            indexRecords[computeShowEpisodesIndexKey(showUuid, episodeId)] = {};
+            indexWrites++;
         }
     }
     for (const batch of chunk(Object.entries(epRecords), 128)) {
         await storage.put(Object.fromEntries(batch));
     }
-    return { inserts, updates };
+    for (const batch of chunk(Object.entries(indexRecords), 128)) {
+        await storage.put(Object.fromEntries(batch));
+    }
+    return { inserts, updates, indexWrites };
 }
 
 type LookupShowMetrics = { messages: string[], storageListCalls: number, indexRecordsScanned: number, feedItemGetCalls: number, feedGetCalls: number, episodeGetCalls: number };
@@ -824,6 +841,8 @@ enum IndexType {
     PodcastGuid = 1,
     MatchUrlToFeedItem = 2,
     QuerylessMatchUrlToFeedItem = 3,
+    FeedRecordIdToShowUuid = 4,
+    ShowEpisodes = 5,
 }
 
 function computePodcastGuidIndexKey(podcastGuid: string) {
@@ -836,6 +855,14 @@ function computeMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: strin
 
 function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: string, feedItemRecordId: string) {
     return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
+}
+
+function computeFeedRecordIdToShowUuidIndexKey(feedRecordId: string) {
+    return `sc.i0.${IndexType.FeedRecordIdToShowUuid}.${feedRecordId}`;
+}
+
+function computeShowEpisodesIndexKey(showUuid: string, episodeId: string) {
+    return `sc.i0.${IndexType.ShowEpisodes}.${showUuid}.${episodeId}`;
 }
 
 function computeShowKey(uuid: string): string {
