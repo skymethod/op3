@@ -283,7 +283,7 @@ export class ShowController {
                     const destinationUrl = computeChainDestinationUrl(url);
                     if (!destinationUrl) return undefined;
                     for (const queryless of [ false, true ]) {
-                        const matchUrl1024 = computeMatchUrl(url, { queryless }).substring(0, 1024);
+                        const matchUrl1024 = computeMatchUrl(destinationUrl, { queryless }).substring(0, 1024);
                         if (queryless && !matchUrl1024.includes('?')) continue; // queryless match url only computed if the match url has a query string
                         const matches = (queryless ? matchUrls : querylessMatchUrls).get(matchUrl1024);
                         if (!matches || matches.length === 0) continue;
