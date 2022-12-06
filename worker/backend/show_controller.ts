@@ -851,8 +851,8 @@ async function deleteShow(showUuid: string, storage: DurableObjectStorage) {
     const showKey = computeShowKey(showUuid);
     const show = await storage.get(showKey);
     const showKeys = show ? [ showKey ] : [];
-    const indexKeys = Object.keys(await storage.list({ prefix: computeShowEpisodesIndexKeyPrefix({ showUuid })}));
-    const episodeKeys = Object.keys(await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })}));
+    const indexKeys = [...(await storage.list({ prefix: computeShowEpisodesIndexKeyPrefix({ showUuid })})).keys()];
+    const episodeKeys = [...(await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })})).keys()];
     const keysToDelete = [
         ...indexKeys,
         ...episodeKeys,
