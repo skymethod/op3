@@ -137,6 +137,17 @@ export class ShowController {
                 return { results };
             }
         }
+
+        {
+            const m = /^\/show\/feeds\/(.+?)\/items$/.exec(targetPath);
+            if (m && operationKind === 'select') {
+                const feedUrl = m[1];
+                const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
+                const map = await storage.list(computeListOpts(computeFeedItemRecordKeyPrefix(feedRecordId), parameters));
+                const results = [...map.values()].filter(isFeedItemRecord);
+                return { results };
+            }
+        }
     
         {
             const m = /^\/show\/feeds\/(.*?)$/.exec(targetPath);
