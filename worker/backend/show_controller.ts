@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -255,20 +255,56 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const lookupShowMetrics = newLookupShowMetrics();
-                let lookupShowCalls = 0;
-                let lookupShowMillis = 0;
-                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow: async v => {
-                    lookupShowCalls++;
-                    const start = Date.now();
-                    try {
-                        return await lookupShow(v, storage, lookupShowMetrics);
-                    } finally {
-                        lookupShowMetrics.messages.splice(0);
-                        lookupShowMillis += (Date.now() - start);
+
+                const start = Date.now();
+                // preload match urls in memory for fast bulk lookup
+                const loadMatchUrls = async (prefix: string) => {
+                    const map = await storage.list({ prefix });
+                    const rt = new Map<string, { feedRecordId: string, feedItemRecordId: string }[]>(); // key: matchUrl1024
+                    for (const [ key, value ] of map) {
+                        if (!isFeedItemIndexRecord(value)) continue;
+                        const { matchUrl1024, feedRecordId, feedItemRecordId } = unpackMatchUrlToFeedItemIndexKey(key); // assume same structure for queryless
+                        const values = rt.get(matchUrl1024) ?? [];
+                        values.push({ feedRecordId, feedItemRecordId });
+                        rt.set(matchUrl1024, values);
                     }
-                } });
-                return { results: [ {...result, lookupShowCalls, lookupShowMillis, lookupShowMetrics } ] };
+                    return rt;
+                };
+                const matchUrls = await loadMatchUrls(computeMatchUrlToFeedItemIndexKeyPrefix());
+                const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
+                const feedRecordIdsToShowUuids = new Map([...await storage.list({ prefix: computeFeedRecordIdToShowUuidIndexKeyPrefix() })].map(([ key, value ]) => {
+                    const { feedRecordId } = unpackFeedRecordIdToShowUuidIndexKey(key);
+                    return [ feedRecordId, value as string ];
+                }));
+                const preloadMillis = Date.now() - start;
+                
+                const lookupShow = async (url: string) => {
+                    await Promise.resolve();
+                    const destinationUrl = computeChainDestinationUrl(url);
+                    if (!destinationUrl) return undefined;
+                    for (const queryless of [ false, true ]) {
+                        const matchUrl1024 = computeMatchUrl(url, { queryless }).substring(0, 1024);
+                        if (queryless && !matchUrl1024.includes('?')) continue; // queryless match url only computed if the match url has a query string
+                        const matches = (queryless ? matchUrls : querylessMatchUrls).get(matchUrl1024);
+                        if (!matches || matches.length === 0) continue;
+                        const showMatches = matches.map(({ feedRecordId, feedItemRecordId }) => ({ feedRecordId, feedItemRecordId, showUuid: feedRecordIdsToShowUuids.get(feedRecordId) }));
+                        if (showMatches.length === 1) {
+                            const { showUuid, feedItemRecordId: episodeId } = showMatches[0];
+                            if (typeof showUuid !== 'string') continue;
+                            return { showUuid, episodeId }
+                        }
+                        const showUuids = distinct(showMatches.map(v => v.showUuid)).filter(isString);
+                        if (showUuids.length === 1) {
+                            const showUuid = showUuids[0];
+                            const feedItemRecordIds = distinct(showMatches.map(v => v.feedItemRecordId));
+                            const episodeId = feedItemRecordIds.length === 1 ? feedItemRecordIds[0] : undefined;
+                            return { showUuid, episodeId };
+                        }
+                    }
+                    return undefined;
+                };
+                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow } );
+                return { results: [ { ...result, preloadMillis, matchUrls: matchUrls.size, querylessMatchUrls: querylessMatchUrls.size, feedRecordIdsToShowUuids: feedRecordIdsToShowUuids.size } ] };
             }
         }
 
@@ -883,12 +919,34 @@ function computeMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: strin
     return `sc.i0.${IndexType.MatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
 }
 
+function unpackMatchUrlToFeedItemIndexKey(key: string): { matchUrl1024: string, feedRecordId: string, feedItemRecordId: string } {
+    const [ _, matchUrl1024, feedRecordId, feedItemRecordId ] = checkMatches('key', key, /^sc\.i0\.\d+\.(.*?)\.([0-9a-f]+?)\.([0-9a-f]+?)$/);
+    return { matchUrl1024, feedRecordId, feedItemRecordId };
+}
+
+function computeMatchUrlToFeedItemIndexKeyPrefix() {
+    return `sc.i0.${IndexType.MatchUrlToFeedItem}.`;
+}
+
 function computeQuerylessMatchUrlToFeedItemIndexKey(matchUrl: string, feedRecordId: string, feedItemRecordId: string) {
     return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.${matchUrl.substring(0, 1024)}.${feedRecordId}.${feedItemRecordId}`;
 }
 
+function computeQuerylessMatchUrlToFeedItemIndexKeyPrefix() {
+    return `sc.i0.${IndexType.QuerylessMatchUrlToFeedItem}.`;
+}
+
 function computeFeedRecordIdToShowUuidIndexKey(feedRecordId: string) {
     return `sc.i0.${IndexType.FeedRecordIdToShowUuid}.${feedRecordId}`;
+}
+
+function unpackFeedRecordIdToShowUuidIndexKey(key: string): { feedRecordId: string } {
+    const [ _, feedRecordId ] = checkMatches('key', key, /^sc\.i0\.\d+\.([0-9a-f]+?)$/);
+    return { feedRecordId };
+}
+
+function computeFeedRecordIdToShowUuidIndexKeyPrefix() {
+    return `sc.i0.${IndexType.FeedRecordIdToShowUuid}.`;
 }
 
 function computeShowEpisodesIndexKey(showUuid: string, episodeId: string) {
