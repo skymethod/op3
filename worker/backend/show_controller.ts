@@ -272,10 +272,7 @@ export class ShowController {
                 };
                 const matchUrls = await loadMatchUrls(computeMatchUrlToFeedItemIndexKeyPrefix());
                 const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
-                const feedRecordIdsToShowUuids = new Map([...await storage.list({ prefix: computeFeedRecordIdToShowUuidIndexKeyPrefix() })].map(([ key, value ]) => {
-                    const { feedRecordId } = unpackFeedRecordIdToShowUuidIndexKey(key);
-                    return [ feedRecordId, value as string ];
-                }));
+                const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
                 const preloadMillis = Date.now() - start;
                 
                 const lookupShow = async (url: string) => {
@@ -534,6 +531,17 @@ async function loadFeedRecord(feedUrlOrRecord: string | FeedRecord, storage: Dur
     return feedRecord;
 }
 
+async function loadFeedRecords(storage: DurableObjectStorage): Promise<FeedRecord[]> {
+    const map = await storage.list({ prefix: 'sc.fr0.' });
+    return [...map.values()].filter(isFeedRecord);
+}
+
+async function findShowRecord(showUuid: string, storage: DurableObjectStorage): Promise<ShowRecord | undefined> {
+    const record = await storage.get(computeShowKey(showUuid));
+    if (record !== undefined && !isShowRecord(record)) throw new Error(`Bad ShowRecord found for ${showUuid}: ${JSON.stringify(record)}`);
+    return record;
+}
+
 async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean }): Promise<string> {
     const { storage, blobs, forceResave = false } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
@@ -684,15 +692,23 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     const { storage } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     check('showUuid', showUuid, isValidUuid);
-    if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
-    const { podcastGuid } = feedRecord.piFeed;
-    if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
+
+    let showRecord = await findShowRecord(showUuid, storage);
+    if (showRecord) {
+        // show already exists, allow only if no piFeed
+        if (feedRecord.piFeed !== undefined) throw new Error(`Feed must not have a piFeed`);
+    } else {
+        if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
+        const { podcastGuid } = feedRecord.piFeed;
+        if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
+        showRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
+    }
+
     const rt: string[] = [];
     rt.push(`showGuid: ${showUuid}`);
 
     // save feed and show record
     const update: FeedRecord = { ...feedRecord, showUuid, updated: new Date().toISOString() };
-    const showRecord: ShowRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
     await storage.put(Object.fromEntries([
         [ computeFeedRecordKey(update.id), update ],
         [ computeShowKey(showRecord.uuid), showRecord ],
@@ -844,8 +860,7 @@ async function lookupShow(url: string, storage: DurableObjectStorage, metrics: L
 
 async function deleteShow(showUuid: string, storage: DurableObjectStorage) {
     check('showUuid', showUuid, isValidUuid);
-    const map = await storage.list({ prefix: 'sc.fr0.' });
-    const feed = [...map.values()].filter(isFeedRecord).find(v => v.showUuid === showUuid);
+    const feed = (await loadFeedRecords(storage)).filter(isFeedRecord).find(v => v.showUuid === showUuid);
     if (feed) throw new Error(`Cannot delete show ${showUuid} referenced by ${feed.id} (${feed.url})`);
 
     const showKey = computeShowKey(showUuid);
@@ -903,6 +918,14 @@ async function savePodcastGuidIndexRecords(podcastGuids: Set<string>, storage: D
     }
 }
 
+async function loadFeedRecordIdsToShowUuids(storage: DurableObjectStorage): Promise<Map<string, string>> {
+    return new Map([...await storage.list({ prefix: computeFeedRecordIdToShowUuidIndexKeyPrefix() })].map(([ key, value ]) => {
+        const { feedRecordId } = unpackFeedRecordIdToShowUuidIndexKey(key);
+        if (typeof value !== 'string') throw new Error(`Unexpected index value for key ${key}: ${JSON.stringify(value)}`);
+        return [ feedRecordId, value ];
+    }));
+}
+
 enum IndexType {
     PodcastGuid = 1,
     MatchUrlToFeedItem = 2,
@@ -957,8 +980,8 @@ function computeShowEpisodesIndexKeyPrefix({ showUuid }: { showUuid: string }) {
     return `sc.i0.${IndexType.ShowEpisodes}.${showUuid}.`;
 }
 
-function computeShowKey(uuid: string): string {
-    return `sc.show0.${uuid}`;
+function computeShowKey(showUuid: string): string {
+    return `sc.show0.${showUuid}`;
 }
 
 async function computeEpisodeId(itemGuid: string): Promise<string> {
