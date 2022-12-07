@@ -861,11 +861,13 @@ async function lookupShowBulk(storage: DurableObjectStorage) {
                 messages?.push(`queryless(${queryless}): no matches`);
                 continue;
             }
-            const showMatches = matches.map(({ feedRecordId, feedItemRecordId }) => ({ feedRecordId, feedItemRecordId, showUuid: feedRecordIdsToShowUuids.get(feedRecordId) }));
+            const showMatches = matches.flatMap(({ feedRecordId, feedItemRecordId }) => {
+                const showUuid = feedRecordIdsToShowUuids.get(feedRecordId);
+                return showUuid ? [ { feedRecordId, feedItemRecordId, showUuid } ] : [];
+            });
             if (showMatches.length === 1) {
                 messages?.push(`queryless(${queryless}): single match: ${JSON.stringify(showMatches[0])}`);
                 const { showUuid, feedItemRecordId: episodeId } = showMatches[0];
-                if (typeof showUuid !== 'string') continue;
                 return { showUuid, episodeId }
             }
             const showUuids = distinct(showMatches.map(v => v.showUuid)).filter(isString);
