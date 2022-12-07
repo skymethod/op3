@@ -114,8 +114,8 @@ export class ShowController {
                 return { results, message: metrics.messages.join(', ') };
             }
             if (typeof lookupBulk === 'string') {
-                const { lookupShow } = await lookupShowBulk(storage);
-                const messages: string[] = [];
+                const { lookupShow, matchUrls, querylessMatchUrls, preloadMillis, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
+                const messages = [ JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids }) ];
                 const result = await lookupShow(lookupBulk, messages);
                 const results: unknown[] = [];
                 if (result) {
@@ -857,7 +857,7 @@ async function lookupShowBulk(storage: DurableObjectStorage) {
             const matchUrl1024 = computeMatchUrl(destinationUrl, { queryless }).substring(0, 1024);
             if (queryless && !matchUrl1024.includes('?')) continue; // queryless match url only computed if the match url has a query string
             messages?.push(`queryless(${queryless}): matchUrl1024: ${matchUrl1024}`);
-            const matches = (queryless ? matchUrls : querylessMatchUrls).get(matchUrl1024);
+            const matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
             if (!matches || matches.length === 0) {
                 messages?.push(`queryless(${queryless}): no matches`);
                 continue;
