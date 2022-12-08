@@ -1,6 +1,6 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkAll, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
-import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
+import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
@@ -281,6 +281,20 @@ export class ShowController {
             }
         }
 
+        if (targetPath === '/show/storage/lookup-show-bulk' && operationKind === 'select') {
+            const prefixes = [
+                computeMatchUrlToFeedItemIndexKeyPrefix(),
+                computeQuerylessMatchUrlToFeedItemIndexKeyPrefix(),
+                computeFeedRecordIdToShowUuidIndexKeyPrefix(),
+            ];
+            const results: [string, DurableObjectStorageValue][] = [];
+            for (const prefix of prefixes) {
+                const map = await storage.list({ prefix });
+                results.push(...[...map]);
+            }
+            return { results };
+        }
+
         throw new Error(`Unsupported show-related query`);
     }
 
@@ -326,6 +340,72 @@ export class ShowController {
             consoleInfo('sc-work', `ShowController: ${infos.join('; ')}`); // for now, keep an eye on every call
         }
     }
+}
+
+export async function lookupShowBulk(storage: DurableObjectStorage) {
+    const start = Date.now();
+    // preload match urls in memory for fast bulk lookup
+    const loadMatchUrls = async (prefix: string) => {
+        const map = await storage.list({ prefix });
+        const rt = new Map<string, { feedRecordId: string, feedItemRecordId: string }[]>(); // key: matchUrl1024
+        for (const [ key, value ] of map) {
+            if (!isFeedItemIndexRecord(value)) continue;
+            const { matchUrl1024, feedRecordId, feedItemRecordId } = unpackMatchUrlToFeedItemIndexKey(key); // assume same structure for queryless
+            const values = rt.get(matchUrl1024) ?? [];
+            values.push({ feedRecordId, feedItemRecordId });
+            rt.set(matchUrl1024, values);
+        }
+        return rt;
+    };
+    const matchUrls = await loadMatchUrls(computeMatchUrlToFeedItemIndexKeyPrefix());
+    const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
+    const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
+    const preloadMillis = Date.now() - start;
+    const unableToComputeMatchUrls = new Set<string>();
+    
+    const lookupShow = async (url: string, messages?: string[]) => {
+        await Promise.resolve();
+        messages?.push(`url: ${url}`);
+        const destinationUrl = computeChainDestinationUrl(url);
+        messages?.push(`destinationUrl: ${destinationUrl}`);
+        if (!destinationUrl) return undefined;
+        for (const queryless of [ false, true ]) {
+            const matchUrl = tryComputeMatchUrl(destinationUrl, { queryless });
+            if (matchUrl === undefined) {
+                if (!unableToComputeMatchUrls.has(url)) {
+                    consoleWarn('lookup-show-bulk', `lookupShowBulk: unable to compute match url for url: ${url}, destinationUrl: ${destinationUrl}`);
+                    unableToComputeMatchUrls.add(url);
+                }
+                return undefined;
+            }
+            const matchUrl1024 = matchUrl.substring(0, 1024);
+            messages?.push(`queryless(${queryless}): matchUrl1024: ${matchUrl1024}`);
+            const matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
+            if (!matches || matches.length === 0) {
+                messages?.push(`queryless(${queryless}): no matches`);
+                continue;
+            }
+            const showMatches = matches.flatMap(({ feedRecordId, feedItemRecordId }) => {
+                const showUuid = feedRecordIdsToShowUuids.get(feedRecordId);
+                return showUuid ? [ { feedRecordId, feedItemRecordId, showUuid } ] : [];
+            });
+            if (showMatches.length === 1) {
+                messages?.push(`queryless(${queryless}): single match: ${JSON.stringify(showMatches[0])}`);
+                const { showUuid, feedItemRecordId: episodeId } = showMatches[0];
+                return { showUuid, episodeId }
+            }
+            const showUuids = distinct(showMatches.map(v => v.showUuid)).filter(isString);
+            messages?.push(`queryless(${queryless}): multiple matches: ${JSON.stringify({ showMatches, showUuids })}`);
+            if (showUuids.length === 1) {
+                const showUuid = showUuids[0];
+                const feedItemRecordIds = distinct(showMatches.map(v => v.feedItemRecordId));
+                const episodeId = feedItemRecordIds.length === 1 ? feedItemRecordIds[0] : undefined;
+                return { showUuid, episodeId };
+            }
+        }
+        return undefined;
+    };
+    return { lookupShow, preloadMillis, matchUrls: matchUrls.size, querylessMatchUrls: querylessMatchUrls.size, feedRecordIdsToShowUuids: feedRecordIdsToShowUuids.size };
 }
 
 //
@@ -845,72 +925,6 @@ async function lookupShow(url: string, storage: DurableObjectStorage, metrics: L
         }
         throw new Error(`Matches multiple shows: ${[...showUuids].join(', ')}`);
     }
-}
-
-async function lookupShowBulk(storage: DurableObjectStorage) {
-    const start = Date.now();
-    // preload match urls in memory for fast bulk lookup
-    const loadMatchUrls = async (prefix: string) => {
-        const map = await storage.list({ prefix });
-        const rt = new Map<string, { feedRecordId: string, feedItemRecordId: string }[]>(); // key: matchUrl1024
-        for (const [ key, value ] of map) {
-            if (!isFeedItemIndexRecord(value)) continue;
-            const { matchUrl1024, feedRecordId, feedItemRecordId } = unpackMatchUrlToFeedItemIndexKey(key); // assume same structure for queryless
-            const values = rt.get(matchUrl1024) ?? [];
-            values.push({ feedRecordId, feedItemRecordId });
-            rt.set(matchUrl1024, values);
-        }
-        return rt;
-    };
-    const matchUrls = await loadMatchUrls(computeMatchUrlToFeedItemIndexKeyPrefix());
-    const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
-    const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
-    const preloadMillis = Date.now() - start;
-    const unableToComputeMatchUrls = new Set<string>();
-    
-    const lookupShow = async (url: string, messages?: string[]) => {
-        await Promise.resolve();
-        messages?.push(`url: ${url}`);
-        const destinationUrl = computeChainDestinationUrl(url);
-        messages?.push(`destinationUrl: ${destinationUrl}`);
-        if (!destinationUrl) return undefined;
-        for (const queryless of [ false, true ]) {
-            const matchUrl = tryComputeMatchUrl(destinationUrl, { queryless });
-            if (matchUrl === undefined) {
-                if (!unableToComputeMatchUrls.has(url)) {
-                    consoleWarn('lookup-show-bulk', `lookupShowBulk: unable to compute match url for url: ${url}, destinationUrl: ${destinationUrl}`);
-                    unableToComputeMatchUrls.add(url);
-                }
-                return undefined;
-            }
-            const matchUrl1024 = matchUrl.substring(0, 1024);
-            messages?.push(`queryless(${queryless}): matchUrl1024: ${matchUrl1024}`);
-            const matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
-            if (!matches || matches.length === 0) {
-                messages?.push(`queryless(${queryless}): no matches`);
-                continue;
-            }
-            const showMatches = matches.flatMap(({ feedRecordId, feedItemRecordId }) => {
-                const showUuid = feedRecordIdsToShowUuids.get(feedRecordId);
-                return showUuid ? [ { feedRecordId, feedItemRecordId, showUuid } ] : [];
-            });
-            if (showMatches.length === 1) {
-                messages?.push(`queryless(${queryless}): single match: ${JSON.stringify(showMatches[0])}`);
-                const { showUuid, feedItemRecordId: episodeId } = showMatches[0];
-                return { showUuid, episodeId }
-            }
-            const showUuids = distinct(showMatches.map(v => v.showUuid)).filter(isString);
-            messages?.push(`queryless(${queryless}): multiple matches: ${JSON.stringify({ showMatches, showUuids })}`);
-            if (showUuids.length === 1) {
-                const showUuid = showUuids[0];
-                const feedItemRecordIds = distinct(showMatches.map(v => v.feedItemRecordId));
-                const episodeId = feedItemRecordIds.length === 1 ? feedItemRecordIds[0] : undefined;
-                return { showUuid, episodeId };
-            }
-        }
-        return undefined;
-    };
-    return { lookupShow, preloadMillis, matchUrls: matchUrls.size, querylessMatchUrls: querylessMatchUrls.size, feedRecordIdsToShowUuids: feedRecordIdsToShowUuids.size };
 }
 
 async function deleteShow(showUuid: string, storage: DurableObjectStorage) {
