@@ -19,7 +19,7 @@ export class Banlist {
         try {
             const targetHostname = tryParseUrl(targetUrl)?.hostname;
             if (targetHostname === undefined) return false;
-
+            if (isReservedForTesting(targetHostname)) return true;
             if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace);
             return this.bannedHostnames.has(targetHostname);
         } catch (e) {
@@ -31,6 +31,11 @@ export class Banlist {
 }
 
 //
+
+function isReservedForTesting(hostname: string): boolean {
+    // https://www.rfc-editor.org/rfc/rfc2606.html#section-2
+    return /^(.+?\.)?(test|example|invalid|localhost)$/.test(hostname);
+}
 
 async function loadBannedHostnames(namespace: KVNamespace): Promise<Set<string>> {
     const cacheKey = 'http://op3.com/banlist'; // must be a valid hostname, but never routable to avoid conflicts with worker fetch
