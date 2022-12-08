@@ -64,7 +64,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads(date: string, { onlyResaveShowUuids, statsBlobs, lookupShow } : { onlyResaveShowUuids?: string[], statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -128,8 +128,10 @@ export async function computeDailyDownloads(date: string, { statsBlobs, lookupSh
     const { contentLength } = await write(chunks, statsBlobs, computeDailyKey(date));
     const showContentLengths: Record<string, number> = {};
     for (const [ showUuid, chunkIndexes ] of showChunkIndexes) {
-        const { contentLength } = await write(chunks, statsBlobs, computeShowDailyKey({ date, showUuid }), chunkIndexes);
-        showContentLengths[showUuid] = contentLength;
+        if (!onlyResaveShowUuids || onlyResaveShowUuids.includes(showUuid)) {
+            const { contentLength } = await write(chunks, statsBlobs, computeShowDailyKey({ date, showUuid }), chunkIndexes);
+            showContentLengths[showUuid] = contentLength;
+        }
     }
 
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength, showContentLengths };

@@ -4,6 +4,14 @@ export function check<T>(name: string, value: T, isValid: boolean | ((value: T) 
     return true;
 }
 
+export function checkAll<T>(name: string, values: T[], isValid: boolean | ((value: T) => boolean)): boolean {
+    values.forEach((value, i) => {
+        const valid = typeof isValid === 'boolean' && isValid || typeof isValid === 'function' && isValid(value);
+        if (!valid) throw new Error(`Bad ${name}[${i}]: ${value}`);
+    })
+    return true;
+}
+
 export function checkMatches(name: string, value: string, pattern: RegExp): RegExpExecArray {
     const m = pattern.exec(value);
     if (!m) throw new Error(`Bad ${name}: ${value}`);

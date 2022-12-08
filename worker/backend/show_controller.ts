@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { check, checkAll, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -255,7 +255,7 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date } = parameters;
+            const { hour, date, showUuid, showUuids } = parameters;
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
@@ -271,8 +271,10 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
+                const onlyResaveShowUuids = showUuid ? [ showUuid ] : showUuids ? showUuids.split(',').map(v => v.trim()).filter(v => v !== '') : undefined;
+                if (onlyResaveShowUuids) checkAll('onlyResaveShowUuids', onlyResaveShowUuids, isValidUuid);
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow } );
+                const result = await computeDailyDownloads(date, { onlyResaveShowUuids, statsBlobs, lookupShow } );
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }
