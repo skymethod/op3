@@ -219,6 +219,9 @@ export class ShowController {
                         const { 'show-uuid': showUuid = generateUuid() } = parameters;
                         const message = await setShowUuid(result, showUuid, { storage });
                         return { message };
+                    } else if (action == 'remove-show-uuid') {
+                        const showUuid = await removeShowUuid(result, storage);
+                        return { message: `Removed ${showUuid} from ${result.url}` };
                     }
                     return { message: 'Unknown update action' };
                 }
@@ -691,6 +694,19 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     if (indexWrites > 0) rt.push(`${indexWrites} ep index writes`);
 
     return rt.join(', ');
+}
+
+async function removeShowUuid(feedRecord: FeedRecord, storage: DurableObjectStorage): Promise<string> {
+    const { showUuid } = feedRecord;
+    if (!showUuid) throw new Error(`No showUuid for this feed record`);
+    check('showUuid', showUuid, isValidUuid);
+
+    const update: FeedRecord = { ...feedRecord, showUuid: undefined, updated: new Date().toISOString() };
+    await storage.transaction(async tx => {
+        await tx.put(computeFeedRecordKey(update.id), update);
+        await tx.delete(computeFeedRecordIdToShowUuidIndexKey(feedRecord.id));
+    });
+    return showUuid;
 }
 
 async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: DurableObjectStorage, messages: string[]): Promise<void> {
