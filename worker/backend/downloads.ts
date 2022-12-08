@@ -64,7 +64,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { onlyResaveShowUuids, statsBlobs, lookupShow } : { onlyResaveShowUuids?: string[], statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads(date: string, { skipCombined, showUuids, statsBlobs, lookupShow } : { skipCombined?: boolean, showUuids?: string[], statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -85,6 +85,7 @@ export async function computeDailyDownloads(date: string, { onlyResaveShowUuids,
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
+    const skippedShowUuids = new Set<string>();
     const showChunkIndexes = new Map<string, number[]>();
     chunks.push(encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n'));
     for (let hourNum = 0; hourNum < 24; hourNum++) {
@@ -112,9 +113,15 @@ export async function computeDailyDownloads(date: string, { onlyResaveShowUuids,
             if (downloads.has(download)) continue;
             downloads.add(download);
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+            if (skipCombined && !showUuid) continue; // only need to add chunks for lines for shows
             const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.push(encoder.encode(line)) - 1;
             if (showUuid) {
+                if (skippedShowUuids.has(showUuid)) continue;
+                if (showUuids && !showUuids.includes(showUuid)) {
+                    skippedShowUuids.add(showUuid);
+                    continue;
+                }
                 let arr = showChunkIndexes.get(showUuid);
                 if (!arr) {
                     arr = [ 0 ]; // header row
@@ -125,16 +132,20 @@ export async function computeDailyDownloads(date: string, { onlyResaveShowUuids,
         }
     }
 
-    const { contentLength } = await write(chunks, statsBlobs, computeDailyKey(date));
+    let combinedContentLength: number | undefined;
+    if (!skipCombined) {
+        const { contentLength } = await write(chunks, statsBlobs, computeDailyKey(date));
+        combinedContentLength = contentLength;
+    }
     const showContentLengths: Record<string, number> = {};
     for (const [ showUuid, chunkIndexes ] of showChunkIndexes) {
-        if (!onlyResaveShowUuids || onlyResaveShowUuids.includes(showUuid)) {
+        if (!showUuids || showUuids.includes(showUuid)) {
             const { contentLength } = await write(chunks, statsBlobs, computeShowDailyKey({ date, showUuid }), chunkIndexes);
             showContentLengths[showUuid] = contentLength;
         }
     }
 
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength, showContentLengths };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, combinedContentLength, showContentLengths, skippedShowUuids: skippedShowUuids.size > 0 ? [...skippedShowUuids] : undefined };
 }
 
 //
