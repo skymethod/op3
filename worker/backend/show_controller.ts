@@ -864,6 +864,7 @@ async function lookupShowBulk(storage: DurableObjectStorage) {
     const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
     const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
     const preloadMillis = Date.now() - start;
+    const unableToComputeMatchUrls = new Set<string>();
     
     const lookupShow = async (url: string, messages?: string[]) => {
         await Promise.resolve();
@@ -872,7 +873,15 @@ async function lookupShowBulk(storage: DurableObjectStorage) {
         messages?.push(`destinationUrl: ${destinationUrl}`);
         if (!destinationUrl) return undefined;
         for (const queryless of [ false, true ]) {
-            const matchUrl1024 = computeMatchUrl(destinationUrl, { queryless }).substring(0, 1024);
+            const matchUrl = tryComputeMatchUrl(destinationUrl, { queryless });
+            if (matchUrl === undefined) {
+                if (!unableToComputeMatchUrls.has(url)) {
+                    consoleWarn('lookup-show-bulk', `lookupShowBulk: unable to compute match url for url: ${url}, destinationUrl: ${destinationUrl}`);
+                    unableToComputeMatchUrls.add(url);
+                }
+                return undefined;
+            }
+            const matchUrl1024 = matchUrl.substring(0, 1024);
             messages?.push(`queryless(${queryless}): matchUrl1024: ${matchUrl1024}`);
             const matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
             if (!matches || matches.length === 0) {
