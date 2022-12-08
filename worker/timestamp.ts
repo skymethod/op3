@@ -43,9 +43,9 @@ export function computeRfc822(instant: string): string {
     return `${weekday}, ${day} ${month} ${year} ${hour}:${minute}:${second} GMT`;
 }
 
-export function addDays(date: Date, days: number): Date {
+export function addDays(date: Date | string, days: number): Date {
     const rt = new Date(date);
-    rt.setDate(rt.getDate() + days);
+    rt.setUTCDate(rt.getUTCDate() + days);
     return rt;
 }
 

@@ -6,7 +6,6 @@ import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
-import { consoleWarn } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
@@ -60,9 +59,9 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
         }
     }
 
-    const { error, contentLength } = await write('write-hourly-downloads', chunks, statsBlobs, computeHourlyKey(hour));
+    const { contentLength } = await write(chunks, statsBlobs, computeHourlyKey(hour));
     
-    return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, error, contentLength };
+    return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
 export async function computeDailyDownloads(date: string, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
@@ -86,6 +85,7 @@ export async function computeDailyDownloads(date: string, { statsBlobs, lookupSh
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
+    const showChunkIndexes = new Map<string, number[]>();
     chunks.push(encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'encryptedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n'));
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
@@ -113,13 +113,26 @@ export async function computeDailyDownloads(date: string, { statsBlobs, lookupSh
             downloads.add(download);
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
             const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, encryptedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
-            chunks.push(encoder.encode(line));
+            const chunkIndex = chunks.push(encoder.encode(line)) - 1;
+            if (showUuid) {
+                let arr = showChunkIndexes.get(showUuid);
+                if (!arr) {
+                    arr = [ 0 ]; // header row
+                    showChunkIndexes.set(showUuid, arr);
+                }
+                arr.push(chunkIndex);
+            }
         }
     }
 
-    const { error, contentLength } = await write('write-daily-downloads', chunks, statsBlobs, computeDailyKey(date));
+    const { contentLength } = await write(chunks, statsBlobs, computeDailyKey(date));
+    const showContentLengths: Record<string, number> = {};
+    for (const [ showUuid, chunkIndexes ] of showChunkIndexes) {
+        const { contentLength } = await write(chunks, statsBlobs, computeShowDailyKey({ date, showUuid }), chunkIndexes);
+        showContentLengths[showUuid] = contentLength;
+    }
 
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, error, contentLength };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength, showContentLengths };
 }
 
 //
@@ -132,23 +145,27 @@ function computeDailyKey(date: string): string {
     return `downloads/daily/${date}.tsv`;
 }
 
-async function write(spot: string, chunks: Uint8Array[], blobs: Blobs, key: string): Promise<{ contentLength: number, error?: string }> {
-    const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
-    try {
-        // deno-lint-ignore no-explicit-any
-        const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-        const putPromise = blobs.put(key, readable);
-        const writer = writable.getWriter();
+function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string }): string {
+    return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
+}
+
+async function write(chunks: Uint8Array[], blobs: Blobs, key: string, chunkIndexes?: number[]): Promise<{ contentLength: number }> {
+    const contentLength = chunkIndexes ? chunkIndexes.reduce((a, b) => a + chunks[b].byteLength, 0): chunks.reduce((a, b) => a + b.byteLength, 0);
+   // deno-lint-ignore no-explicit-any
+   const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+   const putPromise = blobs.put(key, readable);
+   const writer = writable.getWriter();
+    if (chunkIndexes) {
+        for (const i of chunkIndexes) {
+            writer.write(chunks[i]);
+        }
+    } else {
         for (const chunk of chunks) {
             writer.write(chunk);
         }
-        await writer.close();
-        // await writable.close(); // will throw on cf
-        await putPromise;
-        return { contentLength };
-    } catch (e) {
-        consoleWarn(spot, `Error in write: ${e.stack || e}`);
-        const error = `${e.stack || e}`;
-        return { contentLength, error };
     }
+   await writer.close();
+   // await writable.close(); // will throw on cf
+   await putPromise;
+   return { contentLength };
 }
