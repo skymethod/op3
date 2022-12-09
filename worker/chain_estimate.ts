@@ -127,7 +127,7 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://growx.podkite.com/https/1234ASDF/
     // http and https endpoints are supported, but destination determined by parameter
-    m = /^https?:\/\/growx\.podkite\.com\/(https?)\/[A-Z0-9]+\/(.*?)$/.exec(url);
+    m = /^https?:\/\/growx\.podkite\.com\/(https?)\/[A-Za-z0-9]+\/(.*?)$/.exec(url);
     if (m) {
         const [ _, scheme, suffix ] = m;
         const targetUrl = `${scheme}://${suffix}`;

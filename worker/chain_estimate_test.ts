@@ -208,6 +208,16 @@ Deno.test({
             { kind: 'prefix', prefix: 'podscribe', url: 'https://pscrb.fm/rss/p/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/pdcn.co/e/p.podderapp.com/1234567890/growx.podkite.com/https/ABCDabWXYZ/pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/pdcn.co/e/p.podderapp.com/1234567890/growx.podkite.com/https/ABCDabWXYZ/pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podcorn', url: 'https://pdcn.co/e/p.podderapp.com/1234567890/growx.podkite.com/https/ABCDabWXYZ/pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podder', url: 'https://p.podderapp.com/1234567890/growx.podkite.com/https/ABCDabWXYZ/pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podkite', url: 'https://growx.podkite.com/https/ABCDabWXYZ/pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://dts.podtrac.com/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

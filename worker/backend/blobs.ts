@@ -6,7 +6,7 @@ export interface Blobs {
     get(key: string, as: 'text'): Promise<string | undefined>;
     delete(key: string): Promise<void>;
     has(key: string): Promise<boolean>;
-    list(opts?: ListOpts): Promise<ListBlobsResponse>
+    list(opts?: ListOpts): Promise<ListBlobsResponse>;
 }
 
 export type ListOpts = { keyPrefix?: string, afterKey?: string };
