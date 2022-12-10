@@ -96,8 +96,12 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
     const maxPartSize = maxPartSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
     const multiputParts: string[] = [];
+
     const multiputCurrentChunks = async () => {
-        const { contentLength } = await write(chunks, v => multiput!.putPart(v));
+        // const { contentLength } = await write(chunks, v => multiput!.putPart(v));
+        const payload = concatByteArrays(...chunks);
+        await multiput!.putPart(payload);
+        const contentLength = chunksLength;
         totalContentLength += contentLength;
         multiputParts.push(`contentLength: ${contentLength}`);
         chunks.splice(0);
@@ -201,6 +205,7 @@ function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string
 
 async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<void>, chunkIndexes?: number[]): Promise<{ contentLength: number }> {
     const contentLength = chunkIndexes ? chunkIndexes.reduce((a, b) => a + chunks[b].byteLength, 0): chunks.reduce((a, b) => a + b.byteLength, 0);
+
    // deno-lint-ignore no-explicit-any
    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
    const putPromise = put(readable); // don't await!
@@ -218,4 +223,15 @@ async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Prom
    // await writable.close(); // will throw on cf
    await putPromise;
    return { contentLength };
+}
+
+function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
+    const length = arrays.reduce((a, b) => a + b.byteLength, 0);
+    const rt = new Uint8Array(length);
+    let offset = 0;
+    for (const array of arrays) {
+        rt.set(array, offset);
+        offset += array.byteLength;
+    }
+    return rt;
 }
