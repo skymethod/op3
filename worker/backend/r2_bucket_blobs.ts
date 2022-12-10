@@ -92,10 +92,12 @@ class R2Multiput implements Multiput {
     async complete(): Promise<{ parts: number }> {
         const { upload, parts } = this;
         this.debug.push(`complete(${JSON.stringify(parts)})`);
+        let attempts = 0;
         try {
-            await upload.complete(parts);
+
+            await r2(() => { attempts++; return upload.complete(parts); });
         } catch (e) {
-            throw new Error(`${this.debug.join(', ')} e=${e.stack || e}`);
+            throw new Error(`attempts:${attempts}, ${this.debug.join(', ')} e=${e.stack || e}`);
         }
         return { parts: parts.length };
     }
@@ -116,5 +118,6 @@ async function r2<T>(fn: () => Promise<T>): Promise<T> {
 function isRetryable(e: Error): boolean {
     const error = `${e.stack || e}`;
     if (error.includes('(10001)')) return true; // Error: get: We encountered an internal error. Please try again. (10001)
+    if (error.includes('(10048)')) return true; // Error: completeMultipartUpload: There was a problem with the multipart upload. (10048)
     return false;
 }

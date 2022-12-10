@@ -160,7 +160,7 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
             const res = await multiput.complete();
             parts = res.parts;
         } catch (e) {
-            throw new Error(`v4, maxPartSize: ${maxPartSize}, multiputParts: ${multiputParts.join(', ')}, e=${e.stack || e}`);
+            throw new Error(`v5, maxPartSize: ${maxPartSize}, multiputParts: ${multiputParts.join(', ')}, e=${e.stack || e}`);
         }
     } else {
         const { contentLength } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
