@@ -95,7 +95,7 @@ class R2Multiput implements Multiput {
         try {
             await upload.complete(parts);
         } catch (e) {
-            throw new Error(this.debug.join(', '), { cause: e });
+            throw new Error(`${this.debug.join(', ')} e=${e.stack || e}`);
         }
         return { parts: parts.length };
     }
