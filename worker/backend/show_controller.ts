@@ -271,11 +271,12 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const { 'max-part-size': maxPartSizeStr = '20' } = parameters; // in mb, 20mb is about 50,000 rows
+                const { 'max-part-size': maxPartSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
                 const maxPartSizeMb = parseInt(maxPartSizeStr);
                 check('max-part-size', maxPartSizeMb, maxPartSizeMb >= 5); // r2 minimum multipart size
+                const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(date, { maxPartSizeMb, statsBlobs, lookupShow } );
+                const result = await computeDailyDownloads(date, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } );
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }

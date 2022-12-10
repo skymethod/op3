@@ -66,7 +66,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { maxPartSizeMb, statsBlobs, lookupShow } : { maxPartSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads(date: string, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } : { multipartMode: 'bytes' | 'stream', maxPartSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -95,14 +95,20 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
     chunks.push(headerChunk); chunksLength += headerChunk.length;
     const maxPartSize = maxPartSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
-    const multiputParts: string[] = [];
+    let multiputParts: string[] | undefined;
 
     const multiputCurrentChunks = async () => {
-        // const { contentLength } = await write(chunks, v => multiput!.putPart(v));
-        const payload = concatByteArrays(...chunks);
-        await multiput!.putPart(payload);
+        if (multipartMode === 'bytes') {
+            const payload = concatByteArrays(...chunks);
+            await multiput!.putPart(payload);
+        } else if (multipartMode === 'stream') {
+            await write(chunks, v => multiput!.putPart(v));
+        } else {
+            throw new Error(`Bad multipartMode: ${multipartMode}`);
+        }       
         const contentLength = chunksLength;
         totalContentLength += contentLength;
+        multiputParts = multiputParts ?? [];
         multiputParts.push(`contentLength: ${contentLength}`);
         chunks.splice(0);
         chunksLength = 0;
@@ -160,7 +166,7 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
             const res = await multiput.complete();
             parts = res.parts;
         } catch (e) {
-            throw new Error(`v5, maxPartSize: ${maxPartSize}, multiputParts: ${multiputParts.join(', ')}, e=${e.stack || e}`);
+            throw new Error(`v5, maxPartSize: ${maxPartSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
         }
     } else {
         const { contentLength } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
