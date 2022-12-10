@@ -74,20 +74,29 @@ class R2Multiput implements Multiput {
     private readonly upload: R2MultipartUpload;
 
     private readonly parts: R2UploadedPart[] = [];
+    private readonly debug: string[] = [];
 
     constructor(upload: R2MultipartUpload) {
+        this.debug.push(`new R2Multiput(${JSON.stringify(upload)})`);
         this.upload = upload;
     }
 
     async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<void> {
         const { upload, parts } = this;
-        const part = await upload.uploadPart(parts.length + 1, body);
+        const partNum = parts.length + 1;
+        const part = await upload.uploadPart(partNum, body);
+        this.debug.push(`putPart(${JSON.stringify({ ...part, inputPartNum: partNum })})`);
         parts.push(part);
     }
 
     async complete(): Promise<{ parts: number }> {
         const { upload, parts } = this;
-        await upload.complete(parts);
+        this.debug.push(`complete(${JSON.stringify(parts)})`);
+        try {
+            await upload.complete(parts);
+        } catch (e) {
+            throw new Error(this.debug.join(', '), e);
+        }
         return { parts: parts.length };
     }
 
