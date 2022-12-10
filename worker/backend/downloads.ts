@@ -175,7 +175,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
     const map: DailyDownloadsMap = { date, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
     await statsBlobs.put(computeDailyMapKey(date), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
 }
 
 //
