@@ -204,19 +204,21 @@ export async function computeShowDailyDownloads(date: string, { showUuids, stats
         }
     }
 
-    const allChunks = stream.pipeThrough(new DelimiterStream(new Uint8Array([ '\n'.charCodeAt(0) ])));
+    const newline = new Uint8Array([ '\n'.charCodeAt(0) ]);
+    const allChunks = stream.pipeThrough(new DelimiterStream(newline));
     let index = 0;
     const showChunks: Record<string, Uint8Array[]> = {};
     for await (const chunk of allChunks) {
         const showUuids = indexToShowUuids.get(index);
         if (showUuids) {
+            const chunkWithNewline = concatByteArrays(chunk, newline);
             for (const showUuid of showUuids) {
                 let chunks = showChunks[showUuid];
                 if (!chunks) {
                     chunks = [];
                     showChunks[showUuid] = chunks;
                 }
-                chunks.push(chunk);
+                chunks.push(chunkWithNewline);
             }
         }
         index++;
@@ -258,26 +260,20 @@ function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string
     return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
 }
 
-async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<void>, chunkIndexes?: number[]): Promise<{ contentLength: number }> {
-    const contentLength = chunkIndexes ? chunkIndexes.reduce((a, b) => a + chunks[b].byteLength, 0): chunks.reduce((a, b) => a + b.byteLength, 0);
+async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<void>): Promise<{ contentLength: number }> {
+    const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
 
-   // deno-lint-ignore no-explicit-any
-   const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-   const putPromise = put(readable); // don't await!
-   const writer = writable.getWriter();
-    if (chunkIndexes) {
-        for (const i of chunkIndexes) {
-            writer.write(chunks[i]);
-        }
-    } else {
-        for (const chunk of chunks) {
-            writer.write(chunk);
-        }
+    // deno-lint-ignore no-explicit-any
+    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+    const putPromise = put(readable); // don't await!
+    const writer = writable.getWriter();
+    for (const chunk of chunks) {
+        writer.write(chunk);
     }
-   await writer.close();
-   // await writable.close(); // will throw on cf
-   await putPromise;
-   return { contentLength };
+    await writer.close();
+    // await writable.close(); // will throw on cf
+    await putPromise;
+    return { contentLength };
 }
 
 function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
