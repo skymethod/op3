@@ -95,9 +95,11 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
     chunks.push(headerChunk); chunksLength += headerChunk.length;
     const maxPartSize = maxPartSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
+    const multiputParts: string[] = [];
     const multiputCurrentChunks = async () => {
         const { contentLength } = await write(chunks, v => multiput!.putPart(v));
         totalContentLength += contentLength;
+        multiputParts.push(`contentLength: ${contentLength}`);
         chunks.splice(0);
         chunksLength = 0;
     }
@@ -150,8 +152,12 @@ export async function computeDailyDownloads(date: string, { maxPartSizeMb, stats
     let parts: number | undefined;
     if (multiput) {
         if (chunks.length > 0) await multiputCurrentChunks(); // flush remaining rows
-        const res = await multiput.complete();
-        parts = res.parts;
+        try {
+            const res = await multiput.complete();
+            parts = res.parts;
+        } catch (e) {
+            throw new Error(`maxPartSize: ${maxPartSize}, multiputParts: ${multiputParts.join(', ')}`, e);
+        }
     } else {
         const { contentLength } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
         totalContentLength = contentLength;
