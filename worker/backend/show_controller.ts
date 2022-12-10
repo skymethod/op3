@@ -10,7 +10,7 @@ import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
-import { computeDailyDownloads, computeHourlyDownloads } from './downloads.ts';
+import { computeDailyDownloads, computeHourlyDownloads, computeShowDailyDownloads } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isShowRecord, isWorkRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
@@ -255,7 +255,7 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date } = parameters;
+            const { hour, date, shows } = parameters;
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
@@ -271,13 +271,19 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const { 'max-part-size': maxPartSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
-                const maxPartSizeMb = parseInt(maxPartSizeStr);
-                check('max-part-size', maxPartSizeMb, maxPartSizeMb >= 5); // r2 minimum multipart size
-                const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
-                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(date, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } );
-                return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
+                if (typeof shows === 'string') {
+                    const showUuids = shows.split(',').filter(v => v !== '');
+                    const result = await computeShowDailyDownloads(date, { showUuids, statsBlobs } );
+                    return { results: [ result ] };
+                } else {
+                    const { 'max-part-size': maxPartSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
+                    const maxPartSizeMb = parseInt(maxPartSizeStr);
+                    check('max-part-size', maxPartSizeMb, maxPartSizeMb >= 5); // r2 minimum multipart size
+                    const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
+                    const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
+                    const result = await computeDailyDownloads(date, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } );
+                    return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
+                }
             }
         }
 

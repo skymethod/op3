@@ -1,12 +1,13 @@
-import { isValidDate, isValidInstant } from '../check.ts';
+import { checkAll, isValidDate, isValidInstant } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
-import { Bytes, TextLineStream, zip, sortBy } from '../deps.ts';
+import { Bytes, TextLineStream, zip, sortBy, distinct, DelimiterStream } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
+import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs, Multiput } from './blobs.ts';
 
@@ -176,6 +177,54 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
     await statsBlobs.put(computeDailyMapKey(date), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
+}
+
+export async function computeShowDailyDownloads(date: string, { showUuids, statsBlobs } : { showUuids: string[], statsBlobs: Blobs }) {
+    const start = Date.now();
+    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+    checkAll('showUuids', showUuids, isValidUuid);
+    showUuids = distinct(showUuids);
+    if (showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
+
+    const stream = await statsBlobs.get(computeDailyKey(date), 'stream');
+    if (!stream) throw new Error(`No daily downloads for ${date}`);
+
+    const mapText = await statsBlobs.get(computeDailyMapKey(date), 'text');
+    if (!mapText) throw new Error(`No daily downloads map for ${date}`);
+    const map = JSON.parse(mapText) as DailyDownloadsMap;
+    const indexToShowUuids = new Map<number, string[]>();
+    for (const [ showUuid, showMap ] of Object.entries(map.showMaps)) {
+        for (const index of showMap.rowIndexes) {
+            let showUuids = indexToShowUuids.get(index);
+            if (!showUuids) {
+                showUuids = [];
+                indexToShowUuids.set(index, showUuids);
+            }
+            showUuids.push(showUuid);
+        }
+    }
+
+    const allChunks = stream.pipeThrough(new DelimiterStream(new Uint8Array([ '\n'.charCodeAt(0) ])));
+    let index = 0;
+    const showChunks: Record<string, Uint8Array[]> = {};
+    for await (const chunk of allChunks) {
+        const showUuids = indexToShowUuids.get(index);
+        if (showUuids) {
+            for (const showUuid of showUuids) {
+                let chunks = showChunks[showUuid];
+                if (!chunks) {
+                    chunks = [];
+                    showChunks[showUuid] = chunks;
+                }
+                chunks.push(chunk);
+            }
+        }
+        index++;
+    }
+
+    await Promise.all(Object.entries(showChunks).map(([ showUuid, chunks ]) => write(chunks, v => statsBlobs.put(computeShowDailyKey({ date, showUuid }), v))));
+
+    return { date, showUuids, millis: Date.now() - start };
 }
 
 //
