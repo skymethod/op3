@@ -1,6 +1,6 @@
-import { R2Bucket, R2ListOptions } from '../deps.ts';
+import { R2Bucket, R2ListOptions, R2MultipartUpload, R2UploadedPart } from '../deps.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { Blobs, ListOpts, ListBlobsResponse } from './blobs.ts';
+import { Blobs, ListOpts, ListBlobsResponse, Multiput } from './blobs.ts';
 
 export class R2BucketBlobs implements Blobs {
     private readonly bucket: R2Bucket;
@@ -58,6 +58,42 @@ export class R2BucketBlobs implements Blobs {
             keys.push(key.substring(prefixLength));
         }
         return { keys };
+    }
+
+    async startMultiput(key: string): Promise<Multiput> {
+        const { bucket, prefix } = this;
+        const upload = await bucket.createMultipartUpload(prefix + key);
+        return new R2Multiput(upload);
+    }
+
+}
+
+//
+
+class R2Multiput implements Multiput {
+    private readonly upload: R2MultipartUpload;
+
+    private readonly parts: R2UploadedPart[] = [];
+
+    constructor(upload: R2MultipartUpload) {
+        this.upload = upload;
+    }
+
+    async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<void> {
+        const { upload, parts } = this;
+        const part = await upload.uploadPart(parts.length + 1, body);
+        parts.push(part);
+    }
+
+    async complete(): Promise<{ parts: number }> {
+        const { upload, parts } = this;
+        await upload.complete(parts);
+        return { parts: parts.length };
+    }
+
+    async abort(): Promise<void> {
+        const { upload } = this;
+        await upload.abort();
     }
 
 }

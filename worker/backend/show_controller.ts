@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkAll, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -271,8 +271,11 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
+                const { 'max-part-size': maxPartSizeStr = '20' } = parameters; // in mb, 20mb is about 50,000 rows
+                const maxPartSizeMb = parseInt(maxPartSizeStr);
+                check('max-part-size', maxPartSizeMb, maxPartSizeMb >= 5); // r2 minimum multipart size
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow } );
+                const result = await computeDailyDownloads(date, { maxPartSizeMb, statsBlobs, lookupShow } );
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }

@@ -7,10 +7,17 @@ export interface Blobs {
     delete(key: string): Promise<void>;
     has(key: string): Promise<boolean>;
     list(opts?: ListOpts): Promise<ListBlobsResponse>;
+    startMultiput(key: string): Promise<Multiput>;
 }
 
 export type ListOpts = { keyPrefix?: string, afterKey?: string };
 
 export interface ListBlobsResponse {
     readonly keys: readonly string[];
+}
+
+export interface Multiput {
+    putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<void>;
+    complete(): Promise<{ parts: number }>;
+    abort(): Promise<void>;
 }

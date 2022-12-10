@@ -8,7 +8,7 @@ import { RpcClient } from '../rpc_model.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { AttNums } from './att_nums.ts';
-import { Blobs } from './blobs.ts';
+import { Blobs, Multiput } from './blobs.ts';
 
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
@@ -61,12 +61,12 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
         }
     }
 
-    const { contentLength } = await write(chunks, statsBlobs, computeHourlyKey(hour));
+    const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyKey(hour), v));
     
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads(date: string, { maxPartSizeMb, statsBlobs, lookupShow } : { maxPartSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -87,9 +87,14 @@ export async function computeDailyDownloads(date: string, { statsBlobs, lookupSh
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
+    let chunksLength = 0;
+    let totalContentLength = 0;
+    let rowIndex = 0;
     const showMaps = new Map<string, ShowMap>();
     const headerChunk = encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n');
-    chunks.push(headerChunk);
+    chunks.push(headerChunk); chunksLength += headerChunk.length;
+    const maxPartSize = maxPartSizeMb * 1024 * 1024;
+    let multiput: Multiput | undefined;
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
         const key = computeHourlyKey(hour);
@@ -117,24 +122,40 @@ export async function computeDailyDownloads(date: string, { statsBlobs, lookupSh
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
             const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
-            const chunkIndex = chunks.push(chunk) - 1;
+            chunks.push(chunk);
+            rowIndex++;
+            chunksLength += chunk.length;
             if (showUuid) {
                 let showMap = showMaps.get(showUuid);
                 if (!showMap) {
                     showMap = { rowIndexes: [ 0 ], contentLength: headerChunk.length }; // header row
                     showMaps.set(showUuid, showMap);
                 }
-                showMap.rowIndexes.push(chunkIndex);
+                showMap.rowIndexes.push(rowIndex);
                 showMap.contentLength += chunk.length;
+            }
+            if (chunksLength > maxPartSize) {
+                if (!multiput) multiput = await statsBlobs.startMultiput(computeDailyKey(date));
+                const { contentLength } = await write(chunks, v => multiput!.putPart(v));
+                totalContentLength += contentLength;
+                chunks.splice(0);
+                chunksLength = 0;
             }
         }
     }
 
-    const { contentLength } = await write(chunks, statsBlobs, computeDailyKey(date));
-    const map: DailyDownloadsMap = { date, contentLength, showMaps: Object.fromEntries(showMaps) };
+    let parts: number | undefined;
+    if (multiput) {
+        const res = await multiput.complete();
+        parts = res.parts;
+    } else {
+        const { contentLength } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
+        totalContentLength = contentLength;
+    }
+    const map: DailyDownloadsMap = { date, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
     await statsBlobs.put(computeDailyMapKey(date), JSON.stringify(map, undefined, 2));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength, showSizes };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts };
 }
 
 //
@@ -168,11 +189,11 @@ function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string
     return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
 }
 
-async function write(chunks: Uint8Array[], blobs: Blobs, key: string, chunkIndexes?: number[]): Promise<{ contentLength: number }> {
+async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<void>, chunkIndexes?: number[]): Promise<{ contentLength: number }> {
     const contentLength = chunkIndexes ? chunkIndexes.reduce((a, b) => a + chunks[b].byteLength, 0): chunks.reduce((a, b) => a + b.byteLength, 0);
    // deno-lint-ignore no-explicit-any
    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-   const putPromise = blobs.put(key, readable);
+   const putPromise = put(readable); // don't await!
    const writer = writable.getWriter();
     if (chunkIndexes) {
         for (const i of chunkIndexes) {

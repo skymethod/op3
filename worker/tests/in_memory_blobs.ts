@@ -1,13 +1,11 @@
-import { Blobs, ListBlobsResponse, ListOpts } from '../backend/blobs.ts';
+import { Blobs, ListBlobsResponse, ListOpts, Multiput } from '../backend/blobs.ts';
+import { Bytes } from '../deps.ts';
 
 export class InMemoryBlobs implements Blobs {
     private readonly data = new Map<string, Uint8Array>();
 
     async put(key: string, body: string | ArrayBuffer | ReadableStream<Uint8Array>): Promise<void> {
-        const arr = typeof body === 'string' ? new TextEncoder().encode(body)
-            : body instanceof ArrayBuffer ? new Uint8Array(body)
-            : new Uint8Array(await new Response(body).arrayBuffer())
-        
+        const arr = await toByteArray(body);
         this.data.set(key, arr);
     }
 
@@ -46,4 +44,58 @@ export class InMemoryBlobs implements Blobs {
         return { keys };
     }
 
+    async startMultiput(key: string): Promise<Multiput> {
+        await Promise.resolve();
+        return new InMemoryMultiput(key, this.data);
+    }
+
+}
+
+//
+
+class InMemoryMultiput implements Multiput {
+    private readonly key: string;
+    private readonly data: Map<string, Uint8Array>;
+
+    private combined = Bytes.EMPTY;
+    private parts = 0;
+    private done = false;
+
+    constructor(key: string, data: Map<string, Uint8Array>) {
+        this.key = key;
+        this.data = data;
+    }
+
+    async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<void> {
+        if (this.done) throw new Error(`Already done!`);
+        await Promise.resolve();
+        if (this.done) throw new Error(`Already done!`);
+        const arr = await toByteArray(body);
+        this.combined = this.combined.concat(new Bytes(arr));
+        this.parts++;
+    }
+
+    async complete(): Promise<{ parts: number }> {
+        await Promise.resolve();
+        if (this.done) throw new Error(`Already done!`);
+        const { parts } = this;
+        if (parts === 0) throw new Error(`No parts!`);
+        this.done = true;
+        return { parts };
+    }
+
+    async abort(): Promise<void> {
+        await Promise.resolve();
+        if (this.done) throw new Error(`Already done!`);
+        this.done = true;
+    }
+
+}
+
+//
+
+async function toByteArray(body: string | ArrayBuffer | ReadableStream<Uint8Array>): Promise<Uint8Array> {
+    return typeof body === 'string' ? new TextEncoder().encode(body)
+        : body instanceof ArrayBuffer ? new Uint8Array(body)
+        : new Uint8Array(await new Response(body).arrayBuffer())
 }
