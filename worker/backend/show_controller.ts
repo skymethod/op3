@@ -255,7 +255,7 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date, parts } = parameters;
+            const { hour, date } = parameters;
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
@@ -271,12 +271,8 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                const tokens = new Set((parts ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
-                const skipCombined = tokens.size > 0 && !tokens.has('combined');
-                const showUuids = tokens.size > 0 ? [...tokens].filter(v => v !== 'combined') : undefined;
-                if (showUuids) checkAll('showUuids', showUuids, isValidUuid);
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(date, { skipCombined, showUuids, statsBlobs, lookupShow } );
+                const result = await computeDailyDownloads(date, { statsBlobs, lookupShow } );
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }
