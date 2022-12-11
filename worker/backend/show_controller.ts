@@ -272,8 +272,11 @@ export class ShowController {
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
                 if (typeof shows === 'string') {
-                    const showUuids = shows.split(',').filter(v => v !== '');
-                    const result = await computeShowDailyDownloads(date, { showUuids, statsBlobs } );
+                    const [ _, modeStr, showsStr ] = checkMatches('shows', shows, /^(include|exclude)=(.*?)$/);
+                    const mode = modeStr === 'include' || modeStr === 'exclude' ? modeStr : undefined;
+                    if (!mode) throw new Error(`Bad shows: ${shows}`);
+                    const showUuids = showsStr.split(',').filter(v => v !== '');
+                    const result = await computeShowDailyDownloads(date, { mode, showUuids, statsBlobs } );
                     return { results: [ result ] };
                 } else {
                     const { 'max-part-size': maxPartSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows

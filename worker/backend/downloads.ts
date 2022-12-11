@@ -182,16 +182,20 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
 }
 
-export async function computeShowDailyDownloads(date: string, { showUuids, statsBlobs } : { showUuids: string[], statsBlobs: Blobs }) {
+export async function computeShowDailyDownloads(date: string, { mode, showUuids, statsBlobs } : { mode: 'include' | 'exclude', showUuids: string[], statsBlobs: Blobs }) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
     checkAll('showUuids', showUuids, isValidUuid);
     showUuids = distinct(showUuids);
-    if (showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
+    if (mode === 'include' && showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
 
     const mapText = await statsBlobs.get(computeDailyMapKey(date), 'text');
     if (!mapText) throw new Error(`No daily downloads map for ${date}`);
     const map = JSON.parse(mapText) as DailyDownloadsMap;
+
+    if (mode === 'exclude') {
+        showUuids = Object.keys(map.showMaps).filter(v => !showUuids.includes(v));
+    }
 
     const stream = await statsBlobs.get(computeDailyKey(date), 'stream', { ifMatch: map.etag });
     if (!stream) throw new Error(`No daily downloads for ${date}`);
@@ -234,7 +238,7 @@ export async function computeShowDailyDownloads(date: string, { showUuids, stats
         return statsBlobs.put(computeShowDailyKey({ date, showUuid }), v);
     })));
 
-    return { date, showUuids, millis: Date.now() - start };
+    return { date, mode, showUuids, millis: Date.now() - start };
 }
 
 //
