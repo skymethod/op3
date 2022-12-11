@@ -67,7 +67,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } : { multipartMode: 'bytes' | 'stream', maxPartSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads(date: string, { multipartMode, partSizeMb, statsBlobs, lookupShow } : { multipartMode: 'bytes' | 'stream', partSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -94,9 +94,10 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
     const showMaps = new Map<string, ShowMap>();
     const headerChunk = encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n');
     chunks.push(headerChunk); chunksLength += headerChunk.length;
-    const maxPartSize = maxPartSizeMb * 1024 * 1024;
+    const partSize = partSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
     let multiputParts: string[] | undefined;
+    let remainder: Uint8Array | undefined;
 
     const multiputCurrentChunks = async () => {
         if (multipartMode === 'bytes') {
@@ -113,6 +114,11 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
         multiputParts.push(`contentLength: ${contentLength}`);
         chunks.splice(0);
         chunksLength = 0;
+        if (remainder) {
+            chunks.push(remainder);
+            chunksLength += remainder.length;
+            remainder = undefined;
+        }
     }
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
@@ -141,9 +147,18 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
             const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
-            chunks.push(chunk);
+            
+            if ((chunksLength + chunk.length) > partSize) { // r2 multipart requires all but last part to be exactly the same size
+                const append = partSize - chunksLength;
+                chunks.push(chunk.slice(0, append));
+                remainder = chunk.slice(append);
+                chunksLength += append;
+            } else {
+                chunks.push(chunk);
+                chunksLength += chunk.length;
+            }
             rowIndex++;
-            chunksLength += chunk.length;
+           
             if (showUuid) {
                 let showMap = showMaps.get(showUuid);
                 if (!showMap) {
@@ -153,7 +168,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
                 showMap.rowIndexes.push(rowIndex);
                 showMap.contentLength += chunk.length;
             }
-            if (chunksLength > maxPartSize) {
+            if (chunksLength >= partSize) {
                 if (!multiput) multiput = await statsBlobs.startMultiput(computeDailyKey(date));
                 await multiputCurrentChunks();
             }
@@ -169,7 +184,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
             parts = res.parts;
             etag = res.etag;
         } catch (e) {
-            throw new Error(`v5, maxPartSize: ${maxPartSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
+            throw new Error(`v6, partSize: ${partSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
         }
     } else {
         const { contentLength, etag: combinedEtag } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));

@@ -279,12 +279,12 @@ export class ShowController {
                     const result = await computeShowDailyDownloads(date, { mode, showUuids, statsBlobs } );
                     return { results: [ result ] };
                 } else {
-                    const { 'max-part-size': maxPartSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
-                    const maxPartSizeMb = parseInt(maxPartSizeStr);
-                    check('max-part-size', maxPartSizeMb, maxPartSizeMb >= 5); // r2 minimum multipart size
+                    const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
+                    const partSizeMb = parseInt(partSizeStr);
+                    check('part-size', partSizeMb, partSizeMb >= 5); // r2 minimum multipart size
                     const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
                     const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                    const result = await computeDailyDownloads(date, { multipartMode, maxPartSizeMb, statsBlobs, lookupShow } );
+                    const result = await computeDailyDownloads(date, { multipartMode, partSizeMb, statsBlobs, lookupShow } );
                     return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
                 }
             }
