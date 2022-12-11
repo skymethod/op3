@@ -1,6 +1,6 @@
-import { R2Bucket, R2ListOptions, R2MultipartUpload, R2UploadedPart } from '../deps.ts';
+import { R2Bucket, R2ListOptions, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody } from '../deps.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { Blobs, ListOpts, ListBlobsResponse, Multiput } from './blobs.ts';
+import { Blobs, ListOpts, ListBlobsResponse, Multiput, GetOpts } from './blobs.ts';
 
 export class R2BucketBlobs implements Blobs {
     private readonly bucket: R2Bucket;
@@ -11,22 +11,27 @@ export class R2BucketBlobs implements Blobs {
         this.prefix = prefix;
     }
 
-    async put(key: string, body: string | ReadableStream<Uint8Array> | ArrayBuffer): Promise<void> {
+    async put(key: string, body: string | ReadableStream<Uint8Array> | ArrayBuffer): Promise<{ etag: string }> {
         const { bucket, prefix } = this;
         if (body instanceof ReadableStream) {
-            await bucket.put(prefix + key, body);
+            const { etag } = await bucket.put(prefix + key, body);
+            return { etag };
         } else {
-            await r2(() => bucket.put(prefix + key, body));
+            const { etag } = await r2(() => bucket.put(prefix + key, body));
+            return { etag };
         }
     }
 
-    get(key: string, as: 'stream'): Promise<ReadableStream<Uint8Array> | undefined>;
-    get(key: string, as: 'buffer'): Promise<ArrayBuffer | undefined>;
-    get(key: string, as: 'text'): Promise<string | undefined>;
-    async get(key: string, as: 'stream' | 'buffer' | 'text'): Promise<ReadableStream<Uint8Array> | ArrayBuffer | string | undefined> {
+    get(key: string, as: 'stream', opts?: GetOpts): Promise<ReadableStream<Uint8Array> | undefined>;
+    get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
+    async get(key: string, as: 'stream' | 'buffer' | 'text', opts: GetOpts = {}): Promise<ReadableStream<Uint8Array> | ArrayBuffer | string | undefined> {
         const { bucket, prefix } = this;
-        const obj = await r2(() => bucket.get(prefix + key));
+        const { ifMatch } = opts;
+        const options: R2GetOptions = ifMatch ? { onlyIf: { etagMatches: ifMatch }} : {};
+        const obj = await r2(() => bucket.get(prefix + key, options));
         if (!obj) return undefined;
+        if (!isR2ObjectBody(obj)) throw new Error(`No response body!`);
         if (as === 'stream') return obj.body;
         if (as === 'buffer') return await obj.arrayBuffer();
         if (as === 'text') return await obj.text();
@@ -81,25 +86,26 @@ class R2Multiput implements Multiput {
         this.upload = upload;
     }
 
-    async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<void> {
+    async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<{ etag: string }> {
         const { upload, parts } = this;
         const partNum = parts.length + 1;
         const part = await upload.uploadPart(partNum, body);
         this.debug.push(`putPart(${JSON.stringify({ ...part, inputPartNum: partNum })})`);
         parts.push(part);
+        const { etag } = part;
+        return { etag };
     }
 
-    async complete(): Promise<{ parts: number }> {
+    async complete(): Promise<{ parts: number, etag: string }> {
         const { upload, parts } = this;
         this.debug.push(`complete(${JSON.stringify(parts)})`);
         let attempts = 0;
         try {
-
-            await r2(() => { attempts++; return upload.complete(parts); });
+            const { etag } = await r2(() => { attempts++; return upload.complete(parts); });
+            return { parts: parts.length, etag };
         } catch (e) {
             throw new Error(`attempts:${attempts}, ${this.debug.join(', ')} e=${e.stack || e}`);
         }
-        return { parts: parts.length };
     }
 
     async abort(): Promise<void> {
@@ -120,4 +126,8 @@ function isRetryable(e: Error): boolean {
     if (error.includes('(10001)')) return true; // Error: get: We encountered an internal error. Please try again. (10001)
     if (error.includes('(10048)')) return true; // Error: completeMultipartUpload: There was a problem with the multipart upload. (10048)
     return false;
+}
+
+function isR2ObjectBody(obj: R2Object | R2ObjectBody): obj is R2ObjectBody {
+    return 'body' in obj;
 }

@@ -161,19 +161,22 @@ export async function computeDailyDownloads(date: string, { multipartMode, maxPa
     }
 
     let parts: number | undefined;
+    let etag: string;
     if (multiput) {
         if (chunks.length > 0) await multiputCurrentChunks(); // flush remaining rows
         try {
             const res = await multiput.complete();
             parts = res.parts;
+            etag = res.etag;
         } catch (e) {
             throw new Error(`v5, maxPartSize: ${maxPartSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
         }
     } else {
-        const { contentLength } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
+        const { contentLength, etag: combinedEtag } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
         totalContentLength = contentLength;
+        etag = combinedEtag;
     }
-    const map: DailyDownloadsMap = { date, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
+    const map: DailyDownloadsMap = { date, etag, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
     await statsBlobs.put(computeDailyMapKey(date), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
@@ -186,12 +189,13 @@ export async function computeShowDailyDownloads(date: string, { showUuids, stats
     showUuids = distinct(showUuids);
     if (showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
 
-    const stream = await statsBlobs.get(computeDailyKey(date), 'stream');
-    if (!stream) throw new Error(`No daily downloads for ${date}`);
-
     const mapText = await statsBlobs.get(computeDailyMapKey(date), 'text');
     if (!mapText) throw new Error(`No daily downloads map for ${date}`);
     const map = JSON.parse(mapText) as DailyDownloadsMap;
+
+    const stream = await statsBlobs.get(computeDailyKey(date), 'stream', { ifMatch: map.etag });
+    if (!stream) throw new Error(`No daily downloads for ${date}`);
+
     const indexToShowUuids = new Map<number, string[]>();
     for (const [ showUuid, showMap ] of Object.entries(map.showMaps)) {
         for (const index of showMap.rowIndexes) {
@@ -234,6 +238,7 @@ export async function computeShowDailyDownloads(date: string, { showUuids, stats
 interface DailyDownloadsMap {
     readonly date: string;
     readonly contentLength: number;
+    readonly etag: string;
     readonly showMaps: Record<string, ShowMap>;
 }
 
@@ -260,7 +265,7 @@ function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string
     return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
 }
 
-async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<void>): Promise<{ contentLength: number }> {
+async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<{ etag: string }>): Promise<{ contentLength: number, etag: string }> {
     const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
 
     // deno-lint-ignore no-explicit-any
@@ -272,8 +277,8 @@ async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Prom
     }
     await writer.close();
     // await writable.close(); // will throw on cf
-    await putPromise;
-    return { contentLength };
+    const { etag } = await putPromise;
+    return { contentLength, etag };
 }
 
 function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
