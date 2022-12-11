@@ -228,7 +228,11 @@ export async function computeShowDailyDownloads(date: string, { showUuids, stats
         index++;
     }
 
-    await Promise.all(Object.entries(showChunks).map(([ showUuid, chunks ]) => write(chunks, v => statsBlobs.put(computeShowDailyKey({ date, showUuid }), v))));
+    await Promise.all(Object.entries(showChunks).map(([ showUuid, chunks ]) => write(chunks, v => {
+        const expectedRows = map.showMaps[showUuid].rowIndexes.length;
+        if (expectedRows !== chunks.length) throw new Error(`Expected ${expectedRows} rows for show ${showUuid}, found ${chunks.length}`);
+        return statsBlobs.put(computeShowDailyKey({ date, showUuid }), v);
+    })));
 
     return { date, showUuids, millis: Date.now() - start };
 }
