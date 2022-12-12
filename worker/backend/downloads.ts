@@ -21,7 +21,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
-    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n'));
+    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n'));
     let queries = 0;
     let hits = 0;
     while (true) {
@@ -35,7 +35,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             hits++;
             if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
             const obj = attNums.unpackRecord(record);
-            const { method, range, ulid: _, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
+            const { method, range, ulid: _, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
             if (method !== 'GET') continue; // ignore all non-GET requests
             const ranges = range ? tryParseRangeHeader(range) : undefined;
             if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
@@ -53,7 +53,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const deviceName = result?.device?.name;
             const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
             const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
-            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
+            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
             chunks.push(encoder.encode(line));
             downloads.add(download);
         }
@@ -92,7 +92,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
     let totalContentLength = 0;
     let rowIndex = 0;
     const showMaps = new Map<string, ShowMap>();
-    const headerChunk = encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ].join('\t') + '\n');
+    const headerChunk = encoder.encode(['serverUrl', 'audienceId', 'showUuid', 'episodeId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n');
     chunks.push(headerChunk); chunksLength += headerChunk.length;
     const partSize = partSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
@@ -140,12 +140,12 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             }
             rows++;
             const obj = Object.fromEntries(zip(headers, values));
-            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
+            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
             const download = `${serverUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             downloads.add(download);
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode ].map(v => v ?? '').join('\t') + '\n';
+            const line = [ serverUrl, audienceId, showUuid, episodeId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
             
             if ((chunksLength + chunk.length) > partSize) { // r2 multipart requires all but last part to be exactly the same size
