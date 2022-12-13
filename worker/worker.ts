@@ -1,15 +1,15 @@
 import { computeOther, computeRawIpAddress } from './cloudflare_request.ts';
-import { ModuleWorkerContext } from './deps.ts';
+import { ModuleWorkerContext, QueueMessageBatch } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
 import { WorkerEnv } from './worker_env.ts';
 import { IsolateId } from './isolate_id.ts';
-import { Background, computeApiResponse, tryParseApiRequest } from './routes/api.ts';
+import { Background, computeApiResponse, routeAdminDataRequest, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
 import { tryParseUlid } from './client_params.ts';
-import { RawRedirect } from './rpc_model.ts';
+import { isRpcRequest, RawRedirect } from './rpc_model.ts';
 import { computeApiDocsResponse } from './routes/api_docs.ts';
 import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
 import { computeTermsResponse } from './routes/terms.ts';
@@ -18,7 +18,7 @@ import { computeReleasesResponse, tryParseReleasesRequest } from './routes/relea
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
-import { consoleError, writeTraceEvent } from './tracer.ts';
+import { consoleError, consoleWarn, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
@@ -26,6 +26,7 @@ import { computeApiKeysResponse } from './routes/api_keys.ts';
 import { computeSetupResponse } from './routes/setup.ts';
 import { DoNames } from './do_names.ts';
 import { Banlist } from './banlist.ts';
+import { ManualColo } from './backend/manual_colo.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -67,7 +68,50 @@ export default {
             consoleError('worker-unhandled', `Unhandled error in worker fetch: ${e.stack || e}`);
             return new Response('failed', { status: 500 });
         }
-    }
+    },
+
+    async queue(batch: QueueMessageBatch, env: WorkerEnv) {
+        try {
+            const { dataset1, backendNamespace } = env;
+            initCloudflareTracer(dataset1);
+
+            const colo = await ManualColo.get();
+            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+            for (const { body, id, timestamp } of batch.messages) {
+                if (isRpcRequest(body)) {
+                    const { kind } = body;
+                    if (kind === 'admin-data') {
+                        const { operationKind, targetPath, parameters, dryRun } = body;
+                        const start = Date.now();
+                        const response = await routeAdminDataRequest(body, rpcClient);
+                        console.log(JSON.stringify(response, undefined, 2));
+                        const millis = Date.now() - start;
+                        const { results, message } = response;
+                        writeTraceEvent({
+                            kind: 'admin-data-job',
+                            colo,
+                            messageId: id,
+                            messageInstant: timestamp.toISOString(),
+                            operationKind,
+                            targetPath,
+                            parameters,
+                            dryRun,
+                            millis,
+                            results,
+                            message,
+                        });
+                    } else {
+                        consoleWarn('queue-handler', `Cannot process '${kind}' rpcs in the queue handler`);
+                    }
+                } else {
+                    consoleWarn('queue-handler', `Unsupported message body: ${JSON.stringify(body)}`);
+                }
+            }
+        } catch (e) {
+            consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${e.stack || e}`);
+            throw e; // Queues will retry for us
+        }
+    },
     
 }
 
@@ -159,7 +203,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime } = env;
+    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams } = new URL(request.url);
     const { method, headers } = request;
@@ -189,7 +233,7 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
             }
         })());
     };
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background });
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

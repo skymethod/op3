@@ -1,4 +1,4 @@
-import { BackendDOColo } from './backend_do_colo.ts';
+import { ManualColo } from './manual_colo.ts';
 import { Bytes, DurableObjectState, DurableObjectStorage } from '../deps.ts';
 import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from '../rpc_model.ts';
 import { IsolateId } from '../isolate_id.ts';
@@ -46,7 +46,7 @@ export class BackendDO {
         try {
             const isolateId = IsolateId.log();
             console.log(request.url);
-            const colo = await BackendDOColo.get();
+            const colo = await ManualColo.get();
             const durableObjectName = request.headers.get('do-name');
             const durableObjectId = this.state.id.toString();
             const durableObjectClass = 'BackendDO';
@@ -192,7 +192,7 @@ export class BackendDO {
                         const { payload } = obj;
                         const { kind: alarmKind } = payload;
                         if (alarmKind === RedirectLogController.notificationAlarmKind) {
-                            const fromColo = await BackendDOColo.get();
+                            const fromColo = await ManualColo.get();
                             await RedirectLogController.sendNotification(payload, { storage, rpcClient, fromColo });
                         } else if (alarmKind === CombinedRedirectLogController.processAlarmKind) {
                             await getOrLoadCombinedRedirectLogController().process();

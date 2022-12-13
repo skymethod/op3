@@ -33,6 +33,14 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
     } else if (kind === 'console-info' || kind === 'console-warning' || kind === 'console-error') {
         const { spot, message } = event;
         return ({ blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] });
+    } else if (kind === 'admin-data-job') {
+        const { colo, messageId, messageInstant, operationKind, targetPath, parameters, dryRun, millis, results, message } = event;
+        const parametersStr = Object.entries((parameters ?? {})).map(v => v.join('=')).join(',');
+        return ({ 
+            blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : null ], 
+            doubles: [ dryRun ? 1 : 0, millis, (results ?? []).length ],
+            indexes: [ kind ]
+        });
     } else {
         throw new Error(`CloudflareTracer: Unsupported kind: ${kind}`);
     }

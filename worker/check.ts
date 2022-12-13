@@ -84,3 +84,7 @@ export function isValidGuid(str: string): boolean {
 export function isString(obj: unknown): obj is string {
     return typeof obj === 'string';
 }
+
+export function undefinedIfBlank(v: string): string | undefined {
+    return v === '' ? undefined : v;
+}

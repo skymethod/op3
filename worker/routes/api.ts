@@ -1,17 +1,18 @@
 import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest, tryParseRedirectLogRequest } from './admin_api.ts';
-import { ApiTokenPermission, hasPermission, isExternalNotification, RpcClient } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, ApiTokenPermission, hasPermission, isExternalNotification, RpcClient, Unkinded } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
 import { computeRawIpAddress } from '../cloudflare_request.ts';
 import { computeApiKeyResponse, computeApiKeysResponse } from './api_api_keys.ts';
 import { computeSessionToken, validateSessionToken } from '../session_token.ts';
-import { isValidHttpUrl, isValidInstant } from '../check.ts';
+import { isStringRecord, isValidHttpUrl, isValidInstant } from '../check.ts';
 import { StatusError } from '../errors.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
+import { Queue } from "../deps.ts";
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -28,9 +29,9 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined }): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue } = opts;
 
     try {
         // handle cors pre-flight
@@ -55,7 +56,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             // all other admin endpoints require admin
             if (!isAdmin) return newForbiddenJsonResponse();
 
-            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient);
+            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
@@ -78,6 +79,41 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         }
     }
 }
+
+export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>, rpcClient: RpcClient): Promise<Unkinded<AdminDataResponse>> {
+    const { operationKind, targetPath, parameters, dryRun } = request;
+    if (operationKind === 'select' && targetPath === '/registry') {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.registry);
+    } else if (operationKind === 'select' && targetPath === '/keys') {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.keyServer);
+    } else if (targetPath.startsWith('/crl/')) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.combinedRedirectLog);
+    } else if (operationKind === 'select' && targetPath === '/api-keys') {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
+    } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
+    } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
+    } else if (targetPath.startsWith('/show/') || /^\/stats(\/.*)?$/.test(targetPath)) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
+    }
+    const doName = tryParseDurableObjectRequest(targetPath);
+    if (doName) {
+        if (operationKind === 'delete') {
+            checkDeleteDurableObjectAllowed(doName);
+        }
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
+    }
+
+    const req = tryParseRedirectLogRequest(targetPath);
+    if (req) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.redirectLogForColo(req.colo));
+    }
+
+    throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
+}
+
+//
 
 export interface ApiRequest {
     readonly instance: string;
@@ -124,48 +160,26 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
     return { kind: 'invalid', reason: 'invalid-token' };
 }
 
-async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient, jobQueue: Queue | undefined): Promise<Response> {
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
 
-    const { operationKind, targetPath = '', dryRun, parameters } = await bodyProvider();
-    if (operationKind === 'select' && targetPath === '/registry') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.registry);
-        return newJsonResponse({ results });
-    } else if (operationKind === 'select' && targetPath === '/keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.keyServer);
-        return newJsonResponse({ results });
-    } else if (targetPath.startsWith('/crl/')) {
-        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.combinedRedirectLog);
-        return newJsonResponse({ results, message });
-    } else if (operationKind === 'select' && targetPath === '/api-keys') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
-        return newJsonResponse({ results });
-    } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
-        return newJsonResponse({ results });
-    } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
-        return newJsonResponse({ results });
-    } else if (targetPath.startsWith('/show/') || /^\/stats(\/.*)?$/.test(targetPath)) {
-        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
+    const { operationKind, targetPath, dryRun, parameters, enqueue } = await bodyProvider();
+    if (!(operationKind === 'select' || operationKind === 'update' || operationKind === 'delete')) throw new Error(`Bad operationKind: ${JSON.stringify(operationKind)}`);
+    if (!(typeof targetPath === 'string' && targetPath !== '')) throw new Error(`Bad targetPath: ${JSON.stringify(targetPath)}`);
+    if (!(dryRun === undefined || typeof dryRun === 'boolean')) throw new Error(`Bad dryRun: ${JSON.stringify(dryRun)}`);
+    if (!(typeof parameters === undefined || isStringRecord(parameters) && Object.values(parameters).every(v => typeof v === 'string'))) throw new Error(`Bad parameters: ${JSON.stringify(dryRun)}`);
+    if (!(enqueue === undefined || typeof enqueue === 'boolean')) throw new Error(`Bad enqueue: ${JSON.stringify(enqueue)}`);
+    
+    if (enqueue) {
+        if (!jobQueue) throw new Error(`Cannot enqueue a job without a jobQueue`);
+        const rpcRequest: AdminDataRequest = { kind: 'admin-data', operationKind, targetPath, dryRun, parameters };
+        const start = Date.now();
+        await jobQueue.send(rpcRequest);
+        return newJsonResponse({ message: `Enqueued in ${Date.now() - start}ms` });
+    } else {
+        const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient);
         return newJsonResponse({ results, message });
     }
-    const doName = tryParseDurableObjectRequest(targetPath);
-    if (doName) {
-        if (operationKind === 'delete') {
-            checkDeleteDurableObjectAllowed(doName);
-        }
-        const { results } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
-        return newJsonResponse({ results });
-    }
-
-    const req = tryParseRedirectLogRequest(targetPath);
-    if (req) {
-        const { results, message } = await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.redirectLogForColo(req.colo));
-        return newJsonResponse({ results, message });
-    }
-
-    throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
 }
 
 async function computeAdminRebuildResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

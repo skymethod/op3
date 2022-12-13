@@ -1,12 +1,12 @@
-export class BackendDOColo {
+export class ManualColo {
 
     private static colo: string | undefined;
 
     static async get(): Promise<string> {
-        if (!BackendDOColo.colo) {
-            BackendDOColo.colo = await computeColo();
+        if (!ManualColo.colo) {
+            ManualColo.colo = await computeColo();
         }
-        return BackendDOColo.colo;
+        return ManualColo.colo;
     }
 
 }

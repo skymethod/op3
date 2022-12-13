@@ -53,6 +53,7 @@ export type TraceEvent =
     | ConsoleInfo
     | ConsoleWarning
     | ConsoleError
+    | AdminDataJob
     ;
 
 export interface ErrorSavingRedirect {
@@ -136,4 +137,18 @@ export interface ConsoleError {
     readonly kind: 'console-error',
     readonly spot: string;
     readonly message: string;
+}
+
+export interface AdminDataJob {
+    readonly kind: 'admin-data-job',
+    readonly colo: string;
+    readonly messageId: string;
+    readonly messageInstant: string;
+    readonly operationKind: 'select' | 'delete' | 'update';
+    readonly targetPath: string;
+    readonly parameters?: Record<string, string>;
+    readonly dryRun?: boolean;
+    readonly millis: number;
+    readonly results?: unknown[];
+    readonly message?: string;
 }

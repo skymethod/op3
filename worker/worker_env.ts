@@ -1,4 +1,4 @@
-import { DurableObjectNamespace, AnalyticsEngine, R2Bucket, KVNamespace } from './deps.ts';
+import { DurableObjectNamespace, AnalyticsEngine, R2Bucket, KVNamespace, Queue } from './deps.ts';
 
 export interface WorkerEnv {
     readonly instance: string;
@@ -19,4 +19,5 @@ export interface WorkerEnv {
     readonly podcastIndexCredentials?: string;
     readonly blobsBucket?: R2Bucket;
     readonly kvNamespace?: KVNamespace;
+    readonly queue1?: Queue;
 }
