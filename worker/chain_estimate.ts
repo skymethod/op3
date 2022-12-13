@@ -179,6 +179,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'glystn', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://adbarker.com/stream/asdfASDf1345asdfASDf1345/a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol trumps
+    m = /^(https?):\/\/adbarker\.com\/stream\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'adbarker', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -203,6 +212,7 @@ export interface ChainItem {
     readonly url: string;
     readonly kind: 'prefix' | 'destination';
     readonly prefix?: 'op3'
+        | 'adbarker'
         | 'artsai'
         | 'blubrry'
         | 'chartable'

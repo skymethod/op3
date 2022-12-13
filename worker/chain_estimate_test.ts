@@ -228,6 +228,21 @@ Deno.test({
             { kind: 'prefix', prefix: 'glystn', url: 'https://t.glystn.com/v2/track/PID-1234abcd/http://a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://adbarker.com/stream/asdfASDf1345asdfASDf1345/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'adbarker', url: 'https://adbarker.com/stream/asdfASDf1345asdfASDf1345/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://adbarker.com/stream/asdfASDf1345asdfASDf1345/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'adbarker', url: 'http://adbarker.com/stream/asdfASDf1345asdfASDf1345/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://adbarker.com/stream/asdfASDf1345asdfASDf1345/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'adbarker', url: 'http://adbarker.com/stream/asdfASDf1345asdfASDf1345/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
