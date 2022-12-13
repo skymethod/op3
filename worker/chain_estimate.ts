@@ -170,6 +170,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'zencastr', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://t.glystn.com/v2/track/PID-1234abcd/a.com/path/to/episode.mp3
+    // http fails, suffix protocol supported
+    m = /^https?:\/\/t\.glystn\.com\/v2\/track\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'glystn', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -198,6 +207,7 @@ export interface ChainItem {
         | 'blubrry'
         | 'chartable'
         | 'claritas'
+        | 'glystn'
         | 'gumball'
         | 'magellan'
         | 'podcorn'

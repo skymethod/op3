@@ -12,7 +12,7 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
-import { Queue } from "../deps.ts";
+import { Queue } from '../deps.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
