@@ -34,13 +34,18 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         const { spot, message } = event;
         return ({ blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] });
     } else if (kind === 'admin-data-job') {
+        console.log('ae-debug-1');
         const { colo, messageId, messageInstant, operationKind, targetPath, parameters, dryRun, millis, results, message } = event;
+        console.log('ae-debug-2');
         const parametersStr = Object.entries((parameters ?? {})).map(v => v.join('=')).join(',');
-        return ({ 
+        console.log(`ae-debug-3 parametersStr=${parametersStr}`);
+        const tmp = {
             blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : null ], 
             doubles: [ dryRun ? 1 : 0, millis, (results ?? []).length ],
             indexes: [ kind ]
-        });
+        };
+        console.log(`ae-debug-4 tmp=${JSON.stringify(tmp)}`);
+        return tmp;
     } else {
         throw new Error(`CloudflareTracer: Unsupported kind: ${kind}`);
     }
