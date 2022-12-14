@@ -40,11 +40,11 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         const parametersStr = Object.entries((parameters ?? {})).map(v => v.join('=')).join(',');
         console.log(`ae-debug-3 parametersStr=${parametersStr}`);
         const tmp = {
-            blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : undefined ],
+            blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : '' ],
             doubles: [ dryRun ? 1 : 0, millis, (results ?? []).length ],
             indexes: [ kind ]
         };
-        console.log(`ae-debug-4 (undefined) tmp=${JSON.stringify(tmp)}`);
+        console.log(`ae-debug-4 (blank) tmp=${JSON.stringify(tmp)}`);
         // deno-lint-ignore no-explicit-any
         return tmp as any;
     } else {
