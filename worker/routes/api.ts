@@ -167,7 +167,7 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
     if (!(operationKind === 'select' || operationKind === 'update' || operationKind === 'delete')) throw new Error(`Bad operationKind: ${JSON.stringify(operationKind)}`);
     if (!(typeof targetPath === 'string' && targetPath !== '')) throw new Error(`Bad targetPath: ${JSON.stringify(targetPath)}`);
     if (!(dryRun === undefined || typeof dryRun === 'boolean')) throw new Error(`Bad dryRun: ${JSON.stringify(dryRun)}`);
-    if (!(typeof parameters === undefined || isStringRecord(parameters) && Object.values(parameters).every(v => typeof v === 'string'))) throw new Error(`Bad parameters: ${JSON.stringify(dryRun)}`);
+    if (!(parameters === undefined || isStringRecord(parameters) && Object.values(parameters).every(v => typeof v === 'string'))) throw new Error(`Bad parameters: ${JSON.stringify(parameters)}`);
     if (!(enqueue === undefined || typeof enqueue === 'boolean')) throw new Error(`Bad enqueue: ${JSON.stringify(enqueue)}`);
     
     if (enqueue) {
