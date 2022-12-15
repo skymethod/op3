@@ -27,6 +27,7 @@ import { computeSetupResponse } from './routes/setup.ts';
 import { DoNames } from './do_names.ts';
 import { Banlist } from './banlist.ts';
 import { ManualColo } from './backend/manual_colo.ts';
+import { R2BucketBlobs } from './backend/r2_bucket_blobs.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -72,17 +73,20 @@ export default {
 
     async queue(batch: QueueMessageBatch, env: WorkerEnv) {
         try {
-            const { dataset1, backendNamespace } = env;
+            const { dataset1, backendNamespace, blobsBucket } = env;
             initCloudflareTracer(dataset1);
             const colo = await ManualColo.get();
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+            const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+
             for (const { body, id, timestamp } of batch.messages) {
                 if (isRpcRequest(body)) {
                     const { kind } = body;
                     if (kind === 'admin-data') {
                         const { operationKind, targetPath, parameters, dryRun } = body;
                         const start = Date.now();
-                        const response = await routeAdminDataRequest(body, rpcClient);
+
+                        const response = await routeAdminDataRequest(body, rpcClient, statsBlobs);
                         console.log(JSON.stringify(response, undefined, 2));
                         const millis = Date.now() - start;
                         const { results, message } = response;
@@ -202,7 +206,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue } = env;
+    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams } = new URL(request.url);
     const { method, headers } = request;
@@ -232,7 +236,8 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
             }
         })());
     };
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue });
+    const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

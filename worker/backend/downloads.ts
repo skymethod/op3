@@ -1,4 +1,4 @@
-import { checkAll, isValidDate, isValidInstant } from '../check.ts';
+import { check, checkAll, checkMatches, isValidDate, isValidInstant } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { Bytes, TextLineStream, zip, sortBy, distinct, DelimiterStream } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
@@ -258,6 +258,16 @@ export async function computeShowDailyDownloads(date: string, { mode, showUuids,
 
 export function computeShowDailyKey({ date, showUuid }: { date: string, showUuid: string }): string {
     return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
+}
+
+export function unpackShowDailyKey(key: string): { date: string, showUuid: string } {
+    const [ _, showUuid, showUuid2, date ] = checkMatches('key', key, /^downloads\/show-daily\/(.*?)\/(.*?)-(.*?)\.tsv$/);
+    check('key', key, showUuid === showUuid2 && isValidUuid(showUuid) && isValidDate(date));
+    return { showUuid, date };
+}
+
+export function computeShowDailyKeyPrefix({ showUuid, datePart }: { showUuid: string, datePart?: string }): string {
+   return datePart ? `downloads/show-daily/${showUuid}/${showUuid}-${datePart}` : `downloads/show-daily/${showUuid}/`;
 }
 
 //

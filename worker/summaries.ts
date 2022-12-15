@@ -8,3 +8,7 @@ export function incrementAll(summary: Record<string, number>, keysAndDeltas: Rec
         increment(summary, key, delta);
     }
 }
+
+export function total(summary: Record<string, number>): number {
+    return Object.values(summary).reduce((a, b) => a + b, 0);
+}

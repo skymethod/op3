@@ -145,7 +145,7 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === DoNames.apiKeyServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
-                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/') || /^\/stats(\/.*)?$/.test(targetPath)) && durableObjectName === DoNames.showServer) {
+                        } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === DoNames.showServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 

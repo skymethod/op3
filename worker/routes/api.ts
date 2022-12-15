@@ -13,6 +13,8 @@ import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
 import { Queue } from '../deps.ts';
+import { computeShowSummaryAdminDataResponse } from '../backend/show_summaries.ts';
+import { Blobs } from '../backend/blobs.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -29,9 +31,9 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined }): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs } = opts;
 
     try {
         // handle cors pre-flight
@@ -56,7 +58,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             // all other admin endpoints require admin
             if (!isAdmin) return newForbiddenJsonResponse();
 
-            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue);
+            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
@@ -80,7 +82,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
     }
 }
 
-export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>, rpcClient: RpcClient): Promise<Unkinded<AdminDataResponse>> {
+export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>, rpcClient: RpcClient, statsBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
     const { operationKind, targetPath, parameters, dryRun } = request;
     if (operationKind === 'select' && targetPath === '/registry') {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.registry);
@@ -94,8 +96,14 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
     } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
-    } else if (targetPath.startsWith('/show/') || /^\/stats(\/.*)?$/.test(targetPath)) {
+    } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
+    } else if (targetPath.startsWith('/summaries/')) {
+        const m = /^\/summaries\/show\/(.*?)$/.exec(targetPath);
+        if (m && operationKind === 'update' && parameters && statsBlobs) {
+            const [ _, showUuid ] = m;
+            return await computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs });
+        }
     }
     const doName = tryParseDurableObjectRequest(targetPath);
     if (doName) {
@@ -160,7 +168,7 @@ async function computeIdentityResult(bearerToken: string | undefined, searchPara
     return { kind: 'invalid', reason: 'invalid-token' };
 }
 
-async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient, jobQueue: Queue | undefined): Promise<Response> {
+async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined): Promise<Response> {
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
 
     const { operationKind, targetPath, dryRun, parameters, enqueue } = await bodyProvider();
@@ -177,7 +185,7 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         await jobQueue.send(rpcRequest);
         return newJsonResponse({ message: `Enqueued in ${Date.now() - start}ms` });
     } else {
-        const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient);
+        const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient, statsBlobs);
         return newJsonResponse({ results, message });
     }
 }

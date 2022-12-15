@@ -1,10 +1,46 @@
-import { isStringRecord } from '../check.ts';
+import { check, isStringRecord, isValidMonth } from '../check.ts';
 import { sortBy, zip } from '../deps.ts';
 import { computeLinestream } from '../streams.ts';
 import { computeBotType } from './bots.ts';
-import { computeShowDailyKey } from './downloads.ts';
-import { increment, incrementAll } from '../summaries.ts';
+import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
+import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
+import { isValidUuid } from '../uuid.ts';
+import { timed } from '../async.ts';
+import { AdminDataResponse, Unkinded } from '../rpc_model.ts';
+
+export async function computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }: { showUuid: string, parameters: Record<string, string>, statsBlobs: Blobs }): Promise<Unkinded<AdminDataResponse>> {
+    const { action, month } = parameters;
+    if (action === 'recompute' && isValidMonth(month)) {
+        const result = await recomputeShowSummariesForMonth({ showUuid, month, statsBlobs });
+        return { results: [ result ] };
+    }
+    throw new Error(`computeShowSummaryAdminDataResponse: Unsupported parameters: ${JSON.stringify(parameters)}`);
+}
+
+export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log }: { showUuid: string, month: string, statsBlobs: Blobs, log?: boolean }) {
+    check('showUuid', showUuid, isValidUuid);
+    check('month', month, isValidMonth);
+
+    const times: Record<string, number> = {};
+    const keyPrefix = computeShowDailyKeyPrefix({ showUuid, datePart: month });
+    const { keys: showDailyKeys } = await timed(times, 'list', () => statsBlobs.list({ keyPrefix }));
+    if (log) console.log(`${showDailyKeys.length} showDailyKeys`);
+    const recomputeShowSummary = async (showDailyKey: string): Promise<string> => {
+        const { date } = unpackShowDailyKey(showDailyKey);
+        if (log) console.log(`Computing ${date}`);
+        const summary = await timed(times, 'compute-daily', () => computeShowSummaryForDate({ showUuid, date, statsBlobs }));
+        if (log) console.log(`Saving ${date}`);
+        const { key } = await timed(times, 'save-daily', () => saveShowSummary({ summary, statsBlobs }));
+        return key;
+    };
+    const inputKeys = await Promise.all(showDailyKeys.map(recomputeShowSummary));
+    if (log) console.log('Computing month aggregate...');
+    const summary = await timed(times, 'compute-month', () => computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod: month, statsBlobs }));
+    if (log) console.log('Saving month aggregate...');
+    const { key: monthKey } = await timed(times, 'save-month', () => saveShowSummary({ summary, statsBlobs }));
+    return { monthKey, showDailyKeys: showDailyKeys.length,  downloads: total(summary.hourlyDownloads), times };
+}
 
 export async function saveShowSummary({ summary, statsBlobs }: { summary: ShowSummary, statsBlobs: Blobs }): Promise<{ key: string, etag: string }> {
     const { showUuid, period } = summary;
@@ -13,7 +49,7 @@ export async function saveShowSummary({ summary, statsBlobs }: { summary: ShowSu
     return { key, etag };
 }
 
-export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod, statsBlobs }: { showUuid: string, inputKeys: string[], outputPeriod: string, statsBlobs: Blobs }): Promise<ShowSummary> {
+export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod, statsBlobs }: { showUuid: string, inputKeys: readonly string[], outputPeriod: string, statsBlobs: Blobs }): Promise<ShowSummary> {
     const hourlyDownloads: Record<string, number> = {};
     const sources: Record<string, string> = {};
     const episodes: Record<string, EpisodeSummary> = {};
