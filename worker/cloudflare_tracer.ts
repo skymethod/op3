@@ -23,30 +23,24 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         return { blobs: [ kind, trim(error) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'worker-request') {
         const { colo, pathname, country, method, contentType, millis, status } = event;
-        return ({ blobs: [ kind, colo, trim(pathname), country, method, trim(contentType) ], doubles: [ 1, millis, status ], indexes: [ kind ] });
+        return { blobs: [ kind, colo, trim(pathname), country, method, trim(contentType) ], doubles: [ 1, millis, status ], indexes: [ kind ] };
     } else if (kind === 'do-fetch') {
         const { colo, durableObjectName, durableObjectClass, durableObjectId, isolateId, method, pathname } = event;
-        return ({ blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId, method, pathname ], doubles: [ 1 ], indexes: [ kind ] });
+        return { blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId, method, pathname ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'do-alarm') {
         const { colo, durableObjectName, durableObjectClass, durableObjectId, isolateId } = event;
-        return ({ blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId ], doubles: [ 1 ], indexes: [ kind ] });
+        return { blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'console-info' || kind === 'console-warning' || kind === 'console-error') {
         const { spot, message } = event;
-        return ({ blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] });
+        return { blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'admin-data-job') {
-        console.log('ae-debug-1');
         const { colo, messageId, messageInstant, operationKind, targetPath, parameters, dryRun, millis, results, message } = event;
-        console.log('ae-debug-2');
         const parametersStr = Object.entries((parameters ?? {})).map(v => v.join('=')).join(',');
-        console.log(`ae-debug-3 parametersStr=${parametersStr}`);
-        const tmp = {
-            blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : '' ],
+        return {
+            blobs: [ kind, colo, messageId, messageInstant, operationKind, trim(targetPath), trim(parametersStr), message ? trim(message) : null ],
             doubles: [ dryRun ? 1 : 0, millis, (results ?? []).length ],
             indexes: [ kind ]
-        };
-        console.log(`ae-debug-4 (blank) tmp=${JSON.stringify(tmp)}`);
-        // deno-lint-ignore no-explicit-any
-        return tmp as any;
+        }
     } else {
         throw new Error(`CloudflareTracer: Unsupported kind: ${kind}`);
     }

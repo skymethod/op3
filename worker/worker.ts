@@ -18,7 +18,7 @@ import { computeReleasesResponse, tryParseReleasesRequest } from './routes/relea
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
-import { consoleError, consoleInfo, consoleWarn, writeTraceEvent } from './tracer.ts';
+import { consoleError, consoleWarn, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
@@ -74,8 +74,6 @@ export default {
         try {
             const { dataset1, backendNamespace } = env;
             initCloudflareTracer(dataset1);
-            console.log(`queue-debug-1 typeof dataset1=${typeof dataset1}`);
-            consoleInfo('queue-debug', `Handling ${batch.messages.length} messages from queue`);
             const colo = await ManualColo.get();
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             for (const { body, id, timestamp } of batch.messages) {
@@ -84,13 +82,10 @@ export default {
                     if (kind === 'admin-data') {
                         const { operationKind, targetPath, parameters, dryRun } = body;
                         const start = Date.now();
-                        console.log(`queue-debug-2 typeof timestamp=${typeof timestamp}`);
                         const response = await routeAdminDataRequest(body, rpcClient);
-                        console.log(`queue-debug-3`);
                         console.log(JSON.stringify(response, undefined, 2));
                         const millis = Date.now() - start;
                         const { results, message } = response;
-                        console.log(`queue-debug-4`);
                         writeTraceEvent({
                             kind: 'admin-data-job',
                             colo,
@@ -104,7 +99,6 @@ export default {
                             results,
                             message,
                         });
-                        console.log(`queue-debug-5`);
                     } else {
                         consoleWarn('queue-handler', `Cannot process '${kind}' rpcs in the queue handler`);
                     }
@@ -113,7 +107,6 @@ export default {
                 }
             }
         } catch (e) {
-            console.log(`queue-debug-6`);
             consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${e.stack || e}`);
             throw e; // Queues will retry for us
         }
