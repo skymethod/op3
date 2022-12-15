@@ -256,6 +256,10 @@ export async function computeShowDailyDownloads(date: string, { mode, showUuids,
     return { date, mode, showUuids, millis: Date.now() - start };
 }
 
+export function computeShowDailyKey({ date, showUuid }: { date: string, showUuid: string }): string {
+    return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
+}
+
 //
 
 interface DailyDownloadsMap {
@@ -282,10 +286,6 @@ function computeDailyKey(date: string): string {
 
 function computeDailyMapKey(date: string): string {
     return `downloads/daily/${date}.map.json`;
-}
-
-function computeShowDailyKey({ date, showUuid}: { date: string, showUuid: string }): string {
-    return `downloads/show-daily/${showUuid}/${showUuid}-${date}.tsv`;
 }
 
 async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<{ etag: string }>): Promise<{ contentLength: number, etag: string }> {

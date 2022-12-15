@@ -2,25 +2,30 @@ import { Blobs, GetOpts, ListBlobsResponse, ListOpts, Multiput } from '../backen
 import { Bytes } from '../deps.ts';
 
 export class InMemoryBlobs implements Blobs {
-    private readonly data = new Map<string, Uint8Array>();
+    private readonly data = new Map<string, Record>();
 
     async put(key: string, body: string | ArrayBuffer | ReadableStream<Uint8Array>): Promise<{ etag: string }> {
         const arr = await toByteArray(body);
-        this.data.set(key, arr);
-        const etag = (await new Bytes(arr).sha1()).hex();
+        const etag = await computeEtag(arr);
+        this.data.set(key, { arr, etag });
         return { etag };
     }
 
+    get(key: string, as: 'stream-and-meta', opts?: GetOpts): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
     get(key: string, as: 'stream', opts?: GetOpts): Promise<ReadableStream<Uint8Array> | undefined>;
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
-    async get(key: string, as: 'stream' | 'buffer' | 'text', opts: GetOpts = {}): Promise<string | ArrayBuffer | ReadableStream<Uint8Array> | undefined> {
+    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta', opts: GetOpts = {}): Promise<string | { text: string, etag: string } | ArrayBuffer | ReadableStream<Uint8Array> | { stream: ReadableStream<Uint8Array>, etag: string } | undefined> {
         await Promise.resolve();
         if (Object.keys(opts).length > 0) throw new Error(`Unsupported get opts: ${JSON.stringify(opts)}`);
-        const arr = this.data.get(key);
-        if (arr === undefined) return undefined;
+        const record = this.data.get(key);
+        if (record === undefined) return undefined;
+        const { arr, etag } = record;
         if (as === 'stream') return new Blob([ arr ]).stream();
+        if (as === 'stream-and-meta') return { stream: new Blob([ arr ]).stream(), etag };
         if (as === 'buffer') return arr.buffer;
+        if (as === 'text-and-meta') return { text: new TextDecoder().decode(arr), etag };
         if (as === 'text') return new TextDecoder().decode(arr);
         
         throw new Error();
@@ -56,15 +61,17 @@ export class InMemoryBlobs implements Blobs {
 
 //
 
+type Record = { arr: Uint8Array, etag: string };
+
 class InMemoryMultiput implements Multiput {
     private readonly key: string;
-    private readonly data: Map<string, Uint8Array>;
+    private readonly data: Map<string, Record>;
 
     private combined = Bytes.EMPTY;
     private parts = 0;
     private done = false;
 
-    constructor(key: string, data: Map<string, Uint8Array>) {
+    constructor(key: string, data: Map<string, Record>) {
         this.key = key;
         this.data = data;
     }
@@ -74,9 +81,9 @@ class InMemoryMultiput implements Multiput {
         await Promise.resolve();
         if (this.done) throw new Error(`Already done!`);
         const arr = await toByteArray(body);
+        const etag = await computeEtag(arr);
         this.combined = this.combined.concat(new Bytes(arr));
         this.parts++;
-        const etag = (await new Bytes(arr).sha1()).hex();
         return { etag };
     }
 
@@ -85,9 +92,10 @@ class InMemoryMultiput implements Multiput {
         if (this.done) throw new Error(`Already done!`);
         const { parts, key, combined } = this;
         if (parts === 0) throw new Error(`No parts!`);
-        this.data.set(key, combined.array());
+        const arr = combined.array();
+        const etag = await computeEtag(arr);
+        this.data.set(key, { arr, etag });
         this.done = true;
-        const etag = (await combined.sha1()).hex();
         return { parts, etag };
     }
 
@@ -105,4 +113,8 @@ async function toByteArray(body: string | ArrayBuffer | ReadableStream<Uint8Arra
     return typeof body === 'string' ? new TextEncoder().encode(body)
         : body instanceof ArrayBuffer ? new Uint8Array(body)
         : new Uint8Array(await new Response(body).arrayBuffer())
+}
+
+async function computeEtag(arr: Uint8Array): Promise<string> {
+    return (await new Bytes(arr).sha1()).hex();
 }

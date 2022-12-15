@@ -22,18 +22,23 @@ export class R2BucketBlobs implements Blobs {
         }
     }
 
+    get(key: string, as: 'stream-and-meta', opts?: GetOpts): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
     get(key: string, as: 'stream', opts?: GetOpts): Promise<ReadableStream<Uint8Array> | undefined>;
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
-    async get(key: string, as: 'stream' | 'buffer' | 'text', opts: GetOpts = {}): Promise<ReadableStream<Uint8Array> | ArrayBuffer | string | undefined> {
+    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta', opts: GetOpts = {}): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | ReadableStream<Uint8Array> | ArrayBuffer | { text: string, etag: string } | string | undefined> {
         const { bucket, prefix } = this;
         const { ifMatch } = opts;
         const options: R2GetOptions = ifMatch ? { onlyIf: { etagMatches: ifMatch }} : {};
         const obj = await r2(() => bucket.get(prefix + key, options));
         if (!obj) return undefined;
         if (!isR2ObjectBody(obj)) throw new Error(`No response body!`);
+        const { etag } = obj;
+        if (as === 'stream-and-meta') return { stream: obj.body, etag };
         if (as === 'stream') return obj.body;
         if (as === 'buffer') return await obj.arrayBuffer();
+        if (as === 'text-and-meta') return { text: await obj.text(), etag };
         if (as === 'text') return await obj.text();
         throw new Error(`Unsupported 'as' value: ${as}`);
     }
