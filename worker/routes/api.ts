@@ -13,7 +13,7 @@ import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
 import { Queue } from '../deps.ts';
-import { computeShowSummaryAdminDataResponse } from '../backend/show_summaries.ts';
+import { computeShowSummaryAdminDataResponse, tryParseShowSummaryAdminDataRequest } from '../backend/show_summaries.ts';
 import { Blobs } from '../backend/blobs.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
@@ -98,13 +98,21 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
-    } else if (targetPath.startsWith('/summaries/')) {
-        const m = /^\/summaries\/show\/(.*?)$/.exec(targetPath);
-        if (m && operationKind === 'update' && parameters && statsBlobs) {
-            const [ _, showUuid ] = m;
+    } 
+    
+    const ssadr = tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters });
+    if (ssadr) {
+        const { showUuid, parameters } = ssadr;
+        const { backend } = parameters;
+        if (backend) {
+            const doName = DoNames.storagelessForSuffix(backend);
+            return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
+        } else {
+            if (statsBlobs === undefined) throw new Error(`routeAdminDataRequest: statsBlobs is required`);
             return await computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs });
         }
     }
+    
     const doName = tryParseDurableObjectRequest(targetPath);
     if (doName) {
         if (operationKind === 'delete') {

@@ -9,6 +9,14 @@ import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
 import { AdminDataResponse, Unkinded } from '../rpc_model.ts';
 
+export function tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): { showUuid: string, parameters: Record<string, string> } | undefined {
+    const m = /^\/summaries\/show\/(.*?)$/.exec(targetPath);
+    if (m && operationKind === 'update' && parameters) {
+        const [ _, showUuid ] = m;
+        return { showUuid, parameters };
+    }
+}
+
 export async function computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }: { showUuid: string, parameters: Record<string, string>, statsBlobs: Blobs }): Promise<Unkinded<AdminDataResponse>> {
     const { action, month, flags } = parameters;
     if (action === 'recompute' && isValidMonth(month)) {

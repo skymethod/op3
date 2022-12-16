@@ -21,6 +21,7 @@ import { newPodcastIndexClient } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
 import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 import { DoNames } from '../do_names.ts';
+import { computeShowSummaryAdminDataResponse, tryParseShowSummaryAdminDataRequest } from './show_summaries.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -149,6 +150,14 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 
+                        const ssadr = tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters });
+                        if (ssadr) {
+                            const { showUuid, parameters } = ssadr;
+                            const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+                            if (statsBlobs === undefined) throw new Error(`computeShowSummaryAdminDataResponse: statsBlobs is required`);
+                            return newRpcResponse({ kind: 'admin-data', ...await computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }) });
+                        }
+
                         const doName = tryParseDurableObjectRequest(targetPath);
                         if (doName) {
                             if (operationKind === 'delete') {
@@ -273,6 +282,11 @@ export class BackendDO {
         const { colo, name, rpcClient } = opts;
         const time = new Date().toISOString();
         const id = this.state.id.toString();
+
+        if (DoNames.isStorageless(name)) {
+            this.info = { id, name, colo, firstSeen: time, lastSeen: time, changes: [] };
+            return this.info;
+        }
 
         let info = await loadDOInfo(storage);
         if (info) {
