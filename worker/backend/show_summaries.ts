@@ -10,22 +10,25 @@ import { timed } from '../async.ts';
 import { AdminDataResponse, Unkinded } from '../rpc_model.ts';
 
 export async function computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }: { showUuid: string, parameters: Record<string, string>, statsBlobs: Blobs }): Promise<Unkinded<AdminDataResponse>> {
-    const { action, month } = parameters;
+    const { action, month, flags } = parameters;
     if (action === 'recompute' && isValidMonth(month)) {
-        const result = await recomputeShowSummariesForMonth({ showUuid, month, statsBlobs });
+        const flagset = new Set((flags ?? '').split(','));
+        const log = flagset.has('log');
+        const sequential = flagset.has('sequential');
+        const result = await recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log, sequential });
         return { results: [ result ] };
     }
     throw new Error(`computeShowSummaryAdminDataResponse: Unsupported parameters: ${JSON.stringify(parameters)}`);
 }
 
-export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log }: { showUuid: string, month: string, statsBlobs: Blobs, log?: boolean }) {
+export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log, sequential }: { showUuid: string, month: string, statsBlobs: Blobs, log?: boolean, sequential?: boolean }) {
     check('showUuid', showUuid, isValidUuid);
     check('month', month, isValidMonth);
 
     const times: Record<string, number> = {};
     const keyPrefix = computeShowDailyKeyPrefix({ showUuid, datePart: month });
     const { keys: showDailyKeys } = await timed(times, 'list', () => statsBlobs.list({ keyPrefix }));
-    if (log) console.log(`${showDailyKeys.length} showDailyKeys`);
+    if (log) console.log(`${showDailyKeys.length} showDailyKeys, sequential=${!!sequential}`);
     const recomputeShowSummary = async (showDailyKey: string): Promise<string> => {
         const { date } = unpackShowDailyKey(showDailyKey);
         if (log) console.log(`Computing ${date}`);
@@ -34,7 +37,15 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlo
         const { key } = await timed(times, 'save-daily', () => saveShowSummary({ summary, statsBlobs }));
         return key;
     };
-    const inputKeys = await Promise.all(showDailyKeys.map(recomputeShowSummary));
+    let inputKeys: string[];
+    if (sequential) {
+        inputKeys = [];
+        for (const showDailyKey of showDailyKeys) {
+            inputKeys.push(await recomputeShowSummary(showDailyKey));
+        }
+    } else {
+        inputKeys = await Promise.all(showDailyKeys.map(recomputeShowSummary));
+    }
     if (log) console.log('Computing month aggregate...');
     const summary = await timed(times, 'compute-month', () => computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod: month, statsBlobs }));
     if (log) console.log('Saving month aggregate...');
