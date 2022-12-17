@@ -14,8 +14,8 @@ export function newRssResponse(string: string): Response {
     return new Response(string, { headers: { 'content-type': 'application/rss+xml; charset=utf-8', 'access-control-allow-origin': '*' } });
 }
 
-export function newTextResponse(string: string): Response {
-    return new Response(string, { headers: { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } });
+export function newTextResponse(string: string, status = 200): Response {
+    return new Response(string, { status, headers: { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } });
 }
 
 export function newXmlResponse(string: string): Response {

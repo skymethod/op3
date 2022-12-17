@@ -26,7 +26,7 @@ if [ -n "$DEPLOY_SHA" ]; then
 fi
 
 # run unit tests as a sanity check
-NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno test
+NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno test --allow-read
 
 # denoflare push the worker script to cloudflare
 NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno run --unstable --allow-all https://raw.githubusercontent.com/skymethod/denoflare/$DENOFLARE_VERSION/cli/cli.ts \
@@ -49,5 +49,6 @@ ${TURNSTILE_SITEKEY:+--text-binding turnstileSitekey:$TURNSTILE_SITEKEY} \
 ${TURNSTILE_SECRET_KEY:+--secret-binding turnstileSecretKey:$TURNSTILE_SECRET_KEY} \
 ${PODCAST_INDEX_CREDENTIALS:+--secret-binding podcastIndexCredentials:$PODCAST_INDEX_CREDENTIALS} \
 ${BLOBS_BUCKET:+--r2-bucket-binding blobsBucket:$BLOBS_BUCKET} \
+${RO_BLOBS_BUCKET:+--r2-bucket-binding roBlobsBucket:$RO_BLOBS_BUCKET} \
 ${KV_NAMESPACE:+--kv-namespace-binding kvNamespace:$KV_NAMESPACE} \
 ${QUEUE1_NAME:+--queue-binding queue1:$QUEUE1_NAME}

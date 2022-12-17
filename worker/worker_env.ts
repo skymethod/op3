@@ -18,6 +18,7 @@ export interface WorkerEnv {
     readonly turnstileSecretKey?: string;
     readonly podcastIndexCredentials?: string;
     readonly blobsBucket?: R2Bucket;
+    readonly roBlobsBucket?: R2Bucket;
     readonly kvNamespace?: KVNamespace;
     readonly queue1?: Queue;
 }

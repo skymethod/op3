@@ -15,6 +15,7 @@ import { DoNames } from '../do_names.ts';
 import { Queue } from '../deps.ts';
 import { computeShowSummaryAdminDataResponse, tryParseShowSummaryAdminDataRequest } from '../backend/show_summaries.ts';
 import { Blobs } from '../backend/blobs.ts';
+import { computeQueryDownloadsResponse } from './api_query_downloads.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -31,9 +32,9 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined }): Promise<Response> {
+export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined }): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs } = opts;
 
     try {
         // handle cors pre-flight
@@ -62,6 +63,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
+        if (path.startsWith('/downloads/')) return await computeQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs });
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 

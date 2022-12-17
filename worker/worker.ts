@@ -206,7 +206,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket } = env;
+    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams } = new URL(request.url);
     const { method, headers } = request;
@@ -237,7 +237,8 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
         })());
     };
     const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs });
+    const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs(roBlobsBucket, 'stats/') : undefined;
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });
