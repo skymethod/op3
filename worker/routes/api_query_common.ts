@@ -40,3 +40,14 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
 
     return rt;
 }
+
+export function newQueryResponse({ startTime, format, headers, rows }: { startTime: number, format: string, headers: string[], rows: unknown[] }): Response {
+    const queryTime = Date.now() - startTime;
+    const count = rows.length;
+    if (format === 'tsv') {
+        rows.unshift(headers.join('\t'));
+        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), 'access-control-allow-origin': '*' } });
+    }
+    const obj = format === 'json-a' ? { headers, rows, count, queryTime } : { rows, count, queryTime };
+    return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
+}

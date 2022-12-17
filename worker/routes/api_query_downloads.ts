@@ -4,9 +4,10 @@ import { check, checkMatches } from '../check.ts';
 import { packError } from '../errors.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse, newTextResponse } from '../responses.ts';
 import { ApiTokenPermission, hasPermission } from '../rpc_model.ts';
+import { yieldTsvFromStream } from '../streams.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_DOWNLOADS } from './api_contract.ts';
-import { ApiQueryCommonParameters, computeApiQueryCommonParameters } from './api_query_common.ts';
+import { ApiQueryCommonParameters, computeApiQueryCommonParameters, newQueryResponse } from './api_query_common.ts';
 
 export async function computeQueryDownloadsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, path: string, searchParams: URLSearchParams, {statsBlobs, roStatsBlobs}: { statsBlobs?: Blobs, roStatsBlobs?: Blobs }): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
@@ -25,16 +26,33 @@ export async function computeQueryDownloadsResponse(permissions: ReadonlySet<Api
 }
 
 export async function computeQueryDownloadsResponseInternal(request: QueryShowDownloadsRequest, { statsBlobs }: { statsBlobs: Blobs }): Promise<Response> {
-    const { showUuid, bots, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive } = request;
+    const { showUuid, bots = 'exclude', limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv' } = request;
 
     const date = startTimeInclusive ? startTimeInclusive.substring(0, 10) : startTimeExclusive ? startTimeExclusive.substring(0, 10) : await computeEarliestShowDownloadDate(showUuid, statsBlobs);
     if (!date) return newTextResponse('', 404);
 
-    const result = await statsBlobs.get(computeShowDailyKey({ date, showUuid }), 'stream');
-    if (!result) return newTextResponse('', 404);
+    const startTime = Date.now();
 
-    return new Response(result);
+    const stream = await statsBlobs.get(computeShowDailyKey({ date, showUuid }), 'stream');
+
+    const rows: unknown[] = [];
+    if (stream) {
+        for await (const obj of yieldTsvFromStream(stream)) {
+            const { time, serverUrl, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
+            if (botType && bots === 'exclude') continue;
+            if (format === 'tsv' || format === 'json-a') {
+                const arr = [ time, serverUrl, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode ];
+                rows.push(format === 'tsv' ? arr.join('\t') : arr);
+            } else {
+                rows.push({ time, serverUrl, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode });
+            }
+        }
+    }
+
+    return newQueryResponse({ startTime, format, headers, rows })
 }
+
+const headers = [ 'time', 'serverUrl', 'audienceId', 'showUuid', 'episodeId', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'botType', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ];
 
 //
 

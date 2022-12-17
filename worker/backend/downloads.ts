@@ -1,10 +1,12 @@
 import { check, checkAll, checkMatches, isValidDate, isValidInstant } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
-import { Bytes, TextLineStream, zip, sortBy, distinct, DelimiterStream } from '../deps.ts';
+import { Bytes, sortBy, distinct, DelimiterStream } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
+import { unpackHashedIpAddressHash } from "../ip_addresses.ts";
 import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
+import { yieldTsvFromStream } from '../streams.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -36,11 +38,12 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             hits++;
             if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
             const obj = attNums.unpackRecord(record);
-            const { method, range, ulid: _, url, hashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
+            const { method, range, ulid: _, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
             if (method !== 'GET') continue; // ignore all non-GET requests
             const ranges = range ? tryParseRangeHeader(range) : undefined;
             if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
             const serverUrl = computeServerUrl(url);
+            const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
             const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|`).sha256()).hex();
             // TODO: how to incorporate ulids into audienceId? not a good replacement for ip address since they cannot be used across urls, and not a good suffix since a single download session across multiple ips would create dup downloads => ignore for now
             const download = `${serverUrl}|${audienceId}`;
@@ -127,21 +130,14 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
         const stream = await statsBlobs.get(key, 'stream');
         if (!stream) continue;
         hours++;
-        const lines = stream
-            .pipeThrough(new TextDecoderStream())
-            .pipeThrough(new TextLineStream());
 
-        let headers: string[] | undefined;
-        for await (const hourlyLine of lines) {
-            if (hourlyLine === '') continue;
-            const values = hourlyLine.split('\t');
-            if (!headers) {
-                headers = values;
-                continue;
-            }
+        for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
-            const obj = Object.fromEntries(zip(headers, values));
             const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
+            if (serverUrl === undefined) throw new Error(`Undefined serverUrl`);
+            if (audienceId === undefined) throw new Error(`Undefined audienceId`);
+            if (agentType === undefined) throw new Error(`Undefined agentType`);
+
             const download = `${serverUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             downloads.add(download);

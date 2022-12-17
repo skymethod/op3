@@ -2,6 +2,7 @@ import { isStringRecord } from '../check.ts';
 import { DurableObjectStorage, DurableObjectStorageValue, sortBy } from '../deps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { setAll } from '../maps.ts';
+import { newQueryResponse } from '../routes/api_query_common.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { addDays, computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
@@ -36,13 +37,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
             rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode });
         }
     }
-    const queryTime = Date.now() - startTime;
-    if (format === 'tsv') {
-        rows.unshift(headers.join('\t'));
-        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), 'access-control-allow-origin': '*' } });
-    }
-    const obj = format === 'json-a' ? { headers, rows, queryTime } : { rows, queryTime };
-    return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
+    return newQueryResponse({ startTime, format, headers, rows });
 }
 
 //

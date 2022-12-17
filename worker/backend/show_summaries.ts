@@ -1,6 +1,6 @@
 import { check, isStringRecord, isValidMonth } from '../check.ts';
-import { sortBy, zip } from '../deps.ts';
-import { computeLinestream } from '../streams.ts';
+import { sortBy } from '../deps.ts';
+import { yieldTsvFromStream } from '../streams.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
 import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
@@ -102,18 +102,11 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
     if (!result) throw new Error(`Show-daily not found: ${showUuid} ${date}`);
     const { stream, etag } = result;
 
-    let headers: string[] | undefined;
     const hourlyDownloads: Record<string, number> = {};
     const episodes: Record<string, EpisodeSummary> = {};
-    for await (const line of computeLinestream(stream)) {
-        if (line === '') continue;
-        const values = line.split('\t');
-        if (!headers) {
-            headers = values;
-            continue;
-        }
-        const obj = Object.fromEntries(zip(headers, values));
+    for await (const obj of yieldTsvFromStream(stream)) {
         const { botType, time, episodeId } = obj;
+        if (time === undefined) throw new Error(`Undefined time`);
         const hour = time.substring(0, '2000-01-01T00'.length);
         if (botType !== undefined) continue;
         increment(hourlyDownloads, hour);
