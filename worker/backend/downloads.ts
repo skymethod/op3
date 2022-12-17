@@ -22,7 +22,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
-    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'botType', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n'));
+    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n'));
     let queries = 0;
     let hits = 0;
     while (true) {
@@ -54,8 +54,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const deviceName = result?.device?.name;
             const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
             const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
-            const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
-            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
+            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
             chunks.push(encoder.encode(line));
             downloads.add(download);
         }
@@ -142,11 +141,17 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             }
             rows++;
             const obj = Object.fromEntries(zip(headers, values));
-            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
+            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
             const download = `${serverUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             downloads.add(download);
+
+            // associate download with a show & episode
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+
+            // associate download with bot type
+            const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
+
             const line = [ time, episodeId, botType, serverUrl, audienceId, showUuid, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
             
