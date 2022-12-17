@@ -1,4 +1,4 @@
-import { tryNormalizeInstant,check,isValidInstant,tryParseInt,checkMatches } from '../check.ts';
+import { tryNormalizeInstant,check,isValidInstant,tryParseInt,checkMatches, isValidDate } from '../check.ts';
 import { tryParseDurationMillis } from '../duration.ts';
 
 export type ApiQueryCommonParameters = { readonly limit: number, readonly startTimeInclusive?: string, readonly startTimeExclusive?: string, readonly endTimeExclusive?: string, readonly format?: string };
@@ -11,6 +11,7 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
         if (typeof duration === 'number') {
             value = new Date(Date.now() + duration).toISOString();
         }
+        if (isValidDate(value)) value = `${value}T00:00:00.000Z`;
         const norm = tryNormalizeInstant(value);
         if (norm) value = norm;
         check(name, value, isValidInstant);

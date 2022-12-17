@@ -6,6 +6,6 @@ export const QUERY_REDIRECT_LOGS = {
 
 export const QUERY_DOWNLOADS = {
     limitDefault: 100,
-    limitMax: 1000,
+    limitMax: 20000,
     limitMin: 0,
 }

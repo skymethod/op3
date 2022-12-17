@@ -1,5 +1,6 @@
-import { assertEquals } from './tests/deps.ts';
-import { computeRfc822, computeTimestamp, isValidTimestamp } from './timestamp.ts';
+import { isValidDate } from './check.ts';
+import { assertEquals, assert } from './tests/deps.ts';
+import { addDaysToDateString, computeRfc822, computeTimestamp, isValidTimestamp } from './timestamp.ts';
 
 Deno.test({
     name: 'computeTimestamp',
@@ -38,5 +39,21 @@ Deno.test({
     name: 'computeRfc822',
     fn: () => {
         assertEquals(computeRfc822('2022-09-18T16:18:54.780Z'), 'Sun, 18 Sep 2022 16:18:54 GMT');
+    }
+});
+
+Deno.test({
+    name: 'addDaysToDateString',
+    fn: () => {
+        assertEquals(addDaysToDateString('2022-01-01', 1), '2022-01-02');
+        let date = '2020-01-01'; // leap year
+        const seen = new Set<string>();
+        for (let i = 0; i < 366; i++) {
+            date = addDaysToDateString(date, 1);
+            assert(isValidDate(date));
+            assert(!seen.has(date));
+            seen.add(date);
+        }
+        assertEquals(date, '2021-01-01');
     }
 });
