@@ -1,6 +1,6 @@
 export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'opera-desktop-sans-referrer';
 
-export function computeBotType({ agentType, agentName, deviceType, referrerName }: { agentType: string, agentName: string, deviceType: string, referrerName?: string }): BotType | undefined {
+export function computeBotType({ agentType, agentName, deviceType, referrerName }: { agentType: string, agentName: string, deviceType?: string, referrerName?: string }): BotType | undefined {
     if (agentType === 'bot') return 'bot'; // easy
     if (agentType === 'library' && isBotLibrary(agentName)) return 'bot-lib'; // some libraries are used in listener apps for playback
     if (agentType === 'unknown' && /bot/i.test(agentName)) return 'unknown-bot'; // "bot" in the user-agent string for unknown agents

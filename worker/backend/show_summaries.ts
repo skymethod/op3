@@ -1,7 +1,6 @@
 import { check, isStringRecord, isValidMonth } from '../check.ts';
 import { sortBy, zip } from '../deps.ts';
 import { computeLinestream } from '../streams.ts';
-import { computeBotType } from './bots.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
 import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
@@ -114,9 +113,8 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
             continue;
         }
         const obj = Object.fromEntries(zip(headers, values));
-        const { agentType, agentName, deviceType, referrerName, time, episodeId } = obj;
+        const { botType, time, episodeId } = obj;
         const hour = time.substring(0, '2000-01-01T00'.length);
-        const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
         if (botType !== undefined) continue;
         increment(hourlyDownloads, hour);
         if (typeof episodeId === 'string') {
