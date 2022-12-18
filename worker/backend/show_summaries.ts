@@ -57,7 +57,17 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlo
     const summary = await timed(times, 'compute-month', () => computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod: month, statsBlobs }));
     if (log) console.log('Saving month aggregate...');
     const { key: monthKey } = await timed(times, 'save-month', () => saveShowSummary({ summary, statsBlobs }));
-    return { monthKey, showDailyKeys: showDailyKeys.length,  downloads: total(summary.hourlyDownloads), times };
+
+    if (log) console.log('Reading overall aggregate...');
+    const overallKey = computeShowSummaryKey({ showUuid, period: 'overall'});
+    const overall = await timed(times, 'read-overall', () => tryLoadShowSummary(overallKey, statsBlobs));
+    const newOverall = tryComputeNewOverall({ overall, summary });
+    if (newOverall) {
+        if (log) console.log('Saving overall aggregate...');
+        await timed(times, 'save-overall', () => saveShowSummary({ summary: newOverall, statsBlobs }));
+    }
+
+    return { monthKey, showDailyKeys: showDailyKeys.length, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads), times };
 }
 
 export async function saveShowSummary({ summary, statsBlobs }: { summary: ShowSummary, statsBlobs: Blobs }): Promise<{ key: string, etag: string }> {
@@ -80,7 +90,11 @@ export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputP
         for (const [ episodeId, epSummary ] of Object.entries(summary.episodes)) {
             let record = episodes[episodeId];
             if (!record) {
-                record = { hourlyDownloads: {} };
+                record = { hourlyDownloads: {}, firstHour: epSummary.firstHour };
+                episodes[episodeId] = record;
+            }
+            if (epSummary.firstHour < record.firstHour) {
+                record = { ...record, firstHour: epSummary.firstHour };
                 episodes[episodeId] = record;
             }
             incrementAll(record.hourlyDownloads, epSummary.hourlyDownloads);
@@ -113,7 +127,11 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         if (typeof episodeId === 'string') {
             let record = episodes[episodeId];
             if (!record) {
-                record = { hourlyDownloads: {} };
+                record = { hourlyDownloads: {}, firstHour: hour };
+                episodes[episodeId] = record;
+            }
+            if (hour < record.firstHour) {
+                record = { ...record, firstHour: hour };
                 episodes[episodeId] = record;
             }
             increment(record.hourlyDownloads, hour);
@@ -128,6 +146,28 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
     });
 }
 
+export function computeShowSummaryKey({ showUuid, period }: { showUuid: string, period: string }): string {
+    return `summaries/show/${showUuid}/${showUuid}-${period}.summary.json`;
+}
+
+export async function tryLoadShowSummary(key: string, statsBlobs: Blobs): Promise<ShowSummary | undefined> {
+    const result = await statsBlobs.get(key, 'text');
+    if (result) {
+        const obj = JSON.parse(result);
+        if (!isValidShowSummary(obj)) throw new Error(`Invalid showSummary at ${key}`);
+        return obj;
+    }
+}
+
+export async function findFirstHourForEpisodeId({ showUuid, episodeId, statsBlobs }: { showUuid: string, episodeId: string, statsBlobs: Blobs }): Promise<string | undefined> {
+    const summary = await tryLoadShowSummary(computeShowSummaryKey({ showUuid, period: 'overall' }), statsBlobs);
+    if (summary) {
+        const epSummary = summary.episodes[episodeId];
+        return epSummary?.firstHour;
+    }
+}
+
+
 //
 
 export interface ShowSummary {
@@ -138,8 +178,19 @@ export interface ShowSummary {
     readonly sources: Record<string, string>;
 }
 
+export function isValidShowSummary(obj: unknown): obj is ShowSummary {
+    return isStringRecord(obj)
+        && typeof obj.showUuid === 'string'
+        && typeof obj.period === 'string'
+        && isStringRecord(obj.hourlyDownloads)
+        && isStringRecord(obj.episodes)
+        && isStringRecord(obj.sources)
+        ;
+}
+
 export interface EpisodeSummary {
     readonly hourlyDownloads: Record<string, number>; // hour (e.g. 2022-12-01T10) -> downloads
+    readonly firstHour: string; // hour (e.g. 2022-12-01T10) first download seen
 }
 
 //
@@ -155,6 +206,15 @@ function computeSorted<T>(obj: T): T {
         : obj as any;
 }
 
-function computeShowSummaryKey({ showUuid, period }: { showUuid: string, period: string }): string {
-    return `summaries/show/${showUuid}/${showUuid}-${period}.summary.json`;
+function tryComputeNewOverall({ overall, summary }: { overall?: ShowSummary, summary: ShowSummary }): ShowSummary | undefined {
+    const rt: ShowSummary = overall ?? { showUuid: summary.showUuid, period: 'overall', episodes: {}, hourlyDownloads: {}, sources: {} };
+    let changed = overall === undefined;
+    for (const [ episodeId, epSummary ] of Object.entries(summary.episodes)) {
+        const existingEpSummary = rt.episodes[episodeId]
+        if (!existingEpSummary || epSummary.firstHour < existingEpSummary.firstHour) {
+            rt.episodes[episodeId] = { ...(existingEpSummary ?? { hourlyDownloads: {} }), firstHour: epSummary.firstHour };
+            changed = true;
+        }
+    }
+    return changed ? rt : undefined;
 }
