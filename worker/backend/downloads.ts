@@ -1,8 +1,9 @@
+import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkAll, checkMatches, isValidDate, isValidInstant } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { Bytes, sortBy, distinct, DelimiterStream } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
-import { unpackHashedIpAddressHash } from "../ip_addresses.ts";
+import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -43,10 +44,12 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const ranges = range ? tryParseRangeHeader(range) : undefined;
             if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
             const serverUrl = computeServerUrl(url);
+            const destinationServerUrl = computeChainDestinationUrl(serverUrl);
+            if (destinationServerUrl === undefined) continue;
             const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
-            const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}|`).sha256()).hex();
+            const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}`).sha256()).hex();
             // TODO: how to incorporate ulids into audienceId? not a good replacement for ip address since they cannot be used across urls, and not a good suffix since a single download session across multiple ips would create dup downloads => ignore for now
-            const download = `${serverUrl}|${audienceId}`;
+            const download = `${destinationServerUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             // TODO: do the ip tagging here
             const time = timestampToInstant(timestamp);
@@ -138,7 +141,10 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             if (audienceId === undefined) throw new Error(`Undefined audienceId`);
             if (agentType === undefined) throw new Error(`Undefined agentType`);
 
-            const download = `${serverUrl}|${audienceId}`;
+            const destinationServerUrl = computeChainDestinationUrl(serverUrl);
+            if (destinationServerUrl === undefined) continue;
+
+            const download = `${destinationServerUrl}|${audienceId}`;
             if (downloads.has(download)) continue;
             downloads.add(download);
 
