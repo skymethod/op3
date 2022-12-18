@@ -16,7 +16,8 @@ export class InMemoryBlobs implements Blobs {
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
     get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
-    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta', opts: GetOpts = {}): Promise<string | { text: string, etag: string } | ArrayBuffer | ReadableStream<Uint8Array> | { stream: ReadableStream<Uint8Array>, etag: string } | undefined> {
+    get(key: string, as: 'json', opts?: GetOpts): Promise<unknown | undefined>;
+    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta' | 'json', opts: GetOpts = {}): Promise<string | { text: string, etag: string } | ArrayBuffer | ReadableStream<Uint8Array> | { stream: ReadableStream<Uint8Array>, etag: string } | unknown | undefined> {
         await Promise.resolve();
         if (Object.keys(opts).length > 0) throw new Error(`Unsupported get opts: ${JSON.stringify(opts)}`);
         const record = this.data.get(key);
@@ -27,6 +28,7 @@ export class InMemoryBlobs implements Blobs {
         if (as === 'buffer') return arr.buffer;
         if (as === 'text-and-meta') return { text: new TextDecoder().decode(arr), etag };
         if (as === 'text') return new TextDecoder().decode(arr);
+        if (as === 'json') return JSON.parse(new TextDecoder().decode(arr));
         
         throw new Error();
     }

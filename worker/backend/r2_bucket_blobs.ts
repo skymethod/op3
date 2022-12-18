@@ -27,7 +27,8 @@ export class R2BucketBlobs implements Blobs {
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
     get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
-    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta', opts: GetOpts = {}): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | ReadableStream<Uint8Array> | ArrayBuffer | { text: string, etag: string } | string | undefined> {
+    get(key: string, as: 'json', opts?: GetOpts): Promise<unknown | undefined>;
+    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta' | 'json', opts: GetOpts = {}): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | ReadableStream<Uint8Array> | ArrayBuffer | { text: string, etag: string } | string | unknown | undefined> {
         const { bucket, prefix } = this;
         const { ifMatch } = opts;
         const options: R2GetOptions = ifMatch ? { onlyIf: { etagMatches: ifMatch }} : {};
@@ -40,6 +41,7 @@ export class R2BucketBlobs implements Blobs {
         if (as === 'buffer') return await obj.arrayBuffer();
         if (as === 'text-and-meta') return { text: await obj.text(), etag };
         if (as === 'text') return await obj.text();
+        if (as === 'json') return await obj.json();
         throw new Error(`Unsupported 'as' value: ${as}`);
     }
 

@@ -17,6 +17,7 @@ import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesFo
 import { Blobs } from '../backend/blobs.ts';
 import { computeQueryDownloadsResponse } from './api_query_downloads.ts';
 import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
+import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -55,10 +56,12 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
 
         const { permissions } = identity;
         if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
-        const isAdmin = permissions.has('admin');
+
+        const hasAdmin = permissions.has('admin');
+
         if (path.startsWith('/admin/')) {
             // all other admin endpoints require admin
-            if (!isAdmin) return newForbiddenJsonResponse();
+            if (!hasAdmin) return newForbiddenJsonResponse();
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
@@ -66,11 +69,13 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
         if (path.startsWith('/downloads/')) return await computeQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs });
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
-        const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], isAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+        { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], hasAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
         if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
         if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
         if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
+        { const m = /^\/shows\/([0-9a-f]{32})$/.exec(path); if (m) return await computeShowsResponse({ showUuid: m[1], method, rpcClient }); }
+        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m) return await computeShowStatsResponse({ showUuid: m[1], method, statsBlobs }); }
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
@@ -178,7 +183,6 @@ function identityResultToJson(result: IdentityResult) {
 }
 
 //
-
 
 async function computeIdentityResult(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient): Promise<IdentityResult> {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;

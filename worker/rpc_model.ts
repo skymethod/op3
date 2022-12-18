@@ -342,11 +342,11 @@ export interface PackedRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'packed-redirect-logs';
 }
 
-export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics';
+export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics' | 'read-show';
 export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
 export function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
-    return value === 'preview' || value === 'read-data' || value === 'notification' || value === 'admin-metrics';
+    return value === 'preview' || value === 'read-data' || value === 'notification' || value === 'admin-metrics' || value === 'read-show';
 }
 
 export function hasPermission(permissions: ReadonlySet<ApiTokenPermission>, ...allowablePermissions: ApiTokenPermission[]): boolean {

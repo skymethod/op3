@@ -6,6 +6,7 @@ export interface Blobs {
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
     get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
+    get(key: string, as: 'json', opts?: GetOpts): Promise<unknown | undefined>;
     delete(key: string): Promise<void>;
     has(key: string): Promise<boolean>;
     list(opts?: ListOpts): Promise<ListBlobsResponse>;
