@@ -13,9 +13,10 @@ import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
 import { Queue } from '../deps.ts';
-import { computeShowSummaryAdminDataResponse, tryParseShowSummaryAdminDataRequest } from '../backend/show_summaries.ts';
+import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesForMonth } from '../backend/show_summaries.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { computeQueryDownloadsResponse } from './api_query_downloads.ts';
+import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
@@ -102,16 +103,29 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } 
     
-    const ssadr = tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters });
-    if (ssadr) {
-        const { showUuid, parameters } = ssadr;
+    const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });
+    if (csddr && parameters) {
         const { backend } = parameters;
         if (backend) {
             const doName = DoNames.storagelessForSuffix(backend);
             return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
         } else {
-            if (statsBlobs === undefined) throw new Error(`routeAdminDataRequest: statsBlobs is required`);
-            return await computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs });
+            if (statsBlobs === undefined) throw new Error(`computeShowDailyDownloads: statsBlobs is required`);
+            const result = await computeShowDailyDownloads(csddr, statsBlobs);
+            return { results: [ result ] };
+        }
+    }
+
+    const rssfmr = tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters });
+    if (rssfmr && parameters) {
+        const { backend } = parameters;
+        if (backend) {
+            const doName = DoNames.storagelessForSuffix(backend);
+            return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, doName);
+        } else {
+            if (statsBlobs === undefined) throw new Error(`recomputeShowSummariesForMonth: statsBlobs is required`);
+            const result = await recomputeShowSummariesForMonth(rssfmr, statsBlobs);
+            return { results: [ result ] };
         }
     }
     

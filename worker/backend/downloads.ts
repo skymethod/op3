@@ -206,7 +206,21 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
 }
 
-export async function computeShowDailyDownloads(date: string, { mode, showUuids, statsBlobs } : { mode: 'include' | 'exclude', showUuids: string[], statsBlobs: Blobs }) {
+export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[] };
+
+export function tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): ComputeShowDailyDownloadsRequest | undefined {
+    if (targetPath === '/work/compute-show-daily-downloads' && operationKind === 'update' && parameters) {
+        const { date, shows } = parameters;
+        check('date', date, isValidDate);
+        const [ _, modeStr, showsStr ] = checkMatches('shows', shows, /^(include|exclude)=(.*?)$/);
+        const mode = modeStr === 'include' || modeStr === 'exclude' ? modeStr : undefined;
+        if (!mode) throw new Error(`Bad shows: ${shows}`);
+        const showUuids = showsStr.split(',').filter(v => v !== '');
+        return { date, mode, showUuids };
+    }
+}
+
+export async function computeShowDailyDownloads({ date, mode, showUuids }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
     checkAll('showUuids', showUuids, isValidUuid);

@@ -21,7 +21,8 @@ import { newPodcastIndexClient } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
 import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 import { DoNames } from '../do_names.ts';
-import { computeShowSummaryAdminDataResponse, tryParseShowSummaryAdminDataRequest } from './show_summaries.ts';
+import { recomputeShowSummariesForMonth, tryParseRecomputeShowSummariesForMonthRequest } from './show_summaries.ts';
+import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } from './downloads.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -150,12 +151,20 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj) });
                         }
 
-                        const ssadr = tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters });
-                        if (ssadr) {
-                            const { showUuid, parameters } = ssadr;
+                        const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });
+                        if (csddr) {
                             const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
-                            if (statsBlobs === undefined) throw new Error(`computeShowSummaryAdminDataResponse: statsBlobs is required`);
-                            return newRpcResponse({ kind: 'admin-data', ...await computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }) });
+                            if (statsBlobs === undefined) throw new Error(`computeShowDailyDownloads: statsBlobs is required`);
+                            const result = await computeShowDailyDownloads(csddr, statsBlobs);
+                            return newRpcResponse({ kind: 'admin-data', results: [ result ] });
+                        }
+                        
+                        const rssfmr = tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters });
+                        if (rssfmr) {
+                            const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+                            if (statsBlobs === undefined) throw new Error(`recomputeShowSummariesForMonth: statsBlobs is required`);
+                            const result = await recomputeShowSummariesForMonth(rssfmr, statsBlobs);
+                            return newRpcResponse({ kind: 'admin-data', results: [ result ] });
                         }
 
                         const doName = tryParseDurableObjectRequest(targetPath);

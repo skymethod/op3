@@ -10,7 +10,7 @@ import { consoleInfo, consoleWarn } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
-import { computeDailyDownloads, computeHourlyDownloads, computeShowDailyDownloads } from './downloads.ts';
+import { computeDailyDownloads, computeHourlyDownloads } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isShowRecord, isWorkRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
@@ -255,7 +255,7 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date, shows } = parameters;
+            const { hour, date } = parameters;
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
@@ -271,22 +271,13 @@ export class ShowController {
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
-                if (typeof shows === 'string') {
-                    const [ _, modeStr, showsStr ] = checkMatches('shows', shows, /^(include|exclude)=(.*?)$/);
-                    const mode = modeStr === 'include' || modeStr === 'exclude' ? modeStr : undefined;
-                    if (!mode) throw new Error(`Bad shows: ${shows}`);
-                    const showUuids = showsStr.split(',').filter(v => v !== '');
-                    const result = await computeShowDailyDownloads(date, { mode, showUuids, statsBlobs } );
-                    return { results: [ result ] };
-                } else {
-                    const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
-                    const partSizeMb = parseInt(partSizeStr);
-                    check('part-size', partSizeMb, partSizeMb >= 5); // r2 minimum multipart size
-                    const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
-                    const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                    const result = await computeDailyDownloads(date, { multipartMode, partSizeMb, statsBlobs, lookupShow } );
-                    return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
-                }
+                const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
+                const partSizeMb = parseInt(partSizeStr);
+                check('part-size', partSizeMb, partSizeMb >= 5); // r2 minimum multipart size
+                const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
+                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
+                const result = await computeDailyDownloads(date, { multipartMode, partSizeMb, statsBlobs, lookupShow } );
+                return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }
 

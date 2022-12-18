@@ -6,29 +6,22 @@ import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
 import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
-import { AdminDataResponse, Unkinded } from '../rpc_model.ts';
 
-export function tryParseShowSummaryAdminDataRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): { showUuid: string, parameters: Record<string, string> } | undefined {
-    const m = /^\/summaries\/show\/(.*?)$/.exec(targetPath);
-    if (m && operationKind === 'update' && parameters) {
-        const [ _, showUuid ] = m;
-        return { showUuid, parameters };
-    }
-}
+export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean };
 
-export async function computeShowSummaryAdminDataResponse({ showUuid, parameters, statsBlobs }: { showUuid: string, parameters: Record<string, string>, statsBlobs: Blobs }): Promise<Unkinded<AdminDataResponse>> {
-    const { action, month, flags } = parameters;
-    if (action === 'recompute' && isValidMonth(month)) {
+export function tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): RecomputeShowSummariesForMonthRequest | undefined {
+    if (targetPath === '/work/recompute-show-summaries' && operationKind === 'update' && parameters) {
+        const { show: showUuid, month, flags } = parameters;
+        check('show', showUuid, isValidUuid);
+        check('month', month, isValidMonth);
         const flagset = new Set((flags ?? '').split(','));
         const log = flagset.has('log');
         const sequential = flagset.has('sequential');
-        const result = await recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log, sequential });
-        return { results: [ result ] };
+        return { showUuid, month, log, sequential };
     }
-    throw new Error(`computeShowSummaryAdminDataResponse: Unsupported parameters: ${JSON.stringify(parameters)}`);
 }
 
-export async function recomputeShowSummariesForMonth({ showUuid, month, statsBlobs, log, sequential }: { showUuid: string, month: string, statsBlobs: Blobs, log?: boolean, sequential?: boolean }) {
+export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
     check('showUuid', showUuid, isValidUuid);
     check('month', month, isValidMonth);
 
