@@ -1,6 +1,8 @@
 import { Blobs } from '../backend/blobs.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from '../backend/downloads.ts';
+import { findFirstHourForEpisodeId } from '../backend/show_summaries.ts';
 import { check, checkMatches } from '../check.ts';
+import { isValidSha256Hex } from '../crypto.ts';
 import { packError } from '../errors.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { ApiTokenPermission, hasPermission } from '../rpc_model.ts';
@@ -27,9 +29,18 @@ export async function computeQueryDownloadsResponse(permissions: ReadonlySet<Api
 }
 
 export async function computeQueryDownloadsResponseInternal(request: QueryShowDownloadsRequest, { statsBlobs }: { statsBlobs: Blobs }): Promise<Response> {
-    const { showUuid, bots = 'exclude', limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv' } = request;
+    const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv' } = request;
 
     let date = startTimeInclusive ? startTimeInclusive.substring(0, 10) : startTimeExclusive ? startTimeExclusive.substring(0, 10) : await computeEarliestShowDownloadDate(showUuid, statsBlobs);
+    if (date && episodeIdFilter) {
+        const firstHour = await findFirstHourForEpisodeId({ showUuid, episodeId: episodeIdFilter, statsBlobs });
+        if (firstHour) {
+            const firstDate = firstHour.substring(0, 10);
+            if (date < firstDate) {
+                date = firstDate;
+            }
+        }
+    }
 
     const startTime = Date.now();
     const rows: unknown[] = [];
@@ -45,6 +56,7 @@ export async function computeQueryDownloadsResponseInternal(request: QueryShowDo
                     if (startTimeInclusive && time < startTimeInclusive) continue;
                     if (startTimeExclusive && time <= startTimeExclusive) continue;
                     if (endTimeExclusive && time >= endTimeExclusive) break;
+                    if (episodeIdFilter && episodeIdFilter !== episodeId) continue;
 
                     if (format === 'tsv' || format === 'json-a') {
                         const arr = [ time, url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode ];
@@ -68,6 +80,7 @@ const headers = [ 'time', 'url', 'audienceId', 'showUuid', 'episodeId', 'hashedI
 
 export interface QueryShowDownloadsRequest extends ApiQueryCommonParameters {
     readonly showUuid: string;
+    readonly episodeId?: string;
     readonly bots?: 'include' | 'exclude';
 }
 
@@ -81,10 +94,14 @@ function parseRequest(path: string, searchParams: URLSearchParams): QueryShowDow
     check('showUuid', showUuid, isValidUuid);
 
     let request: QueryShowDownloadsRequest = { showUuid, ...computeApiQueryCommonParameters(searchParams, QUERY_DOWNLOADS) };
-    const { bots } = Object.fromEntries(searchParams);
+    const { bots, episodeId } = Object.fromEntries(searchParams);
     if (typeof bots === 'string') {
         checkMatches('bots', bots, /^(include|exclude)$/);
         request = { ...request, bots: bots as 'include' | 'exclude' };
+    }
+    if (typeof episodeId === 'string') {
+        check('episodeId', episodeId, isValidSha256Hex);
+        request = { ...request, episodeId };
     }
     return request;
 }

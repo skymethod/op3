@@ -33,11 +33,11 @@ export function tryNormalizeInstant(instantWithVariableDecimals: string): string
 }
 
 export function isValidDate(date: string): boolean {
-    return /^\d{4}-\d{2}-\d{2}$/.test(date);
+    return /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/.test(date);
 }
 
 export function isValidMonth(month: string): boolean {
-    return /^\d{4}-\d{2}$/.test(month);
+    return /^2\d{3}-(0[1-9]|1[012])}$/.test(month);
 }
 
 export function isValidHttpUrl(url: string): boolean {
