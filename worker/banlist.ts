@@ -1,4 +1,5 @@
-import { tryParseJson, tryParseUrl } from './check.ts';
+import { computeChainDestinationHostname } from './chain_estimate.ts';
+import { tryParseJson } from './check.ts';
 import { KVNamespace, CfGlobalCaches } from './deps.ts';
 import { consoleWarn } from './tracer.ts';
 
@@ -17,7 +18,7 @@ export class Banlist {
         if (!namespace) return false;
 
         try {
-            const targetHostname = tryParseUrl(targetUrl)?.hostname;
+            const targetHostname = computeChainDestinationHostname(targetUrl);
             if (targetHostname === undefined) return false;
             if (isReservedForTesting(targetHostname)) return true;
             if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace);
