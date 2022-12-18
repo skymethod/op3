@@ -23,8 +23,9 @@ Deno.test({
         const good = [ 
             '2022-12', 
             '2001-01',
+            '2022-09',
         ];
-        good.forEach(month => assert(isValidMonth, month));
+        good.forEach(month => assert(isValidMonth(month), month));
 
         const bad = [
             '2011-00',
@@ -41,7 +42,7 @@ Deno.test({
             '2022-12-31', 
             '2001-01-01',
         ];
-        good.forEach(date => assert(isValidDate, date));
+        good.forEach(date => assert(isValidDate(date), date));
 
         const bad = [
             '2011-01-00',

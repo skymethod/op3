@@ -37,7 +37,7 @@ export function isValidDate(date: string): boolean {
 }
 
 export function isValidMonth(month: string): boolean {
-    return /^2\d{3}-(0[1-9]|1[012])}$/.test(month);
+    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
 }
 
 export function isValidHttpUrl(url: string): boolean {
