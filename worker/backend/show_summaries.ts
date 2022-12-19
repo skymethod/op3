@@ -6,6 +6,7 @@ import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
 import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
+import { unpackDate } from '../timestamp.ts';
 
 export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, disableAggregates?: boolean, startDay?: number, maxDays?: number };
 
@@ -35,7 +36,7 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         if (maxDays === 0) return false;
         if (typeof startDay === 'number') {
             const { date } = unpackShowDailyKey(v);
-            const day = parseInt(date.substring(5, 7));
+            const { day } = unpackDate(date);
             if (day < startDay) return false;
             if (typeof maxDays === 'number' && day > (startDay + maxDays - 1)) return false;
         }

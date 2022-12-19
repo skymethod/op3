@@ -70,3 +70,11 @@ export function addMonthsToMonthString(month: string, months: number): string {
     rt.setUTCMonth(rt.getUTCMonth() + months);
     return rt.toISOString().substring(0, 7);
 }
+
+export function unpackDate(date: string): { year: number, month: number, day: number } {
+    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+    const year = parseInt(date.substring(0, 4));
+    const month = parseInt(date.substring(5, 7));
+    const day = parseInt(date.substring(8, 10));
+    return { year, month, day };
+}
