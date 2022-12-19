@@ -75,7 +75,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
         if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
         { const m = /^\/shows\/([0-9a-f]{32})$/.exec(path); if (m) return await computeShowsResponse({ showUuid: m[1], method, rpcClient }); }
-        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m) return await computeShowStatsResponse({ showUuid: m[1], method, statsBlobs }); }
+        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs }); }
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);

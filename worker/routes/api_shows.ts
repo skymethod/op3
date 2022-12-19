@@ -5,6 +5,7 @@ import { check } from '../check.ts';
 import { DoNames } from '../do_names.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
+import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 
 export async function computeShowsResponse({ showUuid, method, rpcClient }: { showUuid: string, method: string, rpcClient: RpcClient }): Promise<Response> {
@@ -23,16 +24,23 @@ export async function computeShowsResponse({ showUuid, method, rpcClient }: { sh
     return newJsonResponse({ showUuid, title, episodes });
 }
 
-export async function computeShowStatsResponse({ showUuid, method, statsBlobs }: { showUuid: string, method: string, statsBlobs?: Blobs }): Promise<Response> {
+export async function computeShowStatsResponse({ showUuid, method, searchParams, statsBlobs, roStatsBlobs }: { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs }): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    if (!statsBlobs) throw new Error(`Need statsBlobs`);
+    const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
+    if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
     check('showUuid', showUuid, isValidUuid);
     
-    const overall = await statsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json');
+    const overall = await targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json');
     let episodeFirstHours: Record<string, string> | undefined;
+    let hourlyDownloads: Record<string, number> | undefined;
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
+
+        const thisMonth = new Date().toISOString().substring(0, 7);
+        const latestThreeMonths = [ -2, -1, 0 ].map(v => addMonthsToMonthString(thisMonth, v));
+        const latestThreeMonthSummaries = (await Promise.all(latestThreeMonths.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidShowSummary);
+        hourlyDownloads = Object.fromEntries(latestThreeMonthSummaries.flatMap(v => Object.entries(v.hourlyDownloads)));
     }
    
-    return newJsonResponse({ showUuid, episodeFirstHours });
+    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads });
 }

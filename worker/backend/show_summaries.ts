@@ -1,4 +1,4 @@
-import { check, isStringRecord, isValidMonth } from '../check.ts';
+import { check, isStringRecord, isValidMonth, tryParseInt } from '../check.ts';
 import { sortBy } from '../deps.ts';
 import { yieldTsvFromStream } from '../streams.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
@@ -7,28 +7,41 @@ import { Blobs } from './blobs.ts';
 import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
 
-export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean };
+export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, aggregates?: boolean, startDay?: number, maxDays?: number };
 
 export function tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): RecomputeShowSummariesForMonthRequest | undefined {
     if (targetPath === '/work/recompute-show-summaries' && operationKind === 'update' && parameters) {
-        const { show: showUuid, month, flags } = parameters;
+        const { show: showUuid, month, flags, startDay: startDayStr, maxDays: maxDaysStr } = parameters;
         check('show', showUuid, isValidUuid);
         check('month', month, isValidMonth);
         const flagset = new Set((flags ?? '').split(','));
         const log = flagset.has('log');
         const sequential = flagset.has('sequential');
-        return { showUuid, month, log, sequential };
+        const aggregates = flagset.has('aggregates');
+        const startDay = tryParseInt(startDayStr);
+        const maxDays = tryParseInt(maxDaysStr);
+        return { showUuid, month, log, sequential, aggregates, startDay, maxDays };
     }
 }
 
-export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
+export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential, aggregates = true, startDay, maxDays }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
     check('showUuid', showUuid, isValidUuid);
     check('month', month, isValidMonth);
 
     const times: Record<string, number> = {};
     const keyPrefix = computeShowDailyKeyPrefix({ showUuid, datePart: month });
     const { keys: showDailyKeys } = await timed(times, 'list', () => statsBlobs.list({ keyPrefix }));
-    if (log) console.log(`${showDailyKeys.length} showDailyKeys, sequential=${!!sequential}`);
+    const showDailyKeysProcessed = showDailyKeys.filter(v => {
+        if (maxDays === 0) return false;
+        if (typeof startDay === 'number') {
+            const { date } = unpackShowDailyKey(v);
+            const day = parseInt(date.substring(5, 7));
+            if (day < startDay) return false;
+            if (typeof maxDays === 'number' && day > (startDay + maxDays - 1)) return false;
+        }
+        return true;
+    });
+    if (log) console.log(`${showDailyKeys.length} showDailyKeys, ${showDailyKeysProcessed.length} showDailyKeysProcessed, sequential=${!!sequential}`);
     const recomputeShowSummary = async (showDailyKey: string): Promise<string> => {
         const { date } = unpackShowDailyKey(showDailyKey);
         if (log) console.log(`Computing ${date}`);
@@ -37,30 +50,36 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         const { key } = await timed(times, 'save-daily', () => saveShowSummary({ summary, statsBlobs }));
         return key;
     };
-    let inputKeys: string[];
     if (sequential) {
-        inputKeys = [];
-        for (const showDailyKey of showDailyKeys) {
-            inputKeys.push(await recomputeShowSummary(showDailyKey));
+        for (const showDailyKey of showDailyKeysProcessed) {
+           await recomputeShowSummary(showDailyKey);
         }
     } else {
-        inputKeys = await Promise.all(showDailyKeys.map(recomputeShowSummary));
+        await timed(times, 'recompute-parallel', () => Promise.all(showDailyKeysProcessed.map(recomputeShowSummary)));
     }
-    if (log) console.log('Computing month aggregate...');
-    const summary = await timed(times, 'compute-month', () => computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod: month, statsBlobs }));
-    if (log) console.log('Saving month aggregate...');
-    const { key: monthKey } = await timed(times, 'save-month', () => saveShowSummary({ summary, statsBlobs }));
+    const rt = { showDailyKeys: showDailyKeys.length, showDailyKeysProcessed: showDailyKeysProcessed.length, times };
+    if (aggregates) {
+        const inputKeys = showDailyKeys.map(v => {
+            const { date } = unpackShowDailyKey(v);
+            return computeShowSummaryKey({ showUuid, period: date });
+        });
+        if (log) console.log('Computing month aggregate...');
+        const summary = await timed(times, 'compute-month', () => computeShowSummaryAggregate({ showUuid, inputKeys, outputPeriod: month, statsBlobs }));
+        if (log) console.log('Saving month aggregate...');
+        const { key: monthKey } = await timed(times, 'save-month', () => saveShowSummary({ summary, statsBlobs }));
 
-    if (log) console.log('Reading overall aggregate...');
-    const overallKey = computeShowSummaryKey({ showUuid, period: 'overall'});
-    const overall = await timed(times, 'read-overall', () => tryLoadShowSummary(overallKey, statsBlobs));
-    const newOverall = tryComputeNewOverall({ overall, summary });
-    if (newOverall) {
-        if (log) console.log('Saving overall aggregate...');
-        await timed(times, 'save-overall', () => saveShowSummary({ summary: newOverall, statsBlobs }));
+        if (log) console.log('Reading overall aggregate...');
+        const overallKey = computeShowSummaryKey({ showUuid, period: 'overall'});
+        const overall = await timed(times, 'read-overall', () => tryLoadShowSummary(overallKey, statsBlobs));
+        const newOverall = tryComputeNewOverall({ overall, summary });
+        if (newOverall) {
+            if (log) console.log('Saving overall aggregate...');
+            await timed(times, 'save-overall', () => saveShowSummary({ summary: newOverall, statsBlobs }));
+        }
+        return { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads) };
     }
 
-    return { monthKey, showDailyKeys: showDailyKeys.length, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads), times };
+    return rt;
 }
 
 export async function saveShowSummary({ summary, statsBlobs }: { summary: ShowSummary, statsBlobs: Blobs }): Promise<{ key: string, etag: string }> {
