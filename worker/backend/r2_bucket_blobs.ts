@@ -5,14 +5,18 @@ import { Blobs, ListOpts, ListBlobsResponse, Multiput, GetOpts } from './blobs.t
 export class R2BucketBlobs implements Blobs {
     private readonly bucket: R2Bucket;
     private readonly prefix: string;
+    private readonly readonly?: boolean;
 
-    constructor(bucket: R2Bucket, prefix: string) {
+    constructor({ bucket, prefix, readonly }: { bucket: R2Bucket, prefix: string, readonly?: boolean }) {
         this.bucket = bucket;
         this.prefix = prefix;
+        this.readonly = readonly;
     }
 
     async put(key: string, body: string | ReadableStream<Uint8Array> | ArrayBuffer): Promise<{ etag: string }> {
-        const { bucket, prefix } = this;
+        const { bucket, prefix, readonly } = this;
+        if (readonly) throw new Error(`Bucket is readonly!`);
+
         if (body instanceof ReadableStream) {
             const { etag } = await bucket.put(prefix + key, body);
             return { etag };
@@ -46,7 +50,9 @@ export class R2BucketBlobs implements Blobs {
     }
 
     async delete(key: string): Promise<void> {
-        const { bucket, prefix } = this;
+        const { bucket, prefix, readonly } = this;
+        if (readonly) throw new Error(`Bucket is readonly!`);
+
         await r2(() => bucket.delete(prefix + key));
     }
 
@@ -73,7 +79,9 @@ export class R2BucketBlobs implements Blobs {
     }
 
     async startMultiput(key: string): Promise<Multiput> {
-        const { bucket, prefix } = this;
+        const { bucket, prefix, readonly } = this;
+        if (readonly) throw new Error(`Bucket is readonly!`);
+
         const upload = await bucket.createMultipartUpload(prefix + key);
         return new R2Multiput(upload);
     }

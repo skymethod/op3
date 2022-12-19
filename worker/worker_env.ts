@@ -21,4 +21,5 @@ export interface WorkerEnv {
     readonly roBlobsBucket?: R2Bucket;
     readonly kvNamespace?: KVNamespace;
     readonly queue1?: Queue;
+    readonly roRpcClientParams?: string;
 }

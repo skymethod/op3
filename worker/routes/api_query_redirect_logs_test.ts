@@ -1,7 +1,7 @@
 import { assertEquals } from '../tests/deps.ts';
 import { QueryRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
-import { StubRpcClient } from '../tests/stub_rpc_client.ts';
+import { StubRpcClient } from '../rpc_clients.ts';
 import { DoNames } from '../do_names.ts';
 
 Deno.test({

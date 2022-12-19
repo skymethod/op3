@@ -3,6 +3,7 @@ export type { CfGlobalCaches, CfCache, IncomingRequestCf, ModuleWorkerContext, D
     R2Bucket, R2ListOptions, KVNamespace, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody,
     QueueMessageBatch, QueueMessage, Queue } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/cloudflare_workers_types.d.ts';
 export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/bytes.ts';
+export { R2 } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/r2/r2.ts';
 export { importText } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/import_text.ts';
 export { encodeXml } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/xml_util.ts';
 export { setEqual, setIntersect, setSubtract } from 'https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/common/sets.ts';

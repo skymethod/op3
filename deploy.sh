@@ -50,5 +50,6 @@ ${TURNSTILE_SECRET_KEY:+--secret-binding turnstileSecretKey:$TURNSTILE_SECRET_KE
 ${PODCAST_INDEX_CREDENTIALS:+--secret-binding podcastIndexCredentials:$PODCAST_INDEX_CREDENTIALS} \
 ${BLOBS_BUCKET:+--r2-bucket-binding blobsBucket:$BLOBS_BUCKET} \
 ${RO_BLOBS_BUCKET:+--r2-bucket-binding roBlobsBucket:$RO_BLOBS_BUCKET} \
+${RO_RPC_CLIENT_PARAMS:+--text-binding roRpcClientParams:$RO_RPC_CLIENT_PARAMS} \
 ${KV_NAMESPACE:+--kv-namespace-binding kvNamespace:$KV_NAMESPACE} \
 ${QUEUE1_NAME:+--queue-binding queue1:$QUEUE1_NAME}

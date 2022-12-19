@@ -113,8 +113,8 @@ export class BackendDO {
                             const podcastIndexClient = newPodcastIndexClient({ podcastIndexCredentials, origin });
                             if (!podcastIndexClient) throw new Error(`Valid 'podcastIndexCredentials' are required to init ShowController`);
                             if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init ShowController`);
-                            const feedBlobs = new R2BucketBlobs(blobsBucket, 'feed/');
-                            const statsBlobs = new R2BucketBlobs(blobsBucket, 'stats/');
+                            const feedBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'feed/' });
+                            const statsBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' });
                             this.showController = new ShowController({ storage, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient });
                         }
                         return this.showController;
@@ -153,7 +153,7 @@ export class BackendDO {
 
                         const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });
                         if (csddr) {
-                            const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+                            const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
                             if (statsBlobs === undefined) throw new Error(`computeShowDailyDownloads: statsBlobs is required`);
                             const result = await computeShowDailyDownloads(csddr, statsBlobs);
                             return newRpcResponse({ kind: 'admin-data', results: [ result ] });
@@ -161,7 +161,7 @@ export class BackendDO {
                         
                         const rssfmr = tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters });
                         if (rssfmr) {
-                            const statsBlobs = blobsBucket ? new R2BucketBlobs(blobsBucket, 'stats/') : undefined;
+                            const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
                             if (statsBlobs === undefined) throw new Error(`recomputeShowSummariesForMonth: statsBlobs is required`);
                             const result = await recomputeShowSummariesForMonth(rssfmr, statsBlobs);
                             return newRpcResponse({ kind: 'admin-data', results: [ result ] });
