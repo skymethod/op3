@@ -7,7 +7,7 @@ import { Blobs } from './blobs.ts';
 import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
 
-export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, aggregates?: boolean, startDay?: number, maxDays?: number };
+export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, disableAggregates?: boolean, startDay?: number, maxDays?: number };
 
 export function tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): RecomputeShowSummariesForMonthRequest | undefined {
     if (targetPath === '/work/recompute-show-summaries' && operationKind === 'update' && parameters) {
@@ -17,14 +17,14 @@ export function tryParseRecomputeShowSummariesForMonthRequest({ operationKind, t
         const flagset = new Set((flags ?? '').split(','));
         const log = flagset.has('log');
         const sequential = flagset.has('sequential');
-        const aggregates = flagset.has('aggregates');
+        const disableAggregates = flagset.has('disableAggregates');
         const startDay = tryParseInt(startDayStr);
         const maxDays = tryParseInt(maxDaysStr);
-        return { showUuid, month, log, sequential, aggregates, startDay, maxDays };
+        return { showUuid, month, log, sequential, disableAggregates, startDay, maxDays };
     }
 }
 
-export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential, aggregates = true, startDay, maxDays }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
+export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential, disableAggregates, startDay, maxDays }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
     check('showUuid', showUuid, isValidUuid);
     check('month', month, isValidMonth);
 
@@ -58,7 +58,7 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         await timed(times, 'recompute-parallel', () => Promise.all(showDailyKeysProcessed.map(recomputeShowSummary)));
     }
     const rt = { showDailyKeys: showDailyKeys.length, showDailyKeysProcessed: showDailyKeysProcessed.length, times };
-    if (aggregates) {
+    if (!disableAggregates) {
         const inputKeys = showDailyKeys.map(v => {
             const { date } = unpackShowDailyKey(v);
             return computeShowSummaryKey({ showUuid, period: date });
