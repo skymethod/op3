@@ -2,6 +2,7 @@ import { Blobs } from '../backend/blobs.ts';
 import { isEpisodeRecord } from '../backend/show_controller_model.ts';
 import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
 import { check } from '../check.ts';
+import { compareByDescending } from '../collections.ts';
 import { DoNames } from '../do_names.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -20,10 +21,13 @@ export async function computeShowsResponse({ showUuid, method, searchParams, rpc
 
     const { title } = showRecords[0] as Record<string, unknown>;
     if (title !== undefined && typeof title !== 'string') throw new Error(`Bad title: ${JSON.stringify(title)}`);
-
     const { results: episodeRecords = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer);
 
-    const episodes = episodeRecords.filter(isEpisodeRecord).map(({ id, title, pubdateInstant }) => ({ id, title, pubdate: pubdateInstant }));
+    const episodes = episodeRecords
+        .filter(isEpisodeRecord)
+        .sort(compareByDescending(r => r.pubdateInstant))
+        .map(({ id, title, pubdateInstant }) => ({ id, title, pubdate: pubdateInstant }));
+
     return newJsonResponse({ showUuid, title, episodes });
 }
 

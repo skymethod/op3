@@ -13,4 +13,5 @@ export { XMLParser } from 'https://cdn.skypack.dev/fast-xml-parser@4.0.11?dts';
 export { distinct } from 'https://deno.land/std@0.168.0/collections/distinct.ts';
 export { TextLineStream } from 'https://deno.land/std@0.168.0/streams/text_line_stream.ts';
 export { zip } from 'https://deno.land/std@0.168.0/collections/zip.ts';
+export { ascend, descend } from 'https://deno.land/std@0.168.0/collections/_comparators.ts';
 export { DelimiterStream } from 'https://deno.land/std@0.168.0/streams/delimiter_stream.ts';

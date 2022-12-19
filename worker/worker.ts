@@ -29,6 +29,7 @@ import { Banlist } from './banlist.ts';
 import { ManualColo } from './backend/manual_colo.ts';
 import { R2BucketBlobs } from './backend/r2_bucket_blobs.ts';
 import { ReadonlyRemoteDataRpcClient } from './rpc_clients.ts';
+import { computeShowResponse, tryParseShowRequest } from './routes/show.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -224,7 +225,7 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
     if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
     if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
-    const releasesRequest = tryParseReleasesRequest({ method, pathname, headers }); if (releasesRequest) return computeReleasesResponse(releasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken });
+    { const r = tryParseReleasesRequest({ method, pathname, headers }); if (r) return computeReleasesResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken }); }
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
     const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
@@ -240,6 +241,7 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
     const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
     const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix: 'stats/', readonly: true }) : undefined;
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
+    { const r = tryParseShowRequest({ method, pathname, searchParams, adminTokens }); if (r) return computeShowResponse(r, { instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs }); }
     const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json() }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient });
 
     // redirect /foo/ to /foo (canonical)

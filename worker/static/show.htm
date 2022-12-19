@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class="sl-theme-dark">
+
+<head>
+    <title>${showTitle} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href="${origin}/show/${showUuid}" />
+    <meta name="format-detection" content="telephone=no" />
+    ${styleTag}
+    ${shoelaceCommon}
+    <script type="module">
+const previewToken = '${previewToken}';
+const sessionToken = '${sessionToken}';
+/*${showJs}*/
+    </script>
+</head>
+
+<body class="bg-neutral-900 text-neutral-300 flex flex-col">
+    ${nonProdHeader}
+
+    <h4 id="setup" class="mt-16 mx-auto text-3xl font-semibold">Show!</h4>
+    <div>${showTitle}</div>
+    <div>${hourlyDownloads}</div>
+   
+    <div class="max-w-xl mx-auto my-16">
+        <a href="/">Home</a>
+    </div>
+    ${cfAnalyticsSnippet}
+</body>
+
+</html>
