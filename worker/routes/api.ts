@@ -153,10 +153,10 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
 export async function computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient }: { bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient }): Promise<IdentityResult> {
     const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
     if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
-    if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
-    if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
+    if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]), shows: new Set() };
+    if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]), shows: new Set() };
     const res = await rpcClient.resolveApiToken({ token }, DoNames.apiKeyServer);
-    if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
+    if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions), shows: new Set(res.shows) };
     if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
     if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
     return { kind: 'invalid', reason: 'invalid-token' };
@@ -176,22 +176,21 @@ export interface ApiRequest {
     readonly bodyProvider: JsonProvider;
 }
 
-//
+export type IdentityResult = ValidIdentityResult | InvalidIdentityResult;
 
-type IdentityResult = ValidIdentityResult | InvalidIdentityResult;
-
-interface ValidIdentityResult {
+export interface ValidIdentityResult {
     readonly kind: 'valid';
     readonly permissions: ReadonlySet<ApiTokenPermission>;
+    readonly shows: ReadonlySet<string>;
 }
 
-interface InvalidIdentityResult {
+export interface InvalidIdentityResult {
     readonly kind: 'invalid';
     readonly reason: 'missing-token' | 'invalid-token' | 'blocked-token' | 'expired-token';
 }
 
-function identityResultToJson(result: IdentityResult) {
-    return result.kind === 'valid' ? { kind: result.kind, permissions: [...result.permissions] } : result;
+export function identityResultToJson(result: IdentityResult) {
+    return result.kind === 'valid' ? { kind: result.kind, permissions: [...result.permissions], shows: [...result.shows] } : result;
 }
 
 //

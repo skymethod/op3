@@ -7,10 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/show/${showUuid}" />
     <meta name="format-detection" content="telephone=no" />
+    <meta name="robots" content="noindex" />
     ${styleTag}
     ${shoelaceCommon}
     <script type="module">
-const initialData = ${initialData};
+const initialData = /*${initialData}*/{};
 const previewToken = '${previewToken}';
 const sessionToken = '${sessionToken}';
 /*${showJs}*/

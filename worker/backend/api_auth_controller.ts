@@ -21,7 +21,7 @@ export class ApiAuthController {
             const rec = await findApiTokenRecord(token, tx);
             if (!rec) return { 'kind': 'resolve-api-token', reason: 'invalid' };
 
-            const { permissions, expires, blockReason } = rec;
+            const { permissions, shows, expires, blockReason } = rec;
             const now = new Date().toISOString();
             if (expires && now > expires) {
                 console.log('Expired, delete token');
@@ -35,13 +35,13 @@ export class ApiAuthController {
 
             const newRec: ApiTokenRecord = { ...rec, lastUsed: now };
             await saveApiTokenRecord(newRec, tx);
-            return { 'kind': 'resolve-api-token', permissions };
+            return { 'kind': 'resolve-api-token', permissions, shows };
         });
     }
 
     async modifyApiKey(request: Unkinded<ModifyApiKeyRequest>): Promise<ApiKeyResponse> {
-        const { apiKey, permissions, name, action } = request;
-        console.log(`ApiAuthController.modifyApiKey: ${JSON.stringify({ apiKey, permissions, name, action })}`);
+        const { apiKey, permissions, shows, name, action } = request;
+        console.log(`ApiAuthController.modifyApiKey: ${JSON.stringify({ apiKey, permissions, shows, name, action })}`);
 
         if (!isValidUuid(apiKey)) throw new Error(`Bad apiKey: ${apiKey}`);
 
@@ -65,6 +65,17 @@ export class ApiAuthController {
                         await saveApiTokenRecord(tokenRecord, tx);
                     }
                 }
+            } else if (shows !== undefined) {
+                // shows change
+                if (status === 'blocked') throw new Error(`Cannot modify while blocked`);
+                if (!record.shows || !same(shows, record.shows)) {
+                    keyRecord = { ...keyRecord, shows, updated: now };
+                    await saveApiKeyRecord(keyRecord, tx);
+                    if (tokenRecord) {
+                        tokenRecord = { ...tokenRecord, shows, updated: now };
+                        await saveApiTokenRecord(tokenRecord, tx);
+                    }
+                }
             } else if (name !== undefined) {
                 // name change
                 if (status === 'blocked') throw new Error(`Cannot modify while blocked`);
@@ -84,7 +95,7 @@ export class ApiAuthController {
                         const oldTokenRecord = { ...tokenRecord, updated: now, expires };
                         await saveApiTokenRecord(oldTokenRecord, tx);
                     }
-                    tokenRecord = { token: newToken, apiKey, created: now, updated: now, permissions: keyRecord.permissions };
+                    tokenRecord = { token: newToken, apiKey, created: now, updated: now, permissions: keyRecord.permissions, shows: keyRecord.shows };
                     await saveApiTokenRecord(tokenRecord, tx);
                     includeTokenInResponse = true;
                 } else if (action === 'delete-token') {

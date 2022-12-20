@@ -20,7 +20,7 @@ export function computeHtml(template: string, variables: Record<string, string |
         return value ? g2 : '';
     });
 
-    return template.replace(/(\/\*)?\${(\w+)}(\*\/)?/g, (_, __, g2) => {
+    return template.replace(/(\/\*)?\${(\w+)}(\*\/({})?)?/g, (_, __, g2) => {
         const value = variables[g2];
         if (value === undefined) throw new Error(`Undefined variable: ${g2}`);
         if (typeof value === 'boolean') return `${value}`;

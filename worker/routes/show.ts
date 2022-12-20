@@ -1,10 +1,10 @@
 import { Blobs } from '../backend/blobs.ts';
-import { importText } from '../deps.ts';
+import { importText, setIntersect } from '../deps.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
-import { computeIdentityResult } from './api.ts';
+import { computeIdentityResult, identityResultToJson } from './api.ts';
 import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
@@ -31,10 +31,10 @@ export async function computeShowResponse(req: ShowRequest, opts: { searchParams
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
 
     const result = await computeIdentityResult({ bearerToken: undefined, searchParams, adminTokens, previewTokens, rpcClient });
-    if (result.kind !== 'valid') return compute404(`Invalid id result: ${JSON.stringify(result)}`);
+    if (result.kind !== 'valid') return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
 
-    const allowed = result.permissions.has('admin') || result.permissions.has('read-show');
-    if (!allowed) return compute404(`Not allowed: ${JSON.stringify(result)}`);
+    const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
+    if (!allowed) return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
 
     const sessionToken = podcastIndexCredentials ? await computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials) : '';
 

@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { check, isStringRecord } from './check.ts';
+import { isValidUuid } from './uuid.ts';
 
 export type RpcRequest = 
     | AdminDataRequest
@@ -206,6 +207,7 @@ export interface ModifyApiKeyRequest {
     readonly kind: 'modify-api-key';
     readonly apiKey: string;
     readonly permissions?: readonly SettableApiTokenPermission[];
+    readonly shows?: readonly string[];
     readonly name?: string;
     readonly action?: ModifyApiKeyAction;
 }
@@ -221,6 +223,7 @@ export function isUnkindedModifyApiKeyRequest(obj: unknown): obj is Unkinded<Mod
     return isStringRecord(obj)
     && typeof obj.apiKey === 'string'
     && (obj.permissions === undefined || Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission))
+    && (obj.shows === undefined || Array.isArray(obj.shows) && obj.shows.every(isValidUuid))
     && (obj.name === undefined || typeof obj.name === 'string')
     && (obj.action === undefined || isModifyApiKeyAction(obj.action));
 }
@@ -356,6 +359,7 @@ export function hasPermission(permissions: ReadonlySet<ApiTokenPermission>, ...a
 export interface ResolveApiTokenResponse {
     readonly kind: 'resolve-api-token';
     readonly permissions?: readonly ApiTokenPermission[];
+    readonly shows?: readonly string[];
     readonly reason?: 'invalid' | 'blocked' | 'expired';
 }
 
@@ -365,6 +369,7 @@ export interface ApiKeyInfo {
     readonly updated: string; // instant
     readonly name: string; // user tag
     readonly permissions: readonly SettableApiTokenPermission[];
+    readonly shows?: readonly string[];
     readonly status: 'active' | 'inactive' /* no token */ | 'blocked';
     readonly token?: string;
     readonly tokenLastUsed?: string;
@@ -378,6 +383,7 @@ export function isApiKeyInfo(obj: unknown): obj is ApiKeyInfo {
         && typeof obj.updated === 'string'
         && typeof obj.name === 'string'
         && Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission)
+        && (obj.shows === undefined || Array.isArray(obj.shows) && obj.shows.every(isValidUuid))
         && typeof obj.status === 'string' && ['active', 'inactive', 'blocked'].includes(obj.status)
         && (obj.token === undefined || typeof obj.token === 'string')
         && (obj.tokenLastUsed === undefined || typeof obj.tokenLastUsed === 'string')
@@ -396,6 +402,7 @@ export interface ApiTokenRecord {
     readonly created: string;
     readonly updated: string;
     readonly permissions: readonly SettableApiTokenPermission[];
+    readonly shows?: readonly string[];
     readonly lastUsed?: string;
     readonly expires?: string; // instant
     readonly blockReason?: string; // if blocked
@@ -408,6 +415,7 @@ export function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
         && typeof obj.created === 'string'
         && typeof obj.updated === 'string'
         && Array.isArray(obj.permissions) && obj.permissions.every(isSettableApiTokenPermission)
+        && (obj.shows === undefined || Array.isArray(obj.shows) && obj.shows.every(isValidUuid))
         && (obj.lastUsed === undefined || typeof obj.lastUsed === 'string')
         && (obj.expires === undefined || typeof obj.expires === 'string')
         && (obj.blockReason === undefined || typeof obj.blockReason === 'string')
