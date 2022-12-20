@@ -17,9 +17,9 @@ export async function computeApiKeysResponse({ instance, method, hostname, bodyP
 
     // looks good, generate or lookup an api key
     const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, DoNames.apiKeyServer) : await rpcClient.generateNewApiKey({ }, DoNames.apiKeyServer);
-    const { info: { apiKey, status, created, permissions, name, token, tokenLastUsed, blockReason } } = res;
+    const { info: { apiKey, status, created, permissions, shows, name, token, tokenLastUsed, blockReason } } = res;
 
-    return newJsonResponse({ apiKey, status, created, permissions, name, token, tokenLastUsed, blockReason });
+    return newJsonResponse({ apiKey, status, created, permissions, shows, name, token, tokenLastUsed, blockReason });
 }
 
 export async function computeApiKeyResponse(apiKeyInput: string, isAdmin: boolean, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }: ApiKeysRequestOpts): Promise<Response> {
@@ -38,9 +38,9 @@ export async function computeApiKeyResponse(apiKeyInput: string, isAdmin: boolea
     }
 
     // looks good, modify the api key
-    const { info: { apiKey, created, updated, name, permissions, status, token, tokenLastUsed, blockReason } } = await rpcClient.modifyApiKey(req, DoNames.apiKeyServer);
+    const { info: { apiKey, created, updated, name, permissions, shows, status, token, tokenLastUsed, blockReason } } = await rpcClient.modifyApiKey(req, DoNames.apiKeyServer);
 
-    return newJsonResponse({ apiKey, created, updated, name, permissions, status, token, tokenLastUsed, blockReason });
+    return newJsonResponse({ apiKey, created, updated, name, permissions, shows, status, token, tokenLastUsed, blockReason });
 }
 
 //
