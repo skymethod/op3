@@ -1,11 +1,12 @@
 
 const app = (() => {
 
-    const [ someDiv ] = 
-        [ 'some-div' ].map(v => document.getElementById(v));
-        
+    const [ debugDiv ] = 
+        [ 'debug' ].map(v => document.getElementById(v));
+
     function update() {
-        
+        debugDiv.textContent = Object.keys(initialData).length.toString();
+        console.log(initialData);
     }
 
     return { update };

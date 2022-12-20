@@ -43,7 +43,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } });
 
         // first, we need to know who's calling
-        const identity = await computeIdentityResult(bearerToken, searchParams, adminTokens, previewTokens, rpcClient);
+        const identity = await computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient });
         console.log(`computeApiResponse`, { method, path, identity: identityResultToJson(identity) });
     
         // all api endpoints require an auth token
@@ -150,6 +150,18 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
     throw new StatusError(`Unsupported operationKind ${operationKind} and targetPath ${targetPath}`);
 }
 
+export async function computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient }: { bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient }): Promise<IdentityResult> {
+    const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
+    if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
+    if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
+    if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
+    const res = await rpcClient.resolveApiToken({ token }, DoNames.apiKeyServer);
+    if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
+    if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
+    if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
+    return { kind: 'invalid', reason: 'invalid-token' };
+}
+
 //
 
 export interface ApiRequest {
@@ -183,18 +195,6 @@ function identityResultToJson(result: IdentityResult) {
 }
 
 //
-
-async function computeIdentityResult(bearerToken: string | undefined, searchParams: URLSearchParams, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient): Promise<IdentityResult> {
-    const token = typeof bearerToken === 'string' ? bearerToken : searchParams.get('token') ?? undefined;
-    if (token === undefined) return { kind: 'invalid', reason: 'missing-token' };
-    if (adminTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'admin' ]) };
-    if (previewTokens.has(token)) return { kind: 'valid', permissions: new Set([ 'preview' ]) };
-    const res = await rpcClient.resolveApiToken({ token }, DoNames.apiKeyServer);
-    if (res.permissions !== undefined) return { kind: 'valid', permissions: new Set(res.permissions) };
-    if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
-    if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
-    return { kind: 'invalid', reason: 'invalid-token' };
-}
 
 async function computeAdminDataResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined): Promise<Response> {
     if (method !== 'POST') return newMethodNotAllowedResponse(method);
