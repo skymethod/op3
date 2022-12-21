@@ -21,6 +21,7 @@ export class Banlist {
             const targetHostname = computeChainDestinationHostname(targetUrl);
             if (targetHostname === undefined) return false;
             if (isReservedForTesting(targetHostname)) return true;
+            if (!targetHostname.includes('.')) return true; // ban /e/whatever/path/to/file.mp3
             if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace);
             return this.bannedHostnames.has(targetHostname);
         } catch (e) {
