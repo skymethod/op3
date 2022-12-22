@@ -3,7 +3,6 @@ import { Blobs } from '../backend/blobs.ts';
 import { importText, setIntersect } from '../deps.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
-import { total } from '../summaries.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
 import { computeIdentityResult, identityResultToJson } from './api.ts';
@@ -42,20 +41,19 @@ export async function computeShowResponse(req: ShowRequest, opts: { searchParams
 
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
-    const showRes = await computeShowsResponse({ method: 'GET', searchParams, showUuid, rpcClient, roRpcClient, times });
+    const [ showRes, statsRes ] = await timed(times, 'compute-shows+compute-stats', () => Promise.all([
+        computeShowsResponse({ method: 'GET', searchParams, showUuid, rpcClient, roRpcClient, times }),
+        computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times }),
+    ]));
     if (showRes.status !== 200) return compute404(`Unexpected show response status: ${JSON.stringify(showRes.status)}`);
     const showObj = await showRes.json();
     const { title } = showObj;
 
     const showTitle = title ?? '<untitled>';
-
-    const statsRes = await computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times });
     if (statsRes.status !== 200) return compute404(`Unexpected stats response status: ${JSON.stringify(statsRes.status)}`);
     const statsObj = await statsRes.json();
 
-    const compute = Date.now() - start;
-    times.other = compute - total(times);
-    times.compute = compute;
+    times.compute = Date.now() - start;
 
     const initialData = JSON.stringify({ showObj, statsObj, times });
 

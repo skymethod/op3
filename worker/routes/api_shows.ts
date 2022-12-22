@@ -17,13 +17,17 @@ export async function computeShowsResponse({ showUuid, method, searchParams, rpc
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
-    const { results: showRecords = [] } = await timed(times, 'select-show', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}` }, DoNames.showServer));
+    const [ selectShowResponse, selectEpisodesResponse ] = await timed(times, 'select-show+select-episodes', () => Promise.all([
+        timed(times, 'select-show', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}` }, DoNames.showServer)),
+        timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)),
+    ]));
+    const { results: showRecords = [] } = selectShowResponse;
     if (showRecords.length === 0) return newJsonResponse({ message: 'not found' }, 404);
 
     const { title } = showRecords[0] as Record<string, unknown>;
     if (title !== undefined && typeof title !== 'string') throw new Error(`Bad title: ${JSON.stringify(title)}`);
-    const { results: episodeRecords = [] } = await timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer));
 
+    const { results: episodeRecords = [] } = selectEpisodesResponse;
     const episodes = episodeRecords
         .filter(isEpisodeRecord)
         .sort(compareByDescending(r => r.pubdateInstant))
@@ -38,16 +42,20 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
     if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
     check('showUuid', showUuid, isValidUuid);
     
-    const overall = await timed(times, 'get-overall', () => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json'));
+    const thisMonth = new Date().toISOString().substring(0, 7);
+    const latestThreeMonths = [ -2, -1, 0 ].map(v => addMonthsToMonthString(thisMonth, v));
+
+    const [ overall, latestThreeMonthSummaries ] = await timed(times, 'get-overall+get-latest-three-months', () => Promise.all([
+        timed(times, 'get-overall', () => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json')),
+        timed(times, 'get-latest-three-months', async () => (await Promise.all(latestThreeMonths.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidShowSummary)),
+    ]));
+
     let episodeFirstHours: Record<string, string> | undefined;
     let hourlyDownloads: Record<string, number> | undefined;
     let episodeHourlyDownloads: Record<string, Record<string, number>> | undefined;
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
 
-        const thisMonth = new Date().toISOString().substring(0, 7);
-        const latestThreeMonths = [ -2, -1, 0 ].map(v => addMonthsToMonthString(thisMonth, v));
-        const latestThreeMonthSummaries = (await timed(times, 'get-latest-three-months', () => Promise.all(latestThreeMonths.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json'))))).filter(isValidShowSummary);
         hourlyDownloads = Object.fromEntries(latestThreeMonthSummaries.flatMap(v => Object.entries(v.hourlyDownloads)));
 
         episodeHourlyDownloads = {};
