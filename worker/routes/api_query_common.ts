@@ -1,16 +1,18 @@
-import { tryNormalizeInstant,check,isValidInstant,tryParseInt,checkMatches, isValidDate } from '../check.ts';
+import { isValidBase58 } from '../base58.ts';
+import { tryNormalizeInstant,check,isValidInstant,tryParseInt,checkMatches, isValidDate, isValidMonth } from '../check.ts';
 import { tryParseDurationMillis } from '../duration.ts';
 
-export type ApiQueryCommonParameters = { readonly limit: number, readonly startTimeInclusive?: string, readonly startTimeExclusive?: string, readonly endTimeExclusive?: string, readonly format?: string };
+export type ApiQueryCommonParameters = { readonly limit: number, readonly startTimeInclusive?: string, readonly startTimeExclusive?: string, readonly endTimeExclusive?: string, readonly format?: string, readonly continuationToken?: string, skipHeaders?: boolean };
 
 export function computeApiQueryCommonParameters(searchParams: URLSearchParams, { limitDefault, limitMin, limitMax }: { limitDefault: number, limitMin: number, limitMax: number }): ApiQueryCommonParameters {
-    const { start, startAfter, end, limit, format } = Object.fromEntries(searchParams);
+    const { start, startAfter, end, limit, format, continuationToken, skip } = Object.fromEntries(searchParams);
 
     const checkTime = (name: string, value: string) => {
         const duration = tryParseDurationMillis(value);
         if (typeof duration === 'number') {
             value = new Date(Date.now() + duration).toISOString();
         }
+        if (isValidMonth(value)) value = `${value}-01T00:00:00.000Z`;
         if (isValidDate(value)) value = `${value}T00:00:00.000Z`;
         const norm = tryNormalizeInstant(value);
         if (norm) value = norm;
@@ -37,18 +39,26 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
     if (typeof format === 'string') {
         checkMatches('format', format, /^(tsv|json|json-o|json-a)$/);
         rt = { ...rt, format };
-    }    
+    }
+    if (typeof continuationToken === 'string') {
+        check('continuationToken', continuationToken, isValidBase58);
+        rt = { ...rt, continuationToken };
+    }
+    if (skip === 'headers') {
+        rt = { ...rt, skipHeaders: true };
+    }
 
     return rt;
 }
 
-export function newQueryResponse({ startTime, format, headers, rows }: { startTime: number, format: string, headers: string[], rows: unknown[] }): Response {
+export function newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders }: { startTime: number, format: string, headers: string[], rows: unknown[], continuationToken: string | undefined, skipHeaders?: boolean }): Response {
     const queryTime = Date.now() - startTime;
     const count = rows.length;
     if (format === 'tsv') {
-        rows.unshift(headers.join('\t'));
-        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), 'access-control-allow-origin': '*' } });
+        if (!skipHeaders) rows.unshift(headers.join('\t'));
+        rows.push(''); // trailing newline
+        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), ...(continuationToken ? { 'x-continuation-token': continuationToken } : {}), 'access-control-allow-origin': '*' } });
     }
-    const obj = format === 'json-a' ? { headers, rows, count, queryTime } : { rows, count, queryTime };
+    const obj = format === 'json-a' ? { headers, rows, count, queryTime, continuationToken } : { rows, count, queryTime, continuationToken };
     return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }

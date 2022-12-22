@@ -1,7 +1,7 @@
 import { Blobs } from '../backend/blobs.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from '../backend/downloads.ts';
 import { findFirstHourForEpisodeId } from '../backend/show_summaries.ts';
-import { check, checkMatches } from '../check.ts';
+import { check, checkMatches, isValidDate } from '../check.ts';
 import { isValidSha256Hex } from '../crypto.ts';
 import { packError } from '../errors.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
@@ -11,6 +11,7 @@ import { addDaysToDateString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_DOWNLOADS } from './api_contract.ts';
 import { ApiQueryCommonParameters, computeApiQueryCommonParameters, newQueryResponse } from './api_query_common.ts';
+import { encodeBase58, decodeBase58 } from '../base58.ts';
 
 export async function computeQueryDownloadsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, path: string, searchParams: URLSearchParams, {statsBlobs, roStatsBlobs}: { statsBlobs?: Blobs, roStatsBlobs?: Blobs }): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
@@ -29,7 +30,7 @@ export async function computeQueryDownloadsResponse(permissions: ReadonlySet<Api
 }
 
 export async function computeQueryDownloadsResponseInternal(request: QueryShowDownloadsRequest, { statsBlobs }: { statsBlobs: Blobs }): Promise<Response> {
-    const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv' } = request;
+    const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv', continuationToken: continuationTokenFilter, skipHeaders } = request;
 
     let date = startTimeInclusive ? startTimeInclusive.substring(0, 10) : startTimeExclusive ? startTimeExclusive.substring(0, 10) : await computeEarliestShowDownloadDate(showUuid, statsBlobs);
     if (date && episodeIdFilter) {
@@ -42,16 +43,24 @@ export async function computeQueryDownloadsResponseInternal(request: QueryShowDo
         }
     }
 
+    const unpackedContinuationTokenFilter = continuationTokenFilter ? unpackContinuationToken(continuationTokenFilter) : undefined;
+
     const startTime = Date.now();
     const rows: unknown[] = [];
+    let rowNumber = 0;
     if (date) {
         const today = new Date().toISOString().substring(0, 10);
+        if (unpackedContinuationTokenFilter) date = unpackedContinuationTokenFilter.date;
         while (date <= today && rows.length < limit) {
+            rowNumber = 0;
+            console.log(`computeQueryDownloadsResponseInternal: getting ${showUuid} ${date}`);
             const stream = await statsBlobs.get(computeShowDailyKey({ date, showUuid }), 'stream');
             if (stream) {
                 for await (const obj of yieldTsvFromStream(stream)) {
+                    rowNumber++;
                     const { time, serverUrl: url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
                     if (time === undefined) throw new Error(`Undefined time`);
+                    if (unpackedContinuationTokenFilter && date === unpackedContinuationTokenFilter.date && rowNumber <= unpackedContinuationTokenFilter.rowNumber) continue;
                     if (botType && bots === 'exclude') continue;
                     if (startTimeInclusive && time < startTimeInclusive) continue;
                     if (startTimeExclusive && time <= startTimeExclusive) continue;
@@ -67,11 +76,11 @@ export async function computeQueryDownloadsResponseInternal(request: QueryShowDo
                     if (rows.length >= limit) break;
                 }
             }
-            date = addDaysToDateString(date, 1);
+            if (rows.length < limit) date = addDaysToDateString(date, 1);
         }
     }
-
-    return newQueryResponse({ startTime, format, headers, rows })
+    const continuationToken = rows.length >= limit && date ? packContinuationToken({ date, rowNumber }) : undefined;
+    return newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders })
 }
 
 const headers = [ 'time', 'url', 'audienceId', 'showUuid', 'episodeId', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'botType', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ];
@@ -109,4 +118,19 @@ function parseRequest(path: string, searchParams: URLSearchParams): QueryShowDow
 async function computeEarliestShowDownloadDate(showUuid: string, statsBlobs: Blobs): Promise<string | undefined> {
     const { keys } = await statsBlobs.list({ keyPrefix: computeShowDailyKeyPrefix({ showUuid })});
     return keys.length > 0 ? unpackShowDailyKey(keys[0]).date : undefined;
+}
+
+function packContinuationToken({ date, rowNumber }: { date: string, rowNumber: number }): string {
+    return encodeBase58(new TextEncoder().encode(JSON.stringify({ date, rowNumber })));
+}
+
+function unpackContinuationToken(continuationToken: string): { date: string, rowNumber: number } {
+    try {
+        const { date, rowNumber } = JSON.parse(new TextDecoder().decode(decodeBase58(continuationToken)));
+        const valid = isValidDate(date) && typeof rowNumber === 'number' && Number.isSafeInteger(rowNumber) && rowNumber >= 0;
+        if (!valid) throw new Error();
+        return { date, rowNumber };
+    } catch {
+        throw new Error(`Bad continuationToken: ${continuationToken}`);
+    }
 }

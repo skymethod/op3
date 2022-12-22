@@ -37,7 +37,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
             rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode });
         }
     }
-    return newQueryResponse({ startTime, format, headers, rows });
+    return newQueryResponse({ startTime, format, headers, rows, continuationToken: undefined });
 }
 
 //
