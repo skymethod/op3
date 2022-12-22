@@ -23,6 +23,7 @@ import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 import { DoNames } from '../do_names.ts';
 import { recomputeShowSummariesForMonth, tryParseRecomputeShowSummariesForMonthRequest } from './show_summaries.ts';
 import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } from './downloads.ts';
+import { computeQueryDownloadsResponse } from './query_downloads.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -59,7 +60,7 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -218,6 +219,10 @@ export class BackendDO {
                             await getOrLoadShowController().work();
                         }
                         return newRpcResponse({ kind: 'ok' });
+                    } else if (obj.kind === 'query-downloads') {
+                        const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
+                        const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix: 'stats/', readonly: true }) : undefined;
+                        return await computeQueryDownloadsResponse(obj, { statsBlobs, roStatsBlobs });
                     } else if (obj.kind === 'query-redirect-logs') {
                         return await getOrLoadCombinedRedirectLogController().queryRedirectLogs(obj);
                     } else if (obj.kind === 'admin-rebuild-index') {

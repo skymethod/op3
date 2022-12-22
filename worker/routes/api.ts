@@ -15,19 +15,19 @@ import { DoNames } from '../do_names.ts';
 import { Queue } from '../deps.ts';
 import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesForMonth } from '../backend/show_summaries.ts';
 import { Blobs } from '../backend/blobs.ts';
-import { computeQueryDownloadsResponse } from './api_query_downloads.ts';
+import { computeApiQueryDownloadsResponse } from './api_query_downloads.ts';
 import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
 import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
 
-export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider }): ApiRequest | undefined {
-    const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider } = opts;
+export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined }): ApiRequest | undefined {
+    const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo } = opts;
     const m = /^\/api\/1(\/[a-z\/-]+(\/.+?)?)$/.exec(pathname);
     if (!m) return undefined;
     const [ _, path ] = m;
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
     const bearerToken = m2 ? m2[1] : undefined;
     const rawIpAddress = computeRawIpAddress(headers);
-    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider };
+    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo };
 }
 
 // deno-lint-ignore no-explicit-any
@@ -35,7 +35,7 @@ export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
 export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined }): Promise<Response> {
-    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider } = request;
+    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo } = request;
     const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient } = opts;
 
     try {
@@ -67,7 +67,7 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient);
-        if (path.startsWith('/downloads/')) return await computeQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs });
+        if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], hasAdmin, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
         if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
@@ -174,6 +174,7 @@ export interface ApiRequest {
     readonly bearerToken?: string;
     readonly rawIpAddress?: string;
     readonly bodyProvider: JsonProvider;
+    readonly colo?: string;
 }
 
 export type IdentityResult = ValidIdentityResult | InvalidIdentityResult;

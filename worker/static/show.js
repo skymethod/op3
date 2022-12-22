@@ -49,7 +49,9 @@ function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
     new Chart(ctx, config);
 }
 
-async function download(showUuid, month) {
+async function download(e, showUuid, month) {
+    e.preventDefault();
+    
     const parts = [];
     let continuationToken;
     const qp = new URLSearchParams(document.location.search);
@@ -105,7 +107,7 @@ const app = (() => {
         if (n > 4) break;
     }
 
-    downloadLinkAnchor.onclick = async () => await download(showUuid, '2022-12');
+    downloadLinkAnchor.onclick = async e => await download(e, showUuid, '2022-12');
 
     function update() {
         debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')

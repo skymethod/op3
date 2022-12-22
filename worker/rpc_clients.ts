@@ -1,5 +1,5 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
-import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
@@ -32,6 +32,10 @@ export class StubRpcClient implements RpcClient {
 
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
         throw new Error(`StubRpcClient: queryRedirectLogs(${JSON.stringify({ request, target })}) not implemented`);
+    }
+
+    queryDownloads(request: Unkinded<QueryDownloadsRequest>, target: string): Promise<Response> {
+        throw new Error(`StubRpcClient: queryDownloads(${JSON.stringify({ request, target })}) not implemented`);
     }
 
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse> {

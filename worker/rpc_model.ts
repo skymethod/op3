@@ -17,6 +17,7 @@ export type RpcRequest =
     | ModifyApiKeyRequest
     | QueryPackedRedirectLogsRequest
     | QueryRedirectLogsRequest
+    | QueryDownloadsRequest
     | RedirectLogsNotificationRequest
     | RegisterDORequest 
     | ResolveApiTokenRequest
@@ -37,6 +38,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'modify-api-key'
         || obj.kind === 'query-packed-redirect-logs'
         || obj.kind === 'query-redirect-logs'
+        || obj.kind === 'query-downloads'
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'register-do' 
         || obj.kind === 'resolve-api-token'
@@ -192,6 +194,24 @@ export interface QueryRedirectLogsRequest {
     readonly ulid?: string;
     readonly method?: string;
     readonly uuid?: string;
+}
+
+export interface QueryDownloadsRequest {
+    readonly kind: 'query-downloads';
+
+    readonly limit: number;
+    readonly format?: string; // tsv, json-o, json-a
+
+    readonly startTimeInclusive?: string; // instant
+    readonly startTimeExclusive?: string; // instant
+    readonly endTimeExclusive?: string; // instant
+
+    readonly continuationToken?: string, skipHeaders?: boolean
+
+    readonly showUuid: string;
+    readonly episodeId?: string;
+    readonly bots?: 'include' | 'exclude';
+    readonly ro?: boolean;
 }
 
 export interface AdminGetMetricsRequest {
@@ -435,6 +455,7 @@ export interface RpcClient {
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
+    queryDownloads(request: Unkinded<QueryDownloadsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
