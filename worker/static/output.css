@@ -592,6 +592,18 @@ a:hover {
   visibility: hidden;
 }
 
+.absolute {
+  position: absolute;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.top-0 {
+  top: 0px;
+}
+
 .col-span-3 {
   grid-column: span 3 / span 3;
 }
@@ -704,6 +716,18 @@ a:hover {
   height: 4rem;
 }
 
+.h-32 {
+  height: 8rem;
+}
+
+.max-h-32 {
+  max-height: 8rem;
+}
+
+.max-h-64 {
+  max-height: 16rem;
+}
+
 .w-80 {
   width: 20rem;
 }
@@ -812,6 +836,10 @@ a:hover {
   white-space: nowrap;
 }
 
+.whitespace-pre {
+  white-space: pre;
+}
+
 .break-all {
   word-break: break-all;
 }
@@ -858,6 +886,10 @@ a:hover {
 
 .p-4 {
   padding: 1rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
 }
 
 .px-8 {

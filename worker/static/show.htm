@@ -10,6 +10,7 @@
     <meta name="robots" content="noindex" />
     ${styleTag}
     ${shoelaceCommon}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.1.1/chart.umd.js" integrity="sha512-+Aecf3QQcWkkA8IUdym4PDvIP/ikcKdp4NCDF8PM6qr9FtqwIFCS3JAcm2+GmPMZvnlsrGv1qavSnxL8v+o86w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module">
 const initialData = /*${initialData}*/{};
 const previewToken = '${previewToken}';
@@ -20,10 +21,15 @@ const sessionToken = '${sessionToken}';
 
 <body class="bg-neutral-900 text-neutral-300 flex flex-col">
     ${nonProdHeader}
+    <div id="debug" class="whitespace-pre text-xs absolute top-0 p-2"></div>
 
-    <h4 id="setup" class="mt-16 mx-auto text-3xl font-semibold">Show!</h4>
-    <div>${showTitle}</div>
-    <div id="debug"></div>
+    <h4 id="setup" class="my-16 mx-auto text-3xl font-semibold">${showTitle}</h4>
+   
+    <canvas id="show-downloads" class="max-h-64"></canvas>
+    <canvas id="episode-1-downloads" class="max-h-64"></canvas>
+    <canvas id="episode-2-downloads" class="max-h-64"></canvas>
+    <canvas id="episode-3-downloads" class="max-h-64"></canvas>
+    <canvas id="episode-4-downloads" class="max-h-64"></canvas>
    
     <div class="max-w-xl mx-auto my-16">
         <a href="/">Home</a>
