@@ -52,20 +52,20 @@ function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
 async function download(showUuid, month) {
     const parts = [];
     let continuationToken;
+    const qp = new URLSearchParams(document.location.search);
     while (true) {
         const u = new URL(`/api/1/downloads/show/${showUuid}`, document.location);
-        const qp = new URLSearchParams(document.location.search);
         if (qp.has('ro')) u.searchParams.set('ro', 'true');
         u.searchParams.set('start', month);
-        u.searchParams.set('limit', '20000');
+        u.searchParams.set('limit', qp.get('limit') ?? '20000');
         u.searchParams.set('token', previewToken);
         if (continuationToken) {
             u.searchParams.set('continuationToken', continuationToken);
             u.searchParams.set('skip', 'headers');
         }
-        console.log(`fetch continuationToken=${continuationToken}`);
+        console.log(`fetch limit=${limit} continuationToken=${continuationToken}`);
         const res = await fetch(u.toString());
-        if (res.status !== 200) throw new Error(`Unexpected status: ${res.status}`);
+        if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
         const blob = await res.blob();
         parts.push(blob);
         continuationToken = res.headers.get('x-continuation-token');
