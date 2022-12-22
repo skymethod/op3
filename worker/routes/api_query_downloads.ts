@@ -27,7 +27,7 @@ export async function computeApiQueryDownloadsResponse(permissions: ReadonlySet<
         return await computeQueryDownloadsResponse(req, { statsBlobs: targetStatsBlobs });
     }
     if (colo === undefined) throw new Error('Need colo!');
-    const target = DoNames.storagelessForSuffix(`downloads-${colo}`);
+    const target = DoNames.storagelessForSuffix(`downloads-${colo.toLowerCase()}`);
     return await rpcClient.queryDownloads(req, target);
 }
 
