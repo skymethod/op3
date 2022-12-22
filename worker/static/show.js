@@ -56,8 +56,9 @@ async function download(showUuid, month) {
     while (true) {
         const u = new URL(`/api/1/downloads/show/${showUuid}`, document.location);
         if (qp.has('ro')) u.searchParams.set('ro', 'true');
+        const limit = qp.get('limit') ?? '20000';
         u.searchParams.set('start', month);
-        u.searchParams.set('limit', qp.get('limit') ?? '20000');
+        u.searchParams.set('limit', limit);
         u.searchParams.set('token', previewToken);
         if (continuationToken) {
             u.searchParams.set('continuationToken', continuationToken);
