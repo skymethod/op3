@@ -9,6 +9,7 @@ import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
+import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
 export async function computeShowsResponse({ showUuid, method, searchParams, rpcClient, roRpcClient, times = {} }: { showUuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number> }): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
@@ -33,7 +34,7 @@ export async function computeShowsResponse({ showUuid, method, searchParams, rpc
         .sort(compareByDescending(r => r.pubdateInstant))
         .map(({ id, title, pubdateInstant }) => ({ id, title, pubdate: pubdateInstant }));
 
-    return newJsonResponse({ showUuid, title, episodes });
+    return newJsonResponse({ showUuid, title, episodes } as ApiShowsResponse);
 }
 
 export async function computeShowStatsResponse({ showUuid, method, searchParams, statsBlobs, roStatsBlobs, times = {} }: { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number> }): Promise<Response> {
@@ -66,5 +67,5 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
         }
     }
    
-    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads });
+    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads } as ApiShowStatsResponse);
 }

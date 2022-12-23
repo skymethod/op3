@@ -4,5 +4,6 @@
     "files.exclude": {
         "deno-*": true,
         "deno.lock": true,
+        "app": true,
     }
 }

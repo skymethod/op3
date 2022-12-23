@@ -1,4 +1,4 @@
-export function newJsonResponse(obj: Record<string, unknown>, status = 200): Response {
+export function newJsonResponse(obj: unknown, status = 200): Response {
     return new Response(JSON.stringify(obj, undefined, 2), { status, headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
