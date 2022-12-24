@@ -84,6 +84,7 @@ async function download(e: Event, showUuid: string, month: string, previewToken:
         if (qp.has('ro')) u.searchParams.set('ro', 'true');
         const limit = qp.get('limit') ?? '20000';
         u.searchParams.set('start', month);
+        u.searchParams.set('end', addMonthsToMonthString(month, 1));
         u.searchParams.set('limit', limit);
         u.searchParams.set('token', previewToken);
         if (includeBots) u.searchParams.set('bots', 'include');

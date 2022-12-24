@@ -11,6 +11,8 @@ import { newQueryResponse } from '../routes/api_query_common.ts';
 export async function computeQueryDownloadsResponse(request: QueryDownloadsRequest, { statsBlobs: rwStatsBlobs, roStatsBlobs }: { statsBlobs?: Blobs, roStatsBlobs?: Blobs }): Promise<Response> {
     const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv', continuationToken: continuationTokenFilter, skipHeaders, ro} = request;
 
+    console.log(`computeQueryDownloadsResponse: ${JSON.stringify(request)}`);
+
     const statsBlobs = ro ? roStatsBlobs : rwStatsBlobs;
     if (!statsBlobs) throw new Error(`Need statsBlobs!`);
 
@@ -33,7 +35,7 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
     if (date) {
         const today = new Date().toISOString().substring(0, 10);
         if (unpackedContinuationTokenFilter) date = unpackedContinuationTokenFilter.date;
-        while (date <= today && rows.length < limit) {
+        while (date <= today && rows.length < limit && (!endTimeExclusive || `${date}T00:00:00.000Z` < endTimeExclusive)) {
             rowNumber = 0;
             console.log(`computeQueryDownloadsResponseInternal: getting ${showUuid} ${date}`);
             const stream = await statsBlobs.get(computeShowDailyKey({ date, showUuid }), 'stream');
