@@ -1,4 +1,5 @@
 {
+    "lock": false,
     "tasks": {
         "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/4b5bcdfe1ff8062cfa71b212852fff5f90fccb88/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
         "tailwind": "npx tailwindcss --content ./worker/static/home.htm,./worker/static/terms.htm,./worker/static/privacy.htm,./worker/static/header.htm,./worker/static/releases.htm,./worker/static/404.htm,./worker/static/costs.htm,./worker/routes/costs.ts,./worker/static/api_keys.htm,./worker/static/setup.htm,./worker/static/show.htm -i ./worker/static/input.css -o ./worker/static/output.css --watch"

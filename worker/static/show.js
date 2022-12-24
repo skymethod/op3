@@ -8321,6 +8321,179 @@ var Sc = Object.freeze({
     Sc
 ];
 at.register(...yo);
+function element(id) {
+    const rt = document.getElementById(id);
+    if (!rt) throw new Error(`Element not found: ${id}`);
+    return rt;
+}
+function isValidMonth(month) {
+    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
+}
+function addMonthsToMonthString(month, months) {
+    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
+    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
+    const rt = new Date(`${month}-01T00:00:00.000Z`);
+    rt.setUTCMonth(rt.getUTCMonth() + months);
+    return rt.toISOString().substring(0, 7);
+}
+const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
+    const [exportSpinner, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
+        element('export-spinner'),
+        element('export-title'),
+        element('export-cancel'),
+        element('export-dropdown'),
+        element('export-older'),
+        element('export-bots')
+    ];
+    let exporting;
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    const f = new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC'
+    });
+    const disables = [
+        exportOlderButton,
+        exportBotsSwitch
+    ];
+    for (const monthNum of [
+        0,
+        1,
+        2
+    ]){
+        const button = element(`export-month-${monthNum}`);
+        const month = addMonthsToMonthString(currentMonth, -monthNum);
+        button.textContent = f.format(new Date(`${month}-01T00:00:00Z`));
+        button.title = month;
+        button.onclick = async (e)=>{
+            const includeBots = exportBotsSwitch.checked;
+            const controller = new AbortController();
+            exportCancelButton.onclick = ()=>{
+                controller.abort();
+                exporting = undefined;
+                update();
+            };
+            exporting = controller;
+            update();
+            try {
+                await download(e, showUuid, month, previewToken1, includeBots, controller.signal);
+            } finally{
+                exporting = undefined;
+                update();
+            }
+        };
+        disables.push(button);
+    }
+    document.addEventListener('keydown', (evt)=>{
+        if (evt.key === 'Escape') {
+            if (exporting) {
+                exporting.abort();
+                exporting = undefined;
+                update();
+            }
+        }
+    });
+    function update() {
+        if (exporting) {
+            exportDropdown.open = false;
+            exportSpinner.classList.remove('hidden');
+            exportCancelButton.classList.remove('invisible');
+            exportTitleDiv.textContent = 'Exporting...';
+        } else {
+            exportSpinner.classList.add('hidden');
+            exportCancelButton.classList.add('invisible');
+            exportTitleDiv.textContent = 'Export downloads';
+        }
+        disables.forEach((v)=>v.disabled = !!exporting);
+    }
+    update();
+    return {
+        update
+    };
+};
+async function download(e, showUuid, month, previewToken1, includeBots, signal) {
+    e.preventDefault();
+    console.log(`download ${JSON.stringify({
+        month,
+        includeBots
+    })}`);
+    const parts = [];
+    let continuationToken;
+    const qp = new URLSearchParams(document.location.search);
+    while(true){
+        const u = new URL(`/api/1/downloads/show/${showUuid}`, document.location.href);
+        if (qp.has('ro')) u.searchParams.set('ro', 'true');
+        const limit = qp.get('limit') ?? '20000';
+        u.searchParams.set('start', month);
+        u.searchParams.set('limit', limit);
+        u.searchParams.set('token', previewToken1);
+        if (includeBots) u.searchParams.set('bots', 'include');
+        if (continuationToken) {
+            u.searchParams.set('continuationToken', continuationToken);
+            u.searchParams.set('skip', 'headers');
+        }
+        console.log(`fetch limit=${limit} continuationToken=${continuationToken}`);
+        const res = await fetch(u.toString(), {
+            signal
+        });
+        if (signal.aborted) return;
+        if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+        const blob = await res.blob();
+        if (signal.aborted) return;
+        parts.push(blob);
+        continuationToken = res.headers.get('x-continuation-token');
+        if (typeof continuationToken !== 'string') break;
+    }
+    if (signal.aborted) return;
+    const { type  } = parts[0];
+    const blob1 = new Blob(parts, {
+        type
+    });
+    const blobUrl = URL.createObjectURL(blob1);
+    const anchor = document.createElement('a');
+    anchor.href = blobUrl;
+    anchor.target = '_blank';
+    anchor.download = `downloads-${month}.tsv`;
+    anchor.click();
+    URL.revokeObjectURL(blobUrl);
+}
+const app = (()=>{
+    const [debugDiv] = [
+        element('debug')
+    ];
+    const { showObj , statsObj , times  } = initialData;
+    const { showUuid  } = showObj;
+    if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
+    const hourMarkers = Object.fromEntries(Object.entries(statsObj.episodeFirstHours).map(([episodeId, hour])=>[
+            hour,
+            episodeId
+        ]));
+    drawDownloadsChart('show-downloads', statsObj.hourlyDownloads, hourMarkers);
+    let n = 1;
+    for (const episode of showObj.episodes){
+        const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
+        if (!episodeHourlyDownloads) continue;
+        drawDownloadsChart(`episode-${n}-downloads`, episodeHourlyDownloads);
+        n++;
+        if (n > 4) break;
+    }
+    const exportDownloads = makeExportDownloads({
+        showUuid,
+        previewToken
+    });
+    debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+    console.log(initialData);
+    function update() {
+        exportDownloads.update();
+    }
+    return {
+        update
+    };
+})();
+globalThis.addEventListener('DOMContentLoaded', ()=>{
+    console.log('Document content loaded');
+    app.update();
+});
 function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
     const maxDownloads = Math.max(...Object.values(hourlyDownloads));
     const markerData = Object.keys(hourlyDownloads).map((v)=>{
@@ -8366,73 +8539,3 @@ function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
     };
     new at(ctx, config);
 }
-async function download(e, showUuid, month) {
-    e.preventDefault();
-    const parts = [];
-    let continuationToken;
-    const qp = new URLSearchParams(document.location.search);
-    while(true){
-        const u = new URL(`/api/1/downloads/show/${showUuid}`, document.location.href);
-        if (qp.has('ro')) u.searchParams.set('ro', 'true');
-        const limit = qp.get('limit') ?? '20000';
-        u.searchParams.set('start', month);
-        u.searchParams.set('limit', limit);
-        u.searchParams.set('token', previewToken);
-        if (continuationToken) {
-            u.searchParams.set('continuationToken', continuationToken);
-            u.searchParams.set('skip', 'headers');
-        }
-        console.log(`fetch limit=${limit} continuationToken=${continuationToken}`);
-        const res = await fetch(u.toString());
-        if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
-        const blob = await res.blob();
-        parts.push(blob);
-        continuationToken = res.headers.get('x-continuation-token');
-        if (typeof continuationToken !== 'string') break;
-    }
-    const { type  } = parts[0];
-    const blob1 = new Blob(parts, {
-        type
-    });
-    const blobUrl = URL.createObjectURL(blob1);
-    const anchor = document.createElement('a');
-    anchor.href = blobUrl;
-    anchor.target = '_blank';
-    anchor.download = `downloads-${month}.tsv`;
-    anchor.click();
-    URL.revokeObjectURL(blobUrl);
-}
-const app = (()=>{
-    const [debugDiv, downloadLinkAnchor] = [
-        'debug',
-        'download-link'
-    ].map((v)=>document.getElementById(v));
-    const { showObj , statsObj , times  } = initialData;
-    const { showUuid  } = showObj;
-    if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const hourMarkers = Object.fromEntries(Object.entries(statsObj.episodeFirstHours).map(([episodeId, hour])=>[
-            hour,
-            episodeId
-        ]));
-    drawDownloadsChart('show-downloads', statsObj.hourlyDownloads, hourMarkers);
-    let n = 1;
-    for (const episode of showObj.episodes){
-        const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
-        if (!episodeHourlyDownloads) continue;
-        drawDownloadsChart(`episode-${n}-downloads`, episodeHourlyDownloads);
-        n++;
-        if (n > 4) break;
-    }
-    downloadLinkAnchor.onclick = async (e)=>await download(e, showUuid, '2022-12');
-    function update() {
-        debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
-        console.log(initialData);
-    }
-    return {
-        update
-    };
-})();
-globalThis.addEventListener('DOMContentLoaded', ()=>{
-    console.log('Document content loaded');
-    app.update();
-});

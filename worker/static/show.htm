@@ -25,7 +25,26 @@ const sessionToken = '${sessionToken}';
     <h4 id="setup" class="my-16 mx-auto text-3xl font-semibold">${showTitle}</h4>
    
     <canvas id="show-downloads" class="max-h-64"></canvas>
-    <div class="p-4 flex flex-col items-center"><a id="download-link" href="#">This month's downloads (tsv)</a></div>
+
+    <!-- export downloads -->
+    <sl-card class="card-basic m-8 flex">
+        <div slot="header" class="flex items-center justify-between">
+            <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.25rem;"></sl-spinner><div id="export-title" class="ml-2">Export downloads</div></div>
+            <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
+        </div>
+        <sl-button-group>
+            <sl-button id="export-month-0">Mmm YYYY</sl-button>
+            <sl-button id="export-month-1">Mmm YYYY</sl-button>
+            <sl-dropdown id="export-dropdown">
+                <sl-button id="export-older" slot="trigger" caret>Older</sl-button>
+                <sl-menu>
+                    <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
+                </sl-menu>
+            </sl-dropdown>
+        </sl-button-group>
+        <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
+    </sl-card>
+
     <canvas id="episode-1-downloads" class="max-h-64"></canvas>
     <canvas id="episode-2-downloads" class="max-h-64"></canvas>
     <canvas id="episode-3-downloads" class="max-h-64"></canvas>
