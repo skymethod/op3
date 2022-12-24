@@ -9,14 +9,19 @@ declare const previewToken: string;
 
 const app = (() => {
 
-    const [ debugDiv ] = [ element('debug') ];
+    const [ debugDiv, sevenDayDownloadsDiv, thirtyDayDownloadsDiv ] = [
+        element('debug'),
+        element('seven-day-downloads'),
+        element('thirty-day-downloads'),
+    ];
 
     const { showObj, statsObj, times } = initialData;
     const { showUuid } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
-    const hourMarkers = Object.fromEntries(Object.entries(statsObj.episodeFirstHours).map(([episodeId, hour]) => [hour, episodeId]));
-    drawDownloadsChart('show-downloads', statsObj.hourlyDownloads, hourMarkers);
+    const { episodeFirstHours, hourlyDownloads } = statsObj;
+    const hourMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, episodeId ]));
+    drawDownloadsChart('show-downloads', hourlyDownloads, hourMarkers);
     let n = 1;
     for (const episode of showObj.episodes) {
         const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
@@ -27,6 +32,12 @@ const app = (() => {
     }
 
     const exportDownloads = makeExportDownloads({ showUuid, previewToken });
+
+    const f = new Intl.NumberFormat('en-US');
+    const sevenDayDownloads = computeHourlyNDayDownloads(7, hourlyDownloads);
+    sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
+    const thirtyDayDownloads = computeHourlyNDayDownloads(30, hourlyDownloads);
+    thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
 
     debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     console.log(initialData);
@@ -94,4 +105,18 @@ function drawDownloadsChart(id: string, hourlyDownloads: Record<string, number>,
 
     // deno-lint-ignore no-explicit-any
     new Chart(ctx, config as any);
+}
+
+function computeHourlyNDayDownloads(n: number, hourlyDownloads: Record<string, number>): Record<string, number> {
+    const buffer: number[] = [];
+    const rt: Record<string, number> = {};
+    const bufferSize = n * 24;
+    for (const [ hour, downloads ] of Object.entries(hourlyDownloads)) {
+        buffer.push(downloads);
+        if (buffer.length > bufferSize) buffer.shift();
+        if (buffer.length === bufferSize) {
+            rt[hour] = buffer.reduce((a, b) => a + b, 0);
+        }
+    }
+    return rt;
 }

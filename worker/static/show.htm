@@ -24,11 +24,27 @@ const sessionToken = '${sessionToken}';
 
     <h4 id="setup" class="my-16 mx-auto text-3xl font-semibold">${showTitle}</h4>
    
-    <main class="wait">
-        <canvas id="show-downloads" class="max-h-64"></canvas>
+    <main class="wait mx-8">
+
+        <sl-card class="card-basic">
+            <div class="text-[2.5rem] leading-none mb-2" id="seven-day-downloads">xxx</div>
+            <span class="text-sm">downloads in last 7 days</span>
+        </sl-card>
+
+        <sl-card class="card-basic ml-8">
+            <div class="text-[2.5rem] leading-none mb-2" id="thirty-day-downloads">xxx</div>
+            <span class="text-sm">downloads in last 30 days</span>
+        </sl-card>
+
+        <sl-card class="card-basic ml-8">
+            <div class="text-[2.5rem] leading-none mb-2">xxx</div>
+            <span class="text-sm">audience last month</span>
+        </sl-card>
+
+        <canvas id="show-downloads" class="max-h-64 my-8"></canvas>
 
         <!-- export downloads -->
-        <sl-card class="card-basic m-8 flex">
+        <sl-card class="card-basic flex">
             <div slot="header" class="flex items-center justify-between">
                 <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><div id="export-title" class="ml-2">Export downloads</div></div>
                 <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
