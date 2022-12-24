@@ -15,6 +15,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
     ];
 
     let exporting: AbortController | undefined;
+    let progress: number | undefined;
 
     const currentMonth = new Date().toISOString().substring(0, 7);
     const f = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -31,9 +32,9 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
                 controller.abort();
                 exporting = undefined; update();
             }
-            exporting = controller; update();
+            exporting = controller; progress = 0; update();
             try {
-                await download(e, showUuid, month, previewToken, includeBots, controller.signal);
+                await download(e, showUuid, month, previewToken, includeBots, controller.signal, v => { progress = v; update(); });
             } finally {
                 exporting = undefined; update();
             }
@@ -55,7 +56,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
             exportDropdown.open = false;
             exportSpinner.classList.remove('hidden');
             exportCancelButton.classList.remove('invisible');
-            exportTitleDiv.textContent = 'Exporting...';
+            exportTitleDiv.textContent = `Exporting${typeof progress === 'number' ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
         } else {
             exportSpinner.classList.add('hidden');
             exportCancelButton.classList.add('invisible');
@@ -71,7 +72,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
 
 //
 
-async function download(e: Event, showUuid: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal) {
+async function download(e: Event, showUuid: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal, onProgress: (progress: number) => void) {
     e.preventDefault();
     
     console.log(`download ${JSON.stringify({ month, includeBots })}`);
@@ -98,7 +99,10 @@ async function download(e: Event, showUuid: string, month: string, previewToken:
         const blob = await res.blob(); if (signal.aborted) return;
         parts.push(blob);
         continuationToken = res.headers.get('x-continuation-token');
-        if (typeof continuationToken !== 'string') break;
+        const done = typeof continuationToken !== 'string';
+        const progress = done ? 1 : parseFloat(res.headers.get('x-progress') ?? '0');
+        onProgress(progress);
+        if (done) break;
     }
     if (signal.aborted) return;
 

@@ -32,6 +32,7 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
     const startTime = Date.now();
     const rows: unknown[] = [];
     let rowNumber = 0;
+    let latestTime: string | undefined;
     if (date) {
         const today = new Date().toISOString().substring(0, 10);
         if (unpackedContinuationTokenFilter) date = unpackedContinuationTokenFilter.date;
@@ -44,6 +45,7 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
                     rowNumber++;
                     const { time, serverUrl: url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
                     if (time === undefined) throw new Error(`Undefined time`);
+                    latestTime = time;
                     if (unpackedContinuationTokenFilter && date === unpackedContinuationTokenFilter.date && rowNumber <= unpackedContinuationTokenFilter.rowNumber) continue;
                     if (botType && bots === 'exclude') continue;
                     if (startTimeInclusive && time < startTimeInclusive) continue;
@@ -64,7 +66,8 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
         }
     }
     const continuationToken = rows.length >= limit && date ? packContinuationToken({ date, rowNumber }) : undefined;
-    return newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders })
+    const progress = rows.length >= limit && latestTime && startTimeInclusive && endTimeExclusive ? computeProgress(latestTime, startTimeInclusive, endTimeExclusive) : undefined;
+    return newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders, progress })
 }
 
 //
@@ -78,6 +81,11 @@ async function computeEarliestShowDownloadDate(showUuid: string, statsBlobs: Blo
 
 function packContinuationToken({ date, rowNumber }: { date: string, rowNumber: number }): string {
     return encodeBase58(new TextEncoder().encode(JSON.stringify({ date, rowNumber })));
+}
+
+function computeProgress(time: string, from: string, to: string): number {
+    const fromMillis = new Date(from).getTime();
+    return (new Date(time).getTime() - fromMillis) / (new Date(to).getTime() - fromMillis);
 }
 
 function unpackContinuationToken(continuationToken: string): { date: string, rowNumber: number } {

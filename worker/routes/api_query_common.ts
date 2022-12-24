@@ -51,13 +51,19 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
     return rt;
 }
 
-export function newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders }: { startTime: number, format: string, headers: string[], rows: unknown[], continuationToken: string | undefined, skipHeaders?: boolean }): Response {
+export function newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders, progress }: { startTime: number, format: string, headers: string[], rows: unknown[], continuationToken: string | undefined, skipHeaders?: boolean, progress?: number }): Response {
     const queryTime = Date.now() - startTime;
     const count = rows.length;
     if (format === 'tsv') {
         if (!skipHeaders) rows.unshift(headers.join('\t'));
         rows.push(''); // trailing newline
-        return new Response(rows.join('\n'), { headers: { 'content-type': 'text/tab-separated-values', 'x-query-time': queryTime.toString(), ...(continuationToken ? { 'x-continuation-token': continuationToken } : {}), 'access-control-allow-origin': '*' } });
+        return new Response(rows.join('\n'), { headers: { 
+            'content-type': 'text/tab-separated-values', 
+            'x-query-time': queryTime.toString(), 
+            ...(continuationToken ? { 'x-continuation-token': continuationToken } : {}), 
+            ...(typeof progress === 'number' ? { 'x-progress': progress.toString() } : {}), 
+            'access-control-allow-origin': '*',
+        } });
     }
     const obj = format === 'json-a' ? { headers, rows, count, queryTime, continuationToken } : { rows, count, queryTime, continuationToken };
     return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });

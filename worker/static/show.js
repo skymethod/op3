@@ -8346,6 +8346,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
         element('export-bots')
     ];
     let exporting;
+    let progress;
     const currentMonth = new Date().toISOString().substring(0, 7);
     const f = new Intl.DateTimeFormat('en-US', {
         month: 'short',
@@ -8374,9 +8375,13 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
                 update();
             };
             exporting = controller;
+            progress = 0;
             update();
             try {
-                await download(e, showUuid, month, previewToken1, includeBots, controller.signal);
+                await download(e, showUuid, month, previewToken1, includeBots, controller.signal, (v)=>{
+                    progress = v;
+                    update();
+                });
             } finally{
                 exporting = undefined;
                 update();
@@ -8398,7 +8403,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
             exportDropdown.open = false;
             exportSpinner.classList.remove('hidden');
             exportCancelButton.classList.remove('invisible');
-            exportTitleDiv.textContent = 'Exporting...';
+            exportTitleDiv.textContent = `Exporting${typeof progress === 'number' ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
         } else {
             exportSpinner.classList.add('hidden');
             exportCancelButton.classList.add('invisible');
@@ -8411,7 +8416,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
         update
     };
 };
-async function download(e, showUuid, month, previewToken1, includeBots, signal) {
+async function download(e, showUuid, month, previewToken1, includeBots, signal, onProgress) {
     e.preventDefault();
     console.log(`download ${JSON.stringify({
         month,
@@ -8443,7 +8448,10 @@ async function download(e, showUuid, month, previewToken1, includeBots, signal) 
         if (signal.aborted) return;
         parts.push(blob);
         continuationToken = res.headers.get('x-continuation-token');
-        if (typeof continuationToken !== 'string') break;
+        const done = typeof continuationToken !== 'string';
+        const progress = done ? 1 : parseFloat(res.headers.get('x-progress') ?? '0');
+        onProgress(progress);
+        if (done) break;
     }
     if (signal.aborted) return;
     const { type  } = parts[0];
