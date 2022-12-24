@@ -749,6 +749,26 @@ a:hover {
   max-height: 16rem;
 }
 
+.max-h-\[1rem\] {
+  max-height: 1rem;
+}
+
+.max-h-\[2rem\] {
+  max-height: 2rem;
+}
+
+.max-h-\[1\.5rem\] {
+  max-height: 1.5rem;
+}
+
+.max-h-\[8rem\] {
+  max-height: 8rem;
+}
+
+.max-h-\[64rem\] {
+  max-height: 64rem;
+}
+
 .w-80 {
   width: 20rem;
 }
@@ -787,6 +807,26 @@ a:hover {
 
 .max-w-md {
   max-width: 28rem;
+}
+
+.max-w-\[4rem\] {
+  max-width: 4rem;
+}
+
+.max-w-\[6rem\] {
+  max-width: 6rem;
+}
+
+.max-w-\[8rem\] {
+  max-width: 8rem;
+}
+
+.max-w-\[16rem\] {
+  max-width: 16rem;
+}
+
+.max-w-\[64rem\] {
+  max-width: 64rem;
 }
 
 .transform {
@@ -829,6 +869,10 @@ a:hover {
 
 .flex-col {
   flex-direction: column;
+}
+
+.items-end {
+  align-items: flex-end;
 }
 
 .items-center {
@@ -907,6 +951,11 @@ a:hover {
 .bg-neutral-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(38 38 38 / var(--tw-bg-opacity));
+}
+
+.bg-lime-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(54 83 20 / var(--tw-bg-opacity));
 }
 
 .fill-neutral-600 {

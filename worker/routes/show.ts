@@ -63,7 +63,7 @@ export async function computeShowResponse(req: ShowRequest, opts: { searchParams
         initialData,
         titleSuffix: instance === 'prod' ? '' : ` (${instance})`,
         styleTag: computeStyleTag(),
-        shoelaceCommon: computeShoelaceCommon('sl-card', 'sl-spinner', 'sl-icon-button', 'sl-button-group', 'sl-button', 'sl-dropdown', 'sl-menu', 'sl-menu-item', 'sl-switch'),
+        shoelaceCommon: computeShoelaceCommon('sl-card', 'sl-spinner', 'sl-icon-button', 'sl-button-group', 'sl-button', 'sl-dropdown', 'sl-menu', 'sl-menu-item', 'sl-switch', 'sl-icon'),
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,

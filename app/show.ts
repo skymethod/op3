@@ -9,10 +9,12 @@ declare const previewToken: string;
 
 const app = (() => {
 
-    const [ debugDiv, sevenDayDownloadsDiv, thirtyDayDownloadsDiv ] = [
+    const [ debugDiv, sevenDayDownloadsDiv, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsSparklineCanvas ] = [
         element('debug'),
         element('seven-day-downloads'),
+        element<HTMLCanvasElement>('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
+        element<HTMLCanvasElement>('thirty-day-downloads-sparkline'),
     ];
 
     const { showObj, statsObj, times } = initialData;
@@ -36,8 +38,10 @@ const app = (() => {
     const f = new Intl.NumberFormat('en-US');
     const sevenDayDownloads = computeHourlyNDayDownloads(7, hourlyDownloads);
     sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
+    drawSparkline(sevenDayDownloadsSparklineCanvas, sevenDayDownloads);
     const thirtyDayDownloads = computeHourlyNDayDownloads(30, hourlyDownloads);
     thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
+    drawSparkline(thirtyDayDownloadsSparklineCanvas, thirtyDayDownloads);
 
     debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     console.log(initialData);
@@ -67,7 +71,7 @@ function drawDownloadsChart(id: string, hourlyDownloads: Record<string, number>,
 
     const labels = Object.keys(hourlyDownloads);
     const data = {
-        labels: labels,
+        labels,
         datasets: [
             {
                 data: Object.values(hourlyDownloads),
@@ -87,7 +91,7 @@ function drawDownloadsChart(id: string, hourlyDownloads: Record<string, number>,
 
     const config = {
         type: 'line',
-        data: data,
+        data,
         options: {
             animation: {
                 duration: 100,
@@ -120,3 +124,55 @@ function computeHourlyNDayDownloads(n: number, hourlyDownloads: Record<string, n
     }
     return rt;
 }
+
+function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>) {
+    const ctx = canvas.getContext('2d')!;
+
+    const values = Object.values(labelsAndValues);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const labels = Object.keys(labelsAndValues);
+    const data = {
+        labels,
+        datasets: [
+            {
+                data: values,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                pointRadius: 0,
+                borderWidth: 1,
+            },
+        ]
+    };
+
+    const config = {
+        type: 'line',
+        data,
+        options: {
+            scales: {
+                x: {
+                    display: false,
+                },
+                y: {
+                    display: false,
+                    min: minValue,
+                    max: maxValue,
+                }
+            },
+            animation: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    enabled: false,
+                }
+            }
+        }
+    };
+
+    // deno-lint-ignore no-explicit-any
+    new Chart(ctx, config as any);
+}
+
