@@ -38,10 +38,22 @@ const app = (() => {
     const f = new Intl.NumberFormat('en-US');
     const sevenDayDownloads = computeHourlyNDayDownloads(7, hourlyDownloads);
     sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
-    drawSparkline(sevenDayDownloadsSparklineCanvas, sevenDayDownloads);
+    drawSparkline(sevenDayDownloadsSparklineCanvas, sevenDayDownloads, { onHover: v => {
+        if (v) {
+            sevenDayDownloadsDiv.textContent = f.format(Math.round(v.value));
+        } else {
+            sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
+        }
+    }});
     const thirtyDayDownloads = computeHourlyNDayDownloads(30, hourlyDownloads);
     thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
-    drawSparkline(thirtyDayDownloadsSparklineCanvas, thirtyDayDownloads);
+    drawSparkline(thirtyDayDownloadsSparklineCanvas, thirtyDayDownloads, { onHover: v => {
+        if (v) {
+            thirtyDayDownloadsDiv.textContent = f.format(Math.round(v.value));
+        } else {
+            thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
+        }
+    }});
 
     debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     console.log(initialData);
@@ -98,12 +110,13 @@ function drawDownloadsChart(id: string, hourlyDownloads: Record<string, number>,
             },
             interaction: {
                 intersect: false,
+                mode: 'index',
             },
             plugins: {
                 legend: {
                     display: false,
                 }
-            }
+            },
         }
     };
 
@@ -125,9 +138,10 @@ function computeHourlyNDayDownloads(n: number, hourlyDownloads: Record<string, n
     return rt;
 }
 
-function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>) {
+function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, { onHover }: { onHover?: (opts?: { label: string, value: number }) => void } = {}) {
     const ctx = canvas.getContext('2d')!;
 
+    const entries = Object.entries(labelsAndValues);
     const values = Object.values(labelsAndValues);
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
@@ -139,7 +153,6 @@ function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string
                 data: values,
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 pointRadius: 0,
                 borderWidth: 1,
             },
@@ -160,6 +173,10 @@ function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string
                     max: maxValue,
                 }
             },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
             animation: false,
             plugins: {
                 legend: {
@@ -167,12 +184,33 @@ function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string
                 },
                 tooltip: {
                     enabled: false,
+                },
+            },
+        },
+        plugins: [{
+            id: 'event-catcher',
+            // deno-lint-ignore no-explicit-any
+            beforeEvent(_chart: unknown, args: any, _pluginOptions: unknown) {
+                if (args.event.type === 'mouseout' && onHover) {
+                    onHover();
                 }
             }
-        }
+          }]
     };
 
     // deno-lint-ignore no-explicit-any
-    new Chart(ctx, config as any);
+    const chart = new Chart(ctx, config as any);
+
+    if (onHover) {
+        chart.options.onHover = (e) => {
+            // deno-lint-ignore no-explicit-any
+            const points = chart.getElementsAtEventForMode(e as any, 'index', { intersect: false }, true);
+            if (points.length > 0) {
+                const { index } = points[0];
+                const [ label, value ] = entries[index];
+                onHover({ label, value });
+            }
+        };
+    }
 }
 
