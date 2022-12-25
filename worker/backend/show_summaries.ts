@@ -1,47 +1,44 @@
 import { check, isStringRecord, isValidMonth, tryParseInt } from '../check.ts';
 import { sortBy } from '../deps.ts';
-import { computeLinestream, yieldTsvFromStream } from '../streams.ts';
+import { yieldTsvFromStream } from '../streams.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
 import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
 import { isValidUuid } from '../uuid.ts';
 import { timed } from '../async.ts';
 import { computeTimestamp, unpackDate } from '../timestamp.ts';
+import { recomputeAudienceForMonth, saveAudience } from './audience.ts';
 
-type Phase = 'dailies' | 'aggregates' | 'audience' | 'audience-save';
-
-export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, startDay?: number, maxDays?: number, disabledPhases?: Phase[] };
+export type RecomputeShowSummariesForMonthRequest = { showUuid: string, month: string, log?: boolean, sequential?: boolean, startDay?: number, maxDays?: number, phases?: Phase[] };
 
 export function tryParseRecomputeShowSummariesForMonthRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): RecomputeShowSummariesForMonthRequest | undefined {
     if (targetPath === '/work/recompute-show-summaries' && operationKind === 'update' && parameters) {
-        const { show: showUuid, month, flags, startDay: startDayStr, maxDays: maxDaysStr } = parameters;
+        const { show: showUuid, month, flags, phases: phasesStr, startDay: startDayStr, maxDays: maxDaysStr } = parameters;
         check('show', showUuid, isValidUuid);
         check('month', month, isValidMonth);
         const flagset = new Set((flags ?? '').split(','));
         const log = flagset.has('log');
         const sequential = flagset.has('sequential');
-        const disabledPhases: Phase[] = [];
-        if (flagset.has('disableDailies')) disabledPhases.push('dailies');
-        if (flagset.has('disableAggregates')) disabledPhases.push('aggregates');
-        if (flagset.has('disableAudience')) disabledPhases.push('audience');
-        if (flagset.has('disableAudienceSave')) disabledPhases.push('audience-save');
+        const phases = phasesStr ? phasesStr.split(',').filter(isPhase) : undefined;
         const startDay = tryParseInt(startDayStr);
         const maxDays = tryParseInt(maxDaysStr);
-        return { showUuid, month, log, sequential, disabledPhases, startDay, maxDays };
+        return { showUuid, month, log, sequential, phases, startDay, maxDays };
     }
 }
 
-export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential, startDay, maxDays, disabledPhases = [] }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
+export async function recomputeShowSummariesForMonth({ showUuid, month, log, sequential, startDay, maxDays, phases = [ 'dailies', 'aggregates', 'audience' ] }: RecomputeShowSummariesForMonthRequest, statsBlobs: Blobs) {
     check('showUuid', showUuid, isValidUuid);
     check('month', month, isValidMonth);
 
     const times: Record<string, number> = {};
-    let rt: Record<string, unknown> = { times };
+    let rt: Record<string, unknown> = { times, phases };
 
-    const { keys: showDailyKeys } = disabledPhases.includes('dailies') && disabledPhases.includes('aggregates') ? { keys: [] } 
-        : await timed(times, 'list', () => statsBlobs.list({ keyPrefix: computeShowDailyKeyPrefix({ showUuid, datePart: month }) }));
+    const runDailies = phases.includes('dailies');
+    const runAggregates = phases.includes('aggregates');
+    const { keys: showDailyKeys } = runDailies || runAggregates ? await timed(times, 'list', () => statsBlobs.list({ keyPrefix: computeShowDailyKeyPrefix({ showUuid, datePart: month }) }))
+        : { keys: [] };
 
-    if (!disabledPhases.includes('dailies')) {
+    if (runDailies) {
         const showDailyKeysProcessed = showDailyKeys.filter(v => {
             if (maxDays === 0) return false;
             if (typeof startDay === 'number') {
@@ -72,7 +69,7 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         }
         rt = { ...rt, showDailyKeys: showDailyKeys.length, showDailyKeysProcessed: showDailyKeysProcessed.length };
     }
-    if (!disabledPhases.includes('aggregates')) {
+    if (runAggregates) {
         const inputKeys = showDailyKeys.map(v => {
             const { date } = unpackShowDailyKey(v);
             return computeShowSummaryKey({ showUuid, period: date });
@@ -93,10 +90,12 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
     
         rt = { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads) };
     }
-    if (!disabledPhases.includes('audience')) {
-        const skipSave = disabledPhases.includes('audience-save');
-        const { audience, contentLength: audienceContentLength, saved: audienceSaved } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs, skipSave }));
-        rt = { ...rt, audience, audienceContentLength, audienceSaved };
+    if (phases.some(v => v.startsWith('audience'))) {
+        const part = phases.includes('audience-1of2') ? '1of2'
+            : phases.includes('audience-2of2') ? '2of2'
+            : undefined;
+        const { audience, contentLength: audienceContentLength, part: audiencePart } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }));
+        rt = { ...rt, audience, audienceContentLength, audiencePart };
     }
 
     return rt;
@@ -202,44 +201,6 @@ export async function findFirstHourForEpisodeId({ showUuid, episodeId, statsBlob
     }
 }
 
-export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, skipSave }: { showUuid: string, month: string, statsBlobs: Blobs, skipSave?: boolean }) {
-    const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
-    const audienceTimestamps: Record<string, string> = {};
-    let count = 0;
-    for (const key of keys) {
-        const stream = await statsBlobs.get(key, 'stream');
-        if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
-        for await (const line of computeLinestream(stream)) {
-            if (line.length === 0) continue;
-            const audienceId = line.substring(0, 64);
-            const timestamp = line.substring(65, 80);
-            if (!audienceTimestamps[audienceId]) {
-                audienceTimestamps[audienceId] = timestamp;
-                count++;
-            }
-        }
-    }
-    const contentLength = (64 + 1 + 15 + 1) * count;
-
-    if (skipSave) {
-        return { audience: count, contentLength, saved: false };
-    }
-
-    const monthKey = computeAudienceKey({ showUuid, period: month });
-
-    // deno-lint-ignore no-explicit-any
-    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-    const putPromise = statsBlobs.put(monthKey, readable) // don't await!
-    const writer = writable.getWriter();
-    for (const audienceId of Object.keys(audienceTimestamps)) {
-        writer.write(`${audienceId}\t${audienceTimestamps[audienceId]}\n`);
-    }
-    await writer.close();
-    // await writable.close(); // will throw on cf
-    await putPromise;
-    return { audience: count, contentLength, saved: true };
-}
-
 //
 
 export interface ShowSummary {
@@ -263,6 +224,12 @@ export function isValidShowSummary(obj: unknown): obj is ShowSummary {
 export interface EpisodeSummary {
     readonly hourlyDownloads: Record<string, number>; // hour (e.g. 2022-12-01T10) -> downloads
     readonly firstHour: string; // hour (e.g. 2022-12-01T10) first download seen
+}
+
+type Phase = 'dailies' | 'aggregates' | 'audience' | 'audience-1of2' | 'audience-2of2';
+
+function isPhase(v: string): v is Phase {
+    return v === 'dailies' || v === 'aggregates' || v === 'audience' || v === 'audience-1of2' || v === 'audience-2of2';
 }
 
 //
@@ -289,19 +256,4 @@ function tryComputeNewOverall({ overall, summary }: { overall?: ShowSummary, sum
         }
     }
     return changed ? rt : undefined;
-}
-
-async function saveAudience({ showUuid, period, audienceTimestamps, statsBlobs }: { showUuid: string, period: string, audienceTimestamps: Record<string, string>, statsBlobs: Blobs }): Promise<{ key: string, etag: string }> {
-    const key = computeAudienceKey({ showUuid, period });
-    const txt = Object.entries(audienceTimestamps).map(([ audienceId, timestamp ]) => `${audienceId}\t${timestamp}\n`).join('');
-    const { etag } = await statsBlobs.put(key, txt);
-    return { key, etag };
-}
-
-function computeAudienceKey({ showUuid, period }: { showUuid: string, period: string }): string {
-    return `audiences/show/${showUuid}/${showUuid}-${period}.audience.txt`;
-}
-
-function computeAudienceKeyPrefix({ showUuid, month }: { showUuid: string, month: string }): string {
-    return `audiences/show/${showUuid}/${showUuid}-${month}-`;
 }
