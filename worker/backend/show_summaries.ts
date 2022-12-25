@@ -210,9 +210,9 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, s
         const stream = await statsBlobs.get(key, 'stream');
         if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
         for await (const line of computeLinestream(stream)) {
-            if (line === '') continue;
+            if (line.length === 0) continue;
             const audienceId = line.substring(0, 64);
-            const timestamp = line.substring(65, 65 + 15);
+            const timestamp = line.substring(65, 80);
             if (!audienceTimestamps[audienceId]) {
                 audienceTimestamps[audienceId] = timestamp;
                 count++;
@@ -231,9 +231,8 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, s
     const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
     const putPromise = statsBlobs.put(monthKey, readable) // don't await!
     const writer = writable.getWriter();
-    const encoder = new TextEncoder();
-    for (const [ audienceId, timestamp ] of Object.entries(audienceTimestamps)) {
-        writer.write(encoder.encode(`${audienceId}\t${timestamp}\n`));
+    for (const audienceId of Object.keys(audienceTimestamps)) {
+        writer.write(`${audienceId}\t${audienceTimestamps[audienceId]}\n`);
     }
     await writer.close();
     // await writable.close(); // will throw on cf
