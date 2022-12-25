@@ -91,8 +91,10 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         rt = { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads) };
     }
     if (phases.some(v => v.startsWith('audience'))) {
-        const part = phases.includes('audience-1of2') ? '1of2'
-            : phases.includes('audience-2of2') ? '2of2'
+        const part = phases.includes('audience-1of4') ? '1of4'
+            : phases.includes('audience-2of4') ? '2of4'
+            : phases.includes('audience-3of4') ? '3of4'
+            : phases.includes('audience-4of4') ? '4of4'
             : undefined;
         const { audience, contentLength: audienceContentLength, part: audiencePart } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }));
         rt = { ...rt, audience, audienceContentLength, audiencePart };
@@ -226,10 +228,10 @@ export interface EpisodeSummary {
     readonly firstHour: string; // hour (e.g. 2022-12-01T10) first download seen
 }
 
-type Phase = 'dailies' | 'aggregates' | 'audience' | 'audience-1of2' | 'audience-2of2';
+type Phase = 'dailies' | 'aggregates' | 'audience' | 'audience-1of4' | 'audience-2of4' | 'audience-3of4' | 'audience-4of4';
 
 function isPhase(v: string): v is Phase {
-    return v === 'dailies' || v === 'aggregates' || v === 'audience' || v === 'audience-1of2' || v === 'audience-2of2';
+    return v === 'dailies' || v === 'aggregates' || v === 'audience' || v === 'audience-1of4' || v === 'audience-2of4' || v === 'audience-3of4' || v === 'audience-4of4';
 }
 
 //

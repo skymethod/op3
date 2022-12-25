@@ -3,7 +3,7 @@ import { computeLinestream } from '../streams.ts';
 import { increment } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
 
-export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: '1of2' | '2of2' }) {
+export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: '1of4' | '2of4' | '3of4' | '4of4' }) {
     const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
     const audienceTimestamps: Record<string, string> = {};
     const audienceSummary: AudienceSummary = { showUuid, period: month, part, dailyFoundAudience: {} };
@@ -13,8 +13,10 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
         if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
         for await (const line of computeLinestream(stream)) {
             if (line.length === 0) continue;
-            if (part === '1of2' && line >= '8') continue;
-            if (part === '2of2' && line < '8') continue;
+            if (part === '1of4' && !(line < '4')) continue;
+            if (part === '2of4' && !(line >= '4' && line < '8')) continue;
+            if (part === '3of4' && !(line >= '8' && line < 'c')) continue;
+            if (part === '4of4' && !(line >= 'c')) continue;
             const audienceId = line.substring(0, 64);
             const timestamp = line.substring(65, 80);
             increment(audienceSummary.dailyFoundAudience, `20${timestamp.slice(0, 2)}-${timestamp.slice(2, 4)}-${timestamp.slice(4, 6)}`);
