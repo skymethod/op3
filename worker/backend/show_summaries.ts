@@ -194,8 +194,11 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs }:
         const stream = await statsBlobs.get(key, 'stream');
         if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
         for await (const line of computeLinestream(stream)) {
+            if (line === '') continue;
             const audienceId = line.substring(0, 64);
+            if (audienceId.length !== 64) throw new Error(`Invalid audienceId: ${audienceId}`);
             const timestamp = line.substring(65, 65 + 15);
+            if (timestamp.length !== 15) throw new Error(`Invalid timestamp: ${timestamp}`);
             if (!audienceTimestamps[audienceId]) {
                 audienceTimestamps[audienceId] = timestamp;
                 count++;
