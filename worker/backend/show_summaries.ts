@@ -1,6 +1,6 @@
 import { check, isStringRecord, isValidMonth, tryParseInt } from '../check.ts';
 import { sortBy } from '../deps.ts';
-import { yieldTsvFromStream } from '../streams.ts';
+import { computeLinestream, yieldTsvFromStream } from '../streams.ts';
 import { computeShowDailyKey, computeShowDailyKeyPrefix, unpackShowDailyKey } from './downloads.ts';
 import { increment, incrementAll, total } from '../summaries.ts';
 import { Blobs } from './blobs.ts';
@@ -79,7 +79,8 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
             if (log) console.log('Saving overall aggregate...');
             await timed(times, 'save-overall', () => saveShowSummary({ summary: newOverall, statsBlobs }));
         }
-        return { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads) };
+        const { audience } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs }));
+        return { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads), audience };
     }
 
     return rt;
@@ -185,6 +186,37 @@ export async function findFirstHourForEpisodeId({ showUuid, episodeId, statsBlob
     }
 }
 
+export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs }: { showUuid: string, month: string, statsBlobs: Blobs }) {
+    const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
+    const audienceTimestamps: Record<string, string> = {};
+    let count = 0;
+    for (const key of keys) {
+        const stream = await statsBlobs.get(key, 'stream');
+        if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
+        for await (const line of computeLinestream(stream)) {
+            const audienceId = line.substring(0, 64);
+            const timestamp = line.substring(65, 65 + 15);
+            if (!audienceTimestamps[audienceId]) {
+                audienceTimestamps[audienceId] = timestamp;
+                count++;
+            }
+        }
+    }
+    const contentLength = (64 + 1 + 15 + 1) * count;
+    const monthKey = computeAudienceKey({ showUuid, period: month });
+
+    // deno-lint-ignore no-explicit-any
+    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+    const putPromise = statsBlobs.put(monthKey, readable) // don't await!
+    const writer = writable.getWriter();
+    for (const [ audienceId, timestamp ] of Object.entries(audienceTimestamps)) {
+        writer.write(`${audienceId}\t${timestamp}\n`);
+    }
+    await writer.close();
+    // await writable.close(); // will throw on cf
+    await putPromise;
+    return { audience: count };
+}
 
 //
 
@@ -246,4 +278,8 @@ async function saveAudience({ showUuid, period, audienceTimestamps, statsBlobs }
 
 function computeAudienceKey({ showUuid, period }: { showUuid: string, period: string }): string {
     return `audiences/show/${showUuid}/${showUuid}-${period}.audience.txt`;
+}
+
+function computeAudienceKeyPrefix({ showUuid, month }: { showUuid: string, month: string }): string {
+    return `audiences/show/${showUuid}/${showUuid}-${month}-`;
 }
