@@ -79,8 +79,8 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
             if (log) console.log('Saving overall aggregate...');
             await timed(times, 'save-overall', () => saveShowSummary({ summary: newOverall, statsBlobs }));
         }
-        const { audience } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs }));
-        return { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads), audience };
+        const { audience, contentLength: audienceContentLength } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs }));
+        return { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads), audience, audienceContentLength };
     }
 
     return rt;
@@ -209,13 +209,14 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs }:
     const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
     const putPromise = statsBlobs.put(monthKey, readable) // don't await!
     const writer = writable.getWriter();
+    const encoder = new TextEncoder();
     for (const [ audienceId, timestamp ] of Object.entries(audienceTimestamps)) {
-        writer.write(`${audienceId}\t${timestamp}\n`);
+        writer.write(encoder.encode(`${audienceId}\t${timestamp}\n`));
     }
     await writer.close();
     // await writable.close(); // will throw on cf
     await putPromise;
-    return { audience: count };
+    return { audience: count, contentLength };
 }
 
 //
