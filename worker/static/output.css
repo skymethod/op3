@@ -713,6 +713,18 @@ a:hover {
   margin-left: 2rem;
 }
 
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-\[\.25rem\] {
+  margin-top: .25rem;
+}
+
+.mt-\[\.1rem\] {
+  margin-top: .1rem;
+}
+
 .block {
   display: block;
 }
@@ -797,6 +809,30 @@ a:hover {
   width: 12rem;
 }
 
+.w-96 {
+  width: 24rem;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.w-\[12rem\] {
+  width: 12rem;
+}
+
+.w-\[14rem\] {
+  width: 14rem;
+}
+
+.w-\[16rem\] {
+  width: 16rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -827,6 +863,26 @@ a:hover {
 
 .max-w-\[64rem\] {
   max-width: 64rem;
+}
+
+.max-w-\[10rem\] {
+  max-width: 10rem;
+}
+
+.max-w-\[12rem\] {
+  max-width: 12rem;
+}
+
+.max-w-\[11rem\] {
+  max-width: 11rem;
+}
+
+.max-w-\[9rem\] {
+  max-width: 9rem;
+}
+
+.max-w-\[9\.5rem\] {
+  max-width: 9.5rem;
 }
 
 .transform {
@@ -1094,6 +1150,10 @@ a:hover {
 
 .leading-none {
   line-height: 1;
+}
+
+.leading-loose {
+  line-height: 2;
 }
 
 .text-neutral-300 {

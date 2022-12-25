@@ -9,11 +9,13 @@ declare const previewToken: string;
 
 const app = (() => {
 
-    const [ debugDiv, sevenDayDownloadsDiv, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsSparklineCanvas ] = [
+    const [ debugDiv, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas ] = [
         element('debug'),
         element('seven-day-downloads'),
+        element('seven-day-downloads-asof'),
         element<HTMLCanvasElement>('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
+        element('thirty-day-downloads-asof'),
         element<HTMLCanvasElement>('thirty-day-downloads-sparkline'),
     ];
 
@@ -35,25 +37,8 @@ const app = (() => {
 
     const exportDownloads = makeExportDownloads({ showUuid, previewToken });
 
-    const f = new Intl.NumberFormat('en-US');
-    const sevenDayDownloads = computeHourlyNDayDownloads(7, hourlyDownloads);
-    sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
-    drawSparkline(sevenDayDownloadsSparklineCanvas, sevenDayDownloads, { onHover: v => {
-        if (v) {
-            sevenDayDownloadsDiv.textContent = f.format(Math.round(v.value));
-        } else {
-            sevenDayDownloadsDiv.textContent = f.format(Object.values(sevenDayDownloads).at(-1)!);
-        }
-    }});
-    const thirtyDayDownloads = computeHourlyNDayDownloads(30, hourlyDownloads);
-    thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
-    drawSparkline(thirtyDayDownloadsSparklineCanvas, thirtyDayDownloads, { onHover: v => {
-        if (v) {
-            thirtyDayDownloadsDiv.textContent = f.format(Math.round(v.value));
-        } else {
-            thirtyDayDownloadsDiv.textContent = f.format(Object.values(thirtyDayDownloads).at(-1)!);
-        }
-    }});
+    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
+    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
 
     debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     console.log(initialData);
@@ -71,6 +56,26 @@ globalThis.addEventListener('DOMContentLoaded', () => {
 });
 
 //
+
+function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, valueDiv: HTMLElement, asofSpan: HTMLElement, sparklineCanvas: HTMLCanvasElement) {
+    const withCommas = new Intl.NumberFormat('en-US');
+    const asofFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+    const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
+    const init = () => {
+        valueDiv.textContent = withCommas.format(Object.values(nDayDownloads).at(-1)!);
+        asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(nDayDownloads).at(-1)!.substring(0, 10)}T00:00:00.000Z`));
+    };
+    init();
+    drawSparkline(sparklineCanvas, nDayDownloads, { onHover: v => {
+        if (v) {
+            valueDiv.textContent = withCommas.format(Math.round(v.value));
+            asofSpan.textContent = asofFormat.format(new Date(`${v.label.substring(0, 10)}T00:00:00.000Z`));
+        } else {
+            init();
+        }
+    }});
+}
 
 function drawDownloadsChart(id: string, hourlyDownloads: Record<string, number>, hourMarkers?: Record<string, unknown>,) {
     const maxDownloads = Math.max(...Object.values(hourlyDownloads));
@@ -184,6 +189,20 @@ function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string
                 },
                 tooltip: {
                     enabled: false,
+                    backgroundColor: 'transparent',
+                    caretSize: 0,
+                    padding: 0,
+                    titleFont: {
+                        style: 'normal',
+                        weight: 'normal',
+                        size: 12,
+                        lineHeight: 1,
+                    },
+                    titleSpacing: 0,
+                    titleMarginBottom: 30,
+                    callbacks: {
+                        label: () => '', /* only use the title */
+                    }
                 },
             },
         },
