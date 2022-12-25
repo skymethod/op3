@@ -43,13 +43,15 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         return true;
     });
     if (log) console.log(`${showDailyKeys.length} showDailyKeys, ${showDailyKeysProcessed.length} showDailyKeysProcessed, sequential=${!!sequential}`);
-    const recomputeShowSummary = async (showDailyKey: string): Promise<string> => {
+    const recomputeShowSummary = async (showDailyKey: string): Promise<void> => {
         const { date } = unpackShowDailyKey(showDailyKey);
         if (log) console.log(`Computing ${date}`);
-        const summary = await timed(times, 'compute-daily', () => computeShowSummaryForDate({ showUuid, date, statsBlobs }));
+        const { summary, audienceIds } = await timed(times, 'compute-daily', () => computeShowSummaryForDate({ showUuid, date, statsBlobs }));
         if (log) console.log(`Saving ${date}`);
-        const { key } = await timed(times, 'save-daily', () => saveShowSummary({ summary, statsBlobs }));
-        return key;
+        await Promise.all([
+            timed(times, 'save-daily', () => saveShowSummary({ summary, statsBlobs })),
+            timed(times, 'save-daily-audience', () => saveAudience({ showUuid: summary.showUuid, period: date, audienceIds, statsBlobs })),
+        ]);
     };
     if (sequential) {
         for (const showDailyKey of showDailyKeysProcessed) {
@@ -123,7 +125,7 @@ export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputP
     });
 }
 
-export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: { showUuid: string, date: string, statsBlobs: Blobs }): Promise<ShowSummary> {
+export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: { showUuid: string, date: string, statsBlobs: Blobs }): Promise<{ summary: ShowSummary, audienceIds: Set<string> }> {
     const key = computeShowDailyKey({ showUuid, date });
     const result = await statsBlobs.get(key, 'stream-and-meta');
     if (!result) throw new Error(`Show-daily not found: ${showUuid} ${date}`);
@@ -131,8 +133,9 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
 
     const hourlyDownloads: Record<string, number> = {};
     const episodes: Record<string, EpisodeSummary> = {};
+    const audienceIds = new Set<string>();
     for await (const obj of yieldTsvFromStream(stream)) {
-        const { botType, time, episodeId } = obj;
+        const { botType, time, episodeId, audienceId } = obj;
         if (time === undefined) throw new Error(`Undefined time`);
         const hour = time.substring(0, '2000-01-01T00'.length);
         if (botType !== undefined) continue;
@@ -148,15 +151,17 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
                 episodes[episodeId] = record;
             }
             increment(record.hourlyDownloads, hour);
+            if (audienceId) audienceIds.add(audienceId);
         }
     }
-    return computeSorted({
+    const summary = computeSorted({
         showUuid,
         period: date,
         hourlyDownloads,
         episodes,
         sources: Object.fromEntries([ [ key, etag] ]),
     });
+    return { summary, audienceIds };
 }
 
 export function computeShowSummaryKey({ showUuid, period }: { showUuid: string, period: string }): string {
@@ -230,4 +235,14 @@ function tryComputeNewOverall({ overall, summary }: { overall?: ShowSummary, sum
         }
     }
     return changed ? rt : undefined;
+}
+
+async function saveAudience({ showUuid, period, audienceIds, statsBlobs }: { showUuid: string, period: string, audienceIds: Set<string>, statsBlobs: Blobs }): Promise<{ key: string, etag: string }> {
+    const key = computeAudienceKey({ showUuid, period });
+    const { etag } = await statsBlobs.put(key, [...audienceIds].join('\n'));
+    return { key, etag };
+}
+
+function computeAudienceKey({ showUuid, period }: { showUuid: string, period: string }): string {
+    return `audiences/show/${showUuid}/${showUuid}-${period}.audience.txt`;
 }
