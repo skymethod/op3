@@ -833,6 +833,10 @@ a:hover {
   width: 16rem;
 }
 
+.w-\[35rem\] {
+  width: 35rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -885,6 +889,10 @@ a:hover {
   max-width: 9.5rem;
 }
 
+.max-w-\[35rem\] {
+  max-width: 35rem;
+}
+
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -923,8 +931,16 @@ a:hover {
   grid-template-columns: min-content 1fr;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-col {
   flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
 .items-end {
@@ -945,6 +961,10 @@ a:hover {
 
 .gap-4 {
   gap: 1rem;
+}
+
+.gap-8 {
+  gap: 2rem;
 }
 
 .gap-x-4 {
@@ -1262,6 +1282,10 @@ a:hover {
 
   .md\:max-w-2xl {
     max-width: 42rem;
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
   }
 
   .md\:px-8 {
