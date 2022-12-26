@@ -1,6 +1,6 @@
 export function increment(summary: Record<string, number>, key: string, delta = 1) {
-    if (summary[key] === undefined) summary[key] = 0;
-    summary[key] += delta;
+    const existing = summary[key];
+    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
 }
 
 export function incrementAll(summary: Record<string, number>, keysAndDeltas: Record<string, number>) {

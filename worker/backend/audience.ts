@@ -19,7 +19,7 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
             if (part === '4of4' && !(line >= 'c')) continue;
             const audienceId = line.substring(0, 64);
             const timestamp = line.substring(65, 80);
-            increment(audienceSummary.dailyFoundAudience, `20${timestamp.slice(0, 2)}-${timestamp.slice(2, 4)}-${timestamp.slice(4, 6)}`);
+            increment(audienceSummary.dailyFoundAudience, timestamp.substring(0, 6));
             if (!audienceTimestamps[audienceId]) {
                 audienceTimestamps[audienceId] = timestamp;
                 count++;
