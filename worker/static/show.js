@@ -8466,54 +8466,33 @@ async function download(e, showUuid, month, previewToken1, includeBots, signal, 
     anchor.click();
     URL.revokeObjectURL(blobUrl);
 }
-const app = (()=>{
-    const [debugDiv, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas] = [
-        element('debug'),
+function increment(summary, key, delta = 1) {
+    const existing = summary[key];
+    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
+}
+const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
+    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
         element('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
         element('thirty-day-downloads-asof'),
-        element('thirty-day-downloads-sparkline')
+        element('thirty-day-downloads-sparkline'),
+        element('audience-count'),
+        element('audience-period'),
+        element('audience-minigraph')
     ];
-    const { showObj , statsObj , times  } = initialData;
-    const { showUuid  } = showObj;
-    if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const { episodeFirstHours , hourlyDownloads  } = statsObj;
-    const hourMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
-            hour,
-            episodeId
-        ]));
-    drawDownloadsChart('show-downloads', hourlyDownloads, hourMarkers);
-    let n = 1;
-    for (const episode of showObj.episodes){
-        const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
-        if (!episodeHourlyDownloads) continue;
-        drawDownloadsChart(`episode-${n}-downloads`, episodeHourlyDownloads);
-        n++;
-        if (n > 4) break;
-    }
-    const exportDownloads = makeExportDownloads({
-        showUuid,
-        previewToken
-    });
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
-    debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
-    console.log(initialData);
-    function update() {
-        exportDownloads.update();
-    }
+    initAudienceBox(dailyFoundAudience, audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    function update() {}
+    update();
     return {
         update
     };
-})();
-globalThis.addEventListener('DOMContentLoaded', ()=>{
-    console.log('Document content loaded');
-    app.update();
-});
+};
+const withCommas = new Intl.NumberFormat('en-US');
 function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanvas) {
-    const withCommas = new Intl.NumberFormat('en-US');
     const asofFormat = new Intl.DateTimeFormat('en-US', {
         weekday: 'short',
         month: 'long',
@@ -8536,52 +8515,6 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
             }
         }
     });
-}
-function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
-    const maxDownloads = Math.max(...Object.values(hourlyDownloads));
-    const markerData = Object.keys(hourlyDownloads).map((v)=>{
-        if (hourMarkers && hourMarkers[v]) return maxDownloads;
-        return undefined;
-    });
-    const ctx = document.getElementById(id).getContext('2d');
-    const labels = Object.keys(hourlyDownloads);
-    const data = {
-        labels,
-        datasets: [
-            {
-                data: Object.values(hourlyDownloads),
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                pointRadius: 0,
-                borderWidth: 1
-            },
-            {
-                type: 'bar',
-                data: markerData,
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)'
-            }
-        ]
-    };
-    const config = {
-        type: 'line',
-        data,
-        options: {
-            animation: {
-                duration: 100
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    };
-    new at(ctx, config);
 }
 function computeHourlyNDayDownloads(n, hourlyDownloads) {
     const buffer = [];
@@ -8684,4 +8617,209 @@ function drawSparkline(canvas, labelsAndValues, { onHover  } = {}) {
             }
         };
     }
+}
+function initAudienceBox(dailyFoundAudience, audienceCountDiv, audiencePeriodDiv, audienceMinigraph) {
+    const monthlyAudience = {};
+    for (const [date, count] of Object.entries(dailyFoundAudience)){
+        const month = date.substring(0, 7);
+        increment(monthlyAudience, month, count);
+    }
+    console.log(monthlyAudience);
+    const [lastMonth, lastMonthAudience] = Object.entries(monthlyAudience).at(-2);
+    const thisMonth = Object.keys(monthlyAudience).at(-1);
+    audienceCountDiv.textContent = withCommas.format(lastMonthAudience);
+    audiencePeriodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
+    drawMinigraph(audienceMinigraph, monthlyAudience, {
+        onHover: (v)=>{
+            const { label , value  } = v ?? {
+                label: lastMonth,
+                value: lastMonthAudience
+            };
+            audienceCountDiv.textContent = withCommas.format(value);
+            audiencePeriodDiv.textContent = `in ${computeMonthName(label)}${label === thisMonth ? ' (so far)' : ''}`;
+        }
+    });
+}
+function computeMonthName(month) {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        timeZone: 'UTC'
+    }).format(new Date(`${month}-01`));
+}
+function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
+    const ctx = canvas.getContext('2d');
+    const entries = Object.entries(labelsAndValues);
+    const values = Object.values(labelsAndValues);
+    const maxValue = Math.max(...values);
+    const labels = Object.keys(labelsAndValues);
+    const data = {
+        labels,
+        datasets: [
+            {
+                data: values,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                pointRadius: 0,
+                borderWidth: 1
+            }
+        ]
+    };
+    const config = {
+        type: 'bar',
+        data,
+        options: {
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    display: false,
+                    min: 0,
+                    max: maxValue
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            animation: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false,
+                    backgroundColor: 'transparent',
+                    caretSize: 0,
+                    padding: 0,
+                    titleFont: {
+                        style: 'normal',
+                        weight: 'normal',
+                        size: 12,
+                        lineHeight: 1
+                    },
+                    titleSpacing: 0,
+                    titleMarginBottom: 30,
+                    callbacks: {
+                        label: ()=>''
+                    }
+                }
+            }
+        },
+        plugins: [
+            {
+                id: 'event-catcher',
+                beforeEvent (_chart, args, _pluginOptions) {
+                    if (args.event.type === 'mouseout' && onHover) {
+                        onHover();
+                    }
+                }
+            }
+        ]
+    };
+    const chart = new at(ctx, config);
+    if (onHover) {
+        chart.options.onHover = (e)=>{
+            const points = chart.getElementsAtEventForMode(e, 'index', {
+                intersect: false
+            }, true);
+            if (points.length > 0) {
+                const { index  } = points[0];
+                const [label, value] = entries[index];
+                onHover({
+                    label,
+                    value
+                });
+            }
+        };
+    }
+}
+const app = (()=>{
+    const [debugDiv] = [
+        element('debug')
+    ];
+    const { showObj , statsObj , times  } = initialData;
+    const { showUuid  } = showObj;
+    if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
+    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience  } = statsObj;
+    const hourMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
+            hour,
+            episodeId
+        ]));
+    drawDownloadsChart('show-downloads', hourlyDownloads, hourMarkers);
+    let n = 1;
+    for (const episode of showObj.episodes){
+        const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
+        if (!episodeHourlyDownloads) continue;
+        drawDownloadsChart(`episode-${n}-downloads`, episodeHourlyDownloads);
+        n++;
+        if (n > 4) break;
+    }
+    const exportDownloads = makeExportDownloads({
+        showUuid,
+        previewToken
+    });
+    const headlineStats = makeHeadlineStats({
+        hourlyDownloads,
+        dailyFoundAudience
+    });
+    debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+    console.log(initialData);
+    function update() {
+        exportDownloads.update();
+        headlineStats.update();
+    }
+    return {
+        update
+    };
+})();
+globalThis.addEventListener('DOMContentLoaded', ()=>{
+    console.log('Document content loaded');
+    app.update();
+});
+function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
+    const maxDownloads = Math.max(...Object.values(hourlyDownloads));
+    const markerData = Object.keys(hourlyDownloads).map((v)=>{
+        if (hourMarkers && hourMarkers[v]) return maxDownloads;
+        return undefined;
+    });
+    const ctx = document.getElementById(id).getContext('2d');
+    const labels = Object.keys(hourlyDownloads);
+    const data = {
+        labels,
+        datasets: [
+            {
+                data: Object.values(hourlyDownloads),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                pointRadius: 0,
+                borderWidth: 1
+            },
+            {
+                type: 'bar',
+                data: markerData,
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)'
+            }
+        ]
+    };
+    const config = {
+        type: 'line',
+        data,
+        options: {
+            animation: {
+                duration: 100
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    };
+    new at(ctx, config);
 }

@@ -64,6 +64,10 @@ export async function saveAudience({ showUuid, period, audienceTimestamps, stats
     return { key, etag };
 }
 
+export function computeAudienceSummaryKey({ showUuid, period, part }: { showUuid: string, period: string, part?: string }): string {
+    return `audience-summaries/show/${showUuid}/${showUuid}-${period}.${part ?? 'all'}.audience-summary.json`;
+}
+
 //
 
 export interface AudienceSummary {
@@ -97,8 +101,4 @@ function unpackAudienceKey(key: string): { showUuid: string, period: string, par
     check('key', key, showUuid === showUuid2 && isValidUuid(showUuid) && (isValidDate(period) || isValidMonth(period)));
     const part = partStr === 'all' ? undefined : partStr;
     return { showUuid, period, part };
-}
-
-function computeAudienceSummaryKey({ showUuid, period, part }: { showUuid: string, period: string, part?: string }): string {
-    return `audience-summaries/show/${showUuid}/${showUuid}-${period}.${part ?? 'all'}.audience-summary.json`;
 }
