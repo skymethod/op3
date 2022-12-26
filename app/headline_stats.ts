@@ -9,6 +9,7 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts)
     const [ 
         sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
         thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, 
+        downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph,
         audienceCountDiv, audiencePeriodDiv, audienceMinigraph,
     ] = [
         element('seven-day-downloads'),
@@ -17,6 +18,9 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts)
         element('thirty-day-downloads'),
         element('thirty-day-downloads-asof'),
         element<HTMLCanvasElement>('thirty-day-downloads-sparkline'),
+        element('downloads-count'),
+        element('downloads-period'),
+        element<HTMLCanvasElement>('downloads-minigraph'),
         element('audience-count'),
         element('audience-period'),
         element<HTMLCanvasElement>('audience-minigraph'),
@@ -24,7 +28,11 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts)
 
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
-    initAudienceBox(dailyFoundAudience, audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
+    monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
 
     function update() {
        
@@ -164,26 +172,39 @@ function drawSparkline(canvas: HTMLCanvasElement, labelsAndValues: Record<string
 
 //
 
-function initAudienceBox(dailyFoundAudience: Record<string, number>, audienceCountDiv: HTMLElement, audiencePeriodDiv: HTMLElement, audienceMinigraph: HTMLCanvasElement) {
-    const monthlyAudience: Record<string, number> = {};
-    for (const [ date, count ] of Object.entries(dailyFoundAudience)) {
+function computeMonthlyCounts(dateBasedCounts: Record<string, number>): Record<string, number> {
+    const monthlyCounts: Record<string, number> = {};
+    for (const [ date, count ] of Object.entries(dateBasedCounts)) {
         const month = date.substring(0, 7);
-        increment(monthlyAudience, month, count);
+        increment(monthlyCounts, month, count);
     }
-    console.log(monthlyAudience);
-    const [ lastMonth, lastMonthAudience ] = Object.entries(monthlyAudience).at(-2)!;
-    const thisMonth = Object.keys(monthlyAudience).at(-1);
-    audienceCountDiv.textContent = withCommas.format(lastMonthAudience);
-    audiencePeriodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
-    drawMinigraph(audienceMinigraph, monthlyAudience, { onHover: v => {
-        const { label, value } = v ?? { label: lastMonth, value: lastMonthAudience };
-        audienceCountDiv.textContent = withCommas.format(value);
-        audiencePeriodDiv.textContent = `in ${computeMonthName(label)}${label === thisMonth ? ' (so far)' : ''}`;
+    return monthlyCounts;
+}
+
+type HoverMonthHandler = (hoverMonth?: string) => void;
+type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler: HoverMonthHandler) => void };
+
+function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement): MonthlyBox {
+    const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2)!;
+    const thisMonth = Object.keys(monthlyCounts).at(-1);
+    countDiv.textContent = withCommas.format(lastMonthCount);
+    periodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
+    const hoverListeners: HoverMonthHandler[] = [];
+    const onHoverMonth: HoverMonthHandler = hoverMonth => {
+        const month = hoverMonth ?? lastMonth;
+        const value = monthlyCounts[month];
+        countDiv.textContent = withCommas.format(value);
+        periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
+    }
+    drawMinigraph(minigraph, monthlyCounts, { onHover: v => {
+        onHoverMonth(v?.label);
+        hoverListeners.forEach(w => w(v?.label));
     }});
+    return { onHoverMonth, addHoverListener: v => hoverListeners.push(v)};
 }
 
 function computeMonthName(month: string): string {
-    return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(new Date(`${month}-01`));
+    return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 
 function drawMinigraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, { onHover }: { onHover?: (opts?: { label: string, value: number }) => void } = {}) {

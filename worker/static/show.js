@@ -8471,20 +8471,26 @@ function increment(summary, key, delta = 1) {
     summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
 }
 const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
-    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
+    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
         element('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
         element('thirty-day-downloads-asof'),
         element('thirty-day-downloads-sparkline'),
+        element('downloads-count'),
+        element('downloads-period'),
+        element('downloads-minigraph'),
         element('audience-count'),
         element('audience-period'),
         element('audience-minigraph')
     ];
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
-    initAudienceBox(dailyFoundAudience, audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
+    monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
     function update() {}
     update();
     return {
@@ -8618,33 +8624,42 @@ function drawSparkline(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-function initAudienceBox(dailyFoundAudience, audienceCountDiv, audiencePeriodDiv, audienceMinigraph) {
-    const monthlyAudience = {};
-    for (const [date, count] of Object.entries(dailyFoundAudience)){
+function computeMonthlyCounts(dateBasedCounts) {
+    const monthlyCounts = {};
+    for (const [date, count] of Object.entries(dateBasedCounts)){
         const month = date.substring(0, 7);
-        increment(monthlyAudience, month, count);
+        increment(monthlyCounts, month, count);
     }
-    console.log(monthlyAudience);
-    const [lastMonth, lastMonthAudience] = Object.entries(monthlyAudience).at(-2);
-    const thisMonth = Object.keys(monthlyAudience).at(-1);
-    audienceCountDiv.textContent = withCommas.format(lastMonthAudience);
-    audiencePeriodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
-    drawMinigraph(audienceMinigraph, monthlyAudience, {
+    return monthlyCounts;
+}
+function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
+    const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2);
+    const thisMonth = Object.keys(monthlyCounts).at(-1);
+    countDiv.textContent = withCommas.format(lastMonthCount);
+    periodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
+    const hoverListeners = [];
+    const onHoverMonth = (hoverMonth)=>{
+        const month = hoverMonth ?? lastMonth;
+        const value = monthlyCounts[month];
+        countDiv.textContent = withCommas.format(value);
+        periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
+    };
+    drawMinigraph(minigraph, monthlyCounts, {
         onHover: (v)=>{
-            const { label , value  } = v ?? {
-                label: lastMonth,
-                value: lastMonthAudience
-            };
-            audienceCountDiv.textContent = withCommas.format(value);
-            audiencePeriodDiv.textContent = `in ${computeMonthName(label)}${label === thisMonth ? ' (so far)' : ''}`;
+            onHoverMonth(v?.label);
+            hoverListeners.forEach((w)=>w(v?.label));
         }
     });
+    return {
+        onHoverMonth,
+        addHoverListener: (v)=>hoverListeners.push(v)
+    };
 }
 function computeMonthName(month) {
     return new Intl.DateTimeFormat('en-US', {
         month: 'long',
         timeZone: 'UTC'
-    }).format(new Date(`${month}-01`));
+    }).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
     const ctx = canvas.getContext('2d');

@@ -53,6 +53,19 @@ const sessionToken = '${sessionToken}';
         </sl-card>
 
         <sl-card class="card-basic ml-8 w-[16rem]">
+            <div class="text-[2.5rem] leading-none mb-2" id="downloads-count">xxx</div>
+            <div class="text-sm">downloads</div>
+            <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
+            <div class="flex items-end mt-4 justify-between">
+                <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer"></canvas>
+                <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
+                    <div class="text-xs" slot="content">Downloads for this podcast in a given month.</div>
+                    <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
+                </sl-tooltip>
+            </div>
+        </sl-card>
+
+        <sl-card class="card-basic ml-8 w-[16rem]">
             <div class="text-[2.5rem] leading-none mb-2" id="audience-count">xxx</div>
             <div class="text-sm">unique audience</div>
             <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
