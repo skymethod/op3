@@ -1,6 +1,7 @@
-import { isStringRecord } from '../check.ts';
+import { check, checkMatches, isStringRecord, isValidDate, isValidMonth } from '../check.ts';
 import { computeLinestream } from '../streams.ts';
 import { increment } from '../summaries.ts';
+import { isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 
 export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: '1of4' | '2of4' | '3of4' | '4of4' }) {
@@ -11,15 +12,17 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
     for (const key of keys) {
         const stream = await statsBlobs.get(key, 'stream');
         if (stream === undefined) throw new Error(`recomputeAudienceForMonth: Failed to find key: ${key}`);
+        const { period: date } = unpackAudienceKey(key);
+        check('date', date, isValidDate);
         for await (const line of computeLinestream(stream)) {
             if (line.length === 0) continue;
-            if (part === '1of4' && !(line < '4')) continue;
-            if (part === '2of4' && !(line >= '4' && line < '8')) continue;
-            if (part === '3of4' && !(line >= '8' && line < 'c')) continue;
-            if (part === '4of4' && !(line >= 'c')) continue;
+            if (part) {
+                const linePart = line < '4' ? '1of4' : line < '8' ? '2of4' : line < 'c' ? '3of4' : '4of4';
+                if (linePart !== part) continue;
+            }
             const audienceId = line.substring(0, 64);
             const timestamp = line.substring(65, 80);
-            increment(audienceSummary.dailyFoundAudience, timestamp.substring(0, 6));
+            increment(audienceSummary.dailyFoundAudience, date);
             if (!audienceTimestamps[audienceId]) {
                 audienceTimestamps[audienceId] = timestamp;
                 count++;
@@ -87,6 +90,13 @@ function computeAudienceKey({ showUuid, period, part }: { showUuid: string, peri
 
 function computeAudienceKeyPrefix({ showUuid, month }: { showUuid: string, month: string }): string {
     return `audiences/show/${showUuid}/${showUuid}-${month}-`;
+}
+
+function unpackAudienceKey(key: string): { showUuid: string, period: string, part?: string } {
+    const [ _, showUuid, showUuid2, period, partStr ] = checkMatches('key', key, /^audiences\/show\/(.*?)\/(.*?)-(.*?)\.(.*?)\.audience\.txt$/);
+    check('key', key, showUuid === showUuid2 && isValidUuid(showUuid) && (isValidDate(period) || isValidMonth(period)));
+    const part = partStr === 'all' ? undefined : partStr;
+    return { showUuid, period, part };
 }
 
 function computeAudienceSummaryKey({ showUuid, period, part }: { showUuid: string, period: string, part?: string }): string {
