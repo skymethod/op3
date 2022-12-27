@@ -20,3 +20,9 @@ export interface SlSwitch extends HTMLElement {
     disabled: boolean;
     checked: boolean;
 }
+
+export interface SlMenuItem extends HTMLElement {
+    disabled: boolean;
+    checked: boolean;
+    value: string;
+}

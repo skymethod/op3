@@ -2,6 +2,10 @@
 // deno-lint-ignore-file
 // This code was bundled using `deno bundle` and it's not recommended to edit it manually
 
+function increment(summary, key, delta = 1) {
+    const existing = summary[key];
+    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
+}
 function m(n) {
     return n + .5 | 0;
 }
@@ -8326,6 +8330,126 @@ function element(id) {
     if (!rt) throw new Error(`Element not found: ${id}`);
     return rt;
 }
+const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
+    const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
+        element('downloads-graph'),
+        element('downloads-graph-previous'),
+        element('downloads-graph-granularity'),
+        element('downloads-graph-options'),
+        element('downloads-graph-range'),
+        element('downloads-graph-next')
+    ];
+    let granularity = 'hourly';
+    let showEpisodeMarkers = true;
+    downloadsGraphOptionsMenu.addEventListener('sl-select', (ev)=>{
+        const e = ev;
+        const item = e.detail.item;
+        const { value  } = item;
+        if (isGranularity(value)) {
+            if (granularity === value) return;
+            granularity = value;
+            update();
+            redrawChart();
+        } else if (value === 'episode-markers') {
+            showEpisodeMarkers = !showEpisodeMarkers;
+            update();
+            redrawChart();
+        }
+    });
+    let chart;
+    function redrawChart() {
+        if (chart) chart.destroy();
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloads, granularity, showEpisodeMarkers ? hourMarkers : undefined);
+    }
+    function update() {
+        downloadsGraphGranularitySpan.textContent = ({
+            'hourly': 'Hourly',
+            'six-hourly': '6-hourly',
+            'twelve-hourly': '12-hourly',
+            'daily': 'Daily'
+        })[granularity] + ' Downloads';
+        const items = downloadsGraphOptionsMenu.querySelectorAll('sl-menu-item');
+        for (const item of items){
+            const { value  } = item;
+            if (isGranularity(value)) {
+                item.checked = value === granularity;
+            } else if (value === 'episode-markers') {
+                item.checked = showEpisodeMarkers;
+            }
+        }
+    }
+    update();
+    redrawChart();
+    return {
+        update
+    };
+};
+function isGranularity(obj) {
+    return [
+        'hourly',
+        'six-hourly',
+        'twelve-hourly',
+        'daily'
+    ].includes(obj);
+}
+function computeDownloads(hourlyDownloads, granularity) {
+    if (granularity === 'hourly') return hourlyDownloads;
+    if (granularity === 'daily') {
+        const rt = {};
+        for (const [hour, downloads] of Object.entries(hourlyDownloads)){
+            const key = hour.substring(0, 10);
+            increment(rt, key, downloads);
+        }
+        return rt;
+    }
+    throw new Error(`Unsupported granularity: ${granularity}`);
+}
+function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
+    const downloads = computeDownloads(hourlyDownloads, granularity);
+    const maxDownloads = Math.max(...Object.values(downloads));
+    const markerData = Object.keys(downloads).map((v)=>{
+        if (granularity === 'hourly' && hourMarkers && hourMarkers[v]) return maxDownloads;
+        return undefined;
+    });
+    const ctx = canvas.getContext('2d');
+    const labels = Object.keys(downloads);
+    const data = {
+        labels,
+        datasets: [
+            {
+                data: Object.values(downloads),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                pointRadius: 0,
+                borderWidth: 1
+            },
+            {
+                type: 'bar',
+                data: markerData,
+                backgroundColor: 'rgba(154, 52, 18, 0.75)'
+            }
+        ]
+    };
+    const config = {
+        type: 'line',
+        data,
+        options: {
+            animation: {
+                duration: 100
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    };
+    return new at(ctx, config);
+}
 function isValidMonth(month) {
     return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
 }
@@ -8465,10 +8589,6 @@ async function download(e, showUuid, month, previewToken1, includeBots, signal, 
     anchor.download = `downloads-${month}.tsv`;
     anchor.click();
     URL.revokeObjectURL(blobUrl);
-}
-function increment(summary, key, delta = 1) {
-    const existing = summary[key];
-    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
 }
 const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
     const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
@@ -8761,22 +8881,17 @@ const app = (()=>{
             hour,
             episodeId
         ]));
-    drawDownloadsChart('show-downloads', hourlyDownloads, hourMarkers);
-    let n = 1;
-    for (const episode of showObj.episodes){
-        const episodeHourlyDownloads = statsObj.episodeHourlyDownloads[episode.id];
-        if (!episodeHourlyDownloads) continue;
-        drawDownloadsChart(`episode-${n}-downloads`, episodeHourlyDownloads);
-        n++;
-        if (n > 4) break;
-    }
-    const exportDownloads = makeExportDownloads({
-        showUuid,
-        previewToken
-    });
     const headlineStats = makeHeadlineStats({
         hourlyDownloads,
         dailyFoundAudience
+    });
+    makeDownloadsGraph({
+        hourlyDownloads,
+        hourMarkers
+    });
+    const exportDownloads = makeExportDownloads({
+        showUuid,
+        previewToken
     });
     debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
     console.log(initialData);
@@ -8792,49 +8907,3 @@ globalThis.addEventListener('DOMContentLoaded', ()=>{
     console.log('Document content loaded');
     app.update();
 });
-function drawDownloadsChart(id, hourlyDownloads, hourMarkers) {
-    const maxDownloads = Math.max(...Object.values(hourlyDownloads));
-    const markerData = Object.keys(hourlyDownloads).map((v)=>{
-        if (hourMarkers && hourMarkers[v]) return maxDownloads;
-        return undefined;
-    });
-    const ctx = document.getElementById(id).getContext('2d');
-    const labels = Object.keys(hourlyDownloads);
-    const data = {
-        labels,
-        datasets: [
-            {
-                data: Object.values(hourlyDownloads),
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                pointRadius: 0,
-                borderWidth: 1
-            },
-            {
-                type: 'bar',
-                data: markerData,
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)'
-            }
-        ]
-    };
-    const config = {
-        type: 'line',
-        data,
-        options: {
-            animation: {
-                duration: 100
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    };
-    new at(ctx, config);
-}

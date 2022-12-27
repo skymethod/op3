@@ -22,10 +22,11 @@ const sessionToken = '${sessionToken}';
     ${nonProdHeader}
     <div id="debug" class="whitespace-pre text-xs absolute top-0 p-2"></div>
 
-    <h4 id="setup" class="my-16 mx-auto text-3xl font-semibold">${showTitle}</h4>
+    <h4 class="my-16 mx-auto text-3xl font-semibold">${showTitle}</h4>
    
     <main class="wait mx-8">
 
+        <!-- headline boxes -->
         <div class="flex flex-wrap gap-8 flex-row items-center justify-center">
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="seven-day-downloads">xxx</div>
@@ -80,19 +81,37 @@ const sessionToken = '${sessionToken}';
             </sl-card>
         </div>
 
-        <canvas id="show-downloads" class="max-h-64 my-8"></canvas>
+        <!-- downloads graph -->
+        <div class="flex justify-center items-center mt-16 leading-none">
+            <sl-icon-button name="caret-left-fill" label="Previous" id="downloads-graph-previous"></sl-icon-button>
+            <span id="downloads-graph-granularity">Hourly Downloads</span>
+            <sl-dropdown class="flex justify-center">
+                <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
+                <sl-menu id="downloads-graph-options">
+                    <sl-menu-item checked value="hourly">Hourly</sl-menu-item>
+                    <sl-menu-item value="six-hourly">6-Hourly</sl-menu-item>
+                    <sl-menu-item value="twelve-hourly">12-Hourly</sl-menu-item>
+                    <sl-menu-item value="daily">Daily</sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-item checked value="episode-markers">Episode markers</sl-menu-item>
+                </sl-menu>
+            </sl-dropdown>
+            <span id="downloads-graph-range">October 20 - December 20</span>
+            <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
+        </div>
+        <canvas id="downloads-graph" class="max-h-64 my-8"></canvas>
 
         <!-- export downloads -->
-        <sl-card class="card-basic flex">
+        <sl-card class="card-basic flex justify-center">
             <div slot="header" class="flex items-center justify-between">
                 <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><div id="export-title" class="ml-2">Export downloads</div></div>
                 <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
             </div>
             <sl-button-group>
-                <sl-button id="export-month-0">Mmm YYYY</sl-button>
-                <sl-button id="export-month-1">Mmm YYYY</sl-button>
+                <sl-button id="export-month-0" outline>Mmm YYYY</sl-button>
+                <sl-button id="export-month-1" outline>Mmm YYYY</sl-button>
                 <sl-dropdown id="export-dropdown">
-                    <sl-button id="export-older" slot="trigger" caret>Older</sl-button>
+                    <sl-button id="export-older" slot="trigger" caret outline>Older</sl-button>
                     <sl-menu>
                         <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
                     </sl-menu>
