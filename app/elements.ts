@@ -26,3 +26,7 @@ export interface SlMenuItem extends HTMLElement {
     checked: boolean;
     value: string;
 }
+
+export interface SlIconButton extends HTMLElement {
+    disabled: boolean;
+}

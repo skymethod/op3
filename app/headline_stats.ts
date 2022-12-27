@@ -1,6 +1,7 @@
 import { Chart, CategoryScale, LinearScale, LineController, PointElement, LineElement, BarController, BarElement } from './deps.ts';
 import { element } from './elements.ts';
 import { increment } from '../worker/summaries.ts';
+import { computeMonthName } from './time.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number> };
 
@@ -209,10 +210,6 @@ function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLEle
         hoverListeners.forEach(w => w(v?.label));
     }});
     return { onHoverMonth, addHoverListener: v => hoverListeners.push(v)};
-}
-
-function computeMonthName(month: string): string {
-    return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 
 function drawMinigraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, { onHover }: { onHover?: (opts?: { label: string, value: number }) => void } = {}) {

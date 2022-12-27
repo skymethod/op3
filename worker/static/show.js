@@ -14,6 +14,19 @@ function increment(summary, key, delta = 1) {
     const existing = summary[key];
     summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
 }
+function addDays(date, days) {
+    if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
+    const rt = new Date(date);
+    rt.setUTCDate(rt.getUTCDate() + days);
+    return rt;
+}
+function addMonthsToMonthString(month, months) {
+    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
+    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
+    const rt = new Date(`${month}-01T00:00:00.000Z`);
+    rt.setUTCMonth(rt.getUTCMonth() + months);
+    return rt.toISOString().substring(0, 7);
+}
 function m(n) {
     return n + .5 | 0;
 }
@@ -8332,6 +8345,13 @@ function element(id) {
     if (!rt) throw new Error(`Element not found: ${id}`);
     return rt;
 }
+function computeMonthName(month) {
+    return monthNameFormat.format(new Date(`${month}-01T00:00:00.000Z`));
+}
+const monthNameFormat = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    timeZone: 'UTC'
+});
 const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
     xt.register(Vt);
     xt.register(ic);
@@ -8343,8 +8363,42 @@ const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
         element('downloads-graph-range'),
         element('downloads-graph-next')
     ];
+    const hours = Object.keys(hourlyDownloads);
     let granularity = 'daily';
     let showEpisodeMarkers = true;
+    let rangeStartHourIndex = 0;
+    let rangeEndHourIndex = hours.length - 1;
+    function recomputeRangeForGranularity() {
+        if (granularity === 'daily') {
+            rangeStartHourIndex = 0;
+            rangeEndHourIndex = hours.length - 1;
+        } else if (granularity === 'hourly') {
+            const startOfDayInstant = `${hours[rangeEndHourIndex].substring(0, 10)}T00:00:00Z`;
+            const rangeStartHour = addDays(startOfDayInstant, -4).toISOString().substring(0, 13);
+            rangeStartHourIndex = Math.max(0, hours.indexOf(rangeStartHour));
+        }
+        redrawChart();
+    }
+    downloadsGraphPreviousButton.onclick = ()=>{
+        if (granularity === 'hourly') {
+            const startOfDayInstant = `${hours[rangeStartHourIndex].substring(0, 10)}T00:00:00Z`;
+            const rangeStartHour = addDays(startOfDayInstant, -4).toISOString().substring(0, 13);
+            rangeStartHourIndex = Math.max(0, hours.indexOf(rangeStartHour));
+            rangeEndHourIndex = rangeStartHourIndex + 24 * 4 - 1;
+            redrawChart();
+            update();
+        }
+    };
+    downloadsGraphNextButton.onclick = ()=>{
+        if (granularity === 'hourly') {
+            const startOfDayInstant = `${hours[rangeStartHourIndex].substring(0, 10)}T00:00:00Z`;
+            const rangeStartHour = addDays(startOfDayInstant, 4).toISOString().substring(0, 13);
+            rangeStartHourIndex = Math.max(0, hours.indexOf(rangeStartHour));
+            rangeEndHourIndex = Math.min(rangeStartHourIndex + 24 * 4 - 1, hours.length - 1);
+            redrawChart();
+            update();
+        }
+    };
     downloadsGraphOptionsMenu.addEventListener('sl-select', (ev)=>{
         const e = ev;
         const item = e.detail.item;
@@ -8352,8 +8406,8 @@ const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
         if (isGranularity(value)) {
             if (granularity === value) return;
             granularity = value;
+            recomputeRangeForGranularity();
             update();
-            redrawChart();
         } else if (value === 'episode-markers') {
             showEpisodeMarkers = !showEpisodeMarkers;
             update();
@@ -8363,7 +8417,8 @@ const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
     let chart;
     function redrawChart() {
         if (chart) chart.destroy();
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloads, granularity, showEpisodeMarkers ? hourMarkers : undefined);
+        const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, showEpisodeMarkers ? hourMarkers : undefined);
     }
     function update() {
         downloadsGraphGranularitySpan.textContent = ({
@@ -8381,6 +8436,9 @@ const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
                 item.checked = showEpisodeMarkers;
             }
         }
+        downloadsGraphPreviousButton.disabled = rangeStartHourIndex === 0;
+        downloadsGraphRangeSpan.textContent = `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
+        downloadsGraphNextButton.disabled = rangeEndHourIndex === hours.length - 1;
     }
     update();
     redrawChart();
@@ -8410,7 +8468,15 @@ const dayAndHourFormat = new Intl.DateTimeFormat('en-US', {
     hour12: true,
     timeZone: 'UTC'
 });
+const timeOnlyFormat = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    hour12: true,
+    timeZone: 'UTC'
+});
 const withCommas = new Intl.NumberFormat('en-US');
+function computeRangeDisplay(hour) {
+    return `${computeMonthName(hour.substring(0, 7))} ${parseInt(hour.substring(8, 10))}`;
+}
 function computeKeyForGranularity(hour, granularity) {
     const [_, date, hh] = checkMatches('hour', hour, /^(.*)T(\d{2})$/);
     if (granularity === 'hourly') return `${date}T${hh}:00:00.000Z`;
@@ -8428,8 +8494,8 @@ function computeDownloads(hourlyDownloads, granularity) {
     return rt;
 }
 function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
-    const downloads = computeDownloads(hourlyDownloads, granularity);
     const hours = Object.keys(hourlyDownloads);
+    const downloads = computeDownloads(hourlyDownloads, granularity);
     const hourMarkerPcts = hourMarkers ? Object.keys(hourMarkers).filter((v)=>hours.includes(v)).map((v)=>hours.indexOf(v) / hours.length) : undefined;
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
     const ctx = canvas.getContext('2d');
@@ -8474,7 +8540,9 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
                     ticks: {
                         callback: function(value) {
                             const label = this.getLabelForValue(value);
-                            return dayFormat.format(new Date(label));
+                            const d = new Date(label);
+                            const format = d.getUTCHours() === 0 ? dayFormat : timeOnlyFormat;
+                            return format.format(d);
                         }
                     }
                 }
@@ -8488,7 +8556,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
                         const ctx = chart.ctx;
                         const { chartArea  } = chart;
                         ctx.beginPath();
-                        ctx.strokeStyle = "rgba(154, 52, 18, 0.75)";
+                        ctx.strokeStyle = 'rgba(154, 52, 18, 0.75)';
                         const x = chartArea.left + chart.width * hourMarkerPct;
                         ctx.moveTo(x, chartArea.top);
                         ctx.lineTo(x, chartArea.bottom);
@@ -8499,13 +8567,6 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
         ]
     };
     return new xt(ctx, config);
-}
-function addMonthsToMonthString(month, months) {
-    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
-    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
-    const rt = new Date(`${month}-01T00:00:00.000Z`);
-    rt.setUTCMonth(rt.getUTCMonth() + months);
-    return rt.toISOString().substring(0, 7);
 }
 const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
     const [exportSpinner, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
@@ -8828,12 +8889,6 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
         onHoverMonth,
         addHoverListener: (v)=>hoverListeners.push(v)
     };
-}
-function computeMonthName(month) {
-    return new Intl.DateTimeFormat('en-US', {
-        month: 'long',
-        timeZone: 'UTC'
-    }).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
     const ctx = canvas.getContext('2d');
