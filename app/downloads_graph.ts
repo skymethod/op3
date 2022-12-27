@@ -1,10 +1,14 @@
+import { checkMatches } from '../worker/check.ts';
 import { increment } from '../worker/summaries.ts';
-import { Chart } from './deps.ts';
+import { Chart, TimeScale, Tooltip, TooltipItem } from './deps.ts';
 import { element, SlMenuItem } from './elements.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, hourMarkers: Record<string, unknown> };
 
 export const makeDownloadsGraph = ({ hourlyDownloads, hourMarkers }: Opts) => {
+
+    Chart.register(TimeScale);
+    Chart.register(Tooltip);
 
     const [ 
         downloadsGraphCanvas,
@@ -22,7 +26,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, hourMarkers }: Opts) => {
         element('downloads-graph-next'),
     ];
 
-    let granularity: Granularity = 'hourly';
+    let granularity: Granularity = 'daily';
     let showEpisodeMarkers = true;
 
     downloadsGraphOptionsMenu.addEventListener('sl-select', ev => {
@@ -81,26 +85,34 @@ function isGranularity(obj: string): obj is Granularity {
 
 //
 
-function computeDownloads(hourlyDownloads: Record<string, number>, granularity: Granularity): Record<string, number> {
-    if (granularity === 'hourly') return hourlyDownloads;
-    if (granularity === 'daily') {
-        const rt: Record<string, number> = {};
-        for (const [ hour, downloads ] of Object.entries(hourlyDownloads)) {
-            const key = hour.substring(0, 10);
-            increment(rt, key, downloads);
-        }
-        return rt;
-    }
+const dayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const dayAndHourFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', hour: 'numeric', hour12: true, timeZone: 'UTC' });
+const withCommas = new Intl.NumberFormat('en-US');
+
+function computeKeyForGranularity(hour: string, granularity: Granularity): string {
+    const [ _, date, hh ] = checkMatches('hour', hour, /^(.*)T(\d{2})$/);
+    if (granularity === 'hourly') return `${date}T${hh}:00:00.000Z`;
+    if (granularity === 'six-hourly') return `${date}T${(Math.floor(parseInt(hh) / 6) * 6).toString().padStart(2, '0')}:00:00.000Z`;
+    if (granularity === 'twelve-hourly') return `${date}T${(Math.floor(parseInt(hh) / 12) * 12).toString().padStart(2, '0')}:00:00.000Z`;
+    if (granularity === 'daily') return `${date}T00:00:00.000Z`;
     throw new Error(`Unsupported granularity: ${granularity}`);
+}
+
+function computeDownloads(hourlyDownloads: Record<string, number>, granularity: Granularity): Record<string, number> {
+    const rt: Record<string, number> = {};
+    for (const [ hour, downloads ] of Object.entries(hourlyDownloads)) {
+        const key = computeKeyForGranularity(hour, granularity);
+        increment(rt, key, downloads);
+    }
+    return rt;
 }
 
 function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, hourMarkers?: Record<string, unknown>): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
-    const maxDownloads = Math.max(...Object.values(downloads));
-    const markerData = Object.keys(downloads).map(v => {
-        if (granularity === 'hourly' && hourMarkers && hourMarkers[v]) return maxDownloads;
-        return undefined;
-    });
+    const hours = Object.keys(hourlyDownloads);
+    const hourMarkerPcts = hourMarkers ? Object.keys(hourMarkers).filter(v => hours.includes(v)).map(v => hours.indexOf(v) / hours.length) : undefined;
+
+    const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
 
     const ctx = canvas.getContext('2d')!;
 
@@ -110,21 +122,17 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
         datasets: [
             {
                 data: Object.values(downloads),
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
+                // borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.75)',
+                hoverBackgroundColor: 'rgba(75, 192, 192, 1)',
                 pointRadius: 0,
-                borderWidth: 1,
-            },
-            {
-                type: 'bar',
-                data: markerData,
-                backgroundColor: 'rgba(154, 52, 18, 0.75)',
+                borderWidth: 0,
             },
         ]
     };
 
     const config = {
-        type: 'line',
+        type: 'bar',
         data,
         options: {
             animation: {
@@ -137,9 +145,45 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
             plugins: {
                 legend: {
                     display: false,
+                },
+                tooltip: {
+                    displayColors: false,
+                    callbacks: {
+                        title: (items: TooltipItem<never>[]) => dateFormat.format(new Date(items[0].label)),
+                        // deno-lint-ignore no-explicit-any
+                        label: (item: any) => `${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`,
+                    }
                 }
             },
-        }
+            scales: {
+                x: {
+                    ticks: {
+                        // deno-lint-ignore no-explicit-any
+                        callback: function(this: any, value: number) {
+                            const label = this.getLabelForValue(value);
+                            return dayFormat.format(new Date(label));
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [
+            {
+                beforeDraw: (chart: Chart) => {
+                    if (!hourMarkerPcts) return;
+                    for (const hourMarkerPct of hourMarkerPcts) {
+                        const ctx = chart.ctx;
+                        const { chartArea } = chart;
+                        ctx.beginPath();
+                        ctx.strokeStyle = "rgba(154, 52, 18, 0.75)";
+                        const x = chartArea.left + (chart.width * hourMarkerPct);
+                        ctx.moveTo(x, chartArea.top);
+                        ctx.lineTo(x, chartArea.bottom);
+                        ctx.stroke();
+                    }
+                }
+            }
+        ]
     };
 
     // deno-lint-ignore no-explicit-any
