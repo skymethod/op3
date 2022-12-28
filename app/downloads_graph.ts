@@ -1,13 +1,14 @@
 import { checkMatches } from '../worker/check.ts';
+import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { increment } from '../worker/summaries.ts';
 import { addDays } from '../worker/timestamp.ts';
 import { Chart, TimeScale, Tooltip, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
 import { computeMonthName } from './time.ts';
 
-type Opts = { hourlyDownloads: Record<string, number>, hourMarkers: Record<string, unknown> };
+type Opts = { hourlyDownloads: Record<string, number>, episodeMarkers: Record<string, EpisodeInfo>, debug: boolean };
 
-export const makeDownloadsGraph = ({ hourlyDownloads, hourMarkers }: Opts) => {
+export const makeDownloadsGraph = ({ hourlyDownloads, episodeMarkers, debug }: Opts) => {
 
     Chart.register(TimeScale);
     Chart.register(Tooltip);
@@ -89,7 +90,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, hourMarkers }: Opts) => {
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, showEpisodeMarkers ? hourMarkers : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodeMarkers : undefined);
     }
 
     function update() {
@@ -158,18 +159,31 @@ function computeDownloads(hourlyDownloads: Record<string, number>, granularity: 
     return rt;
 }
 
-function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, hourMarkers?: Record<string, unknown>): Chart {
-    const hours = Object.keys(hourlyDownloads);
+function computeEpisodeMarkerIndex(episodeMarkers: Record<string, EpisodeInfo>, downloadLabels: string[], granularity: Granularity): Map<number, { info: EpisodeInfo, foundHour: string }[]> {
+    const rt = new Map<number, { info: EpisodeInfo, foundHour: string }[]>();
+    for (const [ foundHour, info ] of Object.entries(episodeMarkers)) {
+        const findValue = granularity === 'hourly' ? `${foundHour}:00:00.000Z` : `${foundHour.substring(0, 10)}T00:00:00.000Z`;
+        const index = downloadLabels.indexOf(findValue);
+        if (index < 0) continue;
+        const diff = new Date(`${foundHour}:00:00.000Z`).getTime() - new Date(info.pubdate).getTime();
+        if (diff > 1000 * 60 * 60 * 24 * 30) continue;
+        const records = rt.get(index) ?? [];
+        rt.set(index, records);
+        records.push({ info, foundHour });
+    }
+    return rt;
+}
+
+function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, debug: boolean, episodeMarkers?: Record<string, EpisodeInfo>): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
-    const hourMarkerPcts = hourMarkers ? Object.keys(hourMarkers).filter(v => hours.includes(v)).map(v => hours.indexOf(v) / hours.length) : undefined;
+    const downloadLabels = Object.keys(downloads);
+    const episodeMarkerIndex = episodeMarkers ? computeEpisodeMarkerIndex(episodeMarkers, downloadLabels, granularity) : undefined;
 
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
 
     const ctx = canvas.getContext('2d')!;
-
-    const labels = Object.keys(downloads);
     const data = {
-        labels,
+        labels: downloadLabels,
         datasets: [
             {
                 data: Object.values(downloads),
@@ -198,10 +212,16 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                 },
                 tooltip: {
                     displayColors: false,
+                    footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
                         title: (items: TooltipItem<never>[]) => dateFormat.format(new Date(items[0].label)),
                         // deno-lint-ignore no-explicit-any
                         label: (item: any) => `${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`,
+                        // deno-lint-ignore no-explicit-any
+                        footer: (items: any[]) => {
+                            const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
+                            return records.length === 0 ? undefined : records.map(v => `Published: ${v.info.title}${debug ? ` f:${v.foundHour} p:${v.info.pubdate}` : ''}`).join('\n');
+                        }
                     }
                 }
             },
@@ -222,13 +242,14 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
         plugins: [
             {
                 beforeDraw: (chart: Chart) => {
-                    if (!hourMarkerPcts) return;
-                    for (const hourMarkerPct of hourMarkerPcts) {
+                    if (!episodeMarkerIndex) return;
+                    const meta = chart.getDatasetMeta(0).controller.getMeta();
+                    for (const index of episodeMarkerIndex.keys()) {
+                        const x = meta.data[index].x;
                         const ctx = chart.ctx;
                         const { chartArea } = chart;
                         ctx.beginPath();
                         ctx.strokeStyle = 'rgba(154, 52, 18, 0.75)';
-                        const x = chartArea.left + (chart.width * hourMarkerPct);
                         ctx.moveTo(x, chartArea.top);
                         ctx.lineTo(x, chartArea.bottom);
                         ctx.stroke();

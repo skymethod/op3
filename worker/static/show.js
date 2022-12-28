@@ -8352,7 +8352,7 @@ const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     month: 'long',
     timeZone: 'UTC'
 });
-const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
+const makeDownloadsGraph = ({ hourlyDownloads , episodeMarkers , debug  })=>{
     xt.register(Vt);
     xt.register(ic);
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
@@ -8418,7 +8418,7 @@ const makeDownloadsGraph = ({ hourlyDownloads , hourMarkers  })=>{
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, showEpisodeMarkers ? hourMarkers : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodeMarkers : undefined);
     }
     function update() {
         downloadsGraphGranularitySpan.textContent = ({
@@ -8493,15 +8493,31 @@ function computeDownloads(hourlyDownloads, granularity) {
     }
     return rt;
 }
-function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
-    const hours = Object.keys(hourlyDownloads);
+function computeEpisodeMarkerIndex(episodeMarkers, downloadLabels, granularity) {
+    const rt = new Map();
+    for (const [foundHour, info] of Object.entries(episodeMarkers)){
+        const findValue = granularity === 'hourly' ? `${foundHour}:00:00.000Z` : `${foundHour.substring(0, 10)}T00:00:00.000Z`;
+        const index = downloadLabels.indexOf(findValue);
+        if (index < 0) continue;
+        const diff = new Date(`${foundHour}:00:00.000Z`).getTime() - new Date(info.pubdate).getTime();
+        if (diff > 1000 * 60 * 60 * 24 * 30) continue;
+        const records = rt.get(index) ?? [];
+        rt.set(index, records);
+        records.push({
+            info,
+            foundHour
+        });
+    }
+    return rt;
+}
+function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episodeMarkers) {
     const downloads = computeDownloads(hourlyDownloads, granularity);
-    const hourMarkerPcts = hourMarkers ? Object.keys(hourMarkers).filter((v)=>hours.includes(v)).map((v)=>hours.indexOf(v) / hours.length) : undefined;
+    const downloadLabels = Object.keys(downloads);
+    const episodeMarkerIndex = episodeMarkers ? computeEpisodeMarkerIndex(episodeMarkers, downloadLabels, granularity) : undefined;
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
     const ctx = canvas.getContext('2d');
-    const labels = Object.keys(downloads);
     const data = {
-        labels,
+        labels: downloadLabels,
         datasets: [
             {
                 data: Object.values(downloads),
@@ -8529,9 +8545,14 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
                 },
                 tooltip: {
                     displayColors: false,
+                    footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
                         title: (items)=>dateFormat.format(new Date(items[0].label)),
-                        label: (item)=>`${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`
+                        label: (item)=>`${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`,
+                        footer: (items)=>{
+                            const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
+                            return records.length === 0 ? undefined : records.map((v)=>`Published: ${v.info.title}${debug ? ` f:${v.foundHour} p:${v.info.pubdate}` : ''}`).join('\n');
+                        }
                     }
                 }
             },
@@ -8551,13 +8572,14 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, hourMarkers) {
         plugins: [
             {
                 beforeDraw: (chart)=>{
-                    if (!hourMarkerPcts) return;
-                    for (const hourMarkerPct of hourMarkerPcts){
+                    if (!episodeMarkerIndex) return;
+                    const meta = chart.getDatasetMeta(0).controller.getMeta();
+                    for (const index of episodeMarkerIndex.keys()){
+                        const x = meta.data[index].x;
                         const ctx = chart.ctx;
                         const { chartArea  } = chart;
                         ctx.beginPath();
                         ctx.strokeStyle = 'rgba(154, 52, 18, 0.75)';
-                        const x = chartArea.left + chart.width * hourMarkerPct;
                         ctx.moveTo(x, chartArea.top);
                         ctx.lineTo(x, chartArea.bottom);
                         ctx.stroke();
@@ -8986,23 +9008,29 @@ const app = (()=>{
     const { showUuid  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
     const { episodeFirstHours , hourlyDownloads , dailyFoundAudience  } = statsObj;
-    const hourMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
+    const episodeMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
             hour,
-            episodeId
+            showObj.episodes.find((v)=>v.id === episodeId)
         ]));
     const headlineStats = makeHeadlineStats({
         hourlyDownloads,
         dailyFoundAudience
     });
+    const debug = new URLSearchParams(document.location.search).has('debug');
     makeDownloadsGraph({
         hourlyDownloads,
-        hourMarkers
+        episodeMarkers,
+        debug
     });
     const exportDownloads = makeExportDownloads({
         showUuid,
         previewToken
     });
-    debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+    if (debug) {
+        debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+    } else {
+        debugDiv.style.display = 'none';
+    }
     console.log(initialData);
     function update() {
         exportDownloads.update();

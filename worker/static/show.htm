@@ -84,7 +84,7 @@ const sessionToken = '${sessionToken}';
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none">
             <sl-icon-button name="caret-left-fill" label="Previous" id="downloads-graph-previous"></sl-icon-button>
-            <span id="downloads-graph-granularity">Hourly Downloads</span>
+            <span id="downloads-graph-granularity" class="whitespace-nowrap">Hourly Downloads</span>
             <sl-dropdown class="flex justify-center">
                 <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
                 <sl-menu id="downloads-graph-options">
@@ -96,7 +96,7 @@ const sessionToken = '${sessionToken}';
                     <sl-menu-item checked value="episode-markers">Episode markers</sl-menu-item>
                 </sl-menu>
             </sl-dropdown>
-            <span id="downloads-graph-range">October 20 - December 20</span>
+            <span id="downloads-graph-range" class="whitespace-nowrap">October 20 - December 20</span>
             <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>

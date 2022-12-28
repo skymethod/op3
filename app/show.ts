@@ -1,4 +1,4 @@
-import { ApiShowsResponse, ApiShowStatsResponse } from '../worker/routes/api_shows_model.ts';
+import { ApiShowsResponse, ApiShowStatsResponse, EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { makeDownloadsGraph } from './downloads_graph.ts';
 import { element } from './elements.ts';
 import { makeExportDownloads } from './export_downloads.ts';
@@ -19,15 +19,21 @@ const app = (() => {
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
     const { episodeFirstHours, hourlyDownloads, dailyFoundAudience } = statsObj;
-    const hourMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, episodeId ]));
+    const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
 
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
 
-    makeDownloadsGraph({ hourlyDownloads, hourMarkers });
+    const debug = new URLSearchParams(document.location.search).has('debug');
+    makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
 
     const exportDownloads = makeExportDownloads({ showUuid, previewToken });
     
-    debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
+    if (debug) {
+        debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
+    } else {
+        debugDiv.style.display = 'none';
+    }
+    
     console.log(initialData);
 
     function update() {
