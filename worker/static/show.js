@@ -2,31 +2,6 @@
 // deno-lint-ignore-file
 // This code was bundled using `deno bundle` and it's not recommended to edit it manually
 
-function checkMatches(name1, value, pattern) {
-    const m = pattern.exec(value);
-    if (!m) throw new Error(`Bad ${name1}: ${value}`);
-    return m;
-}
-function isValidMonth(month) {
-    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
-}
-function increment(summary, key, delta = 1) {
-    const existing = summary[key];
-    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
-}
-function addDays(date, days) {
-    if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
-    const rt = new Date(date);
-    rt.setUTCDate(rt.getUTCDate() + days);
-    return rt;
-}
-function addMonthsToMonthString(month, months) {
-    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
-    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
-    const rt = new Date(`${month}-01T00:00:00.000Z`);
-    rt.setUTCMonth(rt.getUTCMonth() + months);
-    return rt.toISOString().substring(0, 7);
-}
 function m(n) {
     return n + .5 | 0;
 }
@@ -8340,6 +8315,35 @@ Object.freeze({
     TimeScale: Vt,
     TimeSeriesScale: Ae
 });
+function distinct(array) {
+    const set = new Set(array);
+    return Array.from(set);
+}
+function checkMatches(name1, value, pattern) {
+    const m = pattern.exec(value);
+    if (!m) throw new Error(`Bad ${name1}: ${value}`);
+    return m;
+}
+function isValidMonth(month) {
+    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
+}
+function increment(summary, key, delta = 1) {
+    const existing = summary[key];
+    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
+}
+function addDays(date, days) {
+    if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
+    const rt = new Date(date);
+    rt.setUTCDate(rt.getUTCDate() + days);
+    return rt;
+}
+function addMonthsToMonthString(month, months) {
+    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
+    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
+    const rt = new Date(`${month}-01T00:00:00.000Z`);
+    rt.setUTCMonth(rt.getUTCMonth() + months);
+    return rt.toISOString().substring(0, 7);
+}
 function element(id) {
     const rt = document.getElementById(id);
     if (!rt) throw new Error(`Element not found: ${id}`);
@@ -8353,8 +8357,6 @@ const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC'
 });
 const makeDownloadsGraph = ({ hourlyDownloads , episodeMarkers , debug  })=>{
-    xt.register(Vt);
-    xt.register(ic);
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
         element('downloads-graph'),
         element('downloads-graph-previous'),
@@ -8590,6 +8592,114 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
     };
     return new xt(ctx, config);
 }
+const makeEpisodePacing = ({ episodeHourlyDownloads , episodes  })=>{
+    const [episodePacingCanvas] = [
+        element('episode-pacing')
+    ];
+    const recentEpisodeIds = episodes.filter((v)=>episodeHourlyDownloads[v.id]).slice(0, 8).map((v)=>v.id);
+    const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map((v)=>[
+            v,
+            episodeHourlyDownloads[v]
+        ]));
+    const episodeInfos = Object.fromEntries(episodes.map((v)=>[
+            v.id,
+            v
+        ]));
+    drawPacingChart(episodePacingCanvas, recentEpisodeHourlyDownloads, episodeInfos);
+    function update() {}
+    update();
+    return {
+        update
+    };
+};
+function computeRelativeCumulative(hourlyDownloads) {
+    const rt = {};
+    let hourNum = 1;
+    let total = 0;
+    for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
+        total += downloads;
+        rt[`h${(hourNum++).toString().padStart(3, '0')}`] = total;
+    }
+    return rt;
+}
+function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
+    const episodeRelativeCumulative = Object.fromEntries(Object.entries(episodeHourlyDownloads).map((v)=>[
+            v[0],
+            computeRelativeCumulative(v[1])
+        ]));
+    const allHours = distinct(Object.values(episodeRelativeCumulative).flatMap((v)=>Object.keys(v)).sort());
+    const parseHourLabel = (label)=>{
+        const hour = parseInt(label.substring(1));
+        return (hour > 1 && (hour - 1) % 24) === 0 ? `Day ${Math.floor((hour - 1) / 24)}` : `Hour ${hour}`;
+    };
+    const ctx = canvas.getContext('2d');
+    const colors = [
+        '#003f5c',
+        '#2f4b7c',
+        '#665191',
+        '#a05195',
+        '#d45087',
+        '#f95d6a',
+        '#ff7c43',
+        '#ffa600'
+    ];
+    return new xt(ctx, {
+        type: 'line',
+        data: {
+            labels: allHours,
+            datasets: Object.entries(episodeRelativeCumulative).map((v, i)=>({
+                    label: [
+                        episodeInfos[v[0]]
+                    ].map((v)=>`${v.pubdate.substring(0, 10)}: ${v.title}`).join(''),
+                    data: v[1],
+                    backgroundColor: colors[i],
+                    borderColor: colors[i],
+                    borderWidth: 1,
+                    pointRadius: 0
+                }))
+        },
+        options: {
+            animation: {
+                duration: 100
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    align: 'start'
+                },
+                tooltip: {
+                    enabled: true,
+                    itemSort: (a, b)=>b.parsed.y - a.parsed.y,
+                    callbacks: {
+                        title: (v)=>parseHourLabel(v[0].label)
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        callback: function(value) {
+                            const label = this.getLabelForValue(value);
+                            return parseHourLabel(label);
+                        }
+                    },
+                    grid: {
+                        color: (ctx)=>ctx.tick.label.startsWith('Day') ? 'rgba(255, 255, 255, 0.1)' : undefined
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
 const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
     const [exportSpinner, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
         element('export-spinner'),
@@ -8721,13 +8831,6 @@ async function download(e, showUuid, month, previewToken1, includeBots, signal, 
     URL.revokeObjectURL(blobUrl);
 }
 const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
-    xt.register(De);
-    xt.register(Oe);
-    xt.register(ie);
-    xt.register(ae);
-    xt.register(ft);
-    xt.register(te);
-    xt.register(re);
     const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
@@ -9001,22 +9104,37 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
     }
 }
 const app = (()=>{
+    xt.register(Vt);
+    xt.register(ic);
+    xt.register(De);
+    xt.register(Oe);
+    xt.register(ie);
+    xt.register(ae);
+    xt.register(ft);
+    xt.register(te);
+    xt.register(re);
+    xt.register(Ul);
     const [debugDiv] = [
         element('debug')
     ];
     const { showObj , statsObj , times  } = initialData;
-    const { showUuid  } = showObj;
+    const { showUuid , episodes  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience  } = statsObj;
+    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads  } = statsObj;
     const episodeMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
             hour,
             showObj.episodes.find((v)=>v.id === episodeId)
         ]));
+    const debug = new URLSearchParams(document.location.search).has('debug');
+    if (debug) {
+        debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+    } else {
+        debugDiv.style.display = 'none';
+    }
     const headlineStats = makeHeadlineStats({
         hourlyDownloads,
         dailyFoundAudience
     });
-    const debug = new URLSearchParams(document.location.search).has('debug');
     makeDownloadsGraph({
         hourlyDownloads,
         episodeMarkers,
@@ -9026,11 +9144,10 @@ const app = (()=>{
         showUuid,
         previewToken
     });
-    if (debug) {
-        debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
-    } else {
-        debugDiv.style.display = 'none';
-    }
+    makeEpisodePacing({
+        episodeHourlyDownloads,
+        episodes
+    });
     console.log(initialData);
     function update() {
         exportDownloads.update();

@@ -1,4 +1,4 @@
-import { Chart, CategoryScale, LinearScale, LineController, PointElement, LineElement, BarController, BarElement } from './deps.ts';
+import { Chart } from './deps.ts';
 import { element } from './elements.ts';
 import { increment } from '../worker/summaries.ts';
 import { computeMonthName } from './time.ts';
@@ -6,14 +6,6 @@ import { computeMonthName } from './time.ts';
 type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number> };
 
 export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts) => {
-
-    Chart.register(CategoryScale);
-    Chart.register(LinearScale);
-    Chart.register(LineController);
-    Chart.register(PointElement);
-    Chart.register(LineElement);
-    Chart.register(BarController);
-    Chart.register(BarElement);
 
     const [ 
         sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 

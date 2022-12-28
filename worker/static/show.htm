@@ -119,11 +119,11 @@ const sessionToken = '${sessionToken}';
             </sl-button-group>
             <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
         </sl-card>
-    
-        <canvas id="episode-1-downloads" class="max-h-64"></canvas>
-        <canvas id="episode-2-downloads" class="max-h-64"></canvas>
-        <canvas id="episode-3-downloads" class="max-h-64"></canvas>
-        <canvas id="episode-4-downloads" class="max-h-64"></canvas>
+
+        <!-- episode pacing -->
+        <div class="flex justify-center mt-16 mb-8">Episode pacing</div>
+        <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+
     </main>
 
     ${cfAnalyticsSnippet}

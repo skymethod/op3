@@ -1,6 +1,8 @@
 import { ApiShowsResponse, ApiShowStatsResponse, EpisodeInfo } from '../worker/routes/api_shows_model.ts';
+import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, TimeScale, Tooltip } from './deps.ts';
 import { makeDownloadsGraph } from './downloads_graph.ts';
 import { element } from './elements.ts';
+import { makeEpisodePacing } from './episode_pacing.ts';
 import { makeExportDownloads } from './export_downloads.ts';
 import { makeHeadlineStats } from './headline_stats.ts';
 
@@ -10,30 +12,40 @@ declare const previewToken: string;
 
 const app = (() => {
 
+    Chart.register(TimeScale);
+    Chart.register(Tooltip);
+    Chart.register(CategoryScale);
+    Chart.register(LinearScale);
+    Chart.register(LineController);
+    Chart.register(PointElement);
+    Chart.register(LineElement);
+    Chart.register(BarController);
+    Chart.register(BarElement);
+    Chart.register(Legend);
+
     const [ debugDiv ] = [
         element('debug'),
     ];
 
     const { showObj, statsObj, times } = initialData;
-    const { showUuid } = showObj;
+    const { showUuid, episodes } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
-    const { episodeFirstHours, hourlyDownloads, dailyFoundAudience } = statsObj;
+    const { episodeFirstHours, hourlyDownloads, dailyFoundAudience, episodeHourlyDownloads } = statsObj;
     const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
 
-    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
-
     const debug = new URLSearchParams(document.location.search).has('debug');
-    makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
 
-    const exportDownloads = makeExportDownloads({ showUuid, previewToken });
-    
     if (debug) {
         debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     } else {
         debugDiv.style.display = 'none';
     }
-    
+    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
+    makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
+    const exportDownloads = makeExportDownloads({ showUuid, previewToken });
+    makeEpisodePacing({ episodeHourlyDownloads, episodes });
+
     console.log(initialData);
 
     function update() {

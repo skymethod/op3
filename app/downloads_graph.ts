@@ -2,16 +2,13 @@ import { checkMatches } from '../worker/check.ts';
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { increment } from '../worker/summaries.ts';
 import { addDays } from '../worker/timestamp.ts';
-import { Chart, TimeScale, Tooltip, TooltipItem } from './deps.ts';
+import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
 import { computeMonthName } from './time.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, episodeMarkers: Record<string, EpisodeInfo>, debug: boolean };
 
 export const makeDownloadsGraph = ({ hourlyDownloads, episodeMarkers, debug }: Opts) => {
-
-    Chart.register(TimeScale);
-    Chart.register(Tooltip);
 
     const [ 
         downloadsGraphCanvas,
