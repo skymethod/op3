@@ -9207,7 +9207,7 @@ const makeTopCountries = ({ monthlyCountryDownloads  })=>{
                 ...countryCode
             ].map((v)=>regionalIndicators[v]).join('');
             const dt = item.querySelector('dt');
-            dt.textContent = countryCode;
+            dt.textContent = (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined) ?? countryCode;
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
             topCountriesList.appendChild(item);
@@ -9234,6 +9234,11 @@ const makeTopCountries = ({ monthlyCountryDownloads  })=>{
         update
     };
 };
+const regionNamesInEnglish = new Intl.DisplayNames([
+    'en'
+], {
+    type: 'region'
+});
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);

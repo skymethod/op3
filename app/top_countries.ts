@@ -38,7 +38,7 @@ export const makeTopCountries = ({ monthlyCountryDownloads }: Opts) => {
             const span = item.querySelector('span')!;
             span.textContent = [...countryCode].map(v => regionalIndicators[v]).join('');
             const dt = item.querySelector('dt')!;
-            dt.textContent = countryCode;
+            dt.textContent = (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined ) ?? countryCode;
             const dd = item.querySelector('dd')!;
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
             topCountriesList.appendChild(item);
@@ -71,3 +71,7 @@ export const makeTopCountries = ({ monthlyCountryDownloads }: Opts) => {
 
     return { update };
 };
+
+//
+
+const regionNamesInEnglish = new Intl.DisplayNames([ 'en' ], { type: 'region' });

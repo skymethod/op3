@@ -63,7 +63,7 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
     let hourlyDownloads: Record<string, number> | undefined;
     let episodeHourlyDownloads: Record<string, Record<string, number>> | undefined;
     let dailyFoundAudience: Record<string, number> | undefined;
-    let monthlyCountryDownloads: Record<string,Record<string, number>> | undefined;
+    let monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> | undefined;
 
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
@@ -83,8 +83,8 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
             }
         }
 
-        monthlyCountryDownloads = Object.fromEntries(latestThreeMonthSummaries.map(v => [ v.period, v.countryDownloads ?? {} ]));
+        monthlyDimensionDownloads = Object.fromEntries(latestThreeMonthSummaries.map(v => [ v.period, v.dimensionDownloads ?? {} ]));
     }
    
-    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyCountryDownloads } as ApiShowStatsResponse);
+    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads } as ApiShowStatsResponse);
 }
