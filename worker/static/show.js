@@ -9182,29 +9182,28 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
-    const [topCountriesExportButton, topCountriesMonthPreviousButton, topCountriesMonthDiv, topCountriesMonthNextButton, topCountriesList, topCountriesRowTemplate] = [
-        element('top-countries-export'),
-        element('top-countries-month-previous'),
-        element('top-countries-month'),
-        element('top-countries-month-next'),
-        element('top-countries'),
-        element('top-countries-row')
+const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId , templateId , monthlyDownloads , tsvHeaderNames , computeEmoji , computeName  })=>{
+    const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
+        element(exportId),
+        element(previousId),
+        element(monthId),
+        element(nextId),
+        element(listId),
+        element(templateId)
     ];
-    const months = Object.keys(monthlyDimensionDownloads);
+    const months = Object.keys(monthlyDownloads);
     let monthIndex = months.length - 2;
     const tsvRows = [
         [
             'rank',
-            'countryCode',
-            'countryName',
+            ...tsvHeaderNames,
             'downloads',
             'pct'
         ]
     ];
-    topCountriesExportButton.onclick = ()=>{
+    exportButton.onclick = ()=>{
         const tsv = tsvRows.map((v)=>v.join('\t')).join('\n');
-        const filename = `top-countries-${computeMonthName(months[monthIndex], {
+        const filename = `top-${type}-${computeMonthName(months[monthIndex], {
             includeYear: true
         }).toLowerCase().replace(' ', '-')}.tsv`;
         download(tsv, {
@@ -9212,61 +9211,54 @@ const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
             filename
         });
     };
-    const regionalIndicators = Object.fromEntries([
-        ...new Array(26).keys()
-    ].map((v)=>[
-            String.fromCharCode('A'.charCodeAt(0) + v),
-            String.fromCodePoint('🇦'.codePointAt(0) + v)
-        ]));
     const updateTableForMonth = ()=>{
-        topCountriesMonthDiv.textContent = computeMonthName(months[monthIndex], {
+        monthDiv.textContent = computeMonthName(months[monthIndex], {
             includeYear: true
         });
-        const countryDownloads = Object.values(monthlyDimensionDownloads)[monthIndex]['countryCode'] ?? {};
-        const totalDownloads = Object.values(countryDownloads).reduce((a, b)=>a + b, 0);
-        removeAllChildren(topCountriesList);
-        const sorted = sortBy(Object.entries(countryDownloads), (v)=>-v[1]);
-        const display = sorted.slice(0, 10);
-        const allOthers = sorted.slice(10).map((v)=>v[1]).reduce((a, b)=>a + b, 0);
-        if (allOthers > 0) display.push([
-            '(all others)',
-            allOthers
-        ]);
-        for (const [countryCode, downloads] of display){
-            const item = topCountriesRowTemplate.content.cloneNode(true);
+        const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
+        const totalDownloads = Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
+        removeAllChildren(list);
+        const sorted = sortBy(Object.entries(monthDownloads), (v)=>-v[1]);
+        for (const [key, downloads] of sorted){
+            const item = rowTemplate.content.cloneNode(true);
             const span = item.querySelector('span');
-            span.textContent = [
-                ...countryCode
-            ].map((v)=>regionalIndicators[v]).join('');
+            if (computeEmoji) {
+                span.textContent = computeEmoji(key);
+            }
             const dt = item.querySelector('dt');
-            dt.textContent = computeCountryName(countryCode);
+            dt.textContent = computeName(key);
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
-            topCountriesList.appendChild(item);
+            list.appendChild(item);
         }
-        topCountriesMonthPreviousButton.disabled = monthIndex === 0;
-        topCountriesMonthNextButton.disabled = monthIndex === months.length - 1;
+        previousButton.disabled = monthIndex === 0;
+        nextButton.disabled = monthIndex === months.length - 1;
         tsvRows.splice(1);
         let rank = 1;
-        for (const [countryCode1, downloads1] of sorted){
-            const countryName = computeCountryName(countryCode1);
+        for (const [key1, downloads1] of sorted){
+            const name1 = computeName(key1);
             const pct = (downloads1 / totalDownloads * 100).toFixed(4);
+            const fields = tsvHeaderNames.length === 1 ? [
+                name1
+            ] : [
+                key1,
+                name1
+            ];
             tsvRows.push([
                 `${rank++}`,
-                countryCode1,
-                countryName,
+                ...fields,
                 downloads1.toString(),
                 pct
             ]);
         }
     };
-    topCountriesMonthPreviousButton.onclick = ()=>{
+    previousButton.onclick = ()=>{
         if (monthIndex > 0) {
             monthIndex--;
             updateTableForMonth();
         }
     };
-    topCountriesMonthNextButton.onclick = ()=>{
+    nextButton.onclick = ()=>{
         if (monthIndex < months.length - 1) {
             monthIndex++;
             updateTableForMonth();
@@ -9279,6 +9271,36 @@ const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
         update
     };
 };
+const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['countryCode'] ?? {}
+        ]));
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    return makeTopBox({
+        type: 'countries',
+        exportId: 'top-countries-export',
+        previousId: 'top-countries-month-previous',
+        nextId: 'top-countries-month-next',
+        monthId: 'top-countries-month',
+        listId: 'top-countries',
+        templateId: 'top-countries-row',
+        monthlyDownloads,
+        tsvHeaderNames: [
+            'countryCode',
+            'countryName'
+        ],
+        computeEmoji: (countryCode)=>[
+                ...countryCode
+            ].map((v)=>regionalIndicators[v]).join(''),
+        computeName: computeCountryName
+    });
+};
 const regionNamesInEnglish = new Intl.DisplayNames([
     'en'
 ], {
@@ -9287,6 +9309,26 @@ const regionNamesInEnglish = new Intl.DisplayNames([
 function computeCountryName(countryCode) {
     return (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined) ?? countryCode;
 }
+const makeTopApps = ({ monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['appName'] ?? {}
+        ]));
+    return makeTopBox({
+        type: 'apps',
+        exportId: 'top-apps-export',
+        previousId: 'top-apps-month-previous',
+        nextId: 'top-apps-month-next',
+        monthId: 'top-apps-month',
+        listId: 'top-apps',
+        templateId: 'top-apps-row',
+        monthlyDownloads,
+        tsvHeaderNames: [
+            'app'
+        ],
+        computeName: (key)=>key
+    });
+};
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9333,6 +9375,9 @@ const app = (()=>{
         episodes
     });
     makeTopCountries({
+        monthlyDimensionDownloads
+    });
+    makeTopApps({
         monthlyDimensionDownloads
     });
     console.log(initialData);

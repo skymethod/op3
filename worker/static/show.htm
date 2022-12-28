@@ -130,24 +130,50 @@ const sessionToken = '${sessionToken}';
             </template>
         </div>
 
-         <!-- top countries -->
-         <sl-card class="card-basic flex justify-center mb-16 mt-16">
-            <div slot="header" class="flex items-center justify-between w-64">
-                <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top countries</div>
-                <sl-icon-button id="top-countries-export" name="download" label="Export" title="Export"></sl-icon-button>
-            </div>
 
-            <div class="flex items-center mb-4 justify-center">
-                <sl-icon-button name="caret-left-fill" label="Previous" id="top-countries-month-previous"></sl-icon-button>
-                <span id="top-countries-month" class="whitespace-nowrap">October 2022</span>
-                <sl-icon-button name="caret-right-fill" label="Next" id="top-countries-month-next"></sl-icon-button>
-            </div>
+        <div class="flex flex-wrap gap-8 flex-row items-center justify-center">
+            <!-- top countries -->
+            <sl-card class="card-basic flex justify-center mb-16 mt-16 ">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top countries</div>
+                    <sl-icon-button id="top-countries-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-countries-month-previous"></sl-icon-button>
+                    <span id="top-countries-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-countries-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-countries" class="grid grid-cols-[1.5rem_1fr_3rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4"></dl>
+                <template id="top-countries-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed">Country</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
 
-            <dl id="top-countries" class="grid grid-cols-[1.5rem_1fr_3rem] text-xs md:text-sm "></dl>
-            <template id="top-countries-row">
-                <span class="leading-relaxed"></span><dt class="leading-relaxed">Country</dt><dd class="font-mono text-right leading-relaxed">50.00</dd>
-            </template>
-        </sl-card>
+            <!-- top apps -->
+            <sl-card class="card-basic flex justify-center mb-16 mt-16 ">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top apps</div>
+                    <sl-icon-button id="top-apps-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-apps-month-previous"></sl-icon-button>
+                    <span id="top-apps-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-apps-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-apps" class="grid grid-cols-[0_1fr_3rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4"></dl>
+                <template id="top-apps-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed">Country</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
+        </div>
 
     </main>
 
