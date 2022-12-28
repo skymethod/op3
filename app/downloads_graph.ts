@@ -4,7 +4,7 @@ import { increment } from '../worker/summaries.ts';
 import { addDays } from '../worker/timestamp.ts';
 import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
-import { computeMonthName } from './time.ts';
+import { computeMonthName } from './util.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, episodeMarkers: Record<string, EpisodeInfo>, debug: boolean };
 

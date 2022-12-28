@@ -8376,6 +8376,21 @@ function removeAllChildren(node) {
 function computeMonthName(month, { includeYear  } = {}) {
     return (includeYear ? monthNameAndYearFormat : monthNameFormat).format(new Date(`${month}-01T00:00:00.000Z`));
 }
+function download(content, { type , filename  }) {
+    const parts = typeof content === 'string' ? [
+        content
+    ] : content;
+    const blob = new Blob(parts, {
+        type
+    });
+    const blobUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = blobUrl;
+    anchor.target = '_blank';
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(blobUrl);
+}
 const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     month: 'long',
     timeZone: 'UTC'
@@ -8768,8 +8783,9 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
     });
 }
 const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
-    const [exportSpinner, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
+    const [exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
         element('export-spinner'),
+        element('export-icon'),
         element('export-title'),
         element('export-cancel'),
         element('export-dropdown'),
@@ -8809,7 +8825,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
             progress = 0;
             update();
             try {
-                await download(e, showUuid, month, previewToken1, includeBots, controller.signal, (v)=>{
+                await downloadDownloads(e, showUuid, month, previewToken1, includeBots, controller.signal, (v)=>{
                     progress = v;
                     update();
                 });
@@ -8833,10 +8849,12 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
         if (exporting) {
             exportDropdown.open = false;
             exportSpinner.classList.remove('hidden');
+            exportIcon.classList.add('hidden');
             exportCancelButton.classList.remove('invisible');
             exportTitleDiv.textContent = `Exporting${typeof progress === 'number' ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
         } else {
             exportSpinner.classList.add('hidden');
+            exportIcon.classList.remove('hidden');
             exportCancelButton.classList.add('invisible');
             exportTitleDiv.textContent = 'Export download details';
         }
@@ -8847,7 +8865,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
         update
     };
 };
-async function download(e, showUuid, month, previewToken1, includeBots, signal, onProgress) {
+async function downloadDownloads(e, showUuid, month, previewToken1, includeBots, signal, onProgress) {
     e.preventDefault();
     console.log(`download ${JSON.stringify({
         month,
@@ -8886,16 +8904,10 @@ async function download(e, showUuid, month, previewToken1, includeBots, signal, 
     }
     if (signal.aborted) return;
     const { type  } = parts[0];
-    const blob1 = new Blob(parts, {
-        type
+    download(parts, {
+        type,
+        filename: `downloads-${month}.tsv`
     });
-    const blobUrl = URL.createObjectURL(blob1);
-    const anchor = document.createElement('a');
-    anchor.href = blobUrl;
-    anchor.target = '_blank';
-    anchor.download = `downloads-${month}.tsv`;
-    anchor.click();
-    URL.revokeObjectURL(blobUrl);
 }
 const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
     const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
@@ -9170,16 +9182,36 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-const makeTopCountries = ({ monthlyCountryDownloads  })=>{
-    const [topCountriesMonthPreviousButton, topCountriesMonthDiv, topCountriesMonthNextButton, topCountriesList, topCountriesRowTemplate] = [
+const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
+    const [topCountriesExportButton, topCountriesMonthPreviousButton, topCountriesMonthDiv, topCountriesMonthNextButton, topCountriesList, topCountriesRowTemplate] = [
+        element('top-countries-export'),
         element('top-countries-month-previous'),
         element('top-countries-month'),
         element('top-countries-month-next'),
         element('top-countries'),
         element('top-countries-row')
     ];
-    const months = Object.keys(monthlyCountryDownloads);
+    const months = Object.keys(monthlyDimensionDownloads);
     let monthIndex = months.length - 2;
+    const tsvRows = [
+        [
+            'rank',
+            'countryCode',
+            'countryName',
+            'downloads',
+            'pct'
+        ]
+    ];
+    topCountriesExportButton.onclick = ()=>{
+        const tsv = tsvRows.map((v)=>v.join('\t')).join('\n');
+        const filename = `top-countries-${computeMonthName(months[monthIndex], {
+            includeYear: true
+        }).toLowerCase().replace(' ', '-')}.tsv`;
+        download(tsv, {
+            type: 'text/plain',
+            filename
+        });
+    };
     const regionalIndicators = Object.fromEntries([
         ...new Array(26).keys()
     ].map((v)=>[
@@ -9187,10 +9219,10 @@ const makeTopCountries = ({ monthlyCountryDownloads  })=>{
             String.fromCodePoint('🇦'.codePointAt(0) + v)
         ]));
     const updateTableForMonth = ()=>{
-        topCountriesMonthDiv.textContent = computeMonthName(Object.keys(monthlyCountryDownloads)[monthIndex], {
+        topCountriesMonthDiv.textContent = computeMonthName(months[monthIndex], {
             includeYear: true
         });
-        const countryDownloads = Object.values(monthlyCountryDownloads)[monthIndex];
+        const countryDownloads = Object.values(monthlyDimensionDownloads)[monthIndex]['countryCode'] ?? {};
         const totalDownloads = Object.values(countryDownloads).reduce((a, b)=>a + b, 0);
         removeAllChildren(topCountriesList);
         const sorted = sortBy(Object.entries(countryDownloads), (v)=>-v[1]);
@@ -9207,13 +9239,26 @@ const makeTopCountries = ({ monthlyCountryDownloads  })=>{
                 ...countryCode
             ].map((v)=>regionalIndicators[v]).join('');
             const dt = item.querySelector('dt');
-            dt.textContent = (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined) ?? countryCode;
+            dt.textContent = computeCountryName(countryCode);
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
             topCountriesList.appendChild(item);
         }
         topCountriesMonthPreviousButton.disabled = monthIndex === 0;
         topCountriesMonthNextButton.disabled = monthIndex === months.length - 1;
+        tsvRows.splice(1);
+        let rank = 1;
+        for (const [countryCode1, downloads1] of sorted){
+            const countryName = computeCountryName(countryCode1);
+            const pct = (downloads1 / totalDownloads * 100).toFixed(4);
+            tsvRows.push([
+                `${rank++}`,
+                countryCode1,
+                countryName,
+                downloads1.toString(),
+                pct
+            ]);
+        }
     };
     topCountriesMonthPreviousButton.onclick = ()=>{
         if (monthIndex > 0) {
@@ -9239,6 +9284,9 @@ const regionNamesInEnglish = new Intl.DisplayNames([
 ], {
     type: 'region'
 });
+function computeCountryName(countryCode) {
+    return (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined) ?? countryCode;
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9256,7 +9304,7 @@ const app = (()=>{
     const { showObj , statsObj , times  } = initialData;
     const { showUuid , episodes  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads , monthlyCountryDownloads  } = statsObj;
+    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads , monthlyDimensionDownloads  } = statsObj;
     const episodeMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
             hour,
             showObj.episodes.find((v)=>v.id === episodeId)
@@ -9285,7 +9333,7 @@ const app = (()=>{
         episodes
     });
     makeTopCountries({
-        monthlyCountryDownloads
+        monthlyDimensionDownloads
     });
     console.log(initialData);
     function update() {

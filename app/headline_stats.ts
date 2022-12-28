@@ -1,7 +1,7 @@
 import { Chart } from './deps.ts';
 import { element } from './elements.ts';
 import { increment } from '../worker/summaries.ts';
-import { computeMonthName } from './time.ts';
+import { computeMonthName } from './util.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number> };
 

@@ -1,16 +1,18 @@
 import { addMonthsToMonthString } from '../worker/timestamp.ts';
 import { element, SlButton, SlDropdown, SlSwitch } from './elements.ts';
+import { download } from './util.ts';
 
 type Opts = { readonly showUuid: string, readonly previewToken: string };
 
 export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
 
-    const [ exportSpinner, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch ] = [ 
-        element('export-spinner'), 
-        element('export-title'), 
-        element('export-cancel'), 
-        element<SlDropdown>('export-dropdown'), 
-        element<SlButton>('export-older'), 
+    const [ exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch ] = [ 
+        element('export-spinner'),
+        element('export-icon'),
+        element('export-title'),
+        element('export-cancel'),
+        element<SlDropdown>('export-dropdown'),
+        element<SlButton>('export-older'),
         element<SlSwitch>('export-bots')
     ];
 
@@ -34,7 +36,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
             }
             exporting = controller; progress = 0; update();
             try {
-                await download(e, showUuid, month, previewToken, includeBots, controller.signal, v => { progress = v; update(); });
+                await downloadDownloads(e, showUuid, month, previewToken, includeBots, controller.signal, v => { progress = v; update(); });
             } finally {
                 exporting = undefined; update();
             }
@@ -55,10 +57,12 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
         if (exporting) {
             exportDropdown.open = false;
             exportSpinner.classList.remove('hidden');
+            exportIcon.classList.add('hidden');
             exportCancelButton.classList.remove('invisible');
             exportTitleDiv.textContent = `Exporting${typeof progress === 'number' ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
         } else {
             exportSpinner.classList.add('hidden');
+            exportIcon.classList.remove('hidden');
             exportCancelButton.classList.add('invisible');
             exportTitleDiv.textContent = 'Export download details';
         }
@@ -72,7 +76,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
 
 //
 
-async function download(e: Event, showUuid: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal, onProgress: (progress: number) => void) {
+async function downloadDownloads(e: Event, showUuid: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal, onProgress: (progress: number) => void) {
     e.preventDefault();
     
     console.log(`download ${JSON.stringify({ month, includeBots })}`);
@@ -107,15 +111,5 @@ async function download(e: Event, showUuid: string, month: string, previewToken:
     if (signal.aborted) return;
 
     const { type } = parts[0];
-    const blob = new Blob(parts, { type });
-
-    const blobUrl = URL.createObjectURL(blob);
-
-    const anchor = document.createElement('a');
-    anchor.href = blobUrl;
-    anchor.target = '_blank';
-    anchor.download = `downloads-${month}.tsv`;
-    anchor.click();
-
-    URL.revokeObjectURL(blobUrl);
+    download(parts, { type, filename: `downloads-${month}.tsv`});
 }

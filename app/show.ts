@@ -32,7 +32,7 @@ const app = (() => {
     const { showUuid, episodes } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
-    const { episodeFirstHours, hourlyDownloads, dailyFoundAudience, episodeHourlyDownloads, monthlyCountryDownloads } = statsObj;
+    const { episodeFirstHours, hourlyDownloads, dailyFoundAudience, episodeHourlyDownloads, monthlyDimensionDownloads } = statsObj;
     const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
 
     const debug = new URLSearchParams(document.location.search).has('debug');
@@ -46,7 +46,7 @@ const app = (() => {
     makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
     const exportDownloads = makeExportDownloads({ showUuid, previewToken });
     makeEpisodePacing({ episodeHourlyDownloads, episodes });
-    makeTopCountries({ monthlyCountryDownloads });
+    makeTopCountries({ monthlyDimensionDownloads });
 
     console.log(initialData);
 
