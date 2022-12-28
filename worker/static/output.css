@@ -837,6 +837,18 @@ a:hover {
   width: 35rem;
 }
 
+.w-\[40rem\] {
+  width: 40rem;
+}
+
+.min-w-\[20rem\] {
+  min-width: 20rem;
+}
+
+.min-w-\[40rem\] {
+  min-width: 40rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -949,6 +961,26 @@ a:hover {
 
 .grid-cols-\[2rem_1fr\] {
   grid-template-columns: 2rem 1fr;
+}
+
+.grid-cols-\[1fr_3rem\] {
+  grid-template-columns: 1fr 3rem;
+}
+
+.grid-cols-\[1rem_1fr_3rem\] {
+  grid-template-columns: 1rem 1fr 3rem;
+}
+
+.grid-cols-\[3rem_1fr_3rem\] {
+  grid-template-columns: 3rem 1fr 3rem;
+}
+
+.grid-cols-\[2rem_1fr_3rem\] {
+  grid-template-columns: 2rem 1fr 3rem;
+}
+
+.grid-cols-\[1\.5rem_1fr_3rem\] {
+  grid-template-columns: 1.5rem 1fr 3rem;
 }
 
 .flex-row {

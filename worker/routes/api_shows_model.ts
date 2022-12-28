@@ -13,4 +13,6 @@ export interface ApiShowStatsResponse {
     readonly hourlyDownloads: Record<string, number>;
     readonly episodeHourlyDownloads: Record<string, Record<string, number>>;
     readonly dailyFoundAudience: Record<string, number>;
+    readonly monthlyCountryDownloads: Record<string, Record<string, number>>;
+
 }

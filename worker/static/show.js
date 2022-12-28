@@ -8319,6 +8319,27 @@ function distinct(array) {
     const set = new Set(array);
     return Array.from(set);
 }
+function sortBy(array, selector) {
+    const len = array.length;
+    const indexes = new Array(len);
+    const selectors = new Array(len);
+    for(let i = 0; i < len; i++){
+        indexes[i] = i;
+        const s = selector(array[i]);
+        selectors[i] = Number.isNaN(s) ? null : s;
+    }
+    indexes.sort((ai, bi)=>{
+        const a = selectors[ai];
+        const b = selectors[bi];
+        if (a === null) return 1;
+        if (b === null) return -1;
+        return a > b ? 1 : a < b ? -1 : 0;
+    });
+    for(let i1 = 0; i1 < len; i1++){
+        indexes[i1] = array[indexes[i1]];
+    }
+    return indexes;
+}
 function checkMatches(name1, value, pattern) {
     const m = pattern.exec(value);
     if (!m) throw new Error(`Bad ${name1}: ${value}`);
@@ -8349,11 +8370,19 @@ function element(id) {
     if (!rt) throw new Error(`Element not found: ${id}`);
     return rt;
 }
-function computeMonthName(month) {
-    return monthNameFormat.format(new Date(`${month}-01T00:00:00.000Z`));
+function removeAllChildren(node) {
+    while(node.firstChild)node.removeChild(node.firstChild);
+}
+function computeMonthName(month, { includeYear  } = {}) {
+    return (includeYear ? monthNameAndYearFormat : monthNameFormat).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     month: 'long',
+    timeZone: 'UTC'
+});
+const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
     timeZone: 'UTC'
 });
 const makeDownloadsGraph = ({ hourlyDownloads , episodeMarkers , debug  })=>{
@@ -9141,6 +9170,70 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
+const makeTopCountries = ({ monthlyCountryDownloads  })=>{
+    const [topCountriesMonthPreviousButton, topCountriesMonthDiv, topCountriesMonthNextButton, topCountriesList, topCountriesRowTemplate] = [
+        element('top-countries-month-previous'),
+        element('top-countries-month'),
+        element('top-countries-month-next'),
+        element('top-countries'),
+        element('top-countries-row')
+    ];
+    const months = Object.keys(monthlyCountryDownloads);
+    let monthIndex = months.length - 2;
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    const updateTableForMonth = ()=>{
+        topCountriesMonthDiv.textContent = computeMonthName(Object.keys(monthlyCountryDownloads)[monthIndex], {
+            includeYear: true
+        });
+        const countryDownloads = Object.values(monthlyCountryDownloads)[monthIndex];
+        const totalDownloads = Object.values(countryDownloads).reduce((a, b)=>a + b, 0);
+        removeAllChildren(topCountriesList);
+        const sorted = sortBy(Object.entries(countryDownloads), (v)=>-v[1]);
+        const display = sorted.slice(0, 10);
+        const allOthers = sorted.slice(10).map((v)=>v[1]).reduce((a, b)=>a + b, 0);
+        if (allOthers > 0) display.push([
+            '(all others)',
+            allOthers
+        ]);
+        for (const [countryCode, downloads] of display){
+            const item = topCountriesRowTemplate.content.cloneNode(true);
+            const span = item.querySelector('span');
+            span.textContent = [
+                ...countryCode
+            ].map((v)=>regionalIndicators[v]).join('');
+            const dt = item.querySelector('dt');
+            dt.textContent = countryCode;
+            const dd = item.querySelector('dd');
+            dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
+            topCountriesList.appendChild(item);
+        }
+        topCountriesMonthPreviousButton.disabled = monthIndex === 0;
+        topCountriesMonthNextButton.disabled = monthIndex === months.length - 1;
+    };
+    topCountriesMonthPreviousButton.onclick = ()=>{
+        if (monthIndex > 0) {
+            monthIndex--;
+            updateTableForMonth();
+        }
+    };
+    topCountriesMonthNextButton.onclick = ()=>{
+        if (monthIndex < months.length - 1) {
+            monthIndex++;
+            updateTableForMonth();
+        }
+    };
+    updateTableForMonth();
+    function update() {}
+    update();
+    return {
+        update
+    };
+};
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9158,7 +9251,7 @@ const app = (()=>{
     const { showObj , statsObj , times  } = initialData;
     const { showUuid , episodes  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads  } = statsObj;
+    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads , monthlyCountryDownloads  } = statsObj;
     const episodeMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
             hour,
             showObj.episodes.find((v)=>v.id === episodeId)
@@ -9185,6 +9278,9 @@ const app = (()=>{
     makeEpisodePacing({
         episodeHourlyDownloads,
         episodes
+    });
+    makeTopCountries({
+        monthlyCountryDownloads
     });
     console.log(initialData);
     function update() {

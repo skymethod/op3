@@ -123,12 +123,28 @@ const sessionToken = '${sessionToken}';
         <!-- episode pacing -->
         <div class="flex justify-center mt-16 mb-8">Episode pacing</div>
         <canvas id="episode-pacing" class="cursor-pointer"></canvas>
-        <div class="flex justify-center mt-4 mb-16">
+        <div class="flex justify-center mt-4">
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
             <template id="episode-pacing-legend-item">
-                <dt class="bg-lime-900"></dt><dd class="ml-2 leading-relaxed truncate">Item</dd>
+                <dt></dt><dd class="ml-2 leading-relaxed truncate">Item</dd>
             </template>
         </div>
+
+         <!-- top countries -->
+         <sl-card class="card-basic flex justify-center mb-16 mt-16">
+            <div slot="header" class="flex items-center gap-2 w-64"><sl-icon name="globe-americas"></sl-icon>Top countries</div>
+
+            <div class="flex items-center mb-4 justify-center">
+                <sl-icon-button name="caret-left-fill" label="Previous" id="top-countries-month-previous"></sl-icon-button>
+                <span id="top-countries-month" class="whitespace-nowrap">October 2022</span>
+                <sl-icon-button name="caret-right-fill" label="Next" id="top-countries-month-next"></sl-icon-button>
+            </div>
+
+            <dl id="top-countries" class="grid grid-cols-[1.5rem_1fr_3rem] text-xs md:text-sm "></dl>
+            <template id="top-countries-row">
+                <span class="leading-relaxed"></span><dt class="leading-relaxed">Country</dt><dd class="font-mono text-right leading-relaxed">50.00</dd>
+            </template>
+        </sl-card>
 
     </main>
 

@@ -5,6 +5,10 @@ export function element<T extends HTMLElement>(id: string): T {
     return rt as T;
 }
 
+export function removeAllChildren(node: Node) {
+    while (node.firstChild) node.removeChild(node.firstChild);
+}
+
 //
 
 export interface SlDropdown extends HTMLElement {
