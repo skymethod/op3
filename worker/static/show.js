@@ -9312,7 +9312,7 @@ function computeCountryName(countryCode) {
 const makeTopApps = ({ monthlyDimensionDownloads  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
-            v['appName'] ?? {}
+            computeAppDownloads(v)
         ]));
     return makeTopBox({
         type: 'apps',
@@ -9329,6 +9329,20 @@ const makeTopApps = ({ monthlyDimensionDownloads  })=>{
         computeName: (key)=>key
     });
 };
+function computeAppDownloads(dimensionDownloads) {
+    const rt = dimensionDownloads['appName'] ?? {};
+    const libs = dimensionDownloads['libraryName'] ?? {};
+    const appleCoreMedia = libs['AppleCoreMedia'];
+    if (appleCoreMedia) rt['Unknown Apple App'] = appleCoreMedia;
+    const referrers = dimensionDownloads['referrer'] ?? {};
+    for (const [referrer, downloads] of Object.entries(referrers)){
+        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
+        if (type === 'app') {
+            increment(rt, name1, downloads);
+        }
+    }
+    return rt;
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
