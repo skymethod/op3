@@ -8593,8 +8593,10 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
     return new xt(ctx, config);
 }
 const makeEpisodePacing = ({ episodeHourlyDownloads , episodes  })=>{
-    const [episodePacingCanvas] = [
-        element('episode-pacing')
+    const [episodePacingCanvas, episodePacingLegendElement, episodePacingLegendItemTemplate] = [
+        element('episode-pacing'),
+        element('episode-pacing-legend'),
+        element('episode-pacing-legend-item')
     ];
     const recentEpisodeIds = episodes.filter((v)=>episodeHourlyDownloads[v.id]).slice(0, 8).map((v)=>v.id);
     const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map((v)=>[
@@ -8605,13 +8607,49 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes  })=>{
             v.id,
             v
         ]));
-    drawPacingChart(episodePacingCanvas, recentEpisodeHourlyDownloads, episodeInfos);
+    const chart = drawPacingChart(episodePacingCanvas, recentEpisodeHourlyDownloads, episodeInfos);
+    initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement);
     function update() {}
     update();
     return {
         update
     };
 };
+function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement) {
+    const items = chart.options.plugins.legend.labels.generateLabels(chart);
+    const legendSelections = {};
+    const updateChartForLegend = ()=>{
+        const noneSelected = Object.values(legendSelections).every((v)=>!v);
+        for (const [datasetIndex, selected] of Object.entries(legendSelections)){
+            chart.setDatasetVisibility(parseInt(datasetIndex), noneSelected || selected);
+        }
+        chart.update();
+    };
+    for (const { text , fillStyle , datasetIndex  } of items){
+        const item = episodePacingLegendItemTemplate.content.cloneNode(true);
+        const dt = item.querySelector('dt');
+        dt.style.backgroundColor = fillStyle;
+        const dd = item.querySelector('dd');
+        dd.textContent = text;
+        legendSelections[datasetIndex] = false;
+        const updateItem = ()=>{
+            dt.style.opacity = legendSelections[datasetIndex] ? '1' : '0.9';
+            dd.style.opacity = legendSelections[datasetIndex] ? '1' : '0.5';
+        };
+        updateItem();
+        dd.onmouseover = ()=>{
+            legendSelections[datasetIndex] = true;
+            updateItem();
+            updateChartForLegend();
+        };
+        dd.onmouseout = ()=>{
+            legendSelections[datasetIndex] = false;
+            updateItem();
+            updateChartForLegend();
+        };
+        episodePacingLegendElement.appendChild(item);
+    }
+}
 function computeRelativeCumulative(hourlyDownloads) {
     const rt = {};
     let hourNum = 1;
@@ -8642,7 +8680,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
         '#f95d6a',
         '#ff7c43',
         '#ffa600'
-    ];
+    ].reverse();
     return new xt(ctx, {
         type: 'line',
         data: {
@@ -8668,8 +8706,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
             },
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    align: 'start'
+                    display: false
                 },
                 tooltip: {
                     enabled: true,
@@ -8694,7 +8731,8 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
                 y: {
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
-                    }
+                    },
+                    afterFit: (axis)=>axis.options.suggestedMax = axis.max
                 }
             }
         }

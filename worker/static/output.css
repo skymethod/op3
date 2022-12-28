@@ -931,6 +931,26 @@ a:hover {
   grid-template-columns: min-content 1fr;
 }
 
+.grid-cols-\[6rem_1fr\] {
+  grid-template-columns: 6rem 1fr;
+}
+
+.grid-cols-\[4rem_1fr\] {
+  grid-template-columns: 4rem 1fr;
+}
+
+.grid-cols-\[3rem_1fr\] {
+  grid-template-columns: 3rem 1fr;
+}
+
+.grid-cols-\[1rem_1fr\] {
+  grid-template-columns: 1rem 1fr;
+}
+
+.grid-cols-\[2rem_1fr\] {
+  grid-template-columns: 2rem 1fr;
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -965,6 +985,14 @@ a:hover {
 
 .gap-8 {
   gap: 2rem;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
 }
 
 .gap-x-4 {
@@ -1301,5 +1329,10 @@ a:hover {
   .md\:text-lg {
     font-size: 1.125rem;
     line-height: 1.75rem;
+  }
+
+  .md\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 }

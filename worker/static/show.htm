@@ -123,6 +123,12 @@ const sessionToken = '${sessionToken}';
         <!-- episode pacing -->
         <div class="flex justify-center mt-16 mb-8">Episode pacing</div>
         <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+        <div class="flex justify-center mt-4 mb-16">
+            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
+            <template id="episode-pacing-legend-item">
+                <dt class="bg-lime-900"></dt><dd class="ml-2 leading-relaxed truncate">Item</dd>
+            </template>
+        </div>
 
     </main>
 
