@@ -114,12 +114,14 @@ export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputP
     const hourlyDownloads: Record<string, number> = {};
     const sources: Record<string, string> = {};
     const episodes: Record<string, EpisodeSummary> = {};
+    const countryDownloads: Record<string, number> = {};
     const results = await Promise.all(inputKeys.map(async v => ({ key: v, result: await statsBlobs.get(v, 'text-and-meta') })));
     for (const { key, result } of results) {
         if (result === undefined) continue;
         const { text, etag } = result;
         const summary = JSON.parse(text) as ShowSummary;
         incrementAll(hourlyDownloads, summary.hourlyDownloads);
+        incrementAll(countryDownloads, summary.countryDownloads ?? {});
         for (const [ episodeId, epSummary ] of Object.entries(summary.episodes)) {
             let record = episodes[episodeId];
             if (!record) {
@@ -139,6 +141,7 @@ export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputP
         period: outputPeriod,
         hourlyDownloads,
         episodes,
+        countryDownloads,
         sources,
     });
 }
@@ -152,8 +155,9 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
     const hourlyDownloads: Record<string, number> = {};
     const episodes: Record<string, EpisodeSummary> = {};
     const audienceTimestamps: Record<string, string> = {};
+    const countryDownloads: Record<string, number> = {};
     for await (const obj of yieldTsvFromStream(stream)) {
-        const { botType, time, episodeId, audienceId } = obj;
+        const { botType, time, episodeId, audienceId, countryCode = 'XX' } = obj;
         if (time === undefined) throw new Error(`Undefined time`);
         const hour = time.substring(0, '2000-01-01T00'.length);
         if (botType !== undefined) continue;
@@ -171,12 +175,14 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
             }
             increment(record.hourlyDownloads, hour);
         }
+        increment(countryDownloads, countryCode);
     }
     const summary = computeSorted({
         showUuid,
         period: date,
         hourlyDownloads,
         episodes,
+        countryDownloads,
         sources: Object.fromEntries([ [ key, etag] ]),
     });
     return { summary, audienceTimestamps };
@@ -211,6 +217,7 @@ export interface ShowSummary {
     readonly hourlyDownloads: Record<string, number>; // hour (e.g. 2022-12-01T10) -> downloads
     readonly episodes: Record<string, EpisodeSummary>; // episodeId -> 
     readonly sources: Record<string, string>;
+    readonly countryDownloads?: Record<string, number>; // countryCode
 }
 
 export function isValidShowSummary(obj: unknown): obj is ShowSummary {
@@ -220,6 +227,7 @@ export function isValidShowSummary(obj: unknown): obj is ShowSummary {
         && isStringRecord(obj.hourlyDownloads)
         && isStringRecord(obj.episodes)
         && isStringRecord(obj.sources)
+        && (obj.countryDownloads === undefined || isStringRecord(obj.countryDownloads))
         ;
 }
 

@@ -60,7 +60,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
         } else {
             exportSpinner.classList.add('hidden');
             exportCancelButton.classList.add('invisible');
-            exportTitleDiv.textContent = 'Export downloads';
+            exportTitleDiv.textContent = 'Export download details';
         }
         disables.forEach(v => v.disabled = !!exporting);
     }

@@ -8809,7 +8809,7 @@ const makeExportDownloads = ({ showUuid , previewToken: previewToken1  })=>{
         } else {
             exportSpinner.classList.add('hidden');
             exportCancelButton.classList.add('invisible');
-            exportTitleDiv.textContent = 'Export downloads';
+            exportTitleDiv.textContent = 'Export download details';
         }
         disables.forEach((v)=>v.disabled = !!exporting);
     }
