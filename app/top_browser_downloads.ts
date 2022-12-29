@@ -37,8 +37,10 @@ function computeBrowserDownloads(dimensionDownloads: Record<string, Record<strin
         } else if (type === 'domain') {
             if (name.startsWith('unknown:')) {
                 increment(rt, 'Unknown', downloads);
-            } else {
+            } else if (name.includes(' ')) {
                 increment(rt, name, downloads);
+            } else {
+                increment(rt, `https://${name}`, downloads);
             }
         } else if (type === 'host') {
             increment(rt, name, downloads);

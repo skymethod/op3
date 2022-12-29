@@ -5,6 +5,7 @@ import { isEpisodeRecord } from '../backend/show_controller_model.ts';
 import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
 import { check } from '../check.ts';
 import { compareByDescending } from '../collections.ts';
+import { decodeXml } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -34,9 +35,13 @@ export async function computeShowsResponse({ showUuid, method, searchParams, rpc
     const episodes = episodeRecords
         .filter(isEpisodeRecord)
         .sort(compareByDescending(r => r.pubdateInstant))
-        .map(({ id, title, pubdateInstant }) => ({ id, title, pubdate: pubdateInstant }));
+        .map(({ id, title, pubdateInstant }) => ({ id, title: cleanTitle(title), pubdate: pubdateInstant }));
 
     return newJsonResponse({ showUuid, title, episodes } as ApiShowsResponse);
+}
+
+function cleanTitle(title: string | undefined): string | undefined {
+    return title === undefined ? undefined : decodeXml(title);
 }
 
 export async function computeShowStatsResponse({ showUuid, method, searchParams, statsBlobs, roStatsBlobs, times = {} }: { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number> }): Promise<Response> {

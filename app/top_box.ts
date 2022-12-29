@@ -62,9 +62,20 @@ export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId
             }
 
             const dt = item.querySelector('dt')!;
-            const name = computeName(key);
-            dt.textContent = name;
-            dt.title = name;
+            if (key.startsWith('https://')) {
+                dt.textContent = '';
+                const a = document.createElement('a');
+                a.textContent = new URL(key).host;
+                a.href = key;
+                a.className = 'text-white';
+                a.target = '_blank';
+                a.rel = 'nofollow noopener noreferrer';
+                dt.appendChild(a);
+            } else {
+                const name = computeName(key);
+                dt.textContent = name;
+                dt.title = name;
+            }
 
             const dd = item.querySelector('dd')!;
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
@@ -77,7 +88,8 @@ export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId
 
         tsvRows.splice(1);
         let rank = 1;
-        for (const [ key, downloads ] of sorted) {
+        for (const [ keyStr, downloads ] of sorted) {
+            const key = keyStr.startsWith('https://') ? new URL(keyStr).hostname : keyStr;
             const name = computeName(key);
             const pct = (downloads / totalDownloads * 100).toFixed(4);
             const fields = tsvHeaderNames.length === 1 ? [ name ] : [ key, name ];

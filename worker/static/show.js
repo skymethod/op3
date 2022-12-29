@@ -9230,9 +9230,20 @@ const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId ,
                 span.textContent = computeEmoji(key);
             }
             const dt = item.querySelector('dt');
-            const name1 = computeName(key);
-            dt.textContent = name1;
-            dt.title = name1;
+            if (key.startsWith('https://')) {
+                dt.textContent = '';
+                const a = document.createElement('a');
+                a.textContent = new URL(key).host;
+                a.href = key;
+                a.className = 'text-white';
+                a.target = '_blank';
+                a.rel = 'nofollow noopener noreferrer';
+                dt.appendChild(a);
+            } else {
+                const name1 = computeName(key);
+                dt.textContent = name1;
+                dt.title = name1;
+            }
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
             dd.title = pluralize(downloads, 'download');
@@ -9242,7 +9253,8 @@ const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId ,
         nextButton.disabled = monthIndex === months.length - 1;
         tsvRows.splice(1);
         let rank = 1;
-        for (const [key1, downloads1] of sorted){
+        for (const [keyStr, downloads1] of sorted){
+            const key1 = keyStr.startsWith('https://') ? new URL(keyStr).hostname : keyStr;
             const name11 = computeName(key1);
             const pct = (downloads1 / totalDownloads * 100).toFixed(4);
             const fields = tsvHeaderNames.length === 1 ? [
@@ -9448,8 +9460,10 @@ function computeBrowserDownloads(dimensionDownloads) {
         } else if (type === 'domain') {
             if (name1.startsWith('unknown:')) {
                 increment(rt, 'Unknown', downloads);
-            } else {
+            } else if (name1.includes(' ')) {
                 increment(rt, name1, downloads);
+            } else {
+                increment(rt, `https://${name1}`, downloads);
             }
         } else if (type === 'host') {
             increment(rt, name1, downloads);
