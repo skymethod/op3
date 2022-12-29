@@ -9343,6 +9343,59 @@ function computeAppDownloads(dimensionDownloads) {
     }
     return rt;
 }
+const makeTopDevices = ({ monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['deviceName'] ?? {}
+        ]));
+    return makeTopBox({
+        type: 'devices',
+        exportId: 'top-devices-export',
+        previousId: 'top-devices-month-previous',
+        nextId: 'top-devices-month-next',
+        monthId: 'top-devices-month',
+        listId: 'top-devices',
+        templateId: 'top-devices-row',
+        monthlyDownloads,
+        tsvHeaderNames: [
+            'device'
+        ],
+        computeName: (key)=>key
+    });
+};
+const makeTopDeviceTypes = ({ monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['deviceType'] ?? {}
+        ]));
+    return makeTopBox({
+        type: 'device-types',
+        exportId: 'top-device-types-export',
+        previousId: 'top-device-types-month-previous',
+        nextId: 'top-device-types-month-next',
+        monthId: 'top-device-types-month',
+        listId: 'top-device-types',
+        templateId: 'top-device-types-row',
+        monthlyDownloads,
+        tsvHeaderNames: [
+            'deviceType'
+        ],
+        computeEmoji,
+        computeName: computeDeviceTypeName
+    });
+};
+function computeDeviceTypeName(deviceType) {
+    return deviceType.split('_').map((v)=>v === 'tv' ? 'TV' : v.substring(0, 1).toUpperCase() + v.substring(1)).join(' ');
+}
+function computeEmoji(deviceType) {
+    return ({
+        mobile: '📱',
+        smart_tv: '📺',
+        computer: '💻',
+        smart_speaker: '🔊',
+        watch: '⌚️'
+    })[deviceType] ?? '❔';
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9392,6 +9445,12 @@ const app = (()=>{
         monthlyDimensionDownloads
     });
     makeTopApps({
+        monthlyDimensionDownloads
+    });
+    makeTopDevices({
+        monthlyDimensionDownloads
+    });
+    makeTopDeviceTypes({
         monthlyDimensionDownloads
     });
     console.log(initialData);

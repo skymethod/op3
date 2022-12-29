@@ -7,6 +7,8 @@ import { makeExportDownloads } from './export_downloads.ts';
 import { makeHeadlineStats } from './headline_stats.ts';
 import { makeTopCountries } from './top_countries.ts';
 import { makeTopApps } from './top_apps.ts';
+import { makeTopDevices } from './top_devices.ts';
+import { makeTopDeviceTypes } from './top_device-types.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -49,6 +51,8 @@ const app = (() => {
     makeEpisodePacing({ episodeHourlyDownloads, episodes });
     makeTopCountries({ monthlyDimensionDownloads });
     makeTopApps({ monthlyDimensionDownloads });
+    makeTopDevices({ monthlyDimensionDownloads });
+    makeTopDeviceTypes({ monthlyDimensionDownloads });
 
     console.log(initialData);
 

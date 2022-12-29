@@ -1011,6 +1011,14 @@ a:hover {
   grid-template-columns: 0 1fr 3rem;
 }
 
+.grid-cols-\[0_1fr_3\.5rem\] {
+  grid-template-columns: 0 1fr 3.5rem;
+}
+
+.grid-cols-\[1\.5rem_1fr_3\.5rem\] {
+  grid-template-columns: 1.5rem 1fr 3.5rem;
+}
+
 .flex-row {
   flex-direction: row;
 }
