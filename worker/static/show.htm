@@ -100,28 +100,10 @@ const sessionToken = '${sessionToken}';
             <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
-
-        <!-- export downloads -->
-        <sl-card class="card-basic flex justify-center">
-            <div slot="header" class="flex items-center justify-between">
-                <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><sl-icon name="download" id="export-icon"></sl-icon><div id="export-title" class="ml-2">Export download details</div></div>
-                <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
-            </div>
-            <sl-button-group>
-                <sl-button id="export-month-0" outline>Mmm YYYY</sl-button>
-                <sl-button id="export-month-1" outline>Mmm YYYY</sl-button>
-                <sl-dropdown id="export-dropdown">
-                    <sl-button id="export-older" slot="trigger" caret outline>Older</sl-button>
-                    <sl-menu>
-                        <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
-                    </sl-menu>
-                </sl-dropdown>
-            </sl-button-group>
-            <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
-        </sl-card>
+        <div class="flex justify-center text-xs opacity-75">All dates and times are in UTC</div>
 
         <!-- episode pacing -->
-        <div class="flex justify-center mt-16 mb-8">Episode pacing</div>
+        <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
         <canvas id="episode-pacing" class="cursor-pointer"></canvas>
         <div class="flex justify-center mt-4">
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
@@ -132,6 +114,7 @@ const sessionToken = '${sessionToken}';
 
 
         <div class="flex flex-wrap gap-8 flex-row items-center justify-center">
+
             <!-- top countries -->
             <sl-card class="card-basic flex justify-center mb-16 mt-16 ">
                 <div slot="header" class="flex items-center justify-between w-72">
@@ -156,7 +139,7 @@ const sessionToken = '${sessionToken}';
             <!-- top metros -->
             <sl-card class="card-basic flex justify-center mb-16 mt-16 ">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top Nielsen metros</div>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Nielsen metros</div>
                     <sl-icon-button id="top-metros-export" name="download" label="Export" title="Export"></sl-icon-button>
                 </div>
             
@@ -256,6 +239,25 @@ const sessionToken = '${sessionToken}';
                     <dt class="leading-relaxed truncate max-w-[12rem]">Country</dt>
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
+            </sl-card>
+
+            <!-- export downloads -->
+            <sl-card class="card-basic flex justify-center">
+                <div slot="header" class="flex items-center justify-between">
+                    <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><sl-icon name="download" id="export-icon"></sl-icon><div id="export-title" class="ml-2">Export download details</div></div>
+                    <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
+                </div>
+                <sl-button-group>
+                    <sl-button id="export-month-0" outline>Mmm YYYY</sl-button>
+                    <sl-button id="export-month-1" outline>Mmm YYYY</sl-button>
+                    <sl-dropdown id="export-dropdown">
+                        <sl-button id="export-older" slot="trigger" caret outline>Older</sl-button>
+                        <sl-menu>
+                            <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
+                        </sl-menu>
+                    </sl-dropdown>
+                </sl-button-group>
+                <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
             </sl-card>
         </div>
 
