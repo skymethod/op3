@@ -108,8 +108,8 @@ const app = (() => {
     const [ exampleGuidSpan, searchInput, statusSpinner, statusMessage, searchResultsContainer, searchResultTemplate, searchResultsPageButtonGroup, searchResultsPageButtonTemplate ] = 
         [ 'example-guid', 'search-input', 'status-spinner', 'status-message', 'search-results-container', 'search-result-template', 'search-results-page-button-group', 'search-results-page-button-template' ].map(v => document.getElementById(v));
 
-    const [ feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList, fpPodcastGuidSpan ] = 
-        [ 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list', 'fp-podcast-guid' ].map(v => document.getElementById(v));
+    const [ showPagePreviewAlert, showPageMailto, feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList, fpPodcastGuidSpan ] = 
+        [ 'show-page-preview', 'show-page-mailto', 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list', 'fp-podcast-guid' ].map(v => document.getElementById(v));
 
     const reset = () => {
         searchResults = [];
@@ -266,6 +266,8 @@ const app = (() => {
             feedPanel.feed = feed;
             feedPanel.feedAnalysis = feedAnalysis;
             feedPanel.feedAnalysisError = feedAnalysisError;
+
+            showPageMailto.href = `mailto:john@op3.dev?subject=OP3 show page preview&body=Send me a private preview link to the OP3 stats page for ${fpTitleDiv.textContent} (${fpFeedAnchor.href}) as soon as it's available!`;
         }
         statusSpinner.style.visibility = status && status.pending ? 'visible' : 'hidden';
         statusMessage.textContent = status && status.message ? status.message : '';
@@ -273,6 +275,7 @@ const app = (() => {
         searchResultsPageButtonGroup.style.display = searchResultsPages > 1 ? 'block' : 'none';
 
         feedPanel.style.display = feed ? 'block' : 'none';
+        showPagePreviewAlert.style.display = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures > 0 ? 'block' : 'none';
     }
 
     return { update };

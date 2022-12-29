@@ -14,7 +14,7 @@ export async function computeSetupResponse(opts: { instance: string, origin: str
     const html = computeHtml(setupHtm, {
         titleSuffix: instance === 'prod' ? '' : ` (${instance})`,
         styleTag: computeStyleTag(),
-        shoelaceCommon: computeShoelaceCommon('sl-button', 'sl-input', 'sl-icon', 'sl-spinner', 'sl-button-group', 'sl-details'),
+        shoelaceCommon: computeShoelaceCommon('sl-button', 'sl-input', 'sl-icon', 'sl-spinner', 'sl-button-group', 'sl-details', 'sl-alert'),
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,
