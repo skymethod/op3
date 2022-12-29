@@ -139,7 +139,7 @@ const sessionToken = '${sessionToken}';
             <!-- top metros -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Nielsen metros</div>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top North American metros</div>
                     <sl-icon-button id="top-metros-export" name="download" label="Export" title="Export"></sl-icon-button>
                 </div>
             
@@ -191,7 +191,7 @@ const sessionToken = '${sessionToken}';
                     <sl-icon-button name="caret-right-fill" label="Next" id="top-devices-month-next"></sl-icon-button>
                 </div>
             
-                <dl id="top-devices" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4"></dl>
+                <dl id="top-devices" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
                 <template id="top-devices-row">
                     <span class="leading-relaxed"></span>
                     <dt class="leading-relaxed">Country</dt>

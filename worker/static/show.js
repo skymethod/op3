@@ -8703,7 +8703,7 @@ function computeRelativeCumulative(hourlyDownloads) {
     let total = 0;
     for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
         total += downloads;
-        rt[`h${(hourNum++).toString().padStart(3, '0')}`] = total;
+        rt[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
     }
     return rt;
 }
