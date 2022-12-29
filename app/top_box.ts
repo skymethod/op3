@@ -1,6 +1,6 @@
 import { sortBy } from './deps.ts';
 import { element, removeAllChildren, SlIconButton } from './elements.ts';
-import { computeMonthName, download } from './util.ts';
+import { computeMonthName, download, pluralize } from './util.ts';
 
 type Opts = {
     type: string,
@@ -11,12 +11,13 @@ type Opts = {
     listId: string,
     templateId: string,
     monthlyDownloads: Record<string, Record<string, number>>,
+    downloadsDenominator?: (month: string) => number,
     tsvHeaderNames: string[],
     computeEmoji?: (key: string) => string,
     computeName: (key: string) => string,
 };
 
-export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId, templateId, monthlyDownloads, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
+export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId, templateId, monthlyDownloads, downloadsDenominator, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
 
     const [
         exportButton,
@@ -45,9 +46,10 @@ export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId
     };
 
     const updateTableForMonth = () => {
-        monthDiv.textContent = computeMonthName(months[monthIndex], { includeYear: true });
+        const month = months[monthIndex];
+        monthDiv.textContent = computeMonthName(month, { includeYear: true });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
-        const totalDownloads = Object.values(monthDownloads).reduce((a, b) => a + b, 0);
+        const totalDownloads = downloadsDenominator ? downloadsDenominator(month) : Object.values(monthDownloads).reduce((a, b) => a + b, 0);
         removeAllChildren(list);
        
         const sorted = sortBy(Object.entries(monthDownloads), v => -v[1]);
@@ -60,10 +62,13 @@ export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId
             }
 
             const dt = item.querySelector('dt')!;
-            dt.textContent = computeName(key);
+            const name = computeName(key);
+            dt.textContent = name;
+            dt.title = name;
 
             const dd = item.querySelector('dd')!;
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
+            dd.title = pluralize(downloads, 'download');
 
             list.appendChild(item);
         }

@@ -929,6 +929,10 @@ a:hover {
   max-width: 35rem;
 }
 
+.max-w-\[2rem\] {
+  max-width: 2rem;
+}
+
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }

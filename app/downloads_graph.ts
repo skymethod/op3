@@ -4,7 +4,7 @@ import { increment } from '../worker/summaries.ts';
 import { addDays } from '../worker/timestamp.ts';
 import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
-import { computeMonthName } from './util.ts';
+import { computeMonthName, pluralize } from './util.ts';
 
 type Opts = { hourlyDownloads: Record<string, number>, episodeMarkers: Record<string, EpisodeInfo>, debug: boolean };
 
@@ -132,7 +132,6 @@ function isGranularity(obj: string): obj is Granularity {
 const dayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
 const dayAndHourFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', hour: 'numeric', hour12: true, timeZone: 'UTC' });
 const timeOnlyFormat = new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: true, timeZone: 'UTC' });
-const withCommas = new Intl.NumberFormat('en-US');
 
 function computeRangeDisplay(hour: string): string {
     return `${computeMonthName(hour.substring(0, 7))} ${parseInt(hour.substring(8, 10))}`;
@@ -213,7 +212,7 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                     callbacks: {
                         title: (items: TooltipItem<never>[]) => dateFormat.format(new Date(items[0].label)),
                         // deno-lint-ignore no-explicit-any
-                        label: (item: any) => `${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`,
+                        label: (item: any) => pluralize(item.parsed.y, 'download'),
                         // deno-lint-ignore no-explicit-any
                         footer: (items: any[]) => {
                             const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];

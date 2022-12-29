@@ -215,6 +215,27 @@ const sessionToken = '${sessionToken}';
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
             </sl-card>
+
+            <!-- top browser downloads -->
+            <sl-card class="card-basic flex justify-center mb-16 mt-16 ">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top browser downloads</div>
+                    <sl-icon-button id="top-browser-downloads-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-browser-downloads-month-previous"></sl-icon-button>
+                    <span id="top-browser-downloads-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-browser-downloads-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-browser-downloads" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4"></dl>
+                <template id="top-browser-downloads-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">Country</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
         </div>
 
     </main>

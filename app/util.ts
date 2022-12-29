@@ -18,7 +18,13 @@ export function download(content: Blob[] | string, { type, filename }: { type: s
     URL.revokeObjectURL(blobUrl);
 }
 
+export function pluralize(n: number, unit: string, format?: Intl.NumberFormat): string {
+    return `${(format ?? withCommas).format(n)} ${unit}${n !== 1 ? 's' : ''}`;
+}
+
 //
 
 const monthNameFormat = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' });
 const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const withCommas = new Intl.NumberFormat('en-US');
+

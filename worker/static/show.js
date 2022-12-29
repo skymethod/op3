@@ -8391,6 +8391,9 @@ function download(content, { type , filename  }) {
     anchor.click();
     URL.revokeObjectURL(blobUrl);
 }
+function pluralize(n, unit, format) {
+    return `${(format ?? withCommas).format(n)} ${unit}${n !== 1 ? 's' : ''}`;
+}
 const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     month: 'long',
     timeZone: 'UTC'
@@ -8400,6 +8403,7 @@ const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     timeZone: 'UTC'
 });
+const withCommas = new Intl.NumberFormat('en-US');
 const makeDownloadsGraph = ({ hourlyDownloads , episodeMarkers , debug  })=>{
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
         element('downloads-graph'),
@@ -8519,7 +8523,6 @@ const timeOnlyFormat = new Intl.DateTimeFormat('en-US', {
     hour12: true,
     timeZone: 'UTC'
 });
-const withCommas = new Intl.NumberFormat('en-US');
 function computeRangeDisplay(hour) {
     return `${computeMonthName(hour.substring(0, 7))} ${parseInt(hour.substring(8, 10))}`;
 }
@@ -8594,7 +8597,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
                     footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
                         title: (items)=>dateFormat.format(new Date(items[0].label)),
-                        label: (item)=>`${withCommas.format(item.parsed.y)} download${item.parsed.y === 1 ? '' : 's'}`,
+                        label: (item)=>pluralize(item.parsed.y, 'download'),
                         footer: (items)=>{
                             const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
                             return records.length === 0 ? undefined : records.map((v)=>`Published: ${v.info.title}${debug ? ` f:${v.foundHour} p:${v.info.pubdate}` : ''}`).join('\n');
@@ -9182,7 +9185,7 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId , templateId , monthlyDownloads , tsvHeaderNames , computeEmoji , computeName  })=>{
+const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId , templateId , monthlyDownloads , downloadsDenominator , tsvHeaderNames , computeEmoji , computeName  })=>{
     const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
         element(exportId),
         element(previousId),
@@ -9212,11 +9215,12 @@ const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId ,
         });
     };
     const updateTableForMonth = ()=>{
-        monthDiv.textContent = computeMonthName(months[monthIndex], {
+        const month = months[monthIndex];
+        monthDiv.textContent = computeMonthName(month, {
             includeYear: true
         });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
-        const totalDownloads = Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
+        const totalDownloads = downloadsDenominator ? downloadsDenominator(month) : Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
         removeAllChildren(list);
         const sorted = sortBy(Object.entries(monthDownloads), (v)=>-v[1]);
         for (const [key, downloads] of sorted){
@@ -9226,9 +9230,12 @@ const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId ,
                 span.textContent = computeEmoji(key);
             }
             const dt = item.querySelector('dt');
-            dt.textContent = computeName(key);
+            const name1 = computeName(key);
+            dt.textContent = name1;
+            dt.title = name1;
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
+            dd.title = pluralize(downloads, 'download');
             list.appendChild(item);
         }
         previousButton.disabled = monthIndex === 0;
@@ -9236,13 +9243,13 @@ const makeTopBox = ({ type , exportId , previousId , monthId , nextId , listId ,
         tsvRows.splice(1);
         let rank = 1;
         for (const [key1, downloads1] of sorted){
-            const name1 = computeName(key1);
+            const name11 = computeName(key1);
             const pct = (downloads1 / totalDownloads * 100).toFixed(4);
             const fields = tsvHeaderNames.length === 1 ? [
-                name1
+                name11
             ] : [
                 key1,
-                name1
+                name11
             ];
             tsvRows.push([
                 `${rank++}`,
@@ -9396,6 +9403,49 @@ function computeEmoji(deviceType) {
         watch: '⌚️'
     })[deviceType] ?? '❔';
 }
+const makeTopBrowserDownloads = ({ monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            computeBrowserDownloads(v)
+        ]));
+    const computeDownloadsForMonth = (month)=>Object.values(monthlyDimensionDownloads[month]['countryCode']).reduce((a, b)=>a + b, 0);
+    return makeTopBox({
+        type: 'browser-downloads',
+        exportId: 'top-browser-downloads-export',
+        previousId: 'top-browser-downloads-month-previous',
+        nextId: 'top-browser-downloads-month-next',
+        monthId: 'top-browser-downloads-month',
+        listId: 'top-browser-downloads',
+        templateId: 'top-browser-downloads-row',
+        monthlyDownloads,
+        downloadsDenominator: computeDownloadsForMonth,
+        tsvHeaderNames: [
+            'browserOrReferrer'
+        ],
+        computeName: (key)=>key
+    });
+};
+function computeBrowserDownloads(dimensionDownloads) {
+    const rt = dimensionDownloads['browserName'] ?? {};
+    const referrers = dimensionDownloads['referrer'] ?? {};
+    for (const [referrer, downloads] of Object.entries(referrers)){
+        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
+        if (type === 'app') {
+            increment(rt, name1, downloads);
+        } else if (type === 'domain') {
+            if (name1.startsWith('unknown:')) {
+                increment(rt, 'Unknown', downloads);
+            } else {
+                increment(rt, name1, downloads);
+            }
+        } else if (type === 'host') {
+            increment(rt, name1, downloads);
+        } else {
+            console.warn(`Unsupported referrer type: ${type}`);
+        }
+    }
+    return rt;
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9451,6 +9501,9 @@ const app = (()=>{
         monthlyDimensionDownloads
     });
     makeTopDeviceTypes({
+        monthlyDimensionDownloads
+    });
+    makeTopBrowserDownloads({
         monthlyDimensionDownloads
     });
     console.log(initialData);
