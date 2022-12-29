@@ -645,6 +645,11 @@ a:hover {
   margin-right: 2rem;
 }
 
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
 .mt-16 {
   margin-top: 4rem;
 }
@@ -727,6 +732,10 @@ a:hover {
 
 .mr-2 {
   margin-right: 0.5rem;
+}
+
+.mb-32 {
+  margin-bottom: 8rem;
 }
 
 .block {
@@ -931,6 +940,10 @@ a:hover {
 
 .max-w-\[2rem\] {
   max-width: 2rem;
+}
+
+.grow {
+  flex-grow: 1;
 }
 
 .transform {

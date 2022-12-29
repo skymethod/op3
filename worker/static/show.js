@@ -9289,6 +9289,12 @@ const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
             String.fromCharCode('A'.charCodeAt(0) + v),
             String.fromCodePoint('🇦'.codePointAt(0) + v)
         ]));
+    const computeEmoji = (countryCode)=>({
+            'T1': '🧅',
+            'XX': '❔'
+        })[countryCode] ?? [
+            ...countryCode
+        ].map((v)=>regionalIndicators[v]).join('');
     return makeTopBox({
         type: 'countries',
         exportId: 'top-countries-export',
@@ -9302,9 +9308,7 @@ const makeTopCountries = ({ monthlyDimensionDownloads  })=>{
             'countryCode',
             'countryName'
         ],
-        computeEmoji: (countryCode)=>[
-                ...countryCode
-            ].map((v)=>regionalIndicators[v]).join(''),
+        computeEmoji,
         computeName: computeCountryName
     });
 };
@@ -9313,8 +9317,17 @@ const regionNamesInEnglish = new Intl.DisplayNames([
 ], {
     type: 'region'
 });
+function tryComputeRegionNameInEnglish(countryCode) {
+    try {
+        return regionNamesInEnglish.of(countryCode);
+    } catch (e) {
+        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+    }
+}
 function computeCountryName(countryCode) {
-    return (countryCode.length === 2 ? regionNamesInEnglish.of(countryCode) : undefined) ?? countryCode;
+    if (countryCode === 'T1') return 'Tor traffic';
+    if (countryCode === 'XX') return 'Unknown';
+    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined) ?? countryCode;
 }
 const makeTopApps = ({ monthlyDimensionDownloads  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
