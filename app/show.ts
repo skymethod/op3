@@ -10,6 +10,7 @@ import { makeTopApps } from './top_apps.ts';
 import { makeTopDevices } from './top_devices.ts';
 import { makeTopDeviceTypes } from './top_device-types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
+import { makeTopMetros } from './top_metros.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -55,6 +56,7 @@ const app = (() => {
     makeTopDevices({ monthlyDimensionDownloads });
     makeTopDeviceTypes({ monthlyDimensionDownloads });
     makeTopBrowserDownloads({ monthlyDimensionDownloads });
+    makeTopMetros({ monthlyDimensionDownloads });
 
     console.log(initialData);
 
