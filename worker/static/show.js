@@ -8345,6 +8345,9 @@ function checkMatches(name1, value, pattern) {
     if (!m) throw new Error(`Bad ${name1}: ${value}`);
     return m;
 }
+function isValidHour(hour) {
+    return typeof hour === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([0-1][0-9]|2[0-3])$/.test(hour);
+}
 function isValidMonth(month) {
     return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
 }
@@ -8364,6 +8367,13 @@ function addMonthsToMonthString(month, months) {
     const rt = new Date(`${month}-01T00:00:00.000Z`);
     rt.setUTCMonth(rt.getUTCMonth() + months);
     return rt.toISOString().substring(0, 7);
+}
+function addHoursToHourString(hour, hours) {
+    if (!isValidHour(hour)) throw new Error(`Bad hour: ${hour}`);
+    if (!Number.isSafeInteger(hours)) throw new Error(`Bad hours: ${hours}`);
+    const rt = new Date(`${hour}:00:00.000Z`);
+    rt.setUTCHours(rt.getUTCHours() + hours);
+    return rt.toISOString().substring(0, 13);
 }
 function element(id) {
     const rt = document.getElementById(id);
@@ -9823,10 +9833,12 @@ const app = (()=>{
     const [debugDiv] = [
         element('debug')
     ];
+    console.log(initialData);
     const { showObj , statsObj , times  } = initialData;
     const { showUuid , episodes  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const { episodeFirstHours , hourlyDownloads , dailyFoundAudience , episodeHourlyDownloads , monthlyDimensionDownloads  } = statsObj;
+    const { episodeFirstHours , dailyFoundAudience , episodeHourlyDownloads , monthlyDimensionDownloads  } = statsObj;
+    const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeMarkers = Object.fromEntries(Object.entries(episodeFirstHours).map(([episodeId, hour])=>[
             hour,
             showObj.episodes.find((v)=>v.id === episodeId)
@@ -9872,7 +9884,6 @@ const app = (()=>{
     makeTopMetros({
         monthlyDimensionDownloads
     });
-    console.log(initialData);
     function update() {
         exportDownloads.update();
         headlineStats.update();
@@ -9885,3 +9896,15 @@ globalThis.addEventListener('DOMContentLoaded', ()=>{
     console.log('Document content loaded');
     app.update();
 });
+function insertZeros(hourlyDownloads) {
+    const hours = Object.keys(hourlyDownloads);
+    if (hours.length < 2) return hourlyDownloads;
+    const maxHour = hours.at(-1);
+    let hour = hours[0];
+    const rt = {};
+    while(hour < maxHour){
+        rt[hour] = hourlyDownloads[hour] ?? 0;
+        hour = addHoursToHourString(hour, 1);
+    }
+    return rt;
+}

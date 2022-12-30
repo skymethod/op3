@@ -1,6 +1,6 @@
 import { isValidDate, isValidMonth } from './check.ts';
 import { assertEquals, assert } from './tests/deps.ts';
-import { addDaysToDateString, addMonthsToMonthString, computeRfc822, computeTimestamp, isValidTimestamp, unpackDate } from './timestamp.ts';
+import { addDaysToDateString, addHoursToHourString, addMonthsToMonthString, computeRfc822, computeTimestamp, isValidTimestamp, unpackDate } from './timestamp.ts';
 
 Deno.test({
     name: 'computeTimestamp',
@@ -71,6 +71,15 @@ Deno.test({
             seen.add(month);
         }
         assertEquals(month, '2021-01');
+    }
+});
+
+Deno.test({
+    name: 'addHoursToHourString',
+    fn: () => {
+        assertEquals(addHoursToHourString('2022-01-01T00', -1), '2021-12-31T23');
+        assertEquals(addHoursToHourString('2022-01-01T00', 0), '2022-01-01T00');
+        assertEquals(addHoursToHourString('2020-03-01T00', -24), '2020-02-29T00');
     }
 });
 

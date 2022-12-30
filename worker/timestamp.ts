@@ -2,7 +2,7 @@
 // 220910200920153
 // for 2022-09-10T20:09:20.153Z
 
-import { isValidDate, isValidMonth } from './check.ts';
+import { isValidDate, isValidHour, isValidMonth } from './check.ts';
 
 export function isValidTimestamp(timestamp: string): boolean {
     return /^\d{15}$/.test(timestamp);
@@ -69,6 +69,14 @@ export function addMonthsToMonthString(month: string, months: number): string {
     const rt = new Date(`${month}-01T00:00:00.000Z`);
     rt.setUTCMonth(rt.getUTCMonth() + months);
     return rt.toISOString().substring(0, 7);
+}
+
+export function addHoursToHourString(hour: string, hours: number): string {
+    if (!isValidHour(hour)) throw new Error(`Bad hour: ${hour}`);
+    if (!Number.isSafeInteger(hours)) throw new Error(`Bad hours: ${hours}`);
+    const rt = new Date(`${hour}:00:00.000Z`);
+    rt.setUTCHours(rt.getUTCHours() + hours);
+    return rt.toISOString().substring(0, 13);
 }
 
 export function unpackDate(date: string): { year: number, month: number, day: number } {

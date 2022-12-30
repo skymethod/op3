@@ -11,6 +11,7 @@ import { makeTopDevices } from './top_devices.ts';
 import { makeTopDeviceTypes } from './top_device-types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
 import { makeTopMetros } from './top_metros.ts';
+import { addHoursToHourString } from '../worker/timestamp.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -33,11 +34,14 @@ const app = (() => {
         element('debug'),
     ];
 
+    console.log(initialData);
+
     const { showObj, statsObj, times } = initialData;
     const { showUuid, episodes } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
-    const { episodeFirstHours, hourlyDownloads, dailyFoundAudience, episodeHourlyDownloads, monthlyDimensionDownloads } = statsObj;
+    const { episodeFirstHours, dailyFoundAudience, episodeHourlyDownloads, monthlyDimensionDownloads } = statsObj;
+    const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
 
     const debug = new URLSearchParams(document.location.search).has('debug');
@@ -58,8 +62,6 @@ const app = (() => {
     makeTopBrowserDownloads({ monthlyDimensionDownloads });
     makeTopMetros({ monthlyDimensionDownloads });
 
-    console.log(initialData);
-
     function update() {
         exportDownloads.update();
         headlineStats.update();
@@ -72,3 +74,16 @@ globalThis.addEventListener('DOMContentLoaded', () => {
     console.log('Document content loaded');
     app.update();
 });
+
+function insertZeros(hourlyDownloads: Record<string, number>): Record<string, number> {
+    const hours = Object.keys(hourlyDownloads)
+    if (hours.length < 2) return hourlyDownloads;
+    const maxHour = hours.at(-1)!;
+    let hour = hours[0];
+    const rt: Record<string, number>  = {};
+    while (hour < maxHour) {
+        rt[hour] = hourlyDownloads[hour] ?? 0;
+        hour = addHoursToHourString(hour, 1);
+    }
+    return rt;
+}

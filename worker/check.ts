@@ -32,6 +32,10 @@ export function tryNormalizeInstant(instantWithVariableDecimals: string): string
     return m ? `${m[1]}${(m[2] ?? '.000').substring(0, 4).padEnd(4, '0')}Z` : undefined;
 }
 
+export function isValidHour(hour: unknown): boolean {
+    return typeof hour === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([0-1][0-9]|2[0-3])$/.test(hour);
+}
+
 export function isValidDate(date: unknown): boolean {
     return typeof date === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/.test(date);
 }
