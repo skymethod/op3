@@ -47,6 +47,7 @@ export interface FeedRecord {
     readonly podcastGuid?: string;
     readonly created?: string; // instant
     readonly updated?: string; // instant
+    readonly generator?: string; // instant
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -68,6 +69,7 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
         && (obj.created === undefined || typeof obj.created === 'string')
         && (obj.updated === undefined || typeof obj.updated === 'string')
+        && (obj.generator === undefined || typeof obj.generator === 'string')
         ;
 }
 

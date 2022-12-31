@@ -625,11 +625,12 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const feedRecordId = feedRecord.id;
 
     // update feed-level attributes if necessary
-    if (feedRecord.title !== feed.title || feedRecord.podcastGuid !== feed.podcastGuid) {
-        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid, updated: new Date().toISOString() };
+    if (feedRecord.title !== feed.title || feedRecord.podcastGuid !== feed.podcastGuid || feedRecord.generator !== feed.generator) {
+        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid, generator: feed.generator, updated: new Date().toISOString() };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
         if (feedRecord.title !== feed.title) rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
         if (feedRecord.podcastGuid !== feed.podcastGuid) rt.push(`updated podcastGuid from ${feedRecord.podcastGuid} -> ${feed.podcastGuid}`);
+        if (feedRecord.generator !== feed.generator) rt.push(`updated generator from ${feedRecord.generator} -> ${feed.generator}`);
     }
 
     // collect items by trimmed item guid

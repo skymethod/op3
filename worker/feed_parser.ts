@@ -4,6 +4,7 @@ import { tryParsePubdate } from './pubdates.ts';
 export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
     let feedPodcastGuid: string | undefined;
+    let feedGenerator: string | undefined;
     let itemGuid: string | undefined;
     let itemTitle: string | undefined;
     const items: Item[] = [];
@@ -42,6 +43,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
         onText: (text, path, _attributes, findNamespaceUri) => {
             const xpath = '/' + path.join('/');
             if (xpath === '/rss/channel/title') feedTitle = text;
+            if (xpath === '/rss/channel/generator') feedGenerator = text;
             if (xpath === '/rss/channel/podcast:guid' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) feedPodcastGuid = text;
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
             if (xpath === '/rss/channel/item/title') itemTitle = text;
@@ -61,7 +63,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
         },
     };
     parseXml(feedContents, callback);
-    return { title: feedTitle, podcastGuid: feedPodcastGuid, items };
+    return { title: feedTitle, podcastGuid: feedPodcastGuid, generator: feedGenerator, items };
 }
 
 //
@@ -69,6 +71,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
 export interface Feed {
     readonly title?: string;
     readonly podcastGuid?: string;
+    readonly generator?: string;
     readonly items: readonly Item[];
 }
 
