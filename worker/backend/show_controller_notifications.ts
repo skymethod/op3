@@ -6,6 +6,7 @@ import { tryParsePrefixArguments } from './prefix_arguments.ts';
 import { TimestampSequence } from './timestamp_sequence.ts';
 import { tryCleanUrl } from '../urls.ts';
 import { computeListOpts } from './storage.ts';
+import { hasOp3Reference } from '../fetch_redirects.ts';
 
 export class ShowControllerNotifications {
 
@@ -147,9 +148,9 @@ export class ShowControllerNotifications {
 
 export function trimRecordToFit(record: FeedNotificationRecord): FeedNotificationRecord {
     const { items } = record.feed;
-    const hasOp3Reference = (v: unknown) => Array.isArray(v) && v.some(v => typeof v === 'string' && v.includes('op3.dev'));
+    const arrayHasOp3Reference = (v: unknown) => Array.isArray(v) && v.some(hasOp3Reference);
     if (Array.isArray(items)) {
-        const newItems = items.filter(v => isStringRecord(v) && (hasOp3Reference(v.enclosureUrls) || hasOp3Reference(v.alternateEnclosureUris)));
+        const newItems = items.filter(v => isStringRecord(v) && (arrayHasOp3Reference(v.enclosureUrls) || arrayHasOp3Reference(v.alternateEnclosureUris)));
         for (const item of newItems) {
             const { enclosureUrls, alternateEnclosureUris } = item;
             if (Array.isArray(enclosureUrls) && enclosureUrls.length === 0) delete item.enclosureUrls;

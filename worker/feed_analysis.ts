@@ -1,4 +1,5 @@
 import { XMLParser } from './deps.ts';
+import { hasOp3InRedirectChain, hasOp3Reference } from './fetch_redirects.ts';
 import { parsePubdate } from './pubdates.ts';
 
 export async function computeFeedAnalysis(feed: string, opts: { userAgent: string }): Promise<FeedAnalysis> {
@@ -81,24 +82,6 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
     return { feed, status: res.status, items, itemsWithEnclosures, itemsWithOp3Enclosures, minPubdate, maxPubdate };
 }
 
-export async function hasOp3InRedirectChain(url: string, { userAgent }: { userAgent: string }): Promise<boolean | undefined> {
-    const urls = new Set<string>();
-    try {
-        while (true) {
-            urls.add(url);
-            const res = await fetch(url, { method: 'HEAD', redirect: 'manual', headers: { 'user-agent': userAgent } });
-            const location = res.headers.get('location');
-            if (!location) return false;
-            if (hasOp3Reference(location)) return true;
-            if (urls.has(location)) return false;
-            if (urls.size >= 10) return false;
-            url = location;
-        }
-    } catch (e) {
-        console.warn(`hasOp3InRedirectChain: Error fetching ${url}: ${e.stack || e}, urls=${[...urls].join(', ')}`);
-    }
-}
-
 //
 
 export interface FeedAnalysis {
@@ -109,10 +92,4 @@ export interface FeedAnalysis {
     readonly itemsWithOp3Enclosures: number;
     readonly minPubdate?: string;
     readonly maxPubdate?: string;
-}
-
-//
-
-function hasOp3Reference(url: string): boolean {
-    return typeof url === 'string' && url.toLowerCase().includes('op3.dev/e');
 }

@@ -2,6 +2,7 @@ import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
+import { hasOp3Reference } from '../fetch_redirects.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
@@ -722,7 +723,6 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
 }
 
 function computeRelevantUrls(item: Item): Record<string, string> {
-    const hasOp3Reference = (v: string) => v.includes('op3.dev');
     const rt: Record<string, string> = {};
     if (item.enclosures) {
         item.enclosures.forEach((v, i) => {
