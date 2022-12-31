@@ -8,7 +8,7 @@ import { makeHeadlineStats } from './headline_stats.ts';
 import { makeTopCountries } from './top_countries.ts';
 import { makeTopApps } from './top_apps.ts';
 import { makeTopDevices } from './top_devices.ts';
-import { makeTopDeviceTypes } from './top_device-types.ts';
+import { makeTopDeviceTypes } from './top_device_types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
 import { makeTopMetros } from './top_metros.ts';
 import { addHoursToHourString } from '../worker/timestamp.ts';
@@ -43,7 +43,7 @@ const app = (() => {
     const { episodeFirstHours, dailyFoundAudience, episodeHourlyDownloads, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
-
+    const showSlug = computeShowSlug(showObj.title);
     const debug = new URLSearchParams(document.location.search).has('debug');
 
     if (debug) {
@@ -53,14 +53,14 @@ const app = (() => {
     }
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
-    const exportDownloads = makeExportDownloads({ showUuid, previewToken });
+    const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
     makeEpisodePacing({ episodeHourlyDownloads, episodes });
-    makeTopCountries({ monthlyDimensionDownloads });
-    makeTopApps({ monthlyDimensionDownloads });
-    makeTopDevices({ monthlyDimensionDownloads });
-    makeTopDeviceTypes({ monthlyDimensionDownloads });
-    makeTopBrowserDownloads({ monthlyDimensionDownloads });
-    makeTopMetros({ monthlyDimensionDownloads });
+    makeTopCountries({ showSlug, monthlyDimensionDownloads });
+    makeTopApps({ showSlug, monthlyDimensionDownloads });
+    makeTopDevices({ showSlug, monthlyDimensionDownloads });
+    makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads });
+    makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads });
+    makeTopMetros({ showSlug, monthlyDimensionDownloads });
 
     function update() {
         exportDownloads.update();
@@ -86,4 +86,8 @@ function insertZeros(hourlyDownloads: Record<string, number>): Record<string, nu
         hour = addHoursToHourString(hour, 1);
     }
     return rt;
+}
+
+function computeShowSlug(title: string | undefined): string {
+    return (title ?? 'untitled').toLowerCase().replaceAll(/[^a-z0-9]+/g, ' ').replaceAll(/\s+/g, ' ').trim().replaceAll(' ', '-');
 }

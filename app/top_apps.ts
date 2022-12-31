@@ -2,14 +2,15 @@ import { makeTopBox } from './top_box.ts';
 import { checkMatches } from '../worker/check.ts';
 import { increment } from '../worker/summaries.ts';
 
-type Opts = { monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
 
-export const makeTopApps = ({ monthlyDimensionDownloads }: Opts) => {
+export const makeTopApps = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
 
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, computeAppDownloads(v)]));
 
     return makeTopBox({
         type: 'apps',
+        showSlug,
         exportId: 'top-apps-export',
         previousId: 'top-apps-month-previous',
         nextId: 'top-apps-month-next',

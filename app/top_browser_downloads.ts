@@ -2,15 +2,16 @@ import { makeTopBox } from './top_box.ts';
 import { checkMatches } from '../worker/check.ts';
 import { increment } from '../worker/summaries.ts';
 
-type Opts = { monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
 
-export const makeTopBrowserDownloads = ({ monthlyDimensionDownloads }: Opts) => {
+export const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
 
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, computeBrowserDownloads(v)]));
 
     const computeDownloadsForMonth = (month: string) => Object.values(monthlyDimensionDownloads[month]['countryCode']).reduce((a, b) => a + b, 0);
     return makeTopBox({
-        type: 'browser-downloads',
+        type: 'browser-and-referrers',
+        showSlug,
         exportId: 'top-browser-downloads-export',
         previousId: 'top-browser-downloads-month-previous',
         nextId: 'top-browser-downloads-month-next',

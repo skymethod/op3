@@ -187,16 +187,17 @@ type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler:
 
 function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement): MonthlyBox {
     const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2)!;
-    const thisMonth = Object.keys(monthlyCounts).at(-1);
-    countDiv.textContent = withCommas.format(lastMonthCount);
-    periodDiv.textContent = `in ${computeMonthName(lastMonth)}`;
+    const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1)!;
+    const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
+
     const hoverListeners: HoverMonthHandler[] = [];
     const onHoverMonth: HoverMonthHandler = hoverMonth => {
-        const month = hoverMonth ?? lastMonth;
+        const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
         countDiv.textContent = withCommas.format(value);
         periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
     }
+    onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, { onHover: v => {
         onHoverMonth(v?.label);
         hoverListeners.forEach(w => w(v?.label));

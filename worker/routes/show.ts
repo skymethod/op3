@@ -49,7 +49,7 @@ export async function computeShowResponse(req: ShowRequest, opts: { searchParams
     const showObj = await showRes.json();
     const { title } = showObj;
 
-    const showTitle = title ?? '<untitled>';
+    const showTitle = title ?? '(untitled)';
     if (statsRes.status !== 200) return compute404(`Unexpected stats response status: ${JSON.stringify(statsRes.status)}`);
     const statsObj = await statsRes.json();
 

@@ -1,9 +1,9 @@
 import { METROS } from './metros.ts';
 import { makeTopBox } from './top_box.ts';
 
-type Opts = { monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
 
-export const makeTopMetros = ({ monthlyDimensionDownloads }: Opts) => {
+export const makeTopMetros = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
 
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['metroCode'] ?? {}]));
 
@@ -11,6 +11,7 @@ export const makeTopMetros = ({ monthlyDimensionDownloads }: Opts) => {
 
     return makeTopBox({
         type: 'metros',
+        showSlug,
         exportId: 'top-metros-export',
         previousId: 'top-metros-month-previous',
         nextId: 'top-metros-month-next',

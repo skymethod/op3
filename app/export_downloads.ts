@@ -2,9 +2,9 @@ import { addMonthsToMonthString } from '../worker/timestamp.ts';
 import { element, SlButton, SlDropdown, SlSwitch } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { readonly showUuid: string, readonly previewToken: string };
+type Opts = { readonly showUuid: string, readonly showSlug: string, readonly previewToken: string };
 
-export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
+export const makeExportDownloads = ({ showUuid, showSlug, previewToken }: Opts) => {
 
     const [ exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch ] = [ 
         element('export-spinner'),
@@ -36,7 +36,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
             }
             exporting = controller; progress = 0; update();
             try {
-                await downloadDownloads(e, showUuid, month, previewToken, includeBots, controller.signal, v => { progress = v; update(); });
+                await downloadDownloads(e, showUuid, showSlug, month, previewToken, includeBots, controller.signal, v => { progress = v; update(); });
             } finally {
                 exporting = undefined; update();
             }
@@ -59,7 +59,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
             exportSpinner.classList.remove('hidden');
             exportIcon.classList.add('hidden');
             exportCancelButton.classList.remove('invisible');
-            exportTitleDiv.textContent = `Exporting${typeof progress === 'number' ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
+            exportTitleDiv.textContent = `Exporting${typeof progress === 'number' && progress > 0 ? ` (${(progress * 100).toFixed(0)}%)` : ''}...`;
         } else {
             exportSpinner.classList.add('hidden');
             exportIcon.classList.remove('hidden');
@@ -76,7 +76,7 @@ export const makeExportDownloads = ({ showUuid, previewToken }: Opts) => {
 
 //
 
-async function downloadDownloads(e: Event, showUuid: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal, onProgress: (progress: number) => void) {
+async function downloadDownloads(e: Event, showUuid: string, showSlug: string, month: string, previewToken: string, includeBots: boolean, signal: AbortSignal, onProgress: (progress: number) => void) {
     e.preventDefault();
     
     console.log(`download ${JSON.stringify({ month, includeBots })}`);
@@ -111,5 +111,5 @@ async function downloadDownloads(e: Event, showUuid: string, month: string, prev
     if (signal.aborted) return;
 
     const { type } = parts[0];
-    download(parts, { type, filename: `downloads-${month}.tsv`});
+    download(parts, { type, filename: `${showSlug}-downloads-${month}.tsv`});
 }

@@ -4,6 +4,7 @@ import { computeMonthName, download, pluralize } from './util.ts';
 
 type Opts = {
     type: string,
+    showSlug: string,
     exportId: string,
     previousId: string,
     nextId: string,
@@ -17,7 +18,7 @@ type Opts = {
     computeName: (key: string) => string,
 };
 
-export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId, templateId, monthlyDownloads, downloadsDenominator, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
+export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, monthlyDownloads, downloadsDenominator, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
 
     const [
         exportButton,
@@ -41,7 +42,7 @@ export const makeTopBox = ({ type, exportId, previousId, monthId, nextId, listId
     const tsvRows: string[][] = [ [ 'rank', ...tsvHeaderNames, 'downloads', 'pct' ]];
     exportButton.onclick = () => {
         const tsv = tsvRows.map(v => v.join('\t')).join('\n');
-        const filename = `top-${type}-${computeMonthName(months[monthIndex], { includeYear: true }).toLowerCase().replace(' ', '-')}.tsv`;
+        const filename = `${showSlug}-top-${type}-${months[monthIndex]}.tsv`;
         download(tsv, { type: 'text/plain', filename });
     };
 

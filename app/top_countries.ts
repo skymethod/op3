@@ -1,8 +1,8 @@
 import { makeTopBox } from './top_box.ts';
 
-type Opts = { monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
 
-export const makeTopCountries = ({ monthlyDimensionDownloads }: Opts) => {
+export const makeTopCountries = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
 
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['countryCode'] ?? {}]));
 
@@ -11,6 +11,7 @@ export const makeTopCountries = ({ monthlyDimensionDownloads }: Opts) => {
 
     return makeTopBox({
         type: 'countries',
+        showSlug,
         exportId: 'top-countries-export',
         previousId: 'top-countries-month-previous',
         nextId: 'top-countries-month-next',
