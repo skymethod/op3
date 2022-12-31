@@ -49,5 +49,7 @@ function computeBrowserDownloads(dimensionDownloads: Record<string, Record<strin
         }
     }
 
+    delete rt['Unknown']; // no value here
+
     return rt;
 }

@@ -9481,6 +9481,7 @@ function computeBrowserDownloads(dimensionDownloads) {
             console.warn(`Unsupported referrer type: ${type}`);
         }
     }
+    delete rt['Unknown'];
     return rt;
 }
 const METROS = {
