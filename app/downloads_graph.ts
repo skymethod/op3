@@ -129,6 +129,7 @@ function isGranularity(obj: string): obj is Granularity {
 
 //
 
+const shorterDayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
 const dayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
 const dayAndHourFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', hour: 'numeric', hour12: true, timeZone: 'UTC' });
 const timeOnlyFormat = new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: true, timeZone: 'UTC' });
@@ -228,7 +229,7 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                         callback: function(this: any, value: number) {
                             const label = this.getLabelForValue(value);
                             const d = new Date(label);
-                            const format = d.getUTCHours() === 0 ? dayFormat : timeOnlyFormat;
+                            const format = d.getUTCHours() === 0 ? shorterDayFormat : timeOnlyFormat;
                             return format.format(d);
                         }
                     }

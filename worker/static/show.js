@@ -8514,6 +8514,12 @@ function isGranularity(obj) {
         'daily'
     ].includes(obj);
 }
+const shorterDayFormat = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC'
+});
 const dayFormat = new Intl.DateTimeFormat('en-US', {
     weekday: 'short',
     month: 'long',
@@ -8621,7 +8627,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
                         callback: function(value) {
                             const label = this.getLabelForValue(value);
                             const d = new Date(label);
-                            const format = d.getUTCHours() === 0 ? dayFormat : timeOnlyFormat;
+                            const format = d.getUTCHours() === 0 ? shorterDayFormat : timeOnlyFormat;
                             return format.format(d);
                         }
                     }
