@@ -208,3 +208,23 @@ export function isFeedItemIndexRecord(obj: unknown): obj is FeedItemIndexRecord 
         && typeof obj.feedItemRecordKey === 'string'
         ;
 }
+
+export interface MediaUrlIndexRecord {
+    readonly url: string;
+    readonly updateInstant: string;
+    readonly error?: string;
+    readonly responseInstant?: string;
+    readonly responseHeaders?: [string, string][];
+    readonly redirectUrls?: string[]; // may not be comprehensive, filtered to op3 references only
+}
+
+export function isMediaUrlIndexRecord(obj: unknown): obj is MediaUrlIndexRecord {
+    return isStringRecord(obj)
+        && typeof obj.url === 'string'
+        && typeof obj.updateInstant === 'string'
+        && (obj.error === undefined || typeof obj.error === 'string')
+        && (obj.responseInstant === undefined || typeof obj.responseInstant === 'string')
+        && (obj.responseHeaders === undefined || Array.isArray(obj.responseHeaders) && obj.responseHeaders.every(v => Array.isArray(v) && v.length === 2 && v.every(w => typeof w === 'string')))
+        && (obj.redirectUrls === undefined || Array.isArray(obj.redirectUrls) && obj.redirectUrls.every(v => typeof v === 'string'))
+        ;
+}

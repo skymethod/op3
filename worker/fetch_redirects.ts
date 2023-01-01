@@ -13,6 +13,14 @@ export async function hasOp3InRedirectChain(url: string, { userAgent }: { userAg
     }
 }
 
+export async function fetchOp3RedirectUrls(url: string, { userAgent }: { userAgent: string }): Promise<{ redirectUrls: string[], responseHeaders?: [string, string][] }> {
+    const records = await fetchWithRedirects(url, { method: 'HEAD', userAgent, stopWhenLocationMatches: hasOp3Reference });
+    const last = records.at(-1);
+    const location = last ? new Headers(last.responseHeaders).get('location') ?? undefined : undefined;
+    const redirectUrls = location && hasOp3Reference(location) ? [ location ] : [ ];
+    return { redirectUrls, responseHeaders: last?.responseHeaders };
+}
+
 export async function fetchWithRedirects(url: string, { method, userAgent, stopWhenLocationMatches }: { method?: string, userAgent: string, stopWhenLocationMatches?: (location: string) => boolean }): Promise<RequestResponse[]> {
     const rt: RequestResponse[] = [];
     let requestUrl = url;
@@ -20,6 +28,7 @@ export async function fetchWithRedirects(url: string, { method, userAgent, stopW
     while (true) {
         const requestTime = Date.now();
         requestUrls.add(requestUrl);
+        console.log(`fetchWithRedirects: ${method} ${url}`);
         const response = await fetch(requestUrl, { method, headers: { 'user-agent': userAgent }, redirect: 'manual' });
         const responseTime = Date.now();
         const responseStatus = response.status;
@@ -37,6 +46,10 @@ export async function fetchWithRedirects(url: string, { method, userAgent, stopW
         if (stopWhenLocationMatches && stopWhenLocationMatches(location)) return rt;
         requestUrl = location;
     }
+}
+
+export function isRedirectFetchingRequired({ generator }: { generator: string | undefined }): boolean {
+    return /castopod/i.test(generator ?? ''); // e.g. Castopod - https://castopod.org/
 }
 
 //

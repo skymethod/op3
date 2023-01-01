@@ -1,5 +1,5 @@
 import { XMLParser } from './deps.ts';
-import { hasOp3InRedirectChain, hasOp3Reference } from './fetch_redirects.ts';
+import { hasOp3InRedirectChain, hasOp3Reference, isRedirectFetchingRequired } from './fetch_redirects.ts';
 import { parsePubdate } from './pubdates.ts';
 
 export async function computeFeedAnalysis(feed: string, opts: { userAgent: string }): Promise<FeedAnalysis> {
@@ -58,7 +58,7 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
                                             hasEnclosure = true;
                                             if (hasOp3Reference(url)) {
                                                 hasOp3Enclosure = true;
-                                            } else if (/castopod/i.test(channelGenerator ?? '')) {
+                                            } else if (isRedirectFetchingRequired({ generator: channelGenerator })) {
                                                 if (!hasOp3Enclosure && await hasOp3InRedirectChain(url, opts)) {
                                                     hasOp3Enclosure = true;
                                                 }

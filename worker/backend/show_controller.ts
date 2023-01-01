@@ -2,7 +2,7 @@ import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { Item, parseFeed } from '../feed_parser.ts';
-import { hasOp3Reference } from '../fetch_redirects.ts';
+import { fetchOp3RedirectUrls, hasOp3Reference, isRedirectFetchingRequired } from '../fetch_redirects.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
@@ -13,7 +13,7 @@ import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
-import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isShowRecord, isWorkRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
+import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowRecord, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 
@@ -207,14 +207,14 @@ export class ShowController {
                         const { message, updated, fetchStatus } = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
                         if (action === 'update-feed-and-index-items' && updated && fetchStatus === 200) {
                             const forceResave = force.includes('resave');
-                            const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave });
+                            const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave, origin });
                             return { message: [message, indexItemsMessage ].join(', ') };
                         } else {
                             return { message };
                         }
                     } else if (action === 'index-items') {
                         const forceResave = force.includes('resave');
-                        const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave });
+                        const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave, origin });
                         return { message };
                     } else if (action == 'set-show-uuid') {
                         const { 'show-uuid': showUuid = generateUuid() } = parameters;
@@ -599,8 +599,8 @@ async function findShowRecord(showUuid: string, storage: DurableObjectStorage): 
     return record;
 }
 
-async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean }): Promise<string> {
-    const { storage, blobs, forceResave = false } = opts;
+async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean, origin: string }): Promise<string> {
+    const { storage, blobs, forceResave = false, origin } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl, showUuid } = feedRecord;
 
@@ -639,6 +639,19 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     delete itemsByTrimmedGuid['']; // only save items with non-empty guids
     rt.push(`${Object.keys(itemsByTrimmedGuid).length} unique non-empty item guids`);
 
+    // manually fetch redirect urls if necessary
+    const knownMediaUrls = isRedirectFetchingRequired({ generator: feed.generator }) ? await loadKnownMediaUrls({ feedRecordId, storage }) : undefined;
+    let knownRedirectUrls: Record<string, string[]> | undefined;
+    if (knownMediaUrls) {
+        const loaded = Object.keys(knownMediaUrls).length;
+        if (loaded > 0) rt.push(`Loaded ${loaded} media urls`);
+        const userAgent = computeUserAgent({ origin });
+        const { fetched, remaining } = await fetchMediaUrlsIfNecessary({ knownMediaUrls, items: Object.values(itemsByTrimmedGuid), storage, feedRecordId, userAgent });
+        if (fetched > 0) rt.push(`Fetched ${fetched} media urls`);
+        if (remaining > 0) rt.push(`${remaining} media urls remaining`);
+        knownRedirectUrls = Object.fromEntries(Object.entries(knownMediaUrls).map(v => [ v[0], v[1].redirectUrls ?? [] ]));
+    }
+
     // compute and save new/updated feed item records and matchurl index records
     const newRecords: Record<string, FeedItemRecord> = {};
     const newIndexRecords: Record<string, FeedItemIndexRecord> = {};
@@ -666,7 +679,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
                 record = { feedRecordId, id: feedItemRecordId, guid: trimmedGuid, firstSeenInstant: instant, lastSeenInstant: instant, relevantUrls: {} };
             }
             if (record.lastOkFetch === undefined || instant > record.lastSeenInstant || forceResave) {
-                const relevantUrls = computeRelevantUrls(item);
+                const relevantUrls = computeRelevantUrls(item, knownRedirectUrls);
                 for (const relevantUrl of Object.values(relevantUrls)) {
                     const destinationUrl = computeChainDestinationUrl(relevantUrl);
                     if (destinationUrl) {
@@ -722,22 +735,69 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     return rt.join(', ');
 }
 
-function computeRelevantUrls(item: Item): Record<string, string> {
+function needsAnotherFetch(record: MediaUrlIndexRecord): boolean {
+    if (record.redirectUrls && record.redirectUrls.some(hasOp3Reference)) return false;
+    const age = Date.now() - new Date(record.updateInstant).getTime();
+    return age > 1000 * 60 * 60 * 24;
+}
+
+async function computeNewMediaUrlIndexRecord(url: string, userAgent: string): Promise<MediaUrlIndexRecord> {
+    try {
+        const { redirectUrls, responseHeaders } = await fetchOp3RedirectUrls(url, { userAgent });
+        const responseInstant = new Date().toISOString();
+        return { url, updateInstant: responseInstant, responseInstant, redirectUrls, responseHeaders };
+    } catch (e) {
+        const error = `${e.stack || e}`;
+        return { url, updateInstant:  new Date().toISOString(), error };
+    }
+}
+
+async function fetchMediaUrlsIfNecessary({ knownMediaUrls, items, storage, userAgent, feedRecordId }: { knownMediaUrls: Record<string, MediaUrlIndexRecord>, items: Item[], storage: DurableObjectStorage, userAgent: string, feedRecordId: string }): Promise<{ fetched: number, remaining: number }> {
+    const mediaUrls = distinct(items.flatMap(v => [...(v.enclosures ?? []).map(w => w.url).filter(isString), ...(v.alternateEnclosures ?? []).flatMap(w => (w.sources ?? []).map(x => x.uri).filter(isString))]));
+    const toFetch: string[] = [];
+    for (const mediaUrl of mediaUrls) {
+        if (hasOp3Reference(mediaUrl)) continue; // no need to actually fetch if it's in the explicit url
+        const known = knownMediaUrls[mediaUrl];
+        if (!known || needsAnotherFetch(known)) {
+            toFetch.push(mediaUrl);
+        }
+    }
+    let fetched = 0;
+    let remaining = toFetch.length;
+    const upserts: Record<string, MediaUrlIndexRecord> = {};
+    for (const url of toFetch) {
+        const upsert = await computeNewMediaUrlIndexRecord(url, userAgent);
+        upserts[computeFeedMediaUrlsIndexKey({ feedRecordId, url })] = upsert;
+        fetched++;
+        remaining--;
+        if (fetched >= 10) break;
+    }
+    await storage.put(upserts);
+    return { fetched, remaining };
+}
+
+function computeRelevantUrls(item: Item, knownRedirects?: Record<string, string[]>): Record<string, string> {
     const rt: Record<string, string> = {};
+    const addRelevantUrlIfPresent = (path: string, url?: string) => {
+        if (url && hasOp3Reference(url)) {
+            rt[path] = url;
+        } else if (url && knownRedirects) {
+            const redirect = (knownRedirects[url] ?? []).find(hasOp3Reference);
+            if (redirect) {
+                rt[`${path}.redirect`] = redirect;
+            }
+        }
+    };
     if (item.enclosures) {
         item.enclosures.forEach((v, i) => {
-            if (v.url && hasOp3Reference(v.url)) {
-                rt[`e.${i}.url`] = v.url;
-            }
+            addRelevantUrlIfPresent(`e.${i}.url`, v.url);
         });
     }
     if (item.alternateEnclosures) {
         item.alternateEnclosures.forEach((v, i) => {
             if (v.sources) {
                 v.sources.forEach((w, j) => {
-                    if (w.uri && hasOp3Reference(w.uri)) {
-                        rt[`ae.${i}.s.${j}.uri`] = w.uri;
-                    }
+                    addRelevantUrlIfPresent(`ae.${i}.s.${j}.uri`, w.uri);
                 });
             }
         });
@@ -996,12 +1056,18 @@ async function loadFeedRecordIdsToShowUuids(storage: DurableObjectStorage): Prom
     }));
 }
 
+async function loadKnownMediaUrls({ feedRecordId, storage }: { feedRecordId: string, storage: DurableObjectStorage }): Promise<Record<string, MediaUrlIndexRecord>> {
+    const records = Object.values(await storage.list({ prefix: computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }) })).filter(isMediaUrlIndexRecord);
+    return Object.fromEntries(records.map(v => [ v.url, v ]));
+}
+
 enum IndexType {
     PodcastGuid = 1,
     MatchUrlToFeedItem = 2,
     QuerylessMatchUrlToFeedItem = 3,
     FeedRecordIdToShowUuid = 4,
     ShowEpisodes = 5,
+    FeedMediaUrls = 6,
 }
 
 function computePodcastGuidIndexKey(podcastGuid: string) {
@@ -1065,3 +1131,12 @@ function computeEpisodeKey({ showUuid, id }: { showUuid: string, id: string }): 
 function computeEpisodeKeyPrefix({ showUuid }: { showUuid: string }): string {
     return `sc.ep0.${showUuid}.`;
 }
+
+function computeFeedMediaUrlsIndexKey({ feedRecordId, url }: { feedRecordId: string, url: string }) {
+    return `sc.i0.${IndexType.FeedMediaUrls}.${feedRecordId}.${url.substring(0, 1024)}`;
+}
+
+function computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }: { feedRecordId: string }) {
+    return `sc.i0.${IndexType.FeedMediaUrls}.${feedRecordId}.`;
+}
+
