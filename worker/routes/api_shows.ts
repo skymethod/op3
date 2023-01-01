@@ -5,6 +5,7 @@ import { isEpisodeRecord } from '../backend/show_controller_model.ts';
 import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
 import { check } from '../check.ts';
 import { compareByDescending } from '../collections.ts';
+import { Configuration } from '../configuration.ts';
 import { decodeXml } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
@@ -14,8 +15,12 @@ import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
-export async function computeShowsResponse({ showUuid, method, searchParams, rpcClient, roRpcClient, times = {} }: { showUuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number> }): Promise<Response> {
+type ShowsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
+
+export async function computeShowsResponse({ showUuid: showUuidInput, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
+    check('showUuid', showUuidInput, isValidUuid);
+    const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
     check('showUuid', showUuid, isValidUuid);
     
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
@@ -37,17 +42,17 @@ export async function computeShowsResponse({ showUuid, method, searchParams, rpc
         .sort(compareByDescending(r => r.pubdateInstant))
         .map(({ id, title, pubdateInstant }) => ({ id, title: cleanTitle(title), pubdate: pubdateInstant }));
 
-    return newJsonResponse({ showUuid, title, episodes } as ApiShowsResponse);
+    return newJsonResponse(computeApiShowsResponse(showUuidInput, { showUuid, title, episodes }));
 }
 
-function cleanTitle(title: string | undefined): string | undefined {
-    return title === undefined ? undefined : decodeXml(title);
-}
+type StatsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number>, configuration: Configuration };
 
-export async function computeShowStatsResponse({ showUuid, method, searchParams, statsBlobs, roStatsBlobs, times = {} }: { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number> }): Promise<Response> {
+export async function computeShowStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
     if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
+    check('showUuid', showUuidInput, isValidUuid);
+    const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
     check('showUuid', showUuid, isValidUuid);
     
     const thisMonth = new Date().toISOString().substring(0, 7);
@@ -64,11 +69,11 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
         latestThreeMonthAudiencesLarge = await timed(times, 'get-3mo-audience-large', async () => (await Promise.all(monthParts.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v.month, part: v.part }), 'json')))).filter(isValidAudienceSummary));
     }
 
-    let episodeFirstHours: Record<string, string> | undefined;
-    let hourlyDownloads: Record<string, number> | undefined;
-    let episodeHourlyDownloads: Record<string, Record<string, number>> | undefined;
-    let dailyFoundAudience: Record<string, number> | undefined;
-    let monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> | undefined;
+    let episodeFirstHours: Record<string, string> = {};
+    let hourlyDownloads: Record<string, number> = {};
+    let episodeHourlyDownloads: Record<string, Record<string, number>> = {};
+    let dailyFoundAudience: Record<string, number> = {};
+    let monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> = {};
 
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
@@ -91,5 +96,146 @@ export async function computeShowStatsResponse({ showUuid, method, searchParams,
         monthlyDimensionDownloads = Object.fromEntries(latestThreeMonthSummaries.map(v => [ v.period, v.dimensionDownloads ?? {} ]));
     }
    
-    return newJsonResponse({ showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads } as ApiShowStatsResponse);
+    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
 }
+
+//
+
+function cleanTitle(title: string | undefined): string | undefined {
+    return title === undefined ? undefined : decodeXml(title);
+}
+
+async function computeUnderlyingShowUuid(showUuidInput: string, configuration: Configuration): Promise<string> {
+    return showUuidInput === DEMO_SHOW_1 ? await configuration.get('demo-show-1') ?? showUuidInput : showUuidInput;
+}
+
+function computeApiShowsResponse(showUuidInput: string, underlyingResponse: ApiShowsResponse): ApiShowsResponse {
+    if (showUuidInput === DEMO_SHOW_1) {
+        // swap out real titles with fake ones
+        return {
+            showUuid: showUuidInput,
+            title: DEMO_SHOW_1_TITLE,
+            episodes: underlyingResponse.episodes.map((v, i) => {
+                const { id, pubdate } = v;
+                return {
+                    id,
+                    pubdate,
+                    title: DEMO_SHOW_1_EPISODE_TITLES[i % DEMO_SHOW_1_EPISODE_TITLES.length],
+                }
+            }),
+        }
+    }
+    return underlyingResponse;
+}
+
+function computeApiShowStatsResponse(showUuidInput: string, underlyingResponse: ApiShowStatsResponse): ApiShowStatsResponse {
+    if (showUuidInput === DEMO_SHOW_1) {
+        // swap out real domains with fake ones
+        const domainSubs: Record<string, string> = {};
+        const getSubstitute = (key: string) => {
+            const existing = domainSubs[key];
+            if (existing) return existing;
+            const exampleDomain = DEMO_SHOW_1_REFERRER_DOMAINS[Object.keys(domainSubs).length % DEMO_SHOW_1_REFERRER_DOMAINS.length];
+            domainSubs[key] = `domain.${exampleDomain}`;
+            return domainSubs[key];
+        };
+        for (const [ _month, dimensionDownloads ] of Object.entries(underlyingResponse.monthlyDimensionDownloads)) {
+            const referrerDownloads = dimensionDownloads['referrer'] ?? {};
+            for (const [ key, downloads ] of Object.entries(referrerDownloads)) {
+                if (key.startsWith('domain.')) {
+                    delete referrerDownloads[key];
+                    if (key.startsWith('domain.unknown')) continue;
+                    if (downloads < 10) continue;
+                    const subsKey = getSubstitute(key);
+                    referrerDownloads[subsKey] = downloads;
+                }
+            }
+        }
+        
+    }
+    return underlyingResponse;
+}
+
+const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
+
+const DEMO_SHOW_1_TITLE = 'Example Travel Podcast';
+
+const DEMO_SHOW_1_REFERRER_DOMAINS = [
+    'globetrotters.com',
+    'wanderlust.com',
+    'traveltheworld.com',
+    'journeyplanner.com',
+    'tripadvisor.com',
+    'travelguide.com',
+    'exploretheglobe.com',
+    'thetravelingnomad.com',
+    'adventuretravel.com',
+    'wanderlusters.com',
+    'travelmore.com',
+    'letsgotraveling.com',
+    'globetrotting.com',
+    'travelsolutions.com',
+    'adventureplanner.com',
+    'traveladvisor.com',
+    'travelpreparation.com',
+    'tripadvice.com',
+    'travelplanner.com',
+    'thetraveler.com',
+];
+
+const DEMO_SHOW_1_EPISODE_TITLES = [
+    'The Lost City of Petra',
+    'Safari in the Serengeti',
+    'Island Hopping in the Philippines',
+    'Trekking to Machu Picchu',
+    'Exploring the Great Wall of China',
+    'Foodie Adventures in Italy',
+    'Surfing in Bali',
+    'Cultural Immersion in Morocco',
+    'Hiking in the Swiss Alps',
+    'The Wonders of Australia',
+
+    'Discovering Ancient Egypt',
+    'The Magic of New Zealand',
+    'Scuba Diving in the Caribbean',
+    'Snowboarding in the Rocky Mountains',
+    'The Beauty of the Balkans',
+    'The Wilderness of Patagonia',
+    'The Culture of Thailand',
+    'The Charm of Ireland',
+    'The Rich History of France',
+    'The Wonders of Iceland',
+
+    'The Beaches of Costa Rica',
+    'The Wilderness of Alaska',
+    'The Culture of Vietnam',
+    'The Magic of the Maldives',
+    'The Beauty of the Bahamas',
+    'The Charm of Scotland',
+    'The Rich History of Greece',
+    'The Wonders of Japan',
+    'The Beaches of Bora Bora',
+    'The Wilderness of Yellowstone National Park',
+
+    'The Culture of India',
+    'The Magic of Fiji',
+    'The Beauty of the Seychelles',
+    'The Charm of Croatia',
+    'The Rich History of Spain',
+    'The Wonders of Canada',
+    'The Beaches of the Dominican Republic',
+    'The Wilderness of Yosemite National Park',
+    'The Culture of Brazil',
+    'The Magic of the Galapagos Islands',
+
+    'The Beauty of the British Virgin Islands',
+    'The Charm of Austria',
+    'The Rich History of Germany',
+    'The Wonders of South Africa',
+    'The Beaches of the Bahamas',
+    'The Wilderness of the Grand Canyon',
+    'The Culture of Mexico',
+    'The Magic of the Amazon Rainforest',
+    'The Beauty of the Hawaiian Islands',
+    'The Charm of the Netherlands',
+];

@@ -1,5 +1,6 @@
 import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
+import { Configuration } from '../configuration.ts';
 import { importText, setIntersect } from '../deps.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
@@ -20,8 +21,10 @@ export function tryParseShowRequest({ method, pathname }: { method: string, path
     return method === 'GET' && m ? { showUuid: m[1] } : undefined;
 }
 
-export async function computeShowResponse(req: ShowRequest, opts: { searchParams: URLSearchParams, instance: string, hostname: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, podcastIndexCredentials: string | undefined, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined }): Promise<Response> {
-    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs } = opts;
+type Opts = { searchParams: URLSearchParams, instance: string, hostname: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, podcastIndexCredentials: string | undefined, adminTokens: Set<string>, previewTokens: Set<string>, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, configuration: Configuration };
+
+export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
+    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration } = opts;
     const { showUuid } = req;
 
     const start = Date.now();
@@ -42,8 +45,8 @@ export async function computeShowResponse(req: ShowRequest, opts: { searchParams
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
     const [ showRes, statsRes ] = await timed(times, 'compute-shows+compute-stats', () => Promise.all([
-        computeShowsResponse({ method: 'GET', searchParams, showUuid, rpcClient, roRpcClient, times }),
-        computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times }),
+        computeShowsResponse({ method: 'GET', searchParams, showUuid, rpcClient, roRpcClient, times, configuration }),
+        computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
     ]));
     if (showRes.status !== 200) return compute404(`Unexpected show response status: ${JSON.stringify(showRes.status)}`);
     const showObj = await showRes.json();

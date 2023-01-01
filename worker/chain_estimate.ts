@@ -188,6 +188,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'adbarker', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://letscast.fm/track/https://a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol is required
+    m = /^(https?):\/\/letscast\.fm\/track\/(https?:\/\/)(.*?)$/.exec(url);
+    if (m) {
+        const [ _, _scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'letscast', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -218,6 +227,7 @@ export interface ChainItem {
         | 'chartable'
         | 'claritas'
         | 'glystn'
+        | 'letscast'
         | 'gumball'
         | 'magellan'
         | 'podcorn'

@@ -243,6 +243,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'adbarker', url: 'http://adbarker.com/stream/asdfASDf1345asdfASDf1345/https://a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://letscast.fm/track/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'letscast', url: 'https://letscast.fm/track/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

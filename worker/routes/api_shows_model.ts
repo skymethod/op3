@@ -5,7 +5,7 @@ export interface ApiShowsResponse {
     readonly episodes: readonly EpisodeInfo[];
 }
 
-export type EpisodeInfo = { readonly id: string, readonly title: string, readonly pubdate: string };
+export type EpisodeInfo = { readonly id: string, readonly title?: string, readonly pubdate?: string };
 
 export interface ApiShowStatsResponse {
     readonly showUuid: string;

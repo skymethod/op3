@@ -18,6 +18,7 @@ import { Blobs } from '../backend/blobs.ts';
 import { computeApiQueryDownloadsResponse } from './api_query_downloads.ts';
 import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
 import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
+import { Configuration } from '../configuration.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo } = opts;
@@ -34,9 +35,10 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-export async function computeApiResponse(request: ApiRequest, opts: { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined }): Promise<Response> {
+type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined }
+export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration } = opts;
 
     try {
         // handle cors pre-flight
@@ -74,8 +76,8 @@ export async function computeApiResponse(request: ApiRequest, opts: { rpcClient:
         if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
         if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
         if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
-        { const m = /^\/shows\/([0-9a-f]{32})$/.exec(path); if (m) return await computeShowsResponse({ showUuid: m[1], method, searchParams, rpcClient, roRpcClient }); }
-        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs }); }
+        { const m = /^\/shows\/([0-9a-f]{32})$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuid: m[1], method, searchParams, rpcClient, roRpcClient, configuration }); }
+        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
     
         // unknown api endpoint
         return newJsonResponse({ error: 'not found' }, 404);
