@@ -115,7 +115,6 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeHourlyDownloads: Reco
             }))
         },
         options: {
-            
             animation: {
                 duration: 100,
             },
@@ -151,6 +150,7 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeHourlyDownloads: Reco
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)',
                     },
+                    beginAtZero: true,
                     // deno-lint-ignore no-explicit-any
                     afterFit: (axis) => (axis.options as any).suggestedMax = axis.max, // freeze the y axis, even when visible series are updated
                 }

@@ -8796,6 +8796,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
                     },
+                    beginAtZero: true,
                     afterFit: (axis)=>axis.options.suggestedMax = axis.max
                 }
             }
