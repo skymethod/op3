@@ -34,3 +34,7 @@ export interface SlMenuItem extends HTMLElement {
 export interface SlIconButton extends HTMLElement {
     disabled: boolean;
 }
+
+export interface SlRelativeTime extends HTMLElement {
+    date: string | Date;
+}

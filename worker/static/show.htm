@@ -4,11 +4,16 @@
 <head>
     <title>${showTitle} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="viewport-fit=cover, initial-scale=1" />
     <link rel="canonical" href="${origin}/show/${showUuid}" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="robots" content="noindex" />
     ${styleTag}
+    <style>
+        footer {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
     ${shoelaceCommon}
     <script type="module">
 const initialData = /*${initialData}*/{};
@@ -100,7 +105,6 @@ const sessionToken = '${sessionToken}';
             <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
-        <div class="flex justify-center text-xs opacity-75">All dates and times are in UTC</div>
 
         <!-- episode pacing -->
         <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
@@ -262,6 +266,19 @@ const sessionToken = '${sessionToken}';
         </div>
 
     </main>
+
+    <footer class="wait sticky bottom-0 bg-neutral-800 border-t border-neutral-700">
+        <div class="grid grid-cols-2 md:grid-cols-3 text-xs md:text-sm p-2 whitespace-nowrap text-neutral-400">
+            <div class="text-left">Last updated: <span id="footer-last-updated-date">Dec 9</span><span class="hidden md:inline"> (<sl-relative-time id="footer-last-updated-ago" class="inline-block" sync></sl-relative-time>)</span></div>
+            <div class="text-right md:text-center">Dates and times are in
+                <sl-tooltip style="--sl-tooltip-arrow-size: 0; --max-width: 1000px" hoist>
+                    <div class="text-xs" slot="content">UTC stands for Coordinated Universal Time.<br><br>It is a standardized time reference that is not affected by daylight saving time.</div>
+                    <span class="cursor-pointer underline decoration-1 decoration-dotted underline-offset-4">UTC</span>
+                </sl-tooltip>
+            </div>
+            <div class="hidden md:block text-right" id="footer-timezone"><span id="footer-current-timezone-name">US Central</span> is <span id="footer-current-timezone-offset">six hours behind</span> UTC</div>
+        </div>
+    </footer>
 
     ${cfAnalyticsSnippet}
 </body>

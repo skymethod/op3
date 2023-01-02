@@ -8348,6 +8348,9 @@ function checkMatches(name1, value, pattern) {
 function isValidHour(hour) {
     return typeof hour === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([0-1][0-9]|2[0-3])$/.test(hour);
 }
+function isValidDate(date) {
+    return typeof date === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/.test(date);
+}
 function isValidMonth(month) {
     return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
 }
@@ -8360,6 +8363,10 @@ function addDays(date, days) {
     const rt = new Date(date);
     rt.setUTCDate(rt.getUTCDate() + days);
     return rt;
+}
+function addDaysToDateString(date, days) {
+    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+    return addDays(`${date}T00:00:00.000Z`, days).toISOString().substring(0, 10);
 }
 function addMonthsToMonthString(month, months) {
     if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
@@ -9845,6 +9852,37 @@ const makeTopMetros = ({ showSlug , monthlyDimensionDownloads  })=>{
 function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
+const makeFooter = ({ hourlyDownloads  })=>{
+    const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan] = [
+        element('footer-last-updated-date'),
+        element('footer-last-updated-ago'),
+        element('footer-timezone'),
+        element('footer-current-timezone-name'),
+        element('footer-current-timezone-offset')
+    ];
+    const mostRecentDate = Object.keys(hourlyDownloads).at(-1).substring(0, 10);
+    lastUpdatedDateSpan.textContent = shorterDayFormat1.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
+    lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
+    try {
+        currentTimezoneNameSpan.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const offsetMinutes = new Date().getTimezoneOffset();
+        const offsetHours = pluralize(Math.abs(offsetMinutes) / 60, 'hour');
+        currentTimezoneOffsetSpan.textContent = offsetMinutes === 0 ? 'equal to' : offsetMinutes > 0 ? `${offsetHours} behind` : `${offsetHours} ahead of`;
+    } catch (e) {
+        console.warn(`Error displaying current time zone: ${e.stack || e}`);
+        timezoneSpan.style.visibility = 'hidden';
+    }
+    function update() {}
+    update();
+    return {
+        update
+    };
+};
+const shorterDayFormat1 = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+});
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -9917,6 +9955,9 @@ const app = (()=>{
     makeTopMetros({
         showSlug,
         monthlyDimensionDownloads
+    });
+    makeFooter({
+        hourlyDownloads
     });
     function update() {
         exportDownloads.update();

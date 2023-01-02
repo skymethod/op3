@@ -12,6 +12,7 @@ import { makeTopDeviceTypes } from './top_device_types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
 import { makeTopMetros } from './top_metros.ts';
 import { addHoursToHourString } from '../worker/timestamp.ts';
+import { makeFooter } from './footer.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -61,6 +62,7 @@ const app = (() => {
     makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads });
     makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads });
     makeTopMetros({ showSlug, monthlyDimensionDownloads });
+    makeFooter({ hourlyDownloads });
 
     function update() {
         exportDownloads.update();
