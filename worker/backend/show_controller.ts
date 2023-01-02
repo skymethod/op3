@@ -139,7 +139,7 @@ export class ShowController {
         }
 
         {
-            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes)$/.exec(targetPath);
+            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls)$/.exec(targetPath);
             if (m && operationKind === 'select') {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
@@ -147,6 +147,7 @@ export class ShowController {
                     'queryless-match-url': IndexType.QuerylessMatchUrlToFeedItem,
                     'feed-to-show': IndexType.FeedRecordIdToShowUuid,
                     'show-episodes': IndexType.ShowEpisodes,
+                    'feed-media-urls': IndexType.FeedMediaUrls,
                 }[m[1]];
                 const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
                 const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
