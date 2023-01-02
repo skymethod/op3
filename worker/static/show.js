@@ -8564,6 +8564,7 @@ function computeEpisodeMarkerIndex(episodeMarkers, downloadLabels, granularity) 
         const findValue = granularity === 'hourly' ? `${foundHour}:00:00.000Z` : `${foundHour.substring(0, 10)}T00:00:00.000Z`;
         const index = downloadLabels.indexOf(findValue);
         if (index < 0) continue;
+        if (!info.pubdate) continue;
         const diff = new Date(`${foundHour}:00:00.000Z`).getTime() - new Date(info.pubdate).getTime();
         if (diff > 1000 * 60 * 60 * 24 * 30) continue;
         const records = rt.get(index) ?? [];
@@ -8751,7 +8752,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
             datasets: Object.entries(episodeRelativeCumulative).map((v, i)=>({
                     label: [
                         episodeInfos[v[0]]
-                    ].map((v)=>`${v.pubdate.substring(0, 10)}: ${v.title}`).join(''),
+                    ].filter((v)=>v.pubdate).map((v)=>`${v.pubdate.substring(0, 10)}: ${v.title}`).join(''),
                     data: v[1],
                     backgroundColor: colors[i],
                     borderColor: colors[i],
@@ -8964,6 +8965,11 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
         timeZone: 'UTC'
     });
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
+    if (Object.keys(nDayDownloads).length === 0) {
+        valueDiv.textContent = withCommas1.format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
+        asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
+        return;
+    }
     const init = ()=>{
         valueDiv.textContent = withCommas1.format(Object.values(nDayDownloads).at(-1));
         asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(nDayDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
@@ -9091,7 +9097,10 @@ function computeMonthlyCounts(dateBasedCounts) {
     return monthlyCounts;
 }
 function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
-    const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2);
+    const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2) ?? [
+        '',
+        0
+    ];
     const [thisMonth, thisMonthCount] = Object.entries(monthlyCounts).at(-1);
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
     const hoverListeners = [];

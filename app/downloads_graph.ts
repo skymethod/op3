@@ -162,6 +162,7 @@ function computeEpisodeMarkerIndex(episodeMarkers: Record<string, EpisodeInfo>, 
         const findValue = granularity === 'hourly' ? `${foundHour}:00:00.000Z` : `${foundHour.substring(0, 10)}T00:00:00.000Z`;
         const index = downloadLabels.indexOf(findValue);
         if (index < 0) continue;
+        if (!info.pubdate) continue;
         const diff = new Date(`${foundHour}:00:00.000Z`).getTime() - new Date(info.pubdate).getTime();
         if (diff > 1000 * 60 * 60 * 24 * 30) continue;
         const records = rt.get(index) ?? [];

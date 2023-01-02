@@ -106,7 +106,7 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeHourlyDownloads: Reco
         data: {
             labels: allHours,
             datasets: Object.entries(episodeRelativeCumulative).map((v, i) => ({
-                label: [ episodeInfos[v[0]] ].map(v => `${v.pubdate.substring(0, 10)}: ${v.title}`).join(''),
+                label: [ episodeInfos[v[0]] ].filter(v => v.pubdate).map(v => `${v.pubdate!.substring(0, 10)}: ${v.title}`).join(''),
                 data: v[1],
                 backgroundColor: colors[i],
                 borderColor: colors[i],
