@@ -1058,7 +1058,8 @@ async function loadFeedRecordIdsToShowUuids(storage: DurableObjectStorage): Prom
 }
 
 async function loadKnownMediaUrls({ feedRecordId, storage }: { feedRecordId: string, storage: DurableObjectStorage }): Promise<Record<string, MediaUrlIndexRecord>> {
-    const records = Object.values(await storage.list({ prefix: computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }) })).filter(isMediaUrlIndexRecord);
+    const map = await storage.list({ prefix: computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }) });
+    const records = [...map.values()].filter(isMediaUrlIndexRecord);
     return Object.fromEntries(records.map(v => [ v.url, v ]));
 }
 
