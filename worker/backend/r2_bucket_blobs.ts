@@ -130,17 +130,17 @@ class R2Multiput implements Multiput {
 
 }
 
-//
-
-async function r2<T>(fn: () => Promise<T>): Promise<T> {
-    return await executeWithRetries(fn, { tag: 'R2BucketBlobs', isRetryable, maxRetries: 5 });
-}
-
-function isRetryable(e: Error): boolean {
+export function isRetryableErrorFromR2(e: Error): boolean {
     const error = `${e.stack || e}`;
     if (error.includes('(10001)')) return true; // Error: get: We encountered an internal error. Please try again. (10001)
     if (error.includes('(10048)')) return true; // Error: completeMultipartUpload: There was a problem with the multipart upload. (10048)
     return false;
+}
+
+//
+
+async function r2<T>(fn: () => Promise<T>): Promise<T> {
+    return await executeWithRetries(fn, { tag: 'R2BucketBlobs', isRetryable: isRetryableErrorFromR2, maxRetries: 5 });
 }
 
 function isR2ObjectBody(obj: R2Object | R2ObjectBody): obj is R2ObjectBody {

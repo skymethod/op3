@@ -7,6 +7,7 @@ import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
+import { executeWithRetries } from '../sleep.ts';
 import { yieldTsvFromStream } from '../streams.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
@@ -14,6 +15,7 @@ import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs, Multiput } from './blobs.ts';
 import { computeBotType } from './bots.ts';
+import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
@@ -324,17 +326,19 @@ function computeDailyMapKey(date: string): string {
 async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<{ etag: string }>): Promise<{ contentLength: number, etag: string }> {
     const contentLength = chunks.reduce((a, b) => a + b.byteLength, 0);
 
-    // deno-lint-ignore no-explicit-any
-    const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-    const putPromise = put(readable); // don't await!
-    const writer = writable.getWriter();
-    for (const chunk of chunks) {
-        writer.write(chunk);
-    }
-    await writer.close();
-    // await writable.close(); // will throw on cf
-    const { etag } = await putPromise;
-    return { contentLength, etag };
+    return await executeWithRetries(async () => { // the underlying bucket streaming puts are not retryable, but we can retry at this level
+        // deno-lint-ignore no-explicit-any
+        const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+        const putPromise = put(readable); // don't await!
+        const writer = writable.getWriter();
+        for (const chunk of chunks) {
+            writer.write(chunk);
+        }
+        await writer.close();
+        // await writable.close(); // will throw on cf
+        const { etag } = await putPromise;
+        return { contentLength, etag };
+    }, { tag: 'writeDownloadChunks', isRetryable: isRetryableErrorFromR2, maxRetries: 2 });
 }
 
 function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
