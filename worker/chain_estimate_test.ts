@@ -1,5 +1,5 @@
 import { assertEquals } from './tests/deps.ts';
-import { computeChainEstimate, normalizeOrigin } from './chain_estimate.ts';
+import { computeChainDestinationHostname, computeChainEstimate, normalizeOrigin } from './chain_estimate.ts';
 
 Deno.test({
     name: 'computeChainEstimate',
@@ -264,6 +264,29 @@ Deno.test({
         }
         for (const [ input, expectedOutput ] of Object.entries(tests)) {
             assertEquals(normalizeOrigin(input), expectedOutput);
+        }
+    }
+});
+
+Deno.test({
+    name: 'computeChainDestinationHostname',
+    fn: () => {
+
+        const tests = {
+            'https://op3.dev/e/pdcn.co/e/example.com/foo': 'example.com',
+            'https://op3.dev/e/pdcn.co/e/example.com%2Ffoo': undefined,
+        }
+        for (const [ input, expectedOutput ] of Object.entries(tests)) {
+            assertEquals(computeChainDestinationHostname(input, { urlDecodeIfNecessary: false }), expectedOutput);
+        }
+
+        const testsWithUrlDecode = {
+            'https://op3.dev/e/pdcn.co/e/example.com/foo': 'example.com',
+            'https://op3.dev/e/pdcn.co/e/example.com%2Ffoo': 'example.com',
+           
+        }
+        for (const [ input, expectedOutput ] of Object.entries(testsWithUrlDecode)) {
+            assertEquals(computeChainDestinationHostname(input, { urlDecodeIfNecessary: true }), expectedOutput);
         }
     }
 });

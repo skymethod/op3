@@ -6,9 +6,10 @@ export function computeChainDestinationUrl(url: string): string | undefined {
     return last && last.kind === 'destination' ? last.url : undefined;
 }
 
-export function computeChainDestinationHostname(url: string): string | undefined {
+export function computeChainDestinationHostname(url: string, { urlDecodeIfNecessary }: { urlDecodeIfNecessary?: boolean } = {}): string | undefined {
     const destinationUrl = computeChainDestinationUrl(url);
-    return destinationUrl ? tryParseUrl(destinationUrl)?.hostname : undefined;
+    const rt = destinationUrl ? tryParseUrl(destinationUrl)?.hostname : undefined;
+    return !rt && destinationUrl && urlDecodeIfNecessary ? tryParseUrl(destinationUrl.replaceAll(/%2f/ig, '/'))?.hostname : rt;
 }
 
 export function computeChainEstimate(url: string): ChainEstimate {

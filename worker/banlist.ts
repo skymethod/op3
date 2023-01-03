@@ -20,7 +20,7 @@ export class Banlist {
         if (!namespace) return false;
 
         try {
-            const targetHostname = computeChainDestinationHostname(targetUrl);
+            const targetHostname = computeChainDestinationHostname(targetUrl, { urlDecodeIfNecessary: true }); // evil urls will try to urlencode / to %2F
             if (targetHostname === undefined) return false;
             if (isReservedForTesting(targetHostname)) return true;
             if (!targetHostname.includes('.')) return true; // ban /e/whatever/path/to/file.mp3
