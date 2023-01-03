@@ -9228,9 +9228,10 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         element(templateId)
     ];
     const months = Object.keys(monthlyDownloads);
+    const monthlyDownloadsValues = Object.values(monthlyDownloads);
     const computeInitialMonthIndex = ()=>{
-        const lastMonthsDownloads = Object.values(Object.values(monthlyDownloads).at(-2)).reduce((a, b)=>a + b, 0);
-        const thisMonthsDownloads = Object.values(Object.values(monthlyDownloads).at(-1)).reduce((a, b)=>a + b, 0);
+        const lastMonthsDownloads = Object.values(monthlyDownloadsValues.at(-2) ?? {}).reduce((a, b)=>a + b, 0);
+        const thisMonthsDownloads = Object.values(monthlyDownloadsValues.at(-1)).reduce((a, b)=>a + b, 0);
         return months.length - (lastMonthsDownloads > thisMonthsDownloads ? 2 : 1);
     };
     let monthIndex = computeInitialMonthIndex();
