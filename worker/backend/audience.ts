@@ -4,9 +4,10 @@ import { increment } from '../summaries.ts';
 import { isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 
-export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: { partNum: number, numParts: number } }) {
+export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part: partObj }: { showUuid: string, month: string, statsBlobs: Blobs, part?: { partNum: number, numParts: number } }) {
     const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
     const audienceTimestamps: Record<string, string> = {};
+    const part = partObj ? `${partObj.partNum}of${partObj.numParts}` : undefined;
     const audienceSummary: AudienceSummary = { showUuid, period: month, part, dailyFoundAudience: {} };
     let count = 0;
     for (const key of keys) {
@@ -16,8 +17,8 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
         check('date', date, isValidDate);
         for await (const line of computeLinestream(stream)) {
             if (line.length === 0) continue;
-            if (part) {
-                const { partNum, numParts } = part;
+            if (partObj) {
+                const { partNum, numParts } = partObj;
                 if (numParts === 4) {
                     const linePartNum = line < '4' ? 1 : line < '8' ? 2 : line < 'c' ? 3 : 4;
                     if (linePartNum !== partNum) continue;
