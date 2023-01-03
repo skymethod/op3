@@ -91,11 +91,8 @@ export async function recomputeShowSummariesForMonth({ showUuid, month, log, seq
         rt = { ...rt, monthKey, newOverall: !!newOverall, downloads: total(summary.hourlyDownloads) };
     }
     if (phases.some(v => v.startsWith('audience'))) {
-        const part = phases.includes('audience-1of4') ? '1of4'
-            : phases.includes('audience-2of4') ? '2of4'
-            : phases.includes('audience-3of4') ? '3of4'
-            : phases.includes('audience-4of4') ? '4of4'
-            : undefined;
+        const m = phases.map(v => /^audience-(\d)of(\d)$/.exec(v)).find(v => !!v);
+        const part = m ? { partNum: parseInt(m[1]), numParts: parseInt(m[2]) } : undefined;
         const { audience, contentLength: audienceContentLength, part: audiencePart } = await timed(times, 'recompute-audience', () => recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }));
         rt = { ...rt, audience, audienceContentLength, audiencePart };
     }

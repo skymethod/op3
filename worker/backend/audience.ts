@@ -4,7 +4,7 @@ import { increment } from '../summaries.ts';
 import { isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 
-export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: '1of4' | '2of4' | '3of4' | '4of4' }) {
+export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part }: { showUuid: string, month: string, statsBlobs: Blobs, part?: { partNum: number, numParts: number } }) {
     const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
     const audienceTimestamps: Record<string, string> = {};
     const audienceSummary: AudienceSummary = { showUuid, period: month, part, dailyFoundAudience: {} };
@@ -17,8 +17,16 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
         for await (const line of computeLinestream(stream)) {
             if (line.length === 0) continue;
             if (part) {
-                const linePart = line < '4' ? '1of4' : line < '8' ? '2of4' : line < 'c' ? '3of4' : '4of4';
-                if (linePart !== part) continue;
+                const { partNum, numParts } = part;
+                if (numParts === 4) {
+                    const linePartNum = line < '4' ? 1 : line < '8' ? 2 : line < 'c' ? 3 : 4;
+                    if (linePartNum !== partNum) continue;
+                } else if (numParts === 8) {
+                    const linePartNum = line < '2' ? 1 : line < '4' ? 2 : line < '6' ? 3 : line < '8' ? 4 : line < 'a' ? 5 : line < 'c' ? 6 : line < 'e' ? 7 : 8;
+                    if (linePartNum !== partNum) continue;
+                } else {
+                    throw new Error(`Unsupported numParts: ${numParts}`);
+                }
             }
             const audienceId = line.substring(0, 64);
             const timestamp = line.substring(65, 80);
