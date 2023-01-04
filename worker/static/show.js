@@ -8431,7 +8431,8 @@ const makeDownloadsGraph = ({ hourlyDownloads , episodes , debug  })=>{
         element('downloads-graph-next')
     ];
     const hours = Object.keys(hourlyDownloads);
-    let granularity = 'daily';
+    const isHourlyMoreInteresting = hours.length < 24 * 5;
+    let granularity = isHourlyMoreInteresting ? 'hourly' : 'daily';
     let showEpisodeMarkers = true;
     let rangeStartHourIndex = 0;
     let rangeEndHourIndex = hours.length - 1;
@@ -8574,7 +8575,7 @@ function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) {
         if (index < 0) continue;
         if (!pubdate) continue;
         const diff = new Date(`${firstHour}:00:00.000Z`).getTime() - new Date(pubdate).getTime();
-        if (diff > 1000 * 60 * 60 * 24 * 30) continue;
+        if (diff > 1000 * 60 * 60 * 24 * 5) continue;
         const records = rt.get(index) ?? [];
         rt.set(index, records);
         records.push(ep);
