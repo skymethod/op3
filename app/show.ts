@@ -43,7 +43,7 @@ const app = (() => {
 
     const { episodeFirstHours, dailyFoundAudience, episodeHourlyDownloads, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
-    const episodeMarkers: Record<string, EpisodeInfo> = Object.fromEntries(Object.entries(episodeFirstHours).map(([ episodeId, hour ]) => [ hour, showObj.episodes.find(v => v.id === episodeId)! ]));
+    const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...showObj.episodes.find(v => v.id === episodeId)! }));
     const showSlug = computeShowSlug(showObj.title);
     const debug = new URLSearchParams(document.location.search).has('debug');
 
@@ -53,7 +53,7 @@ const app = (() => {
         debugDiv.style.display = 'none';
     }
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
-    makeDownloadsGraph({ hourlyDownloads, episodeMarkers, debug });
+    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
     makeEpisodePacing({ episodeHourlyDownloads, episodes });
     makeTopCountries({ showSlug, monthlyDimensionDownloads });

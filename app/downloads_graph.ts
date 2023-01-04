@@ -6,9 +6,11 @@ import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
 import { computeMonthName, pluralize } from './util.ts';
 
-type Opts = { hourlyDownloads: Record<string, number>, episodeMarkers: Record<string, EpisodeInfo>, debug: boolean };
+type EpisodeInfoAndFirstHour = EpisodeInfo & { firstHour: string };
 
-export const makeDownloadsGraph = ({ hourlyDownloads, episodeMarkers, debug }: Opts) => {
+type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], debug: boolean };
+
+export const makeDownloadsGraph = ({ hourlyDownloads, episodes, debug }: Opts) => {
 
     const [ 
         downloadsGraphCanvas,
@@ -87,7 +89,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodeMarkers, debug }: O
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodeMarkers : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodes : undefined);
     }
 
     function update() {
@@ -156,26 +158,27 @@ function computeDownloads(hourlyDownloads: Record<string, number>, granularity: 
     return rt;
 }
 
-function computeEpisodeMarkerIndex(episodeMarkers: Record<string, EpisodeInfo>, downloadLabels: string[], granularity: Granularity): Map<number, { info: EpisodeInfo, foundHour: string }[]> {
-    const rt = new Map<number, { info: EpisodeInfo, foundHour: string }[]>();
-    for (const [ foundHour, info ] of Object.entries(episodeMarkers)) {
-        const findValue = granularity === 'hourly' ? `${foundHour}:00:00.000Z` : `${foundHour.substring(0, 10)}T00:00:00.000Z`;
+function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], downloadLabels: string[], granularity: Granularity): Map<number, EpisodeInfoAndFirstHour[]> {
+    const rt = new Map<number, EpisodeInfoAndFirstHour[]>();
+    for (const ep of episodes) {
+        const { firstHour, pubdate } = ep;
+        const findValue = granularity === 'hourly' ? `${firstHour}:00:00.000Z` : `${firstHour.substring(0, 10)}T00:00:00.000Z`;
         const index = downloadLabels.indexOf(findValue);
         if (index < 0) continue;
-        if (!info.pubdate) continue;
-        const diff = new Date(`${foundHour}:00:00.000Z`).getTime() - new Date(info.pubdate).getTime();
+        if (!pubdate) continue;
+        const diff = new Date(`${firstHour}:00:00.000Z`).getTime() - new Date(pubdate).getTime();
         if (diff > 1000 * 60 * 60 * 24 * 30) continue;
         const records = rt.get(index) ?? [];
         rt.set(index, records);
-        records.push({ info, foundHour });
+        records.push(ep);
     }
     return rt;
 }
 
-function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, debug: boolean, episodeMarkers?: Record<string, EpisodeInfo>): Chart {
+function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, debug: boolean, episodes?: EpisodeInfoAndFirstHour[]): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
-    const episodeMarkerIndex = episodeMarkers ? computeEpisodeMarkerIndex(episodeMarkers, downloadLabels, granularity) : undefined;
+    const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) : undefined;
 
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
 
@@ -218,7 +221,7 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                         // deno-lint-ignore no-explicit-any
                         footer: (items: any[]) => {
                             const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
-                            return records.length === 0 ? undefined : records.map(v => `Published: ${v.info.title}${debug ? ` f:${v.foundHour} p:${v.info.pubdate}` : ''}`).join('\n');
+                            return records.length === 0 ? undefined : records.map(v => `Published: ${v.title}${debug ? ` f:${v.firstHour} p:${v.pubdate}` : ''}`).join('\n');
                         }
                     }
                 }
