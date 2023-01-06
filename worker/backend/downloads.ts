@@ -24,10 +24,11 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
     const endInstant = addHours(startInstant, 1).toISOString();
     let startAfterRecordKey: string | undefined;
-    const downloads = new Set<string>();
+    type DownloadInfo = { chunkIndex?: number, isFirstTwoBytes?: boolean };
+    const downloads: Record<string, DownloadInfo> = {};
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
-    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n'));
+    chunks.push(encoder.encode(['serverUrl', 'audienceId', 'time', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn', 'tags' ].join('\t') + '\n'));
     let queries = 0;
     let hits = 0;
     while (true) {
@@ -44,7 +45,8 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const { method, range, ulid: _, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
             if (method !== 'GET') continue; // ignore all non-GET requests
             const ranges = range ? tryParseRangeHeader(range) : undefined;
-            if (ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore range requests that don't include a range of more than two bytes
+            const isFirstTwoBytes = ranges && ranges.length === 1 && 'start' in ranges[0] && ranges[0].start === 0 && ranges[0].end === 1; // bytes=0-1
+            if (!isFirstTwoBytes && ranges && !ranges.some(v => estimateByteRangeSize(v) > 2)) continue; // ignore all other range requests that don't include a range of more than two bytes
             const serverUrl = computeServerUrl(url);
             const destinationServerUrl = computeChainDestinationUrl(serverUrl);
             if (destinationServerUrl === undefined) continue;
@@ -52,7 +54,16 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const audienceId = (await Bytes.ofUtf8(`${hashedIpAddress}|${userAgent ?? ''}|${referer ?? ''}`).sha256()).hex();
             // TODO: how to incorporate ulids into audienceId? not a good replacement for ip address since they cannot be used across urls, and not a good suffix since a single download session across multiple ips would create dup downloads => ignore for now
             const download = `${destinationServerUrl}|${audienceId}`;
-            if (downloads.has(download)) continue;
+            const existing = downloads[download];
+            if (existing) {
+                if (existing.isFirstTwoBytes && typeof existing.chunkIndex === 'number' && !isFirstTwoBytes) {
+                    // allow any larger request to replace a prior bytes=0-1 request for this download
+                    chunks.splice(existing.chunkIndex, 1);
+                } else {
+                    // duplicate download, ignore
+                    continue;
+                }
+            }
             // TODO: do the ip tagging here
             const time = timestampToInstant(timestamp);
             const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
@@ -62,9 +73,11 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const deviceName = result?.device?.name;
             const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
             const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
-            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
+            const tags = isFirstTwoBytes ? 'first-two' : undefined;
+            const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
+            const chunkIndex = chunks.length;
             chunks.push(encoder.encode(line));
-            downloads.add(download);
+            downloads[download] = { chunkIndex, isFirstTwoBytes };
         }
         if (entries.length < querySize || hits >= maxHits) {
             break;
@@ -72,8 +85,8 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     }
 
     const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyKey(hour), v));
-    
-    return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: downloads.size, millis: Date.now() - start, contentLength };
+
+    return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
 }
 
 export async function computeDailyDownloads(date: string, { multipartMode, partSizeMb, statsBlobs, lookupShow } : { multipartMode: 'bytes' | 'stream', partSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
@@ -101,7 +114,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
     let totalContentLength = 0;
     let rowIndex = 0;
     const showMaps = new Map<string, ShowMap>();
-    const headerChunk = encoder.encode(['time', 'episodeId', 'botType', 'serverUrl', 'audienceId', 'showUuid', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn' ].join('\t') + '\n');
+    const headerChunk = encoder.encode(['time', 'episodeId', 'botType', 'serverUrl', 'audienceId', 'showUuid', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode', 'asn', 'tags' ].join('\t') + '\n');
     chunks.push(headerChunk); chunksLength += headerChunk.length;
     const partSize = partSizeMb * 1024 * 1024;
     let multiput: Multiput | undefined;
@@ -138,7 +151,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
 
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
-            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
+            const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags } = obj;
             if (serverUrl === undefined) throw new Error(`Undefined serverUrl`);
             if (audienceId === undefined) throw new Error(`Undefined audienceId`);
             if (agentType === undefined) throw new Error(`Undefined agentType`);
@@ -156,7 +169,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             // associate download with bot type
             const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
 
-            const line = [ time, episodeId, botType, serverUrl, audienceId, showUuid, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn ].map(v => v ?? '').join('\t') + '\n';
+            const line = [ time, episodeId, botType, serverUrl, audienceId, showUuid, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
             
             if ((chunksLength + chunk.length) > partSize) { // r2 multipart requires all but last part to be exactly the same size
@@ -295,6 +308,10 @@ export function computeShowDailyKeyPrefix({ showUuid, datePart }: { showUuid: st
    return datePart ? `downloads/show-daily/${showUuid}/${showUuid}-${datePart}` : `downloads/show-daily/${showUuid}/`;
 }
 
+export function computeHourlyKey(hour: string): string {
+    return `downloads/hourly/${hour}.tsv`;
+}
+
 //
 
 interface DailyDownloadsMap {
@@ -310,10 +327,6 @@ interface ShowMap {
 }
 
 //
-
-function computeHourlyKey(hour: string): string {
-    return `downloads/hourly/${hour}.tsv`;
-}
 
 function computeDailyKey(date: string): string {
     return `downloads/daily/${date}.tsv`;

@@ -170,7 +170,7 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         increment(downloads, key);
     };
     for await (const obj of yieldTsvFromStream(stream)) {
-        const { botType, time, episodeId, audienceId, countryCode = 'XX', agentType = 'unknown', agentName = 'Unknown', deviceType = 'unknown', deviceName = 'Unknown', referrerType, referrerName = 'Unknown', metroCode } = obj;
+        const { botType, time, episodeId, audienceId, countryCode = 'XX', agentType = 'unknown', agentName = 'Unknown', deviceType = 'unknown', deviceName = 'Unknown', referrerType, referrerName = 'Unknown', metroCode, tags } = obj;
         if (time === undefined) throw new Error(`Undefined time`);
         const hour = time.substring(0, '2000-01-01T00'.length);
         if (botType !== undefined) continue;
@@ -202,6 +202,11 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         }
         incrementDimension('deviceType', deviceType);
         incrementDimension('deviceName', deviceName);
+        if (tags) {
+            for (const tag of tags.split(',')) {
+                incrementDimension('tag', tag);
+            }
+        }
     }
     const summary = computeSorted({
         showUuid,
