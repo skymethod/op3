@@ -56,6 +56,16 @@ interface Release {
 
 const RELEASES: Release[] = [
     {
+        id: '2022-12-29',
+        time: '2022-12-29T21:00:00.000Z',
+        title: '2022-12-29: Preview links to OP3 show stats pages',
+        bulletPoints: [
+            () => `Made an early version of the show-level stats page available to podcasters running the OP3 prefix, primarily to verify the Downloads calculation.`,
+            ({ origin }) => `Podcasters going through the [Setup page](${origin}/setup) will now see instructions on how to request access to their stats page.`,
+            () => `The underlying OP3 Downloads API is not public yet, but will be part of an upcoming public release.`,
+        ]
+    },
+    {
         id: '2022-10-20',
         time: '2022-10-20T21:40:00.000Z',
         title: '2022-10-20: Saving more request attributes, updated Privacy Policy',
