@@ -67,7 +67,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             // TODO: do the ip tagging here
             const time = timestampToInstant(timestamp);
             const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
-            const agentType = result?.type ?? 'unknown';
+            const agentType = result?.type === 'library' && result.category === 'bot' ? 'bot-library' : (result?.type ?? 'unknown');
             const agentName = result?.name ?? userAgent;
             const deviceType = result?.device?.category;
             const deviceName = result?.device?.name;
