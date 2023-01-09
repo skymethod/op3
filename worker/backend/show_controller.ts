@@ -816,8 +816,11 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
         // show already exists, allow only if no piFeed
         if (feedRecord.piFeed !== undefined) throw new Error(`Feed must not have a piFeed`);
     } else {
-        if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
-        const { podcastGuid } = feedRecord.piFeed;
+        let podcastGuid = feedRecord.podcastGuid;
+        if (podcastGuid === undefined) {
+            if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
+            podcastGuid = feedRecord.piFeed.podcastGuid;
+        }
         if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
         showRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
     }
