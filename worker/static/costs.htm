@@ -34,10 +34,12 @@
 
 ${costsHtml}
 
-        <div class="grid grid-cols-5 gap-4 mt-4">
-            <div>2022 YTD</div>
-            <div class="col-start-5 text-right">${costs2022}</div>
-        </div>
+        <template id="ytd">
+            <div class="grid grid-cols-5 gap-4 my-4">
+                <div>total</div>
+                <div class="col-start-5 text-right">$nnn.nn</div>
+            </div>
+        </template>
     </div>
 
     <div class="max-w-xl mx-auto my-16">

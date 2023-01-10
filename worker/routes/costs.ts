@@ -1,6 +1,7 @@
 import { encodeXml, importText } from '../deps.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
+import { increment } from '../summaries.ts';
 
 const costsHtm = await importText(import.meta.url, '../static/costs.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
@@ -16,8 +17,7 @@ export function computeCostsResponse(opts: { instance: string, hostname: string,
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,
         hostname,
-        costsHtml: COSTS.map(computeCostHtml).join('\n'),
-        costs2022: COST_FORMATTER.format(COSTS.reduce((a, b) => a + b.cost, 0)),
+        costsHtml: computeCostsHtml(),
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
@@ -30,6 +30,7 @@ interface Cost {
     readonly description: string;
     readonly cost: number;
     readonly detail: readonly CostDetail[];
+    readonly daysInYear?: Record<string, number>;
 }
 
 interface CostDetail {
@@ -40,6 +41,22 @@ interface CostDetail {
 //
 
 const COSTS: Cost[] = [
+    {
+        date: '2023-01-10',
+        daysInYear: { '2022': 22, '2023': 9 },
+        description: 'Cloudflare invoice',
+        cost: 267.15,
+        detail: [
+            { description: 'Workers Paid Subscription', cost: 5.00 },
+            { description: 'Workers requests', cost: 12.25 },
+            { description: 'Durable Objects Compute', cost: 12.50 },
+            { description: 'Durable Objects Reads/Writes/Deletes', cost: 192.80 },
+            { description: 'Durable Objects Storage', cost: 18.00 },
+            { description: 'R2 Data Storage', cost: 0.05 },
+            { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
+            { description: 'Sales Tax', cost: 16.55 },
+        ]
+    },
     {
         date: '2022-12-10',
         description: 'Cloudflare invoice',
@@ -127,3 +144,37 @@ ${detail.map(({ description, cost }) => `
 `).join('\n')}
         </details>
 `;
+
+function computeCostsHtml(): string {
+    const parts: string[] = [];
+
+    const m = /<template id="ytd">(.*?)<\/template>/s.exec(costsHtm);
+    if (!m) throw new Error();
+    const [ _, template ] = m;
+
+    const costsPerYear: Record<string, number> = {};
+    COSTS.forEach((cost, i) => {
+        parts.push(computeCostHtml(cost));
+        const year = cost.date.substring(0, 4);
+        if (cost.daysInYear) {
+            const days = Object.values(cost.daysInYear).reduce((a, b) => a + b, 0);
+            for (const [ year, yearDays ] of Object.entries(cost.daysInYear)) {
+                const pct = yearDays / days;
+                increment(costsPerYear, year, pct * cost.cost);
+            }
+        } else {
+            increment(costsPerYear, year, cost.cost);
+        }
+        const nextYear = COSTS[i + 1] ? COSTS[i + 1].date.substring(0, 4) : undefined;
+        if (year !== nextYear) {
+            const isCurrentYear = year === COSTS[0].date.substring(0, 4);
+            const ytd = template.replace('total', `${year}${isCurrentYear ? ' YTD' : ' TOTAL'}`).replace('nnn.nn', COST_FORMATTER.format(costsPerYear[year]));
+            parts.push(ytd);
+        }
+        if (nextYear === undefined) {
+            const total = template.replace('total', 'TOTAL').replace('nnn.nn', COST_FORMATTER.format(COSTS.map(v => v.cost).reduce((a, b) => a + b, 0)));
+            parts.push(total);
+        }
+    });
+    return parts.join('\n');
+}
