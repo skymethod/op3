@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@c0ee15c44c1eee8666d43f6585f31e32e1aff57c (2023-01-09T22:34:28Z)
+// from user-agents-v2@d59c51f49c68d4108598fe27b7bfbd6726c2f7c5 (2023-01-10T19:00:36Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -172,7 +172,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AllHitMusicRadio\//.test(userAgent)) return { name: `AllHitMusicRadio`, type: 'app' };
     if (/^Aloha\//.test(userAgent)) return { name: `Aloha`, type: 'app' };
     if (/^Amazon;AF/.test(userAgent)) return { name: `Amazon Fire`, type: 'app' };
-    if (/^AmazonMusic/.test(userAgent)) return { name: `Amazon Music`, type: 'app' };
+    if (/^AmazonMusic|^Harley\/\d/.test(userAgent)) return { name: `Amazon Music`, type: 'app' };
     if (/^AMPApp\//.test(userAgent)) return { name: `AMPApp`, type: 'app' };
     if (/^Anchor\//.test(userAgent)) return { name: `Anchor`, type: 'app' };
     if (/^AnchorFM\//.test(userAgent)) return { name: `AnchorFM`, type: 'app' };

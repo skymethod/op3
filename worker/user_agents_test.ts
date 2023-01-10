@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@c0ee15c44c1eee8666d43f6585f31e32e1aff57c (2023-01-09T22:34:28Z)
+// from user-agents-v2@d59c51f49c68d4108598fe27b7bfbd6726c2f7c5 (2023-01-10T19:00:36Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -196,6 +196,8 @@ const appTests = {
     'AmazonMusic/9.16.0 iPhone12,1 CFNetwork/1128.0.1 Darwin/19.6.0': { type: 'app', name: `Amazon Music` },
     'AmazonMusic/22.13.3 iPad7,3 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Amazon Music` },
     'AmazonMusic/16.17.0 Dalvik/2.1.0 (Linux; U; Android 6.0.1; vivo 1610 Build/MMB29M)': { type: 'app', name: `Amazon Music` },
+    'Harley/3.12.0.78 A1CTGXB4BA274T/9.4.0.2386': { type: 'app', name: `Amazon Music` },
+    'Harley/3.11.0.181 A5FPM1T85BR19/9.2.1.2362a': { type: 'app', name: `Amazon Music` },
     'AMPApp/32.6.1 CFNetwork/978.0.7 Darwin/18.6.0': { type: 'app', name: `AMPApp` },
     'Anchor/9 CFNetwork/901.1 Darwin/17.5.0': { type: 'app', name: `Anchor` },
     'AnchorFM/3.0 (Linux;Android 6.0) ExoPlayerLib/2.5.4': { type: 'app', name: `AnchorFM` },
