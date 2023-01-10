@@ -12,6 +12,7 @@ import { newTextResponse } from '../responses.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { computeListOpts } from './storage.ts';
 import { DoNames } from '../do_names.ts';
+import { IpAddressHashingFn } from './redirect_log_controller.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -21,6 +22,7 @@ export class CombinedRedirectLogController {
     private readonly rpcClient: RpcClient;
     private readonly sourceStateCache = new Map<string, SourceState>();
     private readonly knownExistingUrls = new Set<string>();
+    private readonly hashIpAddress: IpAddressHashingFn;
 
     private attNums?: AttNums;
     private mostBehindTimestampId?: string;
@@ -29,10 +31,11 @@ export class CombinedRedirectLogController {
     private knownExistingUrlsMax = 200;
     private init = false;
 
-    constructor(storage: DurableObjectStorage, rpcClient: RpcClient, durableObjectName: string) {
+    constructor(storage: DurableObjectStorage, rpcClient: RpcClient, durableObjectName: string, hashIpAddress: IpAddressHashingFn) {
         this.storage = storage;
         this.rpcClient = rpcClient;
         this.durableObjectName = durableObjectName;
+        this.hashIpAddress = hashIpAddress;
     }
 
     async getState() {
@@ -179,7 +182,7 @@ export class CombinedRedirectLogController {
         await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
         const mostBehindTimestamp = typeof this.mostBehindTimestampId === 'string' ? this.mostBehindTimestampId.substring(0, 15) : undefined;
-        return await queryCombinedRedirectLogs(request, mostBehindTimestamp, attNums, this.storage);
+        return await queryCombinedRedirectLogs(request, mostBehindTimestamp, attNums, this.storage, this.hashIpAddress);
     }
 
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {

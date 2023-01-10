@@ -10,13 +10,13 @@ import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeApiQueryCommonParameters } from './api_query_common.ts';
 
-export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient): Promise<Response> {
+export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, rawIpAddress: string | undefined): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
-        request = await parseRequest(searchParams);
+        request = await parseRequest(searchParams, rawIpAddress);
     } catch (e) {
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
@@ -26,7 +26,7 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
 
 //
 
-async function parseRequest(searchParams: URLSearchParams): Promise<Unkinded<QueryRedirectLogsRequest>> {
+async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined): Promise<Unkinded<QueryRedirectLogsRequest>> {
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_REDIRECT_LOGS) };
     const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method, uuid } = Object.fromEntries(searchParams);
 
@@ -60,8 +60,13 @@ async function parseRequest(searchParams: URLSearchParams): Promise<Unkinded<Que
         request = { ...request, referer };
     }
     if (typeof hashedIpAddress === 'string') {
-        check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
-        request = { ...request, hashedIpAddress };
+        if (hashedIpAddress === 'current') {
+            if (typeof rawIpAddress !== 'string') throw new Error(`Unable to compute current hashedIpAddress`);
+            request = { ...request, rawIpAddress };
+        } else {
+            check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
+            request = { ...request, hashedIpAddress };
+        }
     }
     if (typeof edgeColo === 'string') {
         check('edgeColo', edgeColo, isNotBlank);

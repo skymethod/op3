@@ -71,9 +71,7 @@ export class BackendDO {
                     if (!isRpcRequest(obj)) throw new Error(`Bad rpc request: ${JSON.stringify(obj)}`);
                     const { storage } = this.state;
 
-                    const getOrLoadRedirectLogController = () => {
-                        if (this.redirectLogController) return this.redirectLogController;
-
+                    const getOrLoadHashingFns = () => {
                         if (!this.keyClient) this.keyClient = newKeyClient(rpcClient);
                         const keyClient = this.keyClient;
                         const encryptIpAddress: IpAddressEncryptionFn = async (rawIpAddress, opts) => {
@@ -86,6 +84,12 @@ export class BackendDO {
                             const signature = await hmac(Bytes.ofUtf8(rawIpAddress), key);
                             return packHashedIpAddress(id, signature);
                         }
+                        return { encryptIpAddress, hashIpAddress };
+                    }
+
+                    const getOrLoadRedirectLogController = () => {
+                        if (this.redirectLogController) return this.redirectLogController;
+                        const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
                         const notificationDelaySeconds = tryParseInt(redirectLogNotificationDelaySeconds);
                         this.redirectLogController = new RedirectLogController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
                         return this.redirectLogController;
@@ -97,7 +101,9 @@ export class BackendDO {
                     }
 
                     const getOrLoadCombinedRedirectLogController = () => {
-                        if (!this.combinedRedirectLogController) this.combinedRedirectLogController = new CombinedRedirectLogController(storage, rpcClient, durableObjectName);
+                        if (this.combinedRedirectLogController) return this.combinedRedirectLogController;
+                        const { hashIpAddress } = getOrLoadHashingFns();
+                        this.combinedRedirectLogController = new CombinedRedirectLogController(storage, rpcClient, durableObjectName, hashIpAddress);
                         return this.combinedRedirectLogController;
                     }
 

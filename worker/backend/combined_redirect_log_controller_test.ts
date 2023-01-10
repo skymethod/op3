@@ -14,6 +14,7 @@ import { packHashedIpAddress, unpackHashedIpAddressHash } from '../ip_addresses.
 import { importHmacKey } from '../crypto.ts';
 import { isStringRecord } from '../check.ts';
 import { DoNames } from '../do_names.ts';
+import { IpAddressHashingFn } from './redirect_log_controller.ts';
 
 Deno.test({
     name: 'process -> queryRedirectLogs -> index-and-record-storage',
@@ -64,7 +65,8 @@ Deno.test({
                 throw new Error(JSON.stringify({ request, target }));
             }
         }
-        const controller = new CombinedRedirectLogController(storage, rpcClient, 'controller-test');
+        const hashIpAddress: IpAddressHashingFn = () => { throw new Error() };
+        const controller = new CombinedRedirectLogController(storage, rpcClient, 'controller-test', hashIpAddress);
         await controller.process();
 
         {

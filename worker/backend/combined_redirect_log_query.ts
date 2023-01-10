@@ -8,11 +8,12 @@ import { addDays, computeTimestamp, isValidTimestamp, timestampToInstant } from 
 import { consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { IndexId, INDEX_DEFINITIONS } from './combined_redirect_log_controller.ts';
+import { IpAddressHashingFn } from './redirect_log_controller.ts';
 
-export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, mostBehindTimestamp: string | undefined, attNums: AttNums, storage: DurableObjectStorage): Promise<Response> {
+export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, mostBehindTimestamp: string | undefined, attNums: AttNums, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Response> {
     const { format = 'tsv' } = request;
     const startTime = Date.now();
-    const map = await computeResultMap(request, storage);
+    const map = await computeResultMap(request, storage, hashIpAddress);
     const rows: unknown[] = [];
     for (const record of map.values()) {
         if (typeof record !== 'string') continue;
@@ -66,9 +67,12 @@ function tryParseTimestampFromTimestampAndUuid(timestampAndUuid: string): string
     return rt;
 }
 
-async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, storage: DurableObjectStorage): Promise<Map<string, DurableObjectStorageValue>> {
-    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, edgeColo, doColo, source, ulid, method, uuid } = request;
+async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Map<string, DurableObjectStorageValue>> {
+    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid } = request;
     // parameters validated in edge worker
+
+    // compute hashedIpAddress for caller if necessary
+    const hashedIpAddress = request.hashedIpAddress ?? (rawIpAddress ? await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }) : undefined);
     
     // handle urlStartsWith queries separately, uses a more complicated index
     if (typeof urlStartsWith === 'string') {
