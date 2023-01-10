@@ -4,16 +4,18 @@ import { isUnkindedModifyApiKeyRequest, RpcClient } from '../rpc_model.ts';
 import { isValidUuid } from '../uuid.ts';
 import { JsonProvider } from './api.ts';
 
-export type ApiKeysRequestOpts = { instance: string, method: string, hostname: string, bodyProvider: JsonProvider, rawIpAddress: string | undefined, turnstileSecretKey: string | undefined, rpcClient: RpcClient };
+export type ApiKeysRequestOpts = { instance: string, isAdmin: boolean, method: string, hostname: string, bodyProvider: JsonProvider, rawIpAddress: string | undefined, turnstileSecretKey: string | undefined, rpcClient: RpcClient };
 
-export async function computeApiKeysResponse({ instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }: ApiKeysRequestOpts): Promise<Response> {
+export async function computeApiKeysResponse({ instance, isAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }: ApiKeysRequestOpts): Promise<Response> {
     console.log('computeApiKeysResponse');
     const { turnstileToken, apiKey: apiKeyFromInput } = await commonRequest(instance, method, bodyProvider, rawIpAddress, turnstileSecretKey);
-    if (typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
+    if (!isAdmin && typeof turnstileToken !== 'string') throw new Error(`Expected turnstileToken string`);
     if (apiKeyFromInput !== undefined && typeof apiKeyFromInput !== 'string') throw new Error(`Expected apiKeyFromInput string`);
     if (apiKeyFromInput !== undefined && !isValidUuid(apiKeyFromInput)) throw new Error(`Bad apiKeyFromInput`);
 
-    await commonTurnstileValidation(hostname, turnstileSecretKey, turnstileToken, rawIpAddress!);
+    if (!isAdmin) {
+        await commonTurnstileValidation(hostname, turnstileSecretKey, turnstileToken, rawIpAddress!);
+    }
 
     // looks good, generate or lookup an api key
     const res = apiKeyFromInput ? await rpcClient.getApiKey({ apiKey: apiKeyFromInput }, DoNames.apiKeyServer) : await rpcClient.generateNewApiKey({ }, DoNames.apiKeyServer);
@@ -22,7 +24,7 @@ export async function computeApiKeysResponse({ instance, method, hostname, bodyP
     return newJsonResponse({ apiKey, status, created, permissions, shows, name, token, tokenLastUsed, blockReason });
 }
 
-export async function computeApiKeyResponse(apiKeyInput: string, isAdmin: boolean, { instance, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }: ApiKeysRequestOpts): Promise<Response> {
+export async function computeApiKeyResponse(apiKeyInput: string, { instance, isAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }: ApiKeysRequestOpts): Promise<Response> {
     console.log('computeApiKeyResponse', { apiKeyInput, isAdmin });
     const req = await commonRequest(instance, method, bodyProvider, rawIpAddress, turnstileSecretKey);
     const { turnstileToken } = req;
