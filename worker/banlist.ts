@@ -20,6 +20,7 @@ export class Banlist {
         if (!namespace) return false;
 
         try {
+            if (/\.(mp3|mp4)$/i.test(targetUrl)) return false;
             const targetHostname = computeChainDestinationHostname(targetUrl, { urlDecodeIfNecessary: true }); // evil urls will try to urlencode / to %2F
             if (targetHostname === undefined) return false;
             if (isReservedForTesting(targetHostname)) return true;
