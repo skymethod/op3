@@ -137,9 +137,9 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://media.blubrry.com/something/a.com/path/to/episode.mp3
     // http and https endpoints are supported
-    m = /^(https?):\/\/media\.blubrry\.com\/\w+\/(.*?)$/.exec(url);
+    m = /^(https?):\/\/media\.blubrry\.com\/\w+\/(p\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, suffix ] = m;
+        const [ _, scheme, __, suffix ] = m;
         const targetUrl = `${scheme}://${suffix}`;
         return [ { kind: 'prefix', prefix: 'blubrry', url }, ...computeChainEstimate(targetUrl) ];
     }
