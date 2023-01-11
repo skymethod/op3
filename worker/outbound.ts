@@ -5,5 +5,5 @@ export function newPodcastIndexClient({ podcastIndexCredentials, origin }: { pod
 }
 
 export function computeUserAgent({ origin }: { origin: string }): string {
-    return `op3-fetcher/1.0 (${origin})`;
+    return `op3-fetcher/1.0 (bot; ${origin})`;
 }
