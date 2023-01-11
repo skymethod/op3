@@ -41,6 +41,9 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
             doubles: [ dryRun ? 1 : 0, millis, (results ?? []).length ],
             indexes: [ kind ]
         }
+    } else if (kind === 'generic') {
+        const { type, strings, doubles } = event;
+        return { blobs: [ kind, type, ...(strings ?? []) ], doubles, indexes: [ kind ] };
     } else {
         throw new Error(`CloudflareTracer: Unsupported kind: ${kind}`);
     }

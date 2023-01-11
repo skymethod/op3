@@ -6,6 +6,7 @@ import { DoNames } from '../do_names.ts';
 import { packError } from '../errors.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
+import { writeTraceEvent } from '../tracer.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeApiQueryCommonParameters } from './api_query_common.ts';
@@ -17,6 +18,7 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
         request = await parseRequest(searchParams, rawIpAddress);
+        if (!permissions.has('admin')) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request) });
     } catch (e) {
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
@@ -85,4 +87,31 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         request = { ...request, uuid };
     }
     return request;
+}
+
+function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>): { strings: string[], doubles: number[] } {
+    const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
+    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid } = request;
+    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid };
+    let filterName = '';
+    let filterValue = '';
+    for (const [ name, value ] of Object.entries(filters)) {
+        if (typeof value === 'string') {
+            filterName = name;
+            filterValue = name === 'rawIpAddress' ? '<elided>' : value;
+            break;
+        }
+    }
+    const strings = [
+        format,
+        startTimeInclusive,
+        startTimeExclusive,
+        endTimeExclusive,
+        filterName,
+        filterValue,
+    ];
+    const doubles = [ 
+        limit,
+    ];
+    return { strings, doubles };
 }

@@ -54,6 +54,7 @@ export type TraceEvent =
     | ConsoleWarning
     | ConsoleError
     | AdminDataJob
+    | Generic
     ;
 
 export interface ErrorSavingRedirect {
@@ -151,4 +152,11 @@ export interface AdminDataJob {
     readonly millis: number;
     readonly results?: unknown[];
     readonly message?: string;
+}
+
+export interface Generic {
+    readonly kind: 'generic',
+    readonly type: string;
+    readonly strings?: string[];
+    readonly doubles?: number[];
 }
