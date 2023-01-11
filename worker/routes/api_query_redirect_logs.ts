@@ -18,7 +18,7 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
         request = await parseRequest(searchParams, rawIpAddress);
-        if (!permissions.has('admin')) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request) });
+        if (!permissions.has('admin')) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request, permissions.has('preview')) });
     } catch (e) {
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
@@ -89,7 +89,7 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     return request;
 }
 
-function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>): { strings: string[], doubles: number[] } {
+function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
     const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid } = request;
     const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid };
@@ -112,6 +112,7 @@ function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>): { str
     ];
     const doubles = [ 
         limit,
+        isPreview ? 0 : 1,
     ];
     return { strings, doubles };
 }

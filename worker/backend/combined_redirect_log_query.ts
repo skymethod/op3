@@ -72,7 +72,7 @@ async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, sto
     // parameters validated in edge worker
 
     // compute hashedIpAddress for caller if necessary
-    const hashedIpAddress = request.hashedIpAddress ?? (rawIpAddress ? await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }) : undefined);
+    const hashedIpAddress = request.hashedIpAddress ?? (rawIpAddress ? unpackHashedIpAddressHash(await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() })) : undefined);
     
     // handle urlStartsWith queries separately, uses a more complicated index
     if (typeof urlStartsWith === 'string') {
