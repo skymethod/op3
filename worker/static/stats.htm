@@ -2,12 +2,11 @@
 <html class="sl-theme-dark">
 
 <head>
-    <title>${showTitle} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <title>Global Stats · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="viewport-fit=cover, initial-scale=1" />
-    <link rel="canonical" href="${origin}/show/${showUuid}" />
+    <link rel="canonical" href="${origin}/stats" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="robots" content="noindex" />
     ${styleTag}
     <style>
         footer {
@@ -17,8 +16,6 @@
     ${shoelaceCommon}
     <script type="module">
 const initialData = /*${initialData}*/{};
-const previewToken = '${previewToken}';
-const sessionToken = '${sessionToken}';
 /*${showJs}*/
     </script>
 </head>
@@ -27,7 +24,7 @@ const sessionToken = '${sessionToken}';
     ${nonProdHeader}
     <div id="debug" class="whitespace-pre text-xs absolute top-0 p-2"></div>
 
-    <h4 class="my-16 mx-4 text-3xl font-semibold flex justify-center text-center">${showTitle}</h4>
+    <h4 class="my-16 mx-4 text-3xl font-semibold flex justify-center text-center">OP3 Global Stats</h4>
    
     <main class="wait mx-8">
 
@@ -36,88 +33,15 @@ const sessionToken = '${sessionToken}';
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="seven-day-downloads">xxx</div>
                 <div class="text-sm">downloads in last 7 days</div>
-                <div class="text-sm opacity-50 mt-[.1rem]">as of <span id="seven-day-downloads-asof">xxx</span></div>
-                <div class="flex items-end mt-4 justify-between">
-                    <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
-                    <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Total number of downloads for this podcast in the last 7 days, and a graph showing the recent history of this value.<br><br>In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.</div>
-                        <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
-                    </sl-tooltip>
-                </div>
             </sl-card>
 
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="thirty-day-downloads">xxx</div>
                 <div class="text-sm">downloads in last 30 days</div>
-                <div class="text-sm opacity-50 mt-[.1rem]">as of <span id="thirty-day-downloads-asof">xxx</span></div>
-                <div class="flex items-end mt-4 justify-between">
-                    <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
-                    <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Total number of downloads for this podcast in the last 30 days, and a graph showing the recent history of this value.<br><br>In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.</div>
-                        <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
-                    </sl-tooltip>
-                </div>
-            </sl-card>
-
-            <sl-card class="card-basic w-[16rem]">
-                <div class="text-[2.5rem] leading-none mb-2" id="downloads-count">xxx</div>
-                <div class="text-sm">downloads</div>
-                <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
-                <div class="flex items-end mt-4 justify-between">
-                    <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
-                    <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Downloads for this podcast in a given month.</div>
-                        <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
-                    </sl-tooltip>
-                </div>
-            </sl-card>
-
-            <sl-card class="card-basic w-[16rem]">
-                <div class="text-[2.5rem] leading-none mb-2" id="audience-count">xxx</div>
-                <div class="text-sm">unique audience</div>
-                <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
-                <div class="flex items-end mt-4 justify-between">
-                    <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
-                    <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Unique listeners (IP hash) for this podcast in a given month.<br><br>OP3 rotates listener IP hashes every month for privacy reasons.</div>
-                        <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
-                    </sl-tooltip>
-                </div>
             </sl-card>
         </div>
 
         <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/download-calculation" target="_blank">How OP3 calculates Downloads →</a></div>
-
-        <!-- downloads graph -->
-        <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
-            <sl-icon-button name="caret-left-fill" label="Previous" id="downloads-graph-previous"></sl-icon-button>
-            <span id="downloads-graph-granularity" class="whitespace-nowrap">Hourly Downloads</span>
-            <sl-dropdown class="flex justify-center">
-                <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
-                <sl-menu id="downloads-graph-options">
-                    <sl-menu-item value="daily" checked>Daily</sl-menu-item>
-                    <!-- <sl-menu-item value="twelve-hourly">12-Hourly</sl-menu-item> -->
-                    <!-- <sl-menu-item value="six-hourly">6-Hourly</sl-menu-item> -->
-                    <sl-menu-item value="hourly">Hourly</sl-menu-item>
-                    <sl-divider></sl-divider>
-                    <sl-menu-item checked value="episode-markers">Episode markers</sl-menu-item>
-                </sl-menu>
-            </sl-dropdown>
-            <span id="downloads-graph-range" class="whitespace-nowrap">October 20 - December 20</span>
-            <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
-        </div>
-        <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
-
-        <!-- episode pacing -->
-        <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
-        <canvas id="episode-pacing" class="cursor-pointer"></canvas>
-        <div class="flex justify-center mt-4">
-            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
-            <template id="episode-pacing-legend-item">
-                <dt></dt><dd class="ml-2 leading-relaxed truncate">Item</dd>
-            </template>
-        </div>
-
 
         <div class="flex flex-wrap gap-8 flex-row items-center justify-center mt-16 mb-32">
 
@@ -247,24 +171,6 @@ const sessionToken = '${sessionToken}';
                 </template>
             </sl-card>
 
-            <!-- export downloads -->
-            <sl-card class="card-basic flex justify-center">
-                <div slot="header" class="flex items-center justify-between">
-                    <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><sl-icon name="download" id="export-icon"></sl-icon><div id="export-title" class="ml-2">Export download details</div></div>
-                    <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
-                </div>
-                <sl-button-group>
-                    <sl-button id="export-month-0" outline>Mmm YYYY</sl-button>
-                    <sl-button id="export-month-1" outline>Mmm YYYY</sl-button>
-                    <sl-dropdown id="export-dropdown">
-                        <sl-button id="export-older" slot="trigger" caret outline>Older</sl-button>
-                        <sl-menu>
-                            <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
-                        </sl-menu>
-                    </sl-dropdown>
-                </sl-button-group>
-                <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
-            </sl-card>
         </div>
 
     </main>

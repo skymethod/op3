@@ -32,6 +32,7 @@ import { ReadonlyRemoteDataRpcClient } from './rpc_clients.ts';
 import { computeShowResponse, tryParseShowRequest } from './routes/show.ts';
 import { CloudflareConfiguration } from './cloudflare_configuration.ts';
 import { computeDownloadCalculationResponse } from './routes/download_calculation.ts';
+import { computeStatsResponse } from './routes/stats.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -243,6 +244,8 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
     };
     const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
     const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix: 'stats/', readonly: true }) : undefined;
+    if (method === 'GET' && pathname === '/stats') return computeStatsResponse({ searchParams, instance, origin, productionOrigin, cfAnalyticsToken, statsBlobs, roStatsBlobs });
+
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
     { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration }); }
