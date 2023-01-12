@@ -1196,6 +1196,11 @@ a:hover {
   color: rgb(154 52 18 / var(--tw-text-opacity));
 }
 
+.text-neutral-700 {
+  --tw-text-opacity: 1;
+  color: rgb(64 64 64 / var(--tw-text-opacity));
+}
+
 .underline {
   text-decoration-line: underline;
 }

@@ -20,7 +20,7 @@ export function computeRedirectResponse(request: ValidRedirectRequest): Response
         headers: {
             // ensure the redirect is never cached, we want to be notified of every request
             // even though the spec discourages user agents from caching these, it is not prohibited, 
-            // and many CDNS like cloudflare will cache them for a short period of time
+            // and many CDNs like cloudflare will cache them for a short period of time
             'cache-control': 'private, no-cache',
 
             // specify the target of the redirect

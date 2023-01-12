@@ -15,14 +15,14 @@
         Download Calculation
     </h1>
     <div class="basic max-w-2xl mx-auto px-8">
-        <p>"Downloads" are still the industry-standard way of measuring a podcast's audience, they are visible evidence on the server-side (hosting companies and analytics prefixes) without the need for any coordination or special APIs from every podcast player app.</p>
+        <p>"Downloads" are currently the industry-standard way of measuring a podcast's audience, they are visible evidence on the server-side (hosting companies and analytics prefixes) without the need for any coordination or special APIs from every podcast player app.</p>
         <p>Of course, many podcast apps auto-download episodes, so a Download does not necessarily equal a Listen. <a href="https://podnews.net/article/understanding-podcast-statistics">Learn more about podcast stats.</a></p>
         <p>Over time, podcast hosting companies and advertising standards entities such as the <a href="https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau">IAB</a> have developed <a href="https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf">best practices</a> about turning raw server logs into unique listener requests.</p>
-        <p>As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-auditable-infrastructure">commitment to auditable infrastructure</a>, our exact process is described below, with links to any relevant codepaths.</p>
+        <p>As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-auditable-infrastructure">commitment to auditable infrastructure</a>, our download calculation is described below, with links to any relevant codepaths.</p>
 
         <h2 id="how">How does OP3 calculate Downloads?</h2>
-        <p>OP3 first encounters incoming HTTP requests for podcast episode media files once podcasters <a href="/setup">add our prefix</a> to podcast episodes in their feed.</p>
-        <p>All incoming requests are quickly redirected to their destination with a <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16">302</a>, but not all requests become Downloads:
+        <p>OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href="/setup">add our prefix</a> to podcast episodes in their feed.</p>
+        <p>All incoming requests are quickly redirected to their destination with a <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16">302</a> and logged, but not all requests become Downloads:
             <ul>
                 <li>First, we ignore all <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46">non-GET</a> requests.</li>
                 <li>We ignore all range requests that don't ask for <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49">more than two bytes</a>, <em>except</em> <b>bytes=0-1</b> requests <em>(see <a href="#first-two">below</a> for rationale)</em>.</li>
@@ -33,7 +33,7 @@
                         <li>A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4">'bot'</a></li>
                         <li>A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5">library with a category of 'bot'</a></li>
                         <li>An <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6">unknown user agent including the text 'bot' or 'crawler'</a></li>
-                        <li>One other <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9">uncommon case</a> found using OP3 data as evidence</li>
+                        <li>One other <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9">uncommon case</a> found in the wild, using OP3 data</li>
                     </ul>
                 </li>
             </ul>
@@ -41,10 +41,10 @@
         </p>
 
         <h2 id="first-two">Why include Range: bytes=0-1 requests?</h2>
-        <p>The IAB (and Podsight's <a href="https://github.com/open-downloads/odl#spec">oDL</a>) say to ignore these when calculating downloads, however...</p>
+        <p>The IAB (and Podsights' <a href="https://github.com/open-downloads/odl#spec">oDL</a>) say to ignore these when calculating downloads, however...</p>
         <p>Apple's CoreMedia framework is used by almost every podcast app and browser on Apple platforms for making streaming playback requests (e.g. when auto-downloading is turned off in Apple Podcasts). It is the engine underneath <a href="https://developer.apple.com/documentation/avfoundation/avplayer">AVPlayer</a>/<a href="https://developer.apple.com/documentation/avfoundation/avurlasset">AVURLAsset</a>, the default media player framework on iOS.</p>
-        <p>AVURLAsset is a high-level framework, taking the episode url as input, and making all of the underlying HTTP calls on the developer's behalf - responsible for fetching pieces of the file on-demand, according to the current device posture (data connection, battery life, data caps, etc).</p>
-        <p>When making a request for a given episode, AppleCoreMedia makes two or more HTTP calls: first with a Range header of bytes=0-1, asking for the first two bytes of the file to verify the server supports range requests (these days, most do). It then follows up with one or more HTTP requests for various byte ranges of the file based on internal heuristics.</p>
+        <p>AVURLAsset is a high-level framework, taking the episode url as input, and making all of the underlying HTTP calls on the app's behalf - responsible for fetching pieces of the file on-demand, according to the current device posture (data connection, battery life, data caps, etc).</p>
+        <p>When making a request for a given episode, AppleCoreMedia makes two or more HTTP calls: first with a Range header of bytes=0-1, asking for the first two bytes of the file to verify the server supports range requests (these days, most do). It then follows up with one or more HTTP requests for various byte ranges of the file, based on internal heuristics.</p>
         <p>👉 The problem for analytics prefixes like OP3 is that the first bytes=0-1 request is sometimes <em>the only request the prefix will see</em>.  That is, AppleCoreMedia sends the subsequent range requests <em>directly</em> to the redirect destination url, bypassing the prefix completely!</p>
         <p>So analytics prefixes <em>can't</em> ignore these bytes=0-1 requests or they would miss legitimate user-initiated downloads, and underreport stats compared to podcast hosting companies (who can see all requests).</p>
         <p class="border-l-4 pl-4 border-neutral-600 opacity-75">The HTTP spec is somewhat ambiguous about this redirect+range situation, <a href="https://httpwg.org/specs/rfc9110.html#status.302">saying</a> "the client <em>ought</em> to continue to use the target URI (original url) for future requests", but one can see how a client might decide to make immediate followup calls to the destination, say as part of a single user-initiated play request.</p>
