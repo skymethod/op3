@@ -56,6 +56,15 @@ interface Release {
 
 const RELEASES: Release[] = [
     {
+        id: '2023-01-12',
+        time: '2023-01-12T15:40:00.000Z',
+        title: '2023-01-12: Download calculation page',
+        bulletPoints: [
+            ({ origin }) => `Published a new page explaining [how OP3 calculates Downloads](${origin}/download-calculation).`,
+            () => `Show-level stats pages link to this page for reference.`,
+        ]
+    },
+    {
         id: '2022-12-29',
         time: '2022-12-29T21:00:00.000Z',
         title: '2022-12-29: Preview links to OP3 show stats pages',
