@@ -159,7 +159,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             const destinationServerUrl = computeChainDestinationUrl(serverUrl);
             if (destinationServerUrl === undefined) continue;
 
-            const download = `${destinationServerUrl}|${audienceId}`;
+            const download = (await new Bytes(encoder.encode(`${destinationServerUrl}|${audienceId}`)).sha256()).hex();
             if (downloads.has(download)) continue;
             downloads.add(download);
 

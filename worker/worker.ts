@@ -244,7 +244,7 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
     };
     const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
     const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix: 'stats/', readonly: true }) : undefined;
-    if (method === 'GET' && pathname === '/stats') return computeStatsResponse({ searchParams, instance, origin, productionOrigin, cfAnalyticsToken, statsBlobs, roStatsBlobs });
+    if (method === 'GET' && pathname === '/stats' && !/staging|prod/.test(instance)) return computeStatsResponse({ searchParams, instance, origin, productionOrigin, cfAnalyticsToken, statsBlobs, roStatsBlobs });
 
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
