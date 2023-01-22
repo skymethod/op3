@@ -813,8 +813,7 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
 
     let showRecord = await findShowRecord(showUuid, storage);
     if (showRecord) {
-        // show already exists, allow only if no piFeed
-        if (feedRecord.piFeed !== undefined) throw new Error(`Feed must not have a piFeed`);
+        // fine, assume we already have the title, podcastGuid from original (will do proper podcastGuid indexing later)
     } else {
         let podcastGuid = feedRecord.podcastGuid;
         if (podcastGuid === undefined) {
