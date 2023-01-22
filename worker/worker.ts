@@ -1,4 +1,4 @@
-import { computeColo, computeOther, computeRawIpAddress } from './cloudflare_request.ts';
+import { computeOther, computeRawIpAddress, tryComputeColo } from './cloudflare_request.ts';
 import { ModuleWorkerContext, QueueMessageBatch } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
@@ -20,7 +20,7 @@ import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from './tracer.ts';
 import { computeChainDestinationHostname } from './chain_estimate.ts';
-import { initCloudflareTracer } from './cloudflare_tracer.ts';
+import { initCloudflareTracer, setWorkerInfo } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
 import { computeSetupResponse } from './routes/setup.ts';
@@ -42,6 +42,9 @@ export default {
             const requestTime = Date.now();
 
             initCloudflareTracer(env.dataset1);
+            const colo = tryComputeColo(request);
+            setWorkerInfo({ colo: colo ?? 'XXX', name: 'eyeball' });
+
             if (!banlist) banlist = new Banlist(env.kvNamespace);
         
             // first, handle redirects - the most important function
@@ -52,7 +55,7 @@ export default {
             // handle all other requests
             let response: Response;
             try {
-                response = await computeResponse(request, env, context);
+                response = await computeResponse(request, colo, env, context);
             } catch (e) {
                 consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
                 response = new Response('failed', { status: 500 });
@@ -81,6 +84,8 @@ export default {
             const { dataset1, backendNamespace, blobsBucket } = env;
             initCloudflareTracer(dataset1);
             const colo = await ManualColo.get();
+            setWorkerInfo({ colo, name: 'eyeball' });
+
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
 
@@ -210,7 +215,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
     return new Set((commaDelimitedString  ?? '').split(',').map(v => v.trim()).filter(v => v !== ''));
 }
 
-async function computeResponse(request: Request, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
+async function computeResponse(request: Request, colo: string | undefined, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
     const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams } = new URL(request.url);
@@ -249,7 +254,7 @@ async function computeResponse(request: Request, env: WorkerEnv, context: Module
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
     { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration }); }
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo: computeColo(request) }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration });
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

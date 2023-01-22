@@ -13,7 +13,7 @@ import { CloudflareRpcClient } from '../cloudflare_rpc_client.ts';
 import { CombinedRedirectLogController } from './combined_redirect_log_controller.ts';
 import { tryParseInt } from '../check.ts';
 import { packHashedIpAddress } from '../ip_addresses.ts';
-import { initCloudflareTracer } from '../cloudflare_tracer.ts';
+import { initCloudflareTracer, setWorkerInfo } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { ApiAuthController } from './api_auth_controller.ts';
 import { ShowController } from './show_controller.ts';
@@ -54,6 +54,8 @@ export class BackendDO {
             const durableObjectId = this.state.id.toString();
             const durableObjectClass = 'BackendDO';
             console.log('logprops:', { colo, durableObjectClass, durableObjectId, durableObjectName });
+
+            setWorkerInfo({ colo, name: durableObjectName ?? '<unnamed>' });
 
             const { method } = request;
             const { pathname } = new URL(request.url);
@@ -285,6 +287,8 @@ export class BackendDO {
                 const { id: durableObjectId, name: durableObjectName, colo } = info;
                 writeTraceEvent({ kind: 'do-alarm', colo, durableObjectClass: 'BackendDO', durableObjectId, durableObjectName: durableObjectName, isolateId: fromIsolateId });
 
+                setWorkerInfo({ colo, name: durableObjectName ?? '<unnamed>' });
+                
                 await rpcClient.sendAlarm({ payload, fromIsolateId }, durableObjectName);
             }
         } catch (e) {

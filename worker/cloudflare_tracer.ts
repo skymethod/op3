@@ -8,7 +8,17 @@ export function initCloudflareTracer(dataset: AnalyticsEngine | undefined) {
     });
 }
 
+export function setWorkerInfo(workerInfo: WorkerInfo) {
+    _workerInfo = workerInfo;
+}
+
 //
+
+export type WorkerInfo = { readonly colo: string, name: string };
+
+//
+
+let _workerInfo: WorkerInfo | undefined;
 
 function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
     const { kind } = event;
@@ -32,7 +42,8 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         return { blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'console-info' || kind === 'console-warning' || kind === 'console-error') {
         const { spot, message } = event;
-        return { blobs: [ kind, spot, trim(message) ], doubles: [ 1 ], indexes: [ kind ] };
+        const { colo = '', name = '', } = _workerInfo ?? {};
+        return { blobs: [ kind, spot, trim(message), colo, name ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'admin-data-job') {
         const { colo, messageId, messageInstant, operationKind, targetPath, parameters, dryRun, millis, results, message } = event;
         const parametersStr = Object.entries((parameters ?? {})).map(v => v.join('=')).join(',');

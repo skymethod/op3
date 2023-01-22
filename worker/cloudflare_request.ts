@@ -22,6 +22,9 @@ export function computeOther(request: Request): Record<string, string> | undefin
     return Object.keys(rt).length > 0 ? rt : undefined;
 }
 
-export function computeColo(request: Request): string | undefined {
-    return (computeOther(request) ?? {}).colo;
+export function tryComputeColo(request: Request): string | undefined {
+    const req = request as IncomingRequestCf;
+    if (typeof req.cf !== 'object') return undefined;
+    const { colo } = req.cf;
+    return typeof colo === 'string' && colo !== '' ? colo : undefined;
 }
