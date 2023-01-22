@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@d59c51f49c68d4108598fe27b7bfbd6726c2f7c5 (2023-01-10T19:00:36Z)
+// from user-agents-v2@ca37e4fd7eb1f0a8aa6d33c38f2b212e8e8c77f9 (2023-01-22T19:28:02Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -142,6 +142,7 @@ const botTests = {
     'Snap URL Preview Service; bot; snapchat; https://developers.snap.com/robots': { type: 'bot', name: `Snapchat Bot` },
     'Spotify/1.0': { type: 'bot', name: `Spotify cache service` },
     'Timpibot/0.8 ( http://www.timpi.io)': { type: 'bot', name: `Timpi search crawler` },
+    'Tiny Tiny RSS/22.12-c30b24d09 (Unsupported) (https://tt-rss.org/)': { type: 'bot', name: `Tiny Tiny RSS` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },
@@ -651,6 +652,8 @@ const appTests = {
     'podverse/393 CFNetwork/1128.0.1 Darwin/19.6.0': { type: 'app', name: `Podverse` },
     'Podyssey': { type: 'app', name: `Podyssey` },
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
+    'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
+    'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
     'radio.de/4671 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `radio.de` },
     'Radioline%202/5.8.4 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Radioline` },
     'Radioline': { type: 'app', name: `Radioline` },
@@ -767,6 +770,7 @@ const libraryTests = {
     'AppleCoreMedia/1.0.0.17J586 (Apple TV; U; CPU OS 13_0 like Mac OS X; en_us)': { type: 'library', name: `AppleCoreMedia` },
     'Armadillo/12.19 (Linux;Android 11) ExoPlayerLib/2.17.1': { type: 'library', name: `Armadillo` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
+    'colly - https://github.com/gocolly/colly': { type: 'library', name: `Colly` },
     'Dalvik/2.1.0 (Linux; U; Android 9; SM-N950U Build/PPR1.180610.011)': { type: 'library', name: `Dalvik` },
     'Dalvik (Linux; U; Android 4.1.1;aries/JRO03L)': { type: 'library', name: `Dalvik` },
     'Dart/2.18 (dart:io)': { type: 'library', name: `Dart` },
@@ -775,12 +779,14 @@ const libraryTests = {
     'Go-http-client/2.0': { type: 'library', name: `Go Http Client` },
     'got (https://github.com/sindresorhus/got)': { type: 'library', name: `Got (node)` },
     'amarok/2.8.0 (Phonon/4.7.80; Phonon-GStreamer/4.7.80)': { type: 'library', name: `GStreamer` },
+    'hackney/1.18.1': { type: 'library', name: `hackney (elixir)` },
     'KaiOS Downloader': { type: 'library', name: `KaiOS Downloader` },
     'libsoup/2.68.2': { type: 'library', name: `libsoup` },
     'Android.LVLDM': { type: 'library', name: `Android License Verification Library` },
     'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)': { type: 'library', name: `node-fetch` },
     'node-fetch': { type: 'library', name: `node-fetch` },
     'okhttp/3.11.0': { type: 'library', name: `okhttp` },
+    'python-httpx/0.18.2': { type: 'library', name: `python-httpx` },
     'react-native-track-player/0.5.1 (Linux;Android 12) ExoPlayerLib/2.18.1': { type: 'library', name: `react-native-track-player` },
     'reqwest/0.9.19': { type: 'library', name: `reqwest (rust)` },
     'resty-requests': { type: 'library', name: `resty-requests (lua)` },
@@ -810,6 +816,7 @@ const browserTests = {
 
 const deviceTests = {
     'apple;apple_tv;33ddb95064d1479ab37179579af23b77;;tpapi;3.200.405': { type: 'device', name: `Apple TV` },
+    'AppleCoreMedia/1.0.0.20K71 (Apple TV; U; CPU OS 16_1 like Mac OS X; en_au)': { type: 'device', name: `Apple TV` },
     'Fountain/0.5.3 ios https://www.fountain.fm': { type: 'device', name: `Apple iPhone` },
     'Anytime/1.1 b64 (phone;ios Version 15.6.1 (Build 19G82)) https://github.com/amugofjava/anytime_podcast_player': { type: 'device', name: `Apple iPhone` },
     'Microsoft Xbox': { type: 'device', name: `Other Smart TV` },

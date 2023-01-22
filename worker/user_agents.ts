@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@d59c51f49c68d4108598fe27b7bfbd6726c2f7c5 (2023-01-10T19:00:36Z)
+// from user-agents-v2@ca37e4fd7eb1f0a8aa6d33c38f2b212e8e8c77f9 (2023-01-22T19:28:02Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -131,6 +131,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Spotify\/1\.0$/.test(userAgent)) return { name: `Spotify cache service`, type: 'bot' };
     if (/^StitcherBot/.test(userAgent)) return { name: `Stitcher Bot`, type: 'bot' };
     if (/Timpibot\//.test(userAgent)) return { name: `Timpi search crawler`, type: 'bot' };
+    if (/^Tiny Tiny RSS\//.test(userAgent)) return { name: `Tiny Tiny RSS`, type: 'bot' };
     if (/TrendsmapResolver\//.test(userAgent)) return { name: `Trendsmap Resolver`, type: 'bot' };
     if (/Twingly Recon;/.test(userAgent)) return { name: `Twingly Bot`, type: 'bot' };
     if (/^Twitterbot/.test(userAgent)) return { name: `Twitterbot`, type: 'bot' };
@@ -482,6 +483,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^[Pp]odverse\//.test(userAgent)) return { name: `Podverse`, type: 'app' };
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
+    if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
     if (/^radio\.de\//.test(userAgent)) return { name: `radio.de`, type: 'app' };
     if (/^Radioline%202\/|^Radioline$/.test(userAgent)) return { name: `Radioline`, type: 'app' };
     if (/(^Radioplayer Android app|^Radioplayer iOS app)/.test(userAgent)) return { name: `RadioPlayer`, type: 'app' };
@@ -560,6 +562,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AppleCoreMedia\/1/.test(userAgent)) return { name: `AppleCoreMedia`, type: 'library' };
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
+    if (/github\.com\/gocolly/.test(userAgent)) return { name: `Colly`, type: 'library', category: 'bot' };
     if (/^Dalvik[\/ ]/.test(userAgent)) return { name: `Dalvik`, type: 'library' };
     if (/^Dart\//.test(userAgent)) return { name: `Dart`, type: 'library', category: 'bot' };
     if (/^Deno\//.test(userAgent)) return { name: `Deno`, type: 'library', category: 'bot' };
@@ -569,11 +572,13 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^got(\/| \()/.test(userAgent)) return { name: `Got (node)`, type: 'library', category: 'bot' };
     if (/^GStreamer|GStreamer\//.test(userAgent)) return { name: `GStreamer`, type: 'library' };
     if (/^gvfs/.test(userAgent)) return { name: `gvfs`, type: 'library' };
+    if (/^hackney\/\d/.test(userAgent)) return { name: `hackney (elixir)`, type: 'library', category: 'bot' };
     if (/KaiOS Downloader/.test(userAgent)) return { name: `KaiOS Downloader`, type: 'library' };
     if (/^libsoup\//.test(userAgent)) return { name: `libsoup`, type: 'library' };
     if (/^Android\.LVLDM$/.test(userAgent)) return { name: `Android License Verification Library`, type: 'library' };
     if (/^node-fetch(\/.*)?$/.test(userAgent)) return { name: `node-fetch`, type: 'library', category: 'bot' };
     if (/okhttp/.test(userAgent)) return { name: `okhttp`, type: 'library', category: 'bot' };
+    if (/^python-httpx\//.test(userAgent)) return { name: `python-httpx`, type: 'library', category: 'bot' };
     if (/^react-native-track-player\//.test(userAgent)) return { name: `react-native-track-player`, type: 'library' };
     if (/request\.js/.test(userAgent)) return { name: `Request (node)`, type: 'library', category: 'bot' };
     if (/^reqwest\/\d/.test(userAgent)) return { name: `reqwest (rust)`, type: 'library' };
