@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@ca37e4fd7eb1f0a8aa6d33c38f2b212e8e8c77f9 (2023-01-22T19:28:02Z)
+// from user-agents-v2@8cf396e6db3da86b511098a52cb138e26afa1010 (2023-01-22T22:39:44Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -114,6 +114,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PodvineBot\//.test(userAgent)) return { name: `PodvineBot`, type: 'bot' };
     if (/^PostRank\//.test(userAgent)) return { name: `PostRank Bot`, type: 'bot' };
     if (/Podwatch-Pro Crawler/.test(userAgent)) return { name: `PodwatchPro`, type: 'bot' };
+    if (/ HeadlessChrome\/\d/.test(userAgent)) return { name: `Puppeteer`, type: 'bot' };
     if (/python-requests/.test(userAgent)) return { name: `python-requests`, type: 'bot' };
     if (/RedCircle/.test(userAgent)) return { name: `RedCircle`, type: 'bot' };
     if (/ RidderBot\//.test(userAgent)) return { name: `Ridder Bot`, type: 'bot' };

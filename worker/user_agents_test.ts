@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@ca37e4fd7eb1f0a8aa6d33c38f2b212e8e8c77f9 (2023-01-22T19:28:02Z)
+// from user-agents-v2@8cf396e6db3da86b511098a52cb138e26afa1010 (2023-01-22T22:39:44Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -127,6 +127,7 @@ const botTests = {
     'PodvineBot/4.0.1 (www.podvine.com)': { type: 'bot', name: `PodvineBot` },
     'PostRank/2.0 (postrank.com; 1 subscribers)': { type: 'bot', name: `PostRank Bot` },
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/105.0.5173.0 Safari/537.36': { type: 'bot', name: `Puppeteer` },
     'RedCircle': { type: 'bot', name: `RedCircle` },
     'Mozilla/5.0 (compatible; RidderBot/1.0; bot@ridder.co)': { type: 'bot', name: `Ridder Bot` },
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
