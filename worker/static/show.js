@@ -8675,6 +8675,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>
         episodePacingShotHeader.textContent = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
+        document.body.style.backgroundColor = 'black';
     }
     const recentEpisodeIds = episodes.filter((v)=>episodeHourlyDownloads[v.id]).slice(0, 8).map((v)=>v.id);
     const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map((v)=>[

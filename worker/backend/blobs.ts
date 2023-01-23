@@ -11,6 +11,7 @@ export interface Blobs {
     has(key: string): Promise<boolean>;
     list(opts?: ListOpts): Promise<ListBlobsResponse>;
     startMultiput(key: string): Promise<Multiput>;
+    head(key: string): Promise<{ etag: string } | undefined>;
 }
 
 export type ListOpts = { keyPrefix?: string, afterKey?: string };

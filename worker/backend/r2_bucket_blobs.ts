@@ -49,6 +49,15 @@ export class R2BucketBlobs implements Blobs {
         throw new Error(`Unsupported 'as' value: ${as}`);
     }
 
+    async head(key: string): Promise<{ etag: string } | undefined> {
+        const { bucket, prefix } = this;
+        const obj = await r2(() => bucket.head(prefix + key));
+        if (!obj) return undefined;
+        const { etag } = obj;
+        if (typeof etag !== 'string') throw new Error(`R2 head response had no etag for: ${key}`);
+        return { etag };
+    }
+
     async delete(key: string): Promise<void> {
         const { bucket, prefix, readonly } = this;
         if (readonly) throw new Error(`Bucket is readonly!`);

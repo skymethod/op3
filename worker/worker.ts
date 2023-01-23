@@ -1,5 +1,5 @@
 import { computeOther, computeRawIpAddress, tryComputeColo } from './cloudflare_request.ts';
-import { ModuleWorkerContext, QueueMessageBatch } from './deps.ts';
+import { ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
@@ -29,7 +29,7 @@ import { Banlist } from './banlist.ts';
 import { ManualColo } from './backend/manual_colo.ts';
 import { R2BucketBlobs } from './backend/r2_bucket_blobs.ts';
 import { ReadonlyRemoteDataRpcClient } from './rpc_clients.ts';
-import { computeShowResponse, tryParseShowRequest } from './routes/show.ts';
+import { computeShowOgImageResponse, computeShowResponse, tryParseShowOgImageRequest, tryParseShowRequest } from './routes/show.ts';
 import { CloudflareConfiguration } from './cloudflare_configuration.ts';
 import { computeDownloadCalculationResponse } from './routes/download_calculation.ts';
 import { computeStatsResponse } from './routes/stats.ts';
@@ -247,13 +247,15 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
             }
         })());
     };
-    const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
-    const roStatsBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix: 'stats/', readonly: true }) : undefined;
+
+    const { blobs: statsBlobs, roBlobs: roStatsBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'stats/' });
     if (method === 'GET' && pathname === '/stats' && !/staging|prod/.test(instance)) return computeStatsResponse({ searchParams, instance, origin, productionOrigin, cfAnalyticsToken, statsBlobs, roStatsBlobs });
 
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
-    { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration }); }
+    const { blobs: assetBlobs, roBlobs: roAssetBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'assets/' });
+    { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
+    { const r = tryParseShowOgImageRequest({ method, pathname }); if (r && configuration) return computeShowOgImageResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
     const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration });
 
     // redirect /foo/ to /foo (canonical)
@@ -263,4 +265,10 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET') return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
 
     return newMethodNotAllowedResponse(method);
+}
+
+function initBlobs({ blobsBucket, roBlobsBucket, prefix }: { blobsBucket?: R2Bucket, roBlobsBucket?: R2Bucket, prefix: string }) {
+    const blobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix }) : undefined;
+    const roBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix, readonly: true }) : undefined;
+    return { blobs, roBlobs };
 }

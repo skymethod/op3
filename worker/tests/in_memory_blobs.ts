@@ -33,6 +33,14 @@ export class InMemoryBlobs implements Blobs {
         throw new Error();
     }
 
+    async head(key: string): Promise<{ etag: string } | undefined> {
+        await Promise.resolve();
+        const record = this.data.get(key);
+        if (record === undefined) return undefined;
+        const { etag } = record;
+        return { etag };
+    }
+
     async delete(key: string): Promise<void> {
         await Promise.resolve();
         this.data.delete(key);

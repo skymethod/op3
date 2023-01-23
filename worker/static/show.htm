@@ -2,12 +2,13 @@
 <html class="sl-theme-dark">
 
 <head>
-    <title>${showTitle} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <title>${showTitleWithSuffix}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="viewport-fit=cover, initial-scale=1" />
     <link rel="canonical" href="${origin}/show/${showUuid}" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="robots" content="noindex" />
+    ${ogTags}
     ${styleTag}
     <style>
         footer {
@@ -111,9 +112,9 @@ const sessionToken = '${sessionToken}';
         <!-- episode pacing -->
         <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
         <div id="episode-pacing-container">
-            <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl opacity-50 font-semibold pt-16 pb-16">Show name</div>
+            <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl font-semibold pt-16 pb-16">Show name</div>
             <canvas id="episode-pacing" class="cursor-pointer"></canvas>
-            <div id="episode-pacing-shot-footer" class="flex justify-center hidden opacity-50 pt-16 pb-16">Podcast episode downloads (first 30 days) • op3.dev</div>
+            <div id="episode-pacing-shot-footer" class="flex justify-center hidden pt-16 pb-16">Recent podcast episode downloads (first 30 days) • Measured by op3.dev</div>
         </div>
         <div class="flex justify-center mt-4">
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
