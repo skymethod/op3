@@ -110,7 +110,11 @@ const sessionToken = '${sessionToken}';
 
         <!-- episode pacing -->
         <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
-        <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+        <div id="episode-pacing-container">
+            <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl opacity-50 font-semibold pt-16 pb-16">Show name</div>
+            <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+            <div id="episode-pacing-shot-footer" class="flex justify-center hidden opacity-50 pt-16 pb-16">Podcast episode downloads (first 30 days) • op3.dev</div>
+        </div>
         <div class="flex justify-center mt-4">
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
             <template id="episode-pacing-legend-item">

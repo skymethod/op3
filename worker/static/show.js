@@ -8662,12 +8662,20 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
     };
     return new xt(ctx, config);
 }
-const makeEpisodePacing = ({ episodeHourlyDownloads , episodes  })=>{
-    const [episodePacingCanvas, episodePacingLegendElement, episodePacingLegendItemTemplate] = [
+const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>{
+    const [episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingLegendItemTemplate] = [
+        element('episode-pacing-shot-header'),
         element('episode-pacing'),
+        element('episode-pacing-shot-footer'),
         element('episode-pacing-legend'),
         element('episode-pacing-legend-item')
     ];
+    if (new URLSearchParams(document.location.search).has('shot')) {
+        episodePacingShotHeader.classList.remove('hidden');
+        episodePacingShotHeader.textContent = showTitle ?? '(untitled)';
+        episodePacingShotFooter.classList.remove('hidden');
+        episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
+    }
     const recentEpisodeIds = episodes.filter((v)=>episodeHourlyDownloads[v.id]).slice(0, 8).map((v)=>v.id);
     const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map((v)=>[
             v,
@@ -9903,7 +9911,7 @@ const app = (()=>{
     ];
     console.log(initialData);
     const { showObj , statsObj , times  } = initialData;
-    const { showUuid , episodes  } = showObj;
+    const { showUuid , episodes , title: showTitle  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
     const { episodeFirstHours , dailyFoundAudience , monthlyDimensionDownloads  } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
@@ -9915,7 +9923,7 @@ const app = (()=>{
             firstHour,
             ...showObj.episodes.find((v)=>v.id === episodeId)
         }));
-    const showSlug = computeShowSlug(showObj.title);
+    const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
     if (debug) {
         debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
@@ -9938,7 +9946,8 @@ const app = (()=>{
     });
     makeEpisodePacing({
         episodeHourlyDownloads,
-        episodes
+        episodes,
+        showTitle
     });
     makeTopCountries({
         showSlug,

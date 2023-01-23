@@ -38,14 +38,14 @@ const app = (() => {
     console.log(initialData);
 
     const { showObj, statsObj, times } = initialData;
-    const { showUuid, episodes } = showObj;
+    const { showUuid, episodes, title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
     const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
     const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...showObj.episodes.find(v => v.id === episodeId)! }));
-    const showSlug = computeShowSlug(showObj.title);
+    const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
 
     if (debug) {
@@ -56,7 +56,7 @@ const app = (() => {
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
-    makeEpisodePacing({ episodeHourlyDownloads, episodes });
+    makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle });
     makeTopCountries({ showSlug, monthlyDimensionDownloads });
     makeTopApps({ showSlug, monthlyDimensionDownloads });
     makeTopDevices({ showSlug, monthlyDimensionDownloads });

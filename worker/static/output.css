@@ -1104,6 +1104,18 @@ a:hover {
   padding-left: 1rem;
 }
 
+.pt-16 {
+  padding-top: 4rem;
+}
+
+.pt-4 {
+  padding-top: 1rem;
+}
+
+.pb-16 {
+  padding-bottom: 4rem;
+}
+
 .text-left {
   text-align: left;
 }

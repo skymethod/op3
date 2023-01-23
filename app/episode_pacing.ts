@@ -2,15 +2,24 @@ import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { Chart, distinct } from './deps.ts';
 import { element } from './elements.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[] };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined };
 
-export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes }: Opts) => {
+export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle }: Opts) => {
 
-    const [ episodePacingCanvas, episodePacingLegendElement, episodePacingLegendItemTemplate ] = [ 
+    const [ episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingLegendItemTemplate ] = [
+        element('episode-pacing-shot-header'),
         element<HTMLCanvasElement>('episode-pacing'),
+        element('episode-pacing-shot-footer'),
         element('episode-pacing-legend'),
         element<HTMLTemplateElement>('episode-pacing-legend-item'),
     ];
+
+    if (new URLSearchParams(document.location.search).has('shot')) {
+        episodePacingShotHeader.classList.remove('hidden');
+        episodePacingShotHeader.textContent = showTitle ?? '(untitled)';
+        episodePacingShotFooter.classList.remove('hidden');
+        episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
+    }
 
     const recentEpisodeIds = episodes.filter(v => episodeHourlyDownloads[v.id]).slice(0, 8).map(v => v.id);
     const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map(v => [ v, episodeHourlyDownloads[v] ]));
