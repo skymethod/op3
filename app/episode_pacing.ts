@@ -75,6 +75,7 @@ function computeRelativeCumulative(hourlyDownloads: Record<string, number>): Rec
     for (const [ _hour, downloads ] of Object.entries(hourlyDownloads)) {
         total += downloads;
         rt[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
+        if (hourNum > 24 * 30) break; // max 30 days
     }
     return rt;
 }
@@ -85,12 +86,12 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeHourlyDownloads: Reco
 
     const parseHourLabel = (label: string) => {
         const hour = parseInt(label.substring(1));
-        return (hour > 1 && (hour - 1) % 24) === 0 ? `Day ${Math.floor((hour - 1) / 24)}` : `Hour ${hour}`;
+        return hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : `Hour ${hour}`;
     }
 
     const ctx = canvas.getContext('2d')!;
 
-    const colors =[
+    const colors = [
         '#003f5c',
         '#2f4b7c',
         '#665191',
@@ -137,9 +138,12 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeHourlyDownloads: Reco
             scales: {
                 x: {
                     ticks: {
+                        autoSkip: false,
                         callback: function(this, value) {
-                            const label = this.getLabelForValue(value as number);
-                            return parseHourLabel(label);
+                            const hour = (value as number) + 1;
+                            const label = hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : '';
+                            if (label !== '' && this.width < 700 && hour !== 24 && (hour / 24) % 5 !== 0) return '';
+                            return label;
                         }
                     },
                     grid: {

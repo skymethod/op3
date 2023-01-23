@@ -8727,6 +8727,7 @@ function computeRelativeCumulative(hourlyDownloads) {
     for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
         total += downloads;
         rt[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
+        if (hourNum > 24 * 30) break;
     }
     return rt;
 }
@@ -8738,7 +8739,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
     const allHours = distinct(Object.values(episodeRelativeCumulative).flatMap((v)=>Object.keys(v)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
-        return (hour > 1 && (hour - 1) % 24) === 0 ? `Day ${Math.floor((hour - 1) / 24)}` : `Hour ${hour}`;
+        return hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : `Hour ${hour}`;
     };
     const ctx = canvas.getContext('2d');
     const colors = [
@@ -8789,9 +8790,12 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
             scales: {
                 x: {
                     ticks: {
+                        autoSkip: false,
                         callback: function(value) {
-                            const label = this.getLabelForValue(value);
-                            return parseHourLabel(label);
+                            const hour = value + 1;
+                            const label = hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : '';
+                            if (label !== '' && this.width < 700 && hour !== 24 && hour / 24 % 5 !== 0) return '';
+                            return label;
                         }
                     },
                     grid: {
