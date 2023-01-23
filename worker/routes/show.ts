@@ -83,7 +83,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         showUuid,
         showTitle,
         showTitleWithSuffix,
-        ogTags: computeOgTags({ ogImageRes, showTitleWithSuffix, showUuid, origin, searchParams }),
+        ogTags: computeOgTags({ ogImageRes, showTitleWithSuffix, showUuid, origin, searchParams, showTitle }),
         initialData,
         styleTag: computeStyleTag(),
         shoelaceCommon: computeShoelaceCommon('sl-card', 'sl-spinner', 'sl-icon-button', 'sl-button-group', 'sl-button', 'sl-dropdown', 'sl-menu', 'sl-menu-item', 'sl-switch', 'sl-icon', 'sl-relative-time'),
@@ -143,11 +143,11 @@ async function headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }:
     return await targetAssetBlobs?.head(computeOgImageKey({ showUuid }));
 }
 
-function computeOgTags({ ogImageRes, showTitleWithSuffix, showUuid, origin, searchParams }: { ogImageRes: { etag: string } | undefined, showTitleWithSuffix: string, showUuid: string, origin: string, searchParams: URLSearchParams }): string {
+function computeOgTags({ ogImageRes, showTitle, showTitleWithSuffix, showUuid, origin, searchParams }: { ogImageRes: { etag: string } | undefined, showTitle: string, showTitleWithSuffix: string, showUuid: string, origin: string, searchParams: URLSearchParams }): string {
     const { etag } = ogImageRes ?? {};
     return [
         `<meta property="og:title" content="${encodeXml(showTitleWithSuffix)}" />`,
-        `<meta property="og:description" content="Podcast statistics for Buzzcast, measured by OP3" />`,
+        `<meta property="og:description" content="Podcast statistics for ${encodeXml(showTitle)}, measured by OP3" />`,
         `<meta property="og:type" content="website" />`,
         `<meta property="og:url" content="${origin}/show/${showUuid}" />`,
         ...(etag ? [ `<meta property="og:image" content="${computeOgImageUrl({ origin, showUuid, etag, searchParams })}" />` ] : []),
