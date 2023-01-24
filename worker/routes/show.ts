@@ -1,5 +1,6 @@
 import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
+import { tryParseJson } from '../check.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText, setIntersect } from '../deps.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -57,7 +58,14 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     if (result.kind !== 'valid') return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
 
     const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
-    if (!allowed) return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
+    if (!allowed) {
+        const publicShows = tryParseJson(await configuration.get('public-shows') ?? '[]');
+        if (Array.isArray(publicShows) && publicShows.includes(showUuid)) {
+            // allowed
+        } else {
+            return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
+        }
+    }
 
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
