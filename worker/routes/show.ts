@@ -150,7 +150,7 @@ function computeOgTags({ ogImageRes, showTitle, showTitleWithSuffix, showUuid, o
         `<meta property="og:description" content="Podcast statistics for ${encodeXml(showTitle)}, measured by OP3" />`,
         `<meta property="og:type" content="website" />`,
         `<meta property="og:url" content="${origin}/show/${showUuid}" />`,
-        ...(etag ? [ `<meta property="og:image" content="${computeOgImageUrl({ origin, showUuid, etag, searchParams })}" />` ] : []),
+        ...(etag ? [ `<meta property="og:image" content="${computeOgImageUrl({ origin, showUuid, etag, searchParams })}" />`, '<meta name="twitter:card" content="summary_large_image" />' ] : []),
     ].join('\n    ');
 }
 
