@@ -99,6 +99,8 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
 }
 
+export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
+
 //
 
 function cleanTitle(title: string | undefined): string | undefined {
@@ -155,8 +157,6 @@ function computeApiShowStatsResponse(showUuidInput: string, underlyingResponse: 
     }
     return underlyingResponse;
 }
-
-const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
 
 const DEMO_SHOW_1_TITLE = 'Example Travel Podcast';
 
