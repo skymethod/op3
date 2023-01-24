@@ -41,6 +41,7 @@ type Opts = {
     roAssetBlobs: Blobs | undefined, 
 };
 
+
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
     const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
     const { showUuid } = req;
@@ -55,16 +56,18 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
     const times: Record<string, number> = {};
     const result = await timed(times, 'compute-identity-result', () => computeIdentityResult({ bearerToken: undefined, searchParams, adminTokens, previewTokens, rpcClient }));
-    if (result.kind !== 'valid') return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
-
-    const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
-    if (!allowed) {
+    let isPublic = false;
+    if (result.kind !== 'valid') {
         const publicShows = tryParseJson(await configuration.get('public-shows') ?? '[]');
-        if (Array.isArray(publicShows) && publicShows.includes(showUuid)) {
-            // allowed
-        } else {
-            return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
+        isPublic = Array.isArray(publicShows) && publicShows.includes(showUuid);
+        if (!isPublic) {
+            return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
         }
+    }
+
+    if (result.kind === 'valid') {
+        const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
+        if (!allowed) return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
     }
 
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
