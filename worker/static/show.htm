@@ -120,13 +120,13 @@ const sessionToken = '${sessionToken}';
             <div id="episode-pacing-shot-footer" class="flex justify-center hidden pt-16 pb-16">Recent podcast episode downloads (first 30 days) • Measured by op3.dev</div>
         </div>
         <div class="flex justify-center mt-4">
-            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr_auto_auto_auto_auto] gap-x-2 cursor-pointer text-xs md:text-sm">
+            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr_0_0_0_auto] md:grid-cols-[3rem_1fr_auto_auto_auto_auto] gap-x-2 cursor-pointer text-xs md:text-sm">
                 <dt></dt>
                 <dd></dd>
-                <div class="text-right text-xs opacity-50 mr-2 mb-1">3-day</div>
-                <div class="text-right text-xs opacity-50 mr-2">7-day</div>
-                <div class="text-right text-xs opacity-50 mr-2">30-day</div>
-                <div class="text-right text-xs opacity-50">all-time</div>
+                <div class="text-right text-xs opacity-50 mr-2 mb-1 invisible md:visible">3-day</div>
+                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">7-day</div>
+                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">30-day</div>
+                <div class="text-right text-xs opacity-50 mr-2">downloads</div>
 
                 <div id="episode-pacing-nav" class="flex items-center justify-center gap-2 mt-4 mb-8 col-span-6">
                     <sl-icon-button class="invisible" name="download" ></sl-icon-button>
@@ -135,18 +135,17 @@ const sessionToken = '${sessionToken}';
                     <span id="episode-pacing-nav-caption">Page 1 of n</span>
                     <sl-icon-button name="caret-right-fill" label="Older episodes" title="Older episodes" id="episode-pacing-next"></sl-icon-button>
                     <div class="grow"></div>
-                    <sl-icon-button name="download" label="Export" title="Export"></sl-icon-button>
+                    <sl-icon-button id="episode-pacing-export" name="download" label="Export" title="Export"></sl-icon-button>
                 </div>
             </dl>
             <template id="episode-pacing-legend-item">
                 <dt></dt>
                 <dd class="leading-relaxed truncate mr-2">Item</dd>
-                <div class="downloads-3 text-right font-mono opacity-50 mr-2">123</div>
-                <div class="downloads-7 text-right font-mono opacity-50 mr-2">123</div>
-                <div class="downloads-30 text-right font-mono opacity-50 mr-2">123</div>
-                <div class="downloads-all text-right font-mono opacity-50">123</div>
+                <div class="downloads-3 text-right font-mono opacity-50 mr-2 invisible md:visible">123</div>
+                <div class="downloads-7 text-right font-mono opacity-50 mr-2 invisible md:visible">123</div>
+                <div class="downloads-30 text-right font-mono opacity-50 mr-2 invisible md:visible">123</div>
+                <div class="downloads-all text-right font-mono opacity-50 mr-2">123</div>
             </template>
-           
         </div>
 
 

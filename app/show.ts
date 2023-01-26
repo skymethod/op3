@@ -47,6 +47,7 @@ const app = (() => {
     const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...showObj.episodes.find(v => v.id === episodeId)! }));
     const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
+    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)!.substring(0, 10);
 
     if (debug) {
         debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
@@ -56,14 +57,14 @@ const app = (() => {
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
-    makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle });
+    makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate });
     makeTopCountries({ showSlug, monthlyDimensionDownloads });
     makeTopApps({ showSlug, monthlyDimensionDownloads });
     makeTopDevices({ showSlug, monthlyDimensionDownloads });
     makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads });
     makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads });
     makeTopMetros({ showSlug, monthlyDimensionDownloads });
-    makeFooter({ hourlyDownloads });
+    makeFooter({ mostRecentDate });
 
     function update() {
         exportDownloads.update();

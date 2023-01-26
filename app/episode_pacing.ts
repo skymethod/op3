@@ -1,10 +1,12 @@
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
+import { addDaysToDateString } from '../worker/timestamp.ts';
 import { Chart, distinct } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
+import { download } from './util.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string };
 
-export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle }: Opts) => {
+export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate }: Opts) => {
 
     const [ 
         episodePacingPrevious, 
@@ -15,6 +17,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle 
         episodePacingLegendElement, 
         episodePacingNav,
         episodePacingNavCaption,
+        episodePacingExportButton,
         episodePacingLegendItemTemplate
     ] = [
         element<SlIconButton>('episode-pacing-previous'),
@@ -25,6 +28,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle 
         element('episode-pacing-legend'),
         element('episode-pacing-nav'),
         element('episode-pacing-nav-caption'),
+        element<SlIconButton>('episode-pacing-export'),
         element<HTMLTemplateElement>('episode-pacing-legend-item'),
     ];
 
@@ -73,6 +77,29 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle 
             update();
         }
     }
+
+    episodePacingExportButton.onclick = () => {
+        const tsvRows: string[][] = [];
+        tsvRows.push([ 'episode_title', 'episode_pub_date', 'downloads_3_day', 'downloads_7_day', 'downloads_30_day', 'downloads_all_time', 'downloads_asof' ]);
+        const formatForTsv = (downloads: number | undefined) => (downloads === undefined || downloads === 0) ? '' : downloads.toString();
+        const asof = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
+        for (const episode of episodes) {
+            const summary = episodeRelativeSummaries[episode.id];
+            if (!summary) continue;
+            tsvRows.push([ 
+                episode.title ?? '', 
+                episode.pubdate ?? '',
+                formatForTsv(summary.downloads3),
+                formatForTsv(summary.downloads7),
+                formatForTsv(summary.downloads30),
+                formatForTsv(summary.downloadsAll),
+                asof,
+            ]);
+        }
+        const tsv = tsvRows.map(v => v.join('\t')).join('\n');
+        const filename = `${showSlug}-episode-downloads.tsv`;
+        download(tsv, { type: 'text/plain', filename });
+    };
 
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;

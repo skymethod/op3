@@ -739,6 +739,10 @@ a:hover {
   margin-bottom: 0.25rem;
 }
 
+.mr-6 {
+  margin-right: 1.5rem;
+}
+
 .block {
   display: block;
 }
@@ -903,6 +907,18 @@ a:hover {
 
 .grid-cols-\[3rem_1fr_auto_auto_auto_auto_auto\] {
   grid-template-columns: 3rem 1fr auto auto auto auto auto;
+}
+
+.grid-cols-\[3rem_1fr_0_auto_auto_auto\] {
+  grid-template-columns: 3rem 1fr 0 auto auto auto;
+}
+
+.grid-cols-\[3rem_1fr_0_0_auto_auto\] {
+  grid-template-columns: 3rem 1fr 0 0 auto auto;
+}
+
+.grid-cols-\[3rem_1fr_0_0_0_auto\] {
+  grid-template-columns: 3rem 1fr 0 0 0 auto;
 }
 
 .flex-row {
@@ -1267,6 +1283,10 @@ a:hover {
 }
 
 @media (min-width: 768px) {
+  .md\:visible {
+    visibility: visible;
+  }
+
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
@@ -1314,6 +1334,10 @@ a:hover {
 
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:grid-cols-\[3rem_1fr_auto_auto_auto_auto\] {
+    grid-template-columns: 3rem 1fr auto auto auto auto;
   }
 
   .md\:px-8 {

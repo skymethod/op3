@@ -8662,8 +8662,8 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
     };
     return new xt(ctx, config);
 }
-const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>{
-    const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingLegendItemTemplate] = [
+const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , showSlug , mostRecentDate  })=>{
+    const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingExportButton, episodePacingLegendItemTemplate] = [
         element('episode-pacing-previous'),
         element('episode-pacing-next'),
         element('episode-pacing-shot-header'),
@@ -8672,6 +8672,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>
         element('episode-pacing-legend'),
         element('episode-pacing-nav'),
         element('episode-pacing-nav-caption'),
+        element('episode-pacing-export'),
         element('episode-pacing-legend-item')
     ];
     if (new URLSearchParams(document.location.search).has('shot')) {
@@ -8721,6 +8722,39 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>
             redrawChart();
             update();
         }
+    };
+    episodePacingExportButton.onclick = ()=>{
+        const tsvRows = [];
+        tsvRows.push([
+            'episode_title',
+            'episode_pub_date',
+            'downloads_3_day',
+            'downloads_7_day',
+            'downloads_30_day',
+            'downloads_all_time',
+            'downloads_asof'
+        ]);
+        const formatForTsv = (downloads)=>downloads === undefined || downloads === 0 ? '' : downloads.toString();
+        const asof = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
+        for (const episode of episodes){
+            const summary = episodeRelativeSummaries[episode.id];
+            if (!summary) continue;
+            tsvRows.push([
+                episode.title ?? '',
+                episode.pubdate ?? '',
+                formatForTsv(summary.downloads3),
+                formatForTsv(summary.downloads7),
+                formatForTsv(summary.downloads30),
+                formatForTsv(summary.downloadsAll),
+                asof
+            ]);
+        }
+        const tsv = tsvRows.map((v)=>v.join('\t')).join('\n');
+        const filename = `${showSlug}-episode-downloads.tsv`;
+        download(tsv, {
+            type: 'text/plain',
+            filename
+        });
     };
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;
@@ -9925,7 +9959,7 @@ const makeTopMetros = ({ showSlug , monthlyDimensionDownloads  })=>{
 function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
-const makeFooter = ({ hourlyDownloads  })=>{
+const makeFooter = ({ mostRecentDate  })=>{
     const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan] = [
         element('footer-last-updated-date'),
         element('footer-last-updated-ago'),
@@ -9933,7 +9967,6 @@ const makeFooter = ({ hourlyDownloads  })=>{
         element('footer-current-timezone-name'),
         element('footer-current-timezone-offset')
     ];
-    const mostRecentDate = Object.keys(hourlyDownloads).at(-1).substring(0, 10);
     lastUpdatedDateSpan.textContent = shorterDayFormat1.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
     try {
@@ -9986,6 +10019,7 @@ const app = (()=>{
         }));
     const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
+    const mostRecentDate = Object.keys(hourlyDownloads).at(-1).substring(0, 10);
     if (debug) {
         debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
     } else {
@@ -10008,7 +10042,9 @@ const app = (()=>{
     makeEpisodePacing({
         episodeHourlyDownloads,
         episodes,
-        showTitle
+        showTitle,
+        showSlug,
+        mostRecentDate
     });
     makeTopCountries({
         showSlug,
@@ -10035,7 +10071,7 @@ const app = (()=>{
         monthlyDimensionDownloads
     });
     makeFooter({
-        hourlyDownloads
+        mostRecentDate
     });
     function update() {
         exportDownloads.update();

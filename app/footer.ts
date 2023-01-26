@@ -2,9 +2,9 @@ import { addDaysToDateString } from '../worker/timestamp.ts';
 import { element, SlRelativeTime } from './elements.ts';
 import { pluralize } from './util.ts';
 
-type Opts = { hourlyDownloads: Record<string, number> };
+type Opts = { mostRecentDate: string };
 
-export const makeFooter = ({ hourlyDownloads }: Opts) => {
+export const makeFooter = ({ mostRecentDate }: Opts) => {
 
     const [ lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan ] = [ 
         element('footer-last-updated-date'),
@@ -14,7 +14,6 @@ export const makeFooter = ({ hourlyDownloads }: Opts) => {
         element('footer-current-timezone-offset'),
     ];
 
-    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)!.substring(0, 10);
     lastUpdatedDateSpan.textContent = shorterDayFormat.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
 
