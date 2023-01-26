@@ -8663,38 +8663,82 @@ function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episode
     return new xt(ctx, config);
 }
 const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle  })=>{
-    const [episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingLegendItemTemplate] = [
+    const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingLegendItemTemplate] = [
+        element('episode-pacing-previous'),
+        element('episode-pacing-next'),
         element('episode-pacing-shot-header'),
         element('episode-pacing'),
         element('episode-pacing-shot-footer'),
         element('episode-pacing-legend'),
+        element('episode-pacing-nav'),
+        element('episode-pacing-nav-caption'),
         element('episode-pacing-legend-item')
     ];
     if (new URLSearchParams(document.location.search).has('shot')) {
         episodePacingShotHeader.classList.remove('hidden');
-        episodePacingShotHeader.textContent = showTitle ?? '(untitled)';
+        episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
         document.body.style.backgroundColor = 'black';
     }
-    const recentEpisodeIds = episodes.filter((v)=>episodeHourlyDownloads[v.id]).slice(0, 8).map((v)=>v.id);
-    const recentEpisodeHourlyDownloads = Object.fromEntries(recentEpisodeIds.map((v)=>[
-            v,
-            episodeHourlyDownloads[v]
+    const episodeIdsWithData = episodes.filter((v)=>episodeHourlyDownloads[v.id]).map((v)=>v.id);
+    const pages = Math.ceil(episodeIdsWithData.length / 8);
+    const maxPageIndex = pages - 1;
+    let pageIndex = 0;
+    let currentChart;
+    const episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map((v)=>[
+            v[0],
+            computeRelativeSummary(v[1])
         ]));
-    const episodeInfos = Object.fromEntries(episodes.map((v)=>[
-            v.id,
-            v
-        ]));
-    const chart = drawPacingChart(episodePacingCanvas, recentEpisodeHourlyDownloads, episodeInfos);
-    initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement);
-    function update() {}
+    function redrawChart() {
+        if (currentChart) currentChart.destroy();
+        currentChart = undefined;
+        const pageEpisodeIds = episodeIdsWithData.slice(pageIndex * 8, (pageIndex + 1) * 8);
+        const pageEpisodeRelativeSummaries = Object.fromEntries(pageEpisodeIds.map((v)=>[
+                v,
+                episodeRelativeSummaries[v]
+            ]));
+        const suggestedMax = Math.max(...Object.values(pageEpisodeRelativeSummaries).map((v)=>Math.max(...Object.values(v.cumulative))));
+        const episodeInfos = Object.fromEntries(episodes.map((v)=>[
+                v.id,
+                v
+            ]));
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos);
+        initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
+        currentChart = chart;
+    }
+    redrawChart();
+    episodePacingPrevious.onclick = ()=>{
+        if (pageIndex > 0) {
+            pageIndex--;
+            redrawChart();
+            update();
+        }
+    };
+    episodePacingNext.onclick = ()=>{
+        if (pageIndex < maxPageIndex) {
+            pageIndex++;
+            redrawChart();
+            update();
+        }
+    };
+    function update() {
+        episodePacingPrevious.disabled = pageIndex === 0;
+        episodePacingNext.disabled = pageIndex === maxPageIndex;
+        episodePacingNavCaption.textContent = `Page ${pageIndex + 1} of ${pages}`;
+    }
     update();
     return {
         update
     };
 };
-function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement) {
+const withCommas1 = new Intl.NumberFormat('en-US');
+function bindDownloads(item, selector, downloads) {
+    const downloadsN = item.querySelector(selector);
+    downloadsN.textContent = downloads ? withCommas1.format(downloads) : '—';
+}
+function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, episodeRelativeSummaries) {
+    const summaries = Object.values(episodeRelativeSummaries);
     const items = chart.options.plugins.legend.labels.generateLabels(chart);
     const legendSelections = {};
     const updateChartForLegend = ()=>{
@@ -8704,12 +8748,19 @@ function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendE
         }
         chart.update();
     };
-    for (const { text , fillStyle , datasetIndex  } of items){
+    while(episodePacingLegendElement.childElementCount > 7)episodePacingLegendElement.removeChild(episodePacingNav.previousElementSibling);
+    items.forEach((v, i)=>{
+        const { text , fillStyle , datasetIndex  } = v;
+        const summary = summaries[i];
         const item = episodePacingLegendItemTemplate.content.cloneNode(true);
         const dt = item.querySelector('dt');
         dt.style.backgroundColor = fillStyle;
         const dd = item.querySelector('dd');
         dd.textContent = text;
+        bindDownloads(item, '.downloads-3', summary.downloads3);
+        bindDownloads(item, '.downloads-7', summary.downloads7);
+        bindDownloads(item, '.downloads-30', summary.downloads30);
+        bindDownloads(item, '.downloads-all', summary.downloadsAll);
         legendSelections[datasetIndex] = false;
         const updateItem = ()=>{
             dt.style.opacity = legendSelections[datasetIndex] ? '1' : '0.9';
@@ -8726,26 +8777,35 @@ function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendE
             updateItem();
             updateChartForLegend();
         };
-        episodePacingLegendElement.appendChild(item);
-    }
+        episodePacingLegendElement.insertBefore(item, episodePacingNav);
+    });
 }
-function computeRelativeCumulative(hourlyDownloads) {
-    const rt = {};
+function computeRelativeSummary(hourlyDownloads) {
+    const cumulative = {};
+    let downloads3;
+    let downloads7;
+    let downloads30;
     let hourNum = 1;
     let total = 0;
     for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
         total += downloads;
-        rt[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
-        if (hourNum > 24 * 30) break;
+        if (hourNum <= 24 * 30) {
+            cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
+        }
+        if (hourNum === 3 * 24) downloads3 = total;
+        if (hourNum === 7 * 24) downloads7 = total;
+        if (hourNum === 30 * 24) downloads30 = total;
     }
-    return rt;
+    return {
+        cumulative,
+        downloadsAll: total,
+        downloads3,
+        downloads7,
+        downloads30
+    };
 }
-function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
-    const episodeRelativeCumulative = Object.fromEntries(Object.entries(episodeHourlyDownloads).map((v)=>[
-            v[0],
-            computeRelativeCumulative(v[1])
-        ]));
-    const allHours = distinct(Object.values(episodeRelativeCumulative).flatMap((v)=>Object.keys(v)).sort());
+function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos) {
+    const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
         return hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : `Hour ${hour}`;
@@ -8765,11 +8825,11 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
         type: 'line',
         data: {
             labels: allHours,
-            datasets: Object.entries(episodeRelativeCumulative).map((v, i)=>({
+            datasets: Object.entries(episodeRelativeSummaries).map((v, i)=>({
                     label: [
                         episodeInfos[v[0]]
                     ].filter((v)=>v.pubdate).map((v)=>`${v.pubdate.substring(0, 10)}: ${v.title}`).join(''),
-                    data: v[1],
+                    data: v[1].cumulative,
                     backgroundColor: colors[i],
                     borderColor: colors[i],
                     borderWidth: 1,
@@ -8816,7 +8876,7 @@ function drawPacingChart(canvas, episodeHourlyDownloads, episodeInfos) {
                         color: 'rgba(255, 255, 255, 0.1)'
                     },
                     beginAtZero: true,
-                    afterFit: (axis)=>axis.options.suggestedMax = axis.max
+                    suggestedMax
                 }
             }
         }
@@ -8976,7 +9036,7 @@ const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{
         update
     };
 };
-const withCommas1 = new Intl.NumberFormat('en-US');
+const withCommas2 = new Intl.NumberFormat('en-US');
 function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanvas) {
     const asofFormat = new Intl.DateTimeFormat('en-US', {
         weekday: 'short',
@@ -8986,19 +9046,19 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
     });
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
     if (Object.keys(nDayDownloads).length === 0) {
-        valueDiv.textContent = withCommas1.format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
+        valueDiv.textContent = withCommas2.format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
         asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
         return;
     }
     const init = ()=>{
-        valueDiv.textContent = withCommas1.format(Object.values(nDayDownloads).at(-1));
+        valueDiv.textContent = withCommas2.format(Object.values(nDayDownloads).at(-1));
         asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(nDayDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
     };
     init();
     drawSparkline(sparklineCanvas, nDayDownloads, {
         onHover: (v)=>{
             if (v) {
-                valueDiv.textContent = withCommas1.format(Math.round(v.value));
+                valueDiv.textContent = withCommas2.format(Math.round(v.value));
                 asofSpan.textContent = asofFormat.format(new Date(`${v.label.substring(0, 10)}T00:00:00.000Z`));
             } else {
                 init();
@@ -9127,7 +9187,7 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
     const onHoverMonth = (hoverMonth)=>{
         const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
-        countDiv.textContent = withCommas1.format(value);
+        countDiv.textContent = withCommas2.format(value);
         periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
     };
     onHoverMonth(initialMonth);

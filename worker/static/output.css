@@ -616,16 +616,16 @@ a:hover {
   grid-column: span 3 / span 3;
 }
 
+.col-span-6 {
+  grid-column: span 6 / span 6;
+}
+
 .col-start-5 {
   grid-column-start: 5;
 }
 
 .col-start-2 {
   grid-column-start: 2;
-}
-
-.m-10 {
-  margin: 2.5rem;
 }
 
 .mx-auto {
@@ -733,6 +733,10 @@ a:hover {
 
 .mt-0 {
   margin-top: 0px;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
 }
 
 .block {
@@ -869,8 +873,8 @@ a:hover {
   grid-template-columns: min-content 1fr;
 }
 
-.grid-cols-\[3rem_1fr\] {
-  grid-template-columns: 3rem 1fr;
+.grid-cols-\[3rem_1fr_3rem\] {
+  grid-template-columns: 3rem 1fr 3rem;
 }
 
 .grid-cols-\[1\.5rem_1fr_3\.5rem\] {
@@ -883,6 +887,22 @@ a:hover {
 
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-\[3rem_1fr_3rem_3rem_3rem_3rem\] {
+  grid-template-columns: 3rem 1fr 3rem 3rem 3rem 3rem;
+}
+
+.grid-cols-\[1\.5rem_1fr_auto_auto_auto_auto\] {
+  grid-template-columns: 1.5rem 1fr auto auto auto auto;
+}
+
+.grid-cols-\[3rem_1fr_auto_auto_auto_auto\] {
+  grid-template-columns: 3rem 1fr auto auto auto auto;
+}
+
+.grid-cols-\[3rem_1fr_auto_auto_auto_auto_auto\] {
+  grid-template-columns: 3rem 1fr auto auto auto auto auto;
 }
 
 .flex-row {
@@ -930,6 +950,16 @@ a:hover {
        column-gap: 1rem;
 }
 
+.gap-x-8 {
+  -moz-column-gap: 2rem;
+       column-gap: 2rem;
+}
+
+.gap-x-2 {
+  -moz-column-gap: 0.5rem;
+       column-gap: 0.5rem;
+}
+
 .divide-y > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-y-reverse: 0;
   border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
@@ -939,6 +969,10 @@ a:hover {
 .divide-neutral-700 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(64 64 64 / var(--tw-divide-opacity));
+}
+
+.self-end {
+  align-self: flex-end;
 }
 
 .overflow-x-hidden {
@@ -1008,6 +1042,11 @@ a:hover {
   background-color: rgb(38 38 38 / var(--tw-bg-opacity));
 }
 
+.bg-lime-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 98 18 / var(--tw-bg-opacity));
+}
+
 .fill-neutral-600 {
   fill: #525252;
 }
@@ -1028,10 +1067,6 @@ a:hover {
   padding: 0.5rem;
 }
 
-.p-10 {
-  padding: 2.5rem;
-}
-
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
@@ -1050,26 +1085,6 @@ a:hover {
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-}
-
-.px-10 {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
-}
-
-.py-20 {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
-}
-
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
 }
 
 .pl-2 {
@@ -1096,24 +1111,20 @@ a:hover {
   padding-top: 0px;
 }
 
+.pt-16 {
+  padding-top: 4rem;
+}
+
+.pb-16 {
+  padding-bottom: 4rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
 
 .pl-4 {
   padding-left: 1rem;
-}
-
-.pt-16 {
-  padding-top: 4rem;
-}
-
-.pt-4 {
-  padding-top: 1rem;
-}
-
-.pb-16 {
-  padding-bottom: 4rem;
 }
 
 .text-left {

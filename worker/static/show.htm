@@ -91,36 +91,62 @@ const sessionToken = '${sessionToken}';
 
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
-            <sl-icon-button name="caret-left-fill" label="Previous" id="downloads-graph-previous"></sl-icon-button>
+            <sl-icon-button name="caret-left-fill" label="Older downloads" title="Older downloads" id="downloads-graph-previous"></sl-icon-button>
             <span id="downloads-graph-granularity" class="whitespace-nowrap">Hourly Downloads</span>
             <sl-dropdown class="flex justify-center">
                 <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
                 <sl-menu id="downloads-graph-options">
-                    <sl-menu-item value="daily" checked>Daily</sl-menu-item>
+                    <sl-menu-item value="daily" checked type="checkbox">Daily</sl-menu-item>
                     <!-- <sl-menu-item value="twelve-hourly">12-Hourly</sl-menu-item> -->
                     <!-- <sl-menu-item value="six-hourly">6-Hourly</sl-menu-item> -->
-                    <sl-menu-item value="hourly">Hourly</sl-menu-item>
+                    <sl-menu-item value="hourly" type="checkbox">Hourly</sl-menu-item>
                     <sl-divider></sl-divider>
-                    <sl-menu-item checked value="episode-markers">Episode markers</sl-menu-item>
+                    <sl-menu-item checked value="episode-markers" type="checkbox">Episode markers</sl-menu-item>
                 </sl-menu>
             </sl-dropdown>
             <span id="downloads-graph-range" class="whitespace-nowrap">October 20 - December 20</span>
-            <sl-icon-button name="caret-right-fill" label="Next" id="downloads-graph-next"></sl-icon-button>
+            <sl-icon-button name="caret-right-fill" label="Newer downloads" title="Newer downloads" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
 
         <!-- episode pacing -->
-        <div class="flex justify-center items-center gap-2 mt-16 mb-8"><sl-icon name="graph-up"></sl-icon>Episode pacing</div>
+        <div class="flex justify-center items-center gap-2 mt-16 mb-8">
+            <sl-icon name="graph-up"></sl-icon>
+            Episode pacing
+        </div>
         <div id="episode-pacing-container">
             <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl font-semibold pt-16 pb-16">Show name</div>
             <canvas id="episode-pacing" class="cursor-pointer"></canvas>
             <div id="episode-pacing-shot-footer" class="flex justify-center hidden pt-16 pb-16">Recent podcast episode downloads (first 30 days) • Measured by op3.dev</div>
         </div>
         <div class="flex justify-center mt-4">
-            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr] cursor-pointer text-xs md:text-sm"></dl>
+            <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr_auto_auto_auto_auto] gap-x-2 cursor-pointer text-xs md:text-sm">
+                <dt></dt>
+                <dd></dd>
+                <div class="text-right text-xs opacity-50 mr-2 mb-1">3-day</div>
+                <div class="text-right text-xs opacity-50 mr-2">7-day</div>
+                <div class="text-right text-xs opacity-50 mr-2">30-day</div>
+                <div class="text-right text-xs opacity-50">all-time</div>
+
+                <div id="episode-pacing-nav" class="flex items-center justify-center gap-2 mt-4 mb-8 col-span-6">
+                    <sl-icon-button class="invisible" name="download" ></sl-icon-button>
+                    <div class="grow"></div>
+                    <sl-icon-button name="caret-left-fill" label="Newer episodes" title="Newer episodes" id="episode-pacing-previous"></sl-icon-button>
+                    <span id="episode-pacing-nav-caption">Page 1 of n</span>
+                    <sl-icon-button name="caret-right-fill" label="Older episodes" title="Older episodes" id="episode-pacing-next"></sl-icon-button>
+                    <div class="grow"></div>
+                    <sl-icon-button name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            </dl>
             <template id="episode-pacing-legend-item">
-                <dt></dt><dd class="ml-2 leading-relaxed truncate">Item</dd>
+                <dt></dt>
+                <dd class="leading-relaxed truncate mr-2">Item</dd>
+                <div class="downloads-3 text-right font-mono opacity-50 mr-2">123</div>
+                <div class="downloads-7 text-right font-mono opacity-50 mr-2">123</div>
+                <div class="downloads-30 text-right font-mono opacity-50 mr-2">123</div>
+                <div class="downloads-all text-right font-mono opacity-50">123</div>
             </template>
+           
         </div>
 
 
