@@ -600,6 +600,10 @@ a:hover {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
 .sticky {
   position: sticky;
 }
@@ -777,6 +781,30 @@ a:hover {
 
 .h-80 {
   height: 20rem;
+}
+
+.h-96 {
+  height: 24rem;
+}
+
+.h-\[32rem\] {
+  height: 32rem;
+}
+
+.h-24 {
+  height: 6rem;
+}
+
+.h-48 {
+  height: 12rem;
+}
+
+.h-\[12rem\] {
+  height: 12rem;
+}
+
+.h-\[16rem\] {
+  height: 16rem;
 }
 
 .max-h-\[1\.5rem\] {
@@ -1304,6 +1332,22 @@ a:hover {
     display: inline;
   }
 
+  .md\:h-\[32rem\] {
+    height: 32rem;
+  }
+
+  .md\:h-\[16rem\] {
+    height: 16rem;
+  }
+
+  .md\:h-\[20rem\] {
+    height: 20rem;
+  }
+
+  .md\:h-\[24rem\] {
+    height: 24rem;
+  }
+
   .md\:w-10\/12 {
     width: 83.333333%;
   }
@@ -1362,5 +1406,17 @@ a:hover {
   .md\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:h-\[32rem\] {
+    height: 32rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:h-\[40rem\] {
+    height: 40rem;
   }
 }

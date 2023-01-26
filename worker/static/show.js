@@ -8874,6 +8874,7 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
             animation: {
                 duration: 100
             },
+            maintainAspectRatio: false,
             interaction: {
                 intersect: false,
                 mode: 'index'

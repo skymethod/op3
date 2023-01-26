@@ -229,6 +229,7 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
             animation: {
                 duration: 100,
             },
+            maintainAspectRatio: false,
             interaction: {
                 intersect: false,
                 mode: 'index',

@@ -116,7 +116,9 @@ const sessionToken = '${sessionToken}';
         </div>
         <div id="episode-pacing-container">
             <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl font-semibold pt-16 pb-16">Show name</div>
-            <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+            <div class="h-[16rem] md:h-[24rem] lg:h-[32rem] xl:h-[40rem]">
+                <canvas id="episode-pacing" class="cursor-pointer"></canvas>
+            </div>
             <div id="episode-pacing-shot-footer" class="flex justify-center hidden pt-16 pb-16">Recent podcast episode downloads (first 30 days) • Measured by op3.dev</div>
         </div>
         <div class="flex justify-center mt-4">
