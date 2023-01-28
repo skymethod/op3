@@ -89,8 +89,20 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
 }
 
-export async function computeDailyDownloads(date: string, { multipartMode, partSizeMb, statsBlobs, lookupShow } : { multipartMode: 'bytes' | 'stream', partSizeMb: number, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number };
+
+export function parseComputeShowDailyDownloadsRequest(date: string, parameters: Record<string, string>): ComputeDailyDownloadsRequest {
+    const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
+    const partSizeMb = parseInt(partSizeStr);
+    check('part-size', partSizeMb, partSizeMb >= 5); // r2 minimum multipart size
+    const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
+    const { mode, showUuids } = parseIncludeExclude(parameters);
+    return { date, mode, showUuids, partSizeMb, multipartMode };
+}
+
+export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb }: ComputeDailyDownloadsRequest, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
+    showUuids = checkIncludeExclude(mode, showUuids);
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
 
@@ -159,7 +171,14 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             const destinationServerUrl = computeChainDestinationUrl(serverUrl);
             if (destinationServerUrl === undefined) continue;
 
-            const download = (await new Bytes(encoder.encode(`${destinationServerUrl}|${audienceId}`)).sha256()).hex();
+            // optimized, affects CPU + mem limits if done naively
+            const arr1 = encoder.encode(destinationServerUrl)
+            const arr2 = encoder.encode(audienceId);
+            const arr = new Uint8Array(arr1.length + arr2.length);
+            arr.set(arr1);
+            arr.set(arr2, arr1.length);
+            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-256', arr)));
+
             if (downloads.has(download)) continue;
             downloads.add(download);
 
@@ -183,7 +202,7 @@ export async function computeDailyDownloads(date: string, { multipartMode, partS
             }
             rowIndex++;
            
-            if (showUuid) {
+            if (showUuid && (mode === 'include' ? showUuids.includes(showUuid) : !showUuids.includes(showUuid))) {
                 let showMap = showMaps.get(showUuid);
                 if (!showMap) {
                     showMap = { rowIndexes: [ 0 ], contentLength: headerChunk.length }; // header row
@@ -225,12 +244,9 @@ export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' |
 
 export function tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): ComputeShowDailyDownloadsRequest | undefined {
     if (targetPath === '/work/compute-show-daily-downloads' && operationKind === 'update' && parameters) {
-        const { date, shows } = parameters;
+        const { date } = parameters;
         check('date', date, isValidDate);
-        const [ _, modeStr, showsStr ] = checkMatches('shows', shows, /^(include|exclude)=(.*?)$/);
-        const mode = modeStr === 'include' || modeStr === 'exclude' ? modeStr : undefined;
-        if (!mode) throw new Error(`Bad shows: ${shows}`);
-        const showUuids = showsStr.split(',').filter(v => v !== '');
+        const { mode, showUuids } = parseIncludeExclude(parameters);
         return { date, mode, showUuids };
     }
 }
@@ -238,9 +254,7 @@ export function tryParseComputeShowDailyDownloadsRequest({ operationKind, target
 export async function computeShowDailyDownloads({ date, mode, showUuids }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
-    checkAll('showUuids', showUuids, isValidUuid);
-    showUuids = distinct(showUuids);
-    if (mode === 'include' && showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
+    showUuids = checkIncludeExclude(mode, showUuids);
 
     const mapText = await statsBlobs.get(computeDailyMapKey(date), 'text');
     if (!mapText) throw new Error(`No daily downloads map for ${date}`);
@@ -312,6 +326,14 @@ export function computeHourlyKey(hour: string): string {
     return `downloads/hourly/${hour}.tsv`;
 }
 
+export function fastHex(bytes: Uint8Array): string {
+    const rt: string[] = new Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) {
+        rt.push(hexDigits[bytes[i]]);
+    }
+    return rt.join('');
+}
+
 //
 
 interface DailyDownloadsMap {
@@ -327,6 +349,8 @@ interface ShowMap {
 }
 
 //
+
+const hexDigits = [...Array(0x100).keys()].map(v => v.toString(16).padStart(2, '0'));
 
 function computeDailyKey(date: string): string {
     return `downloads/daily/${date}.tsv`;
@@ -363,4 +387,20 @@ function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
         offset += array.byteLength;
     }
     return rt;
+}
+
+function parseIncludeExclude(parameters: Record<string, string>): { mode: 'include' | 'exclude', showUuids: string[] } {
+    const { shows } = parameters;
+    const [ _, modeStr, showsStr ] = checkMatches('shows', shows, /^(include|exclude)=(.*?)$/);
+    const mode = modeStr === 'include' || modeStr === 'exclude' ? modeStr : undefined;
+    if (!mode) throw new Error(`Bad shows: ${shows}`);
+    const showUuids = showsStr.split(',').filter(v => v !== '');
+    return { mode, showUuids };
+}
+
+function checkIncludeExclude(mode: 'include' | 'exclude', showUuids: string[]): string[] {
+    checkAll('showUuids', showUuids, isValidUuid);
+    showUuids = distinct(showUuids);
+    if (mode === 'include' && showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
+    return showUuids;
 }

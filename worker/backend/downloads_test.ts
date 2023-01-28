@@ -5,7 +5,7 @@ import { PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } 
 import { assertEquals, fail } from '../tests/deps.ts';
 import { InMemoryBlobs } from '../tests/in_memory_blobs.ts';
 import { AttNums } from './att_nums.ts';
-import { computeHourlyDownloads, computeHourlyKey } from './downloads.ts';
+import { computeHourlyDownloads, computeHourlyKey, fastHex } from './downloads.ts';
 import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
 
 Deno.test({
@@ -64,6 +64,22 @@ Deno.test({
         const firstTwo = lines[4].split('\t');
         assertEquals(firstTwo[serverUrlIndex], 'https://a.com/3.mp3');
         assertEquals(firstTwo[tagsIndex], 'first-two');
+    }
+});
+
+Deno.test({
+    name: 'fastHex',
+    fn: () => {
+        const inputs = [
+            new Uint8Array(),
+            new Uint8Array([ 255, 0, 128 ]),
+            new TextEncoder().encode('hello'),
+            new TextEncoder().encode(''),
+        ];
+        for (const input of inputs) {
+            console.log(input);
+            assertEquals(fastHex(input), new Bytes(input).hex());
+        }
     }
 });
 
