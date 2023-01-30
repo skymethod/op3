@@ -1,5 +1,5 @@
 import { transform, stop } from 'https://deno.land/x/esbuild@v0.16.10/mod.js';
-import { readAll } from 'https://deno.land/std@0.170.0/streams/read_all.ts';
+import { readAll } from 'https://deno.land/std@0.175.0/streams/read_all.ts';
 
 async function fileExists(filePath: string | URL): Promise<boolean> {
     try {
