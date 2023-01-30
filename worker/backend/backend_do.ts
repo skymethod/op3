@@ -17,7 +17,7 @@ import { initCloudflareTracer, setWorkerInfo } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { ApiAuthController } from './api_auth_controller.ts';
 import { ShowController } from './show_controller.ts';
-import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
+import { newPodcastIndexClient, tryPostDebug } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
 import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 import { DoNames } from '../do_names.ts';
@@ -386,18 +386,4 @@ async function loadDOInfo(storage: DurableObjectStorage): Promise<DOInfo | undef
 
 async function saveDOInfo(info: DOInfo, storage: DurableObjectStorage) {
     await storage.put('i.do', info);
-}
-
-async function tryPostDebug({ debugWebhookUrl, origin, instance, data }: { debugWebhookUrl: string, origin: string, instance: string, data: Record<string, string | undefined> }) {
-    try {
-        const body = new FormData();
-        body.set('time', new Date().toISOString());
-        body.set('instance', instance);
-        for (const [ name, value ] of Object.entries(data)) {
-            if (value) body.set(name, value);
-        }
-        await fetch(debugWebhookUrl, { method: 'POST', body, headers: { 'content-type': 'application/x-www-form-urlencoded', 'user-agent': computeUserAgent({ origin }) } })
-    } catch {
-        // noop
-    }
 }
