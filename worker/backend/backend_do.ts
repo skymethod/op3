@@ -17,7 +17,7 @@ import { initCloudflareTracer, setWorkerInfo } from '../cloudflare_tracer.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { ApiAuthController } from './api_auth_controller.ts';
 import { ShowController } from './show_controller.ts';
-import { newPodcastIndexClient } from '../outbound.ts';
+import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { isValidOrigin } from '../check.ts';
 import { R2BucketBlobs } from './r2_bucket_blobs.ts';
 import { DoNames } from '../do_names.ts';
@@ -269,6 +269,7 @@ export class BackendDO {
     }
 
     async alarm() {
+        let info: DOInfo | undefined;
         try {
             const { storage } = this.state;
             const payload = await storage.get('alarm.payload');
@@ -279,7 +280,7 @@ export class BackendDO {
                 const { backendNamespace } = this.env;
                 const rpcClient = new CloudflareRpcClient(backendNamespace, 5); // alarm will retry for us, but we don't want to rely on that
                 const fromIsolateId = IsolateId.get();
-                const info = this.info ?? await loadDOInfo(storage);
+                info = this.info ?? await loadDOInfo(storage);
                 if (!info) {
                     consoleError('backend-do-alarm-do-name', `BackendDO: unable to compute name!`);
                     return;
@@ -292,6 +293,9 @@ export class BackendDO {
                 await rpcClient.sendAlarm({ payload, fromIsolateId }, durableObjectName);
             }
         } catch (e) {
+            const { debugWebhookUrl, origin, instance } = this.env;
+            const durableObjectName = info?.name;
+            if (debugWebhookUrl && origin) await tryPostDebug({ debugWebhookUrl, origin, instance, data: { kind: 'backend-do-alarm-unhandled', durableObjectName, error: `${e.stack || e}`} });
             consoleError('backend-do-alarm-unhandled', `BackendDO: Unhandled error in alarm: ${e.stack || e}`);
             throw e; // trigger a retry
         }
@@ -382,4 +386,18 @@ async function loadDOInfo(storage: DurableObjectStorage): Promise<DOInfo | undef
 
 async function saveDOInfo(info: DOInfo, storage: DurableObjectStorage) {
     await storage.put('i.do', info);
+}
+
+async function tryPostDebug({ debugWebhookUrl, origin, instance, data }: { debugWebhookUrl: string, origin: string, instance: string, data: Record<string, string | undefined> }) {
+    try {
+        const body = new FormData();
+        body.set('time', new Date().toISOString());
+        body.set('instance', instance);
+        for (const [ name, value ] of Object.entries(data)) {
+            if (value) body.set(name, value);
+        }
+        await fetch(debugWebhookUrl, { method: 'POST', body, headers: { 'content-type': 'application/x-www-form-urlencoded', 'user-agent': computeUserAgent({ origin }) } })
+    } catch {
+        // noop
+    }
 }

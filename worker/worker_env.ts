@@ -22,4 +22,5 @@ export interface WorkerEnv {
     readonly kvNamespace?: KVNamespace;
     readonly queue1?: Queue;
     readonly roRpcClientParams?: string;
+    readonly debugWebhookUrl?: string;
 }
