@@ -145,10 +145,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://mgln.ai/track/a.com/path/to/episode.mp3
+    // https://mgln.ai/e/256/a.com/path/to/episode.mp3
     // http and https endpoints are supported, but suffix protocol must be used for https
-    m = /^https?:\/\/mgln\.ai\/track\/(https?:\/\/)?(.*?)$/.exec(url);
+    m = /^https?:\/\/mgln\.ai\/(track|e\/[a-z0-9]+)\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffixProtocol, suffix ] = m;
+        const [ _, __, suffixProtocol, suffix ] = m;
         const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
         return [ { kind: 'prefix', prefix: 'magellan', url }, ...computeChainEstimate(targetUrl) ];
     }

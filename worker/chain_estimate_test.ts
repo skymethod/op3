@@ -149,6 +149,21 @@ Deno.test({
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://mgln.ai/e/256/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'https://mgln.ai/e/256/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://mgln.ai/e/p609310/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'https://mgln.ai/e/p609310/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://mgln.ai/e/89/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'magellan', url: 'https://mgln.ai/e/89/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
         assertEquals(computeChainEstimate('https://p.podderapp.com/1234567890/a.com/path/to/episode.mp3'), [
             { kind: 'prefix', prefix: 'podder', url: 'https://p.podderapp.com/1234567890/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
