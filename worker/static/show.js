@@ -9359,6 +9359,7 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
             filename
         });
     };
+    let first = true;
     const updateTableForMonth = ()=>{
         const month = months[monthIndex];
         monthDiv.textContent = computeMonthName(month, {
@@ -9367,11 +9368,19 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
         const totalDownloads = downloadsPerMonth ? downloadsPerMonth[month] : Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
         const pct = Object.values(monthDownloads).reduce((a, b)=>a + b, 0) / totalDownloads;
-        if (card && cardId && card && pct < .02) {
-            card.style.display = 'none';
-            console.log(`Hiding ${cardId}, ${pct}`);
-            return;
+        if (first && card && cardId) {
+            const hide = pct < 0.03;
+            console.log({
+                cardId,
+                pct,
+                hide
+            });
+            if (hide) {
+                card.style.display = 'none';
+                return;
+            }
         }
+        first = false;
         removeAllChildren(list);
         const sorted = sortBy(Object.entries(monthDownloads), (v)=>-v[1]);
         for (const [key, downloads] of sorted){
@@ -10002,7 +10011,11 @@ const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             v['euRegion'] ?? {}
         ]));
     Object.values(monthlyDownloads).forEach((v)=>{
-        delete v['Unknown, XX'];
+        for (const name1 of Object.keys(v)){
+            if (name1.startsWith('Unknown, ')) {
+                delete v[name1];
+            }
+        }
     });
     const regionalIndicators = Object.fromEntries([
         ...new Array(26).keys()
@@ -10045,6 +10058,82 @@ function computeRegionName(euRegion) {
     })[region] ?? region;
     return region;
 }
+const makeTopAuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['auRegion'] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        for (const name1 of Object.keys(v)){
+            if (name1.startsWith('Unknown, ')) {
+                delete v[name1];
+            }
+        }
+    });
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    const computeEmoji = (euRegion)=>{
+        const countryCode = euRegion.split(',').at(-1).trim();
+        return ({
+            'T1': '🧅',
+            'XX': '❔'
+        })[countryCode] ?? [
+            ...countryCode
+        ].map((v)=>regionalIndicators[v]).join('');
+    };
+    return makeTopBox({
+        type: 'au-regions',
+        showSlug,
+        exportId: 'top-au-regions-export',
+        previousId: 'top-au-regions-month-previous',
+        nextId: 'top-au-regions-month-next',
+        monthId: 'top-au-regions-month',
+        listId: 'top-au-regions',
+        templateId: 'top-au-regions-row',
+        cardId: 'top-au-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'auRegion'
+        ],
+        computeEmoji,
+        computeName: computeRegionName1
+    });
+};
+function computeRegionName1(auRegion) {
+    const region = auRegion.substring(0, auRegion.length - ', XX'.length).trim();
+    return region;
+}
+const makeTopCaRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['caRegion'] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        delete v['Unknown'];
+    });
+    return makeTopBox({
+        type: 'ca-regions',
+        showSlug,
+        exportId: 'top-ca-regions-export',
+        previousId: 'top-ca-regions-month-previous',
+        nextId: 'top-ca-regions-month-next',
+        monthId: 'top-ca-regions-month',
+        listId: 'top-ca-regions',
+        templateId: 'top-ca-regions-row',
+        cardId: 'top-ca-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'caRegion'
+        ],
+        computeName: (v)=>v
+    });
+};
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -10132,7 +10221,17 @@ const app = (()=>{
         monthlyDimensionDownloads,
         downloadsPerMonth
     });
+    makeTopCaRegions({
+        showSlug,
+        monthlyDimensionDownloads,
+        downloadsPerMonth
+    });
     makeTopEuRegions({
+        showSlug,
+        monthlyDimensionDownloads,
+        downloadsPerMonth
+    });
+    makeTopAuRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth

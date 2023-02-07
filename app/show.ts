@@ -14,6 +14,8 @@ import { makeTopMetros } from './top_metros.ts';
 import { addHoursToHourString } from '../worker/timestamp.ts';
 import { makeFooter } from './footer.ts';
 import { makeTopEuRegions } from './top_eu_regions.ts';
+import { makeTopAuRegions } from './top_au_regions.ts';
+import { makeTopCaRegions } from './top_ca_regions.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -68,7 +70,9 @@ const app = (() => {
     makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads });
     makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeTopMetros({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
+    makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
+    makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeFooter({ mostRecentDate });
 
     function update() {

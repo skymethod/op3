@@ -54,17 +54,23 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
         download(tsv, { type: 'text/plain', filename });
     };
 
+    let first = true;
     const updateTableForMonth = () => {
         const month = months[monthIndex];
         monthDiv.textContent = computeMonthName(month, { includeYear: true });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
         const totalDownloads = downloadsPerMonth ? downloadsPerMonth[month] : Object.values(monthDownloads).reduce((a, b) => a + b, 0);
         const pct = Object.values(monthDownloads).reduce((a, b) => a + b, 0) / totalDownloads;
-        if (card && cardId && card && pct < .02) { // hide the entire card if < 2% of downloads
-            card.style.display = 'none';
-            console.log(`Hiding ${cardId}, ${pct}`);
-            return;
+        if (first && card && cardId) {
+            // hide the entire card if low pct of downloads
+            const hide = pct < 0.03;
+            console.log({ cardId, pct, hide });
+            if (hide) {
+                card.style.display = 'none';
+                return;
+            }
         }
+        first = false;
         removeAllChildren(list);
        
         const sorted = sortBy(Object.entries(monthDownloads), v => -v[1]);
