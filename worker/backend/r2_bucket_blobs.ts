@@ -143,6 +143,7 @@ export function isRetryableErrorFromR2(e: Error): boolean {
     const error = `${e.stack || e}`;
     if (error.includes('(10001)')) return true; // Error: get: We encountered an internal error. Please try again. (10001)
     if (error.includes('(10048)')) return true; // Error: completeMultipartUpload: There was a problem with the multipart upload. (10048)
+    if (error.includes('(10054)')) return true; // Error: get: Client Disconnect (10054)
     return false;
 }
 
