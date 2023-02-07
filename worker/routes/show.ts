@@ -1,13 +1,11 @@
 import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
-import { tryParseJson } from '../check.ts';
 import { Configuration } from '../configuration.ts';
-import { encodeXml, importText, setIntersect } from '../deps.ts';
+import { encodeXml, importText } from '../deps.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
-import { computeIdentityResult, identityResultToJson } from './api.ts';
 import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
@@ -30,7 +28,6 @@ type Opts = {
     productionOrigin: string,
     cfAnalyticsToken: string | undefined,
     podcastIndexCredentials: string | undefined,
-    adminTokens: Set<string>, 
     previewTokens: Set<string>, 
     rpcClient: RpcClient, 
     roRpcClient: RpcClient | undefined, 
@@ -43,7 +40,7 @@ type Opts = {
 
 
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
-    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, adminTokens, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
+    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
     const { showUuid } = req;
 
     const start = Date.now();
@@ -55,21 +52,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
     const times: Record<string, number> = {};
-    const result = await timed(times, 'compute-identity-result', () => computeIdentityResult({ bearerToken: undefined, searchParams, adminTokens, previewTokens, rpcClient }));
-    let isPublic = false;
-    if (result.kind !== 'valid') {
-        const publicShows = tryParseJson(await configuration.get('public-shows') ?? '[]');
-        isPublic = Array.isArray(publicShows) && publicShows.includes(showUuid);
-        if (!isPublic) {
-            return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
-        }
-    }
-
-    if (result.kind === 'valid') {
-        const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
-        if (!allowed) return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
-    }
-
+    
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
     const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
@@ -118,7 +101,7 @@ export function tryParseShowOgImageRequest({ method, pathname }: { method: strin
 
 export async function computeShowOgImageResponse(req: ShowOgImageRequest, opts: Opts): Promise<Response> {
     const { showUuid } = req;
-    const { searchParams, roAssetBlobs, assetBlobs, instance, origin, hostname, productionOrigin, cfAnalyticsToken, adminTokens, previewTokens, rpcClient } = opts;
+    const { searchParams, roAssetBlobs, assetBlobs, instance, origin, hostname, productionOrigin, cfAnalyticsToken } = opts;
 
     const compute404 = (reason: string) => {
         console.log(`Returning 404: ${reason}`);
@@ -129,14 +112,6 @@ export async function computeShowOgImageResponse(req: ShowOgImageRequest, opts: 
 
     const targetAssetBlobs = searchParams.has('ro') ? roAssetBlobs : assetBlobs;
     if (!targetAssetBlobs) return compute404('No asset blobs');
-
-    const times: Record<string, number> = {};
-
-    const result = await timed(times, 'compute-identity-result', () => computeIdentityResult({ bearerToken: undefined, searchParams, adminTokens, previewTokens, rpcClient }));
-    if (result.kind !== 'valid') return compute404(`Invalid id result: ${JSON.stringify(identityResultToJson(result))}`);
-
-    const allowed = result.permissions.has('admin') || result.permissions.has('read-show') && setIntersect(result.shows, new Set([ showUuid, '00000000000000000000000000000000' ])).size > 0;
-    if (!allowed) return compute404(`Not allowed: ${JSON.stringify(identityResultToJson(result))}`);
 
     const { stream, etag } = await targetAssetBlobs.get(computeOgImageKey({ showUuid }), 'stream-and-meta') ?? {};
     if (!stream || !etag) return compute404(`OG image not found for show ${showUuid}`);
