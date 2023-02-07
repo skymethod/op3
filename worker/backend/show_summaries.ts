@@ -170,7 +170,7 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         increment(downloads, key);
     };
     for await (const obj of yieldTsvFromStream(stream)) {
-        const { botType, time, episodeId, audienceId, countryCode = 'XX', agentType = 'unknown', agentName = 'Unknown', deviceType = 'unknown', deviceName = 'Unknown', referrerType, referrerName = 'Unknown', metroCode, tags } = obj;
+        const { botType, time, episodeId, audienceId, countryCode = 'XX', continentCode = 'XX', regionName = 'Unknown', agentType = 'unknown', agentName = 'Unknown', deviceType = 'unknown', deviceName = 'Unknown', referrerType, referrerName = 'Unknown', metroCode, tags } = obj;
         if (time === undefined) throw new Error(`Undefined time`);
         const hour = time.substring(0, '2000-01-01T00'.length);
         if (botType !== undefined) continue;
@@ -190,6 +190,9 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         }
         incrementDimension('countryCode', countryCode);
         if (metroCode) incrementDimension('metroCode', metroCode);
+        if (continentCode === 'EU') incrementDimension('euRegion', `${regionName}, ${countryCode}`);
+        if (countryCode === 'AU' || countryCode === 'NZ') incrementDimension('auRegion', `${regionName}, ${countryCode}`); // australasia
+        if (countryCode === 'CA') incrementDimension('caRegion', `${regionName}`);
         if (agentType === 'app') {
             incrementDimension('appName', agentName);
         } else if (agentType === 'browser') {
@@ -248,7 +251,7 @@ export interface ShowSummary {
     readonly hourlyDownloads: Record<string, number>; // hour (e.g. 2022-12-01T10) -> downloads
     readonly episodes: Record<string, EpisodeSummary>; // episodeId -> 
     readonly sources: Record<string, string>;
-    readonly dimensionDownloads?: Record<string, Record<string, number>>; // countryCode, appName, browserName, libraryName, deviceType, deviceName, referrer (type.name), metroCode
+    readonly dimensionDownloads?: Record<string, Record<string, number>>; // countryCode, appName, browserName, libraryName, deviceType, deviceName, referrer (type.name), metroCode, euRegion, caRegion, auRegion
 }
 
 export function isValidShowSummary(obj: unknown): obj is ShowSummary {
