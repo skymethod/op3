@@ -9325,7 +9325,7 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId , listId , templateId , monthlyDownloads , downloadsDenominator , tsvHeaderNames , computeEmoji , computeName  })=>{
+const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId , listId , templateId , cardId , monthlyDownloads , downloadsPerMonth , tsvHeaderNames , computeEmoji , computeName  })=>{
     const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
         element(exportId),
         element(previousId),
@@ -9334,6 +9334,7 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         element(listId),
         element(templateId)
     ];
+    const card = cardId ? element(cardId) : undefined;
     const months = Object.keys(monthlyDownloads);
     const monthlyDownloadsValues = Object.values(monthlyDownloads);
     const computeInitialMonthIndex = ()=>{
@@ -9364,7 +9365,13 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
             includeYear: true
         });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
-        const totalDownloads = downloadsDenominator ? downloadsDenominator(month) : Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
+        const totalDownloads = downloadsPerMonth ? downloadsPerMonth[month] : Object.values(monthDownloads).reduce((a, b)=>a + b, 0);
+        const pct = Object.values(monthDownloads).reduce((a, b)=>a + b, 0) / totalDownloads;
+        if (card && cardId && card && pct < .02) {
+            card.style.display = 'none';
+            console.log(`Hiding ${cardId}, ${pct}`);
+            return;
+        }
         removeAllChildren(list);
         const sorted = sortBy(Object.entries(monthDownloads), (v)=>-v[1]);
         for (const [key, downloads] of sorted){
@@ -9400,7 +9407,7 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         for (const [keyStr, downloads1] of sorted){
             const key1 = keyStr.startsWith('https://') ? new URL(keyStr).hostname : keyStr;
             const name11 = computeName(key1);
-            const pct = (downloads1 / totalDownloads * 100).toFixed(4);
+            const pct1 = (downloads1 / totalDownloads * 100).toFixed(4);
             const fields = tsvHeaderNames.length === 1 ? [
                 name11
             ] : [
@@ -9411,7 +9418,7 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
                 `${rank++}`,
                 ...fields,
                 downloads1.toString(),
-                pct
+                pct1
             ]);
         }
     };
@@ -9576,12 +9583,11 @@ function computeEmoji(deviceType) {
         watch: '⌚️'
     })[deviceType] ?? '❔';
 }
-const makeTopBrowserDownloads = ({ showSlug , monthlyDimensionDownloads  })=>{
+const makeTopBrowserDownloads = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             computeBrowserDownloads(v)
         ]));
-    const computeDownloadsForMonth = (month)=>Object.values(monthlyDimensionDownloads[month]['countryCode']).reduce((a, b)=>a + b, 0);
     return makeTopBox({
         type: 'browser-and-referrers',
         showSlug,
@@ -9592,7 +9598,7 @@ const makeTopBrowserDownloads = ({ showSlug , monthlyDimensionDownloads  })=>{
         listId: 'top-browser-downloads',
         templateId: 'top-browser-downloads-row',
         monthlyDownloads,
-        downloadsDenominator: computeDownloadsForMonth,
+        downloadsPerMonth,
         tsvHeaderNames: [
             'browserOrReferrer'
         ],
@@ -9933,12 +9939,11 @@ const METROS = {
     '993': `Yellowknife, NT`,
     '996': `Whitehorse, YT`
 };
-const makeTopMetros = ({ showSlug , monthlyDimensionDownloads  })=>{
+const makeTopMetros = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             v['metroCode'] ?? {}
         ]));
-    const computeDownloadsForMonth = (month)=>Object.values(monthlyDimensionDownloads[month]['countryCode']).reduce((a, b)=>a + b, 0);
     return makeTopBox({
         type: 'metros',
         showSlug,
@@ -9948,8 +9953,9 @@ const makeTopMetros = ({ showSlug , monthlyDimensionDownloads  })=>{
         monthId: 'top-metros-month',
         listId: 'top-metros',
         templateId: 'top-metros-row',
+        cardId: 'top-metros-card',
         monthlyDownloads,
-        downloadsDenominator: computeDownloadsForMonth,
+        downloadsPerMonth,
         tsvHeaderNames: [
             'metroCode',
             'metroName'
@@ -9990,6 +9996,55 @@ const shorterDayFormat1 = new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     timeZone: 'UTC'
 });
+const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['euRegion'] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        delete v['Unknown, XX'];
+    });
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    const computeEmoji = (euRegion)=>{
+        const countryCode = euRegion.split(',').at(-1).trim();
+        return ({
+            'T1': '🧅',
+            'XX': '❔'
+        })[countryCode] ?? [
+            ...countryCode
+        ].map((v)=>regionalIndicators[v]).join('');
+    };
+    return makeTopBox({
+        type: 'eu-regions',
+        showSlug,
+        exportId: 'top-eu-regions-export',
+        previousId: 'top-eu-regions-month-previous',
+        nextId: 'top-eu-regions-month-next',
+        monthId: 'top-eu-regions-month',
+        listId: 'top-eu-regions',
+        templateId: 'top-eu-regions-row',
+        cardId: 'top-eu-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'euRegion'
+        ],
+        computeEmoji,
+        computeName: computeRegionName
+    });
+};
+function computeRegionName(euRegion) {
+    let region = euRegion.substring(0, euRegion.length - ', XX'.length).trim();
+    region = ({
+        'Free and Hanseatic City of Hamburg': 'Hamburg'
+    })[region] ?? region;
+    return region;
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -10047,6 +10102,10 @@ const app = (()=>{
         showSlug,
         mostRecentDate
     });
+    const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
+            month,
+            Object.values(v['countryCode'] ?? {}).reduce((a, b)=>a + b, 0)
+        ]));
     makeTopCountries({
         showSlug,
         monthlyDimensionDownloads
@@ -10065,11 +10124,18 @@ const app = (()=>{
     });
     makeTopBrowserDownloads({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        downloadsPerMonth
     });
     makeTopMetros({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        downloadsPerMonth
+    });
+    makeTopEuRegions({
+        showSlug,
+        monthlyDimensionDownloads,
+        downloadsPerMonth
     });
     makeFooter({
         mostRecentDate

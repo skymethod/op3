@@ -175,7 +175,7 @@ const sessionToken = '${sessionToken}';
             </sl-card>
 
             <!-- top metros -->
-            <sl-card class="card-basic flex justify-center">
+            <sl-card id="top-metros-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top U.S. metros</div>
                     <sl-icon-button id="top-metros-export" name="download" label="Export" title="Export"></sl-icon-button>
@@ -191,6 +191,27 @@ const sessionToken = '${sessionToken}';
                 <template id="top-metros-row">
                     <span class="leading-relaxed"></span>
                     <dt class="leading-relaxed truncate max-w-[12rem]">Country</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
+
+            <!-- top eu regions -->
+            <sl-card id="top-eu-regions-card" class="card-basic flex justify-center">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top E.U. regions</div>
+                    <sl-icon-button id="top-eu-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-eu-regions-month-previous"></sl-icon-button>
+                    <span id="top-eu-regions-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-eu-regions-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-eu-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
+                <template id="top-eu-regions-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed text-ellipsis overflow-hidden">EU Region</dt>
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
             </sl-card>

@@ -11,14 +11,15 @@ type Opts = {
     monthId: string,
     listId: string,
     templateId: string,
+    cardId?: string,
     monthlyDownloads: Record<string, Record<string, number>>,
-    downloadsDenominator?: (month: string) => number,
+    downloadsPerMonth?: Record<string, number>,
     tsvHeaderNames: string[],
     computeEmoji?: (key: string) => string,
     computeName: (key: string) => string,
 };
 
-export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, monthlyDownloads, downloadsDenominator, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
+export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
 
     const [
         exportButton,
@@ -26,7 +27,7 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
         monthDiv,
         nextButton,
         list,
-        rowTemplate
+        rowTemplate,
     ] = [
         element<SlIconButton>(exportId),
         element<SlIconButton>(previousId),
@@ -35,6 +36,7 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
         element(listId),
         element<HTMLTemplateElement>(templateId),
     ];
+    const card = cardId ? element(cardId) : undefined;
 
     const months = Object.keys(monthlyDownloads);
     const monthlyDownloadsValues = Object.values(monthlyDownloads);
@@ -56,7 +58,13 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
         const month = months[monthIndex];
         monthDiv.textContent = computeMonthName(month, { includeYear: true });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
-        const totalDownloads = downloadsDenominator ? downloadsDenominator(month) : Object.values(monthDownloads).reduce((a, b) => a + b, 0);
+        const totalDownloads = downloadsPerMonth ? downloadsPerMonth[month] : Object.values(monthDownloads).reduce((a, b) => a + b, 0);
+        const pct = Object.values(monthDownloads).reduce((a, b) => a + b, 0) / totalDownloads;
+        if (card && cardId && card && pct < .02) { // hide the entire card if < 2% of downloads
+            card.style.display = 'none';
+            console.log(`Hiding ${cardId}, ${pct}`);
+            return;
+        }
         removeAllChildren(list);
        
         const sorted = sortBy(Object.entries(monthDownloads), v => -v[1]);
