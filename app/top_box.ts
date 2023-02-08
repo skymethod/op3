@@ -17,9 +17,11 @@ type Opts = {
     tsvHeaderNames: string[],
     computeEmoji?: (key: string) => string,
     computeName: (key: string) => string,
+    computeUrl?: (key: string) => string,
+
 };
 
-export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName }: Opts) => {
+export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl }: Opts) => {
 
     const [
         exportButton,
@@ -83,11 +85,12 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
             }
 
             const dt = item.querySelector('dt')!;
-            if (key.startsWith('https://')) {
+            const isUrl = key.startsWith('https://');
+            if (isUrl || computeUrl) {
                 dt.textContent = '';
                 const a = document.createElement('a');
-                a.textContent = new URL(key).host;
-                a.href = key;
+                a.textContent = computeUrl ? computeName(key) : new URL(key).host;
+                a.href = computeUrl ? computeUrl(key) : key;
                 a.className = 'text-white';
                 a.target = '_blank';
                 a.rel = 'nofollow noopener noreferrer';
@@ -142,3 +145,57 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
 
     return { update };
 };
+
+export function regionCountryFunctions(implicitCountry?: string) {
+    const regionalIndicators = Object.fromEntries([...new Array(26).keys()].map(v => [ String.fromCharCode('A'.charCodeAt(0) + v), String.fromCodePoint('🇦'.codePointAt(0)! + v) ]));
+    const computeEmoji = (str: string) => {
+        const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
+        const countryCode = regionCountry.split(',').at(-1)!.trim();
+        return ({ 'T1': '🧅', 'XX': '❔' })[countryCode] ?? [...countryCode].map(v => regionalIndicators[v]).join('');
+    };
+    const computeUrl = (str: string) => {
+        const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
+        let query = regionCountry;
+        {
+            const m = /^(.*), ([A-Z]{2})$/.exec(query);
+            if (m) query = `${m[1]}, ${tryComputeRegionNameInEnglish(m[2]) ?? m[2]}`;
+        }
+        {
+            const m = /^([A-Z]{2})$/.exec(query);
+            if (m) query = tryComputeRegionNameInEnglish(m[1]) ?? m[1];
+        }
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    };
+    return { computeEmoji, computeUrl };
+}
+
+export function computeMonthlyDownloads(monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, dimension: string) {
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v[dimension] ?? {}]));
+    Object.values(monthlyDownloads).forEach(v => {
+        for (const name of Object.keys(v)) {
+            if (name.startsWith('Unknown, ') || name === 'Unknown') {
+                delete v[name];
+            }
+        }
+    });
+    return monthlyDownloads;
+}
+
+export function tryComputeRegionNameInEnglish(countryCode: string): string | undefined {
+    try {
+        return regionNamesInEnglish.of(countryCode);
+    } catch (e) {
+        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+    }
+}
+
+export function computeCountryName(countryCode: string): string {
+    if (countryCode === 'T1') return 'Tor traffic';
+    if (countryCode === 'XX') return 'Unknown';
+    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined ) ?? countryCode;
+}
+
+//
+
+const regionNamesInEnglish = new Intl.DisplayNames([ 'en' ], { type: 'region' });
+

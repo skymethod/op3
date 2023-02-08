@@ -1,13 +1,10 @@
-import { makeTopBox } from './top_box.ts';
+import { computeMonthlyDownloads, makeTopBox, regionCountryFunctions } from './top_box.ts';
 
 type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number> };
 
 export const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth }: Opts) => {
-
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['caRegion'] ?? {}]));
-    Object.values(monthlyDownloads).forEach(v => {
-        delete v['Unknown'];
-    });
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'caRegion');
+    const { computeUrl } = regionCountryFunctions('CA');
 
     return makeTopBox({
         type: 'ca-regions',
@@ -23,5 +20,6 @@ export const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, download
         downloadsPerMonth,
         tsvHeaderNames: [ 'caRegion' ],
         computeName: v => v,
+        computeUrl,
     });
 };

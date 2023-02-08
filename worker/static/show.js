@@ -9325,7 +9325,7 @@ function drawMinigraph(canvas, labelsAndValues, { onHover  } = {}) {
         };
     }
 }
-const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId , listId , templateId , cardId , monthlyDownloads , downloadsPerMonth , tsvHeaderNames , computeEmoji , computeName  })=>{
+const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId , listId , templateId , cardId , monthlyDownloads , downloadsPerMonth , tsvHeaderNames , computeEmoji , computeName , computeUrl  })=>{
     const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
         element(exportId),
         element(previousId),
@@ -9390,11 +9390,12 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
                 span.textContent = computeEmoji(key);
             }
             const dt = item.querySelector('dt');
-            if (key.startsWith('https://')) {
+            const isUrl = key.startsWith('https://');
+            if (isUrl || computeUrl) {
                 dt.textContent = '';
                 const a = document.createElement('a');
-                a.textContent = new URL(key).host;
-                a.href = key;
+                a.textContent = computeUrl ? computeName(key) : new URL(key).host;
+                a.href = computeUrl ? computeUrl(key) : key;
                 a.className = 'text-white';
                 a.target = '_blank';
                 a.rel = 'nofollow noopener noreferrer';
@@ -9450,23 +9451,75 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         update
     };
 };
-const makeTopCountries = ({ showSlug , monthlyDimensionDownloads  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['countryCode'] ?? {}
-        ]));
+function regionCountryFunctions(implicitCountry) {
     const regionalIndicators = Object.fromEntries([
         ...new Array(26).keys()
     ].map((v)=>[
             String.fromCharCode('A'.charCodeAt(0) + v),
             String.fromCodePoint('🇦'.codePointAt(0) + v)
         ]));
-    const computeEmoji = (countryCode)=>({
+    const computeEmoji = (str)=>{
+        const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
+        const countryCode = regionCountry.split(',').at(-1).trim();
+        return ({
             'T1': '🧅',
             'XX': '❔'
         })[countryCode] ?? [
             ...countryCode
         ].map((v)=>regionalIndicators[v]).join('');
+    };
+    const computeUrl = (str)=>{
+        const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
+        let query = regionCountry;
+        {
+            const m = /^(.*), ([A-Z]{2})$/.exec(query);
+            if (m) query = `${m[1]}, ${tryComputeRegionNameInEnglish(m[2]) ?? m[2]}`;
+        }
+        {
+            const m1 = /^([A-Z]{2})$/.exec(query);
+            if (m1) query = tryComputeRegionNameInEnglish(m1[1]) ?? m1[1];
+        }
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    };
+    return {
+        computeEmoji,
+        computeUrl
+    };
+}
+function computeMonthlyDownloads(monthlyDimensionDownloads, dimension) {
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v[dimension] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        for (const name1 of Object.keys(v)){
+            if (name1.startsWith('Unknown, ') || name1 === 'Unknown') {
+                delete v[name1];
+            }
+        }
+    });
+    return monthlyDownloads;
+}
+function tryComputeRegionNameInEnglish(countryCode) {
+    try {
+        return regionNamesInEnglish.of(countryCode);
+    } catch (e) {
+        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+    }
+}
+function computeCountryName(countryCode) {
+    if (countryCode === 'T1') return 'Tor traffic';
+    if (countryCode === 'XX') return 'Unknown';
+    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined) ?? countryCode;
+}
+const regionNamesInEnglish = new Intl.DisplayNames([
+    'en'
+], {
+    type: 'region'
+});
+const makeTopCountries = ({ showSlug , monthlyDimensionDownloads  })=>{
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'countryCode');
+    const { computeEmoji , computeUrl  } = regionCountryFunctions();
     return makeTopBox({
         type: 'countries',
         showSlug,
@@ -9482,26 +9535,10 @@ const makeTopCountries = ({ showSlug , monthlyDimensionDownloads  })=>{
             'countryName'
         ],
         computeEmoji,
-        computeName: computeCountryName
+        computeName: computeCountryName,
+        computeUrl
     });
 };
-const regionNamesInEnglish = new Intl.DisplayNames([
-    'en'
-], {
-    type: 'region'
-});
-function tryComputeRegionNameInEnglish(countryCode) {
-    try {
-        return regionNamesInEnglish.of(countryCode);
-    } catch (e) {
-        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
-    }
-}
-function computeCountryName(countryCode) {
-    if (countryCode === 'T1') return 'Tor traffic';
-    if (countryCode === 'XX') return 'Unknown';
-    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined) ?? countryCode;
-}
 const makeTopApps = ({ showSlug , monthlyDimensionDownloads  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
@@ -9949,10 +9986,8 @@ const METROS = {
     '996': `Whitehorse, YT`
 };
 const makeTopMetros = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['metroCode'] ?? {}
-        ]));
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'metroCode');
+    const { computeUrl  } = regionCountryFunctions('US');
     return makeTopBox({
         type: 'metros',
         showSlug,
@@ -9969,7 +10004,8 @@ const makeTopMetros = ({ showSlug , monthlyDimensionDownloads , downloadsPerMont
             'metroCode',
             'metroName'
         ],
-        computeName: computeMetroName
+        computeName: computeMetroName,
+        computeUrl: (v)=>computeUrl(computeMetroName(v))
     });
 };
 function computeMetroName(metroCode) {
@@ -10006,32 +10042,8 @@ const shorterDayFormat1 = new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC'
 });
 const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['euRegion'] ?? {}
-        ]));
-    Object.values(monthlyDownloads).forEach((v)=>{
-        for (const name1 of Object.keys(v)){
-            if (name1.startsWith('Unknown, ')) {
-                delete v[name1];
-            }
-        }
-    });
-    const regionalIndicators = Object.fromEntries([
-        ...new Array(26).keys()
-    ].map((v)=>[
-            String.fromCharCode('A'.charCodeAt(0) + v),
-            String.fromCodePoint('🇦'.codePointAt(0) + v)
-        ]));
-    const computeEmoji = (regionCountry)=>{
-        const countryCode = regionCountry.split(',').at(-1).trim();
-        return ({
-            'T1': '🧅',
-            'XX': '❔'
-        })[countryCode] ?? [
-            ...countryCode
-        ].map((v)=>regionalIndicators[v]).join('');
-    };
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'euRegion');
+    const { computeEmoji , computeUrl  } = regionCountryFunctions();
     return makeTopBox({
         type: 'eu-regions',
         showSlug,
@@ -10048,7 +10060,8 @@ const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             'euRegion'
         ],
         computeEmoji,
-        computeName: computeRegionName
+        computeName: computeRegionName,
+        computeUrl
     });
 };
 function computeRegionName(regionCountry) {
@@ -10059,32 +10072,8 @@ function computeRegionName(regionCountry) {
     return region;
 }
 const makeTopAuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['auRegion'] ?? {}
-        ]));
-    Object.values(monthlyDownloads).forEach((v)=>{
-        for (const name1 of Object.keys(v)){
-            if (name1.startsWith('Unknown, ')) {
-                delete v[name1];
-            }
-        }
-    });
-    const regionalIndicators = Object.fromEntries([
-        ...new Array(26).keys()
-    ].map((v)=>[
-            String.fromCharCode('A'.charCodeAt(0) + v),
-            String.fromCodePoint('🇦'.codePointAt(0) + v)
-        ]));
-    const computeEmoji = (regionCountry)=>{
-        const countryCode = regionCountry.split(',').at(-1).trim();
-        return ({
-            'T1': '🧅',
-            'XX': '❔'
-        })[countryCode] ?? [
-            ...countryCode
-        ].map((v)=>regionalIndicators[v]).join('');
-    };
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'auRegion');
+    const { computeEmoji , computeUrl  } = regionCountryFunctions();
     return makeTopBox({
         type: 'au-regions',
         showSlug,
@@ -10101,7 +10090,8 @@ const makeTopAuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             'auRegion'
         ],
         computeEmoji,
-        computeName: computeRegionName1
+        computeName: computeRegionName1,
+        computeUrl
     });
 };
 function computeRegionName1(regionCountry) {
@@ -10109,13 +10099,8 @@ function computeRegionName1(regionCountry) {
     return region;
 }
 const makeTopCaRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['caRegion'] ?? {}
-        ]));
-    Object.values(monthlyDownloads).forEach((v)=>{
-        delete v['Unknown'];
-    });
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'caRegion');
+    const { computeUrl  } = regionCountryFunctions('CA');
     return makeTopBox({
         type: 'ca-regions',
         showSlug,
@@ -10131,36 +10116,13 @@ const makeTopCaRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
         tsvHeaderNames: [
             'caRegion'
         ],
-        computeName: (v)=>v
+        computeName: (v)=>v,
+        computeUrl
     });
 };
 const makeTopAsRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['asRegion'] ?? {}
-        ]));
-    Object.values(monthlyDownloads).forEach((v)=>{
-        for (const name1 of Object.keys(v)){
-            if (name1.startsWith('Unknown, ')) {
-                delete v[name1];
-            }
-        }
-    });
-    const regionalIndicators = Object.fromEntries([
-        ...new Array(26).keys()
-    ].map((v)=>[
-            String.fromCharCode('A'.charCodeAt(0) + v),
-            String.fromCodePoint('🇦'.codePointAt(0) + v)
-        ]));
-    const computeEmoji = (regionCountry)=>{
-        const countryCode = regionCountry.split(',').at(-1).trim();
-        return ({
-            'T1': '🧅',
-            'XX': '❔'
-        })[countryCode] ?? [
-            ...countryCode
-        ].map((v)=>regionalIndicators[v]).join('');
-    };
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'asRegion');
+    const { computeEmoji , computeUrl  } = regionCountryFunctions();
     return makeTopBox({
         type: 'as-regions',
         showSlug,
@@ -10177,7 +10139,8 @@ const makeTopAsRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             'asRegion'
         ],
         computeEmoji,
-        computeName: computeRegionName2
+        computeName: computeRegionName2,
+        computeUrl
     });
 };
 function computeRegionName2(regionCountry) {
@@ -10185,32 +10148,8 @@ function computeRegionName2(regionCountry) {
     return region;
 }
 const makeTopLatamRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
-            n,
-            v['latamRegion'] ?? {}
-        ]));
-    Object.values(monthlyDownloads).forEach((v)=>{
-        for (const name1 of Object.keys(v)){
-            if (name1.startsWith('Unknown, ')) {
-                delete v[name1];
-            }
-        }
-    });
-    const regionalIndicators = Object.fromEntries([
-        ...new Array(26).keys()
-    ].map((v)=>[
-            String.fromCharCode('A'.charCodeAt(0) + v),
-            String.fromCodePoint('🇦'.codePointAt(0) + v)
-        ]));
-    const computeEmoji = (regionCountry)=>{
-        const countryCode = regionCountry.split(',').at(-1).trim();
-        return ({
-            'T1': '🧅',
-            'XX': '❔'
-        })[countryCode] ?? [
-            ...countryCode
-        ].map((v)=>regionalIndicators[v]).join('');
-    };
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'latamRegion');
+    const { computeEmoji , computeUrl  } = regionCountryFunctions();
     return makeTopBox({
         type: 'latam-regions',
         showSlug,
@@ -10227,7 +10166,8 @@ const makeTopLatamRegions = ({ showSlug , monthlyDimensionDownloads , downloadsP
             'latamRegion'
         ],
         computeEmoji,
-        computeName: computeRegionName3
+        computeName: computeRegionName3,
+        computeUrl
     });
 };
 function computeRegionName3(regionCountry) {

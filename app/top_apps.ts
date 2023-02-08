@@ -5,7 +5,6 @@ import { increment } from '../worker/summaries.ts';
 type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
 
 export const makeTopApps = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
-
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, computeAppDownloads(v)]));
 
     return makeTopBox({
