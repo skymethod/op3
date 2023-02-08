@@ -216,6 +216,27 @@ const sessionToken = '${sessionToken}';
                 </template>
             </sl-card>
 
+            <!-- top latam regions -->
+            <sl-card id="top-latam-regions-card" class="card-basic flex justify-center">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Latin American regions</div>
+                    <sl-icon-button id="top-latam-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-latam-regions-month-previous"></sl-icon-button>
+                    <span id="top-latam-regions-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-latam-regions-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-latam-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
+                <template id="top-latam-regions-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">Latam Region</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
+
             <!-- top eu regions -->
             <sl-card id="top-eu-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
@@ -232,15 +253,36 @@ const sessionToken = '${sessionToken}';
                 <dl id="top-eu-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
                 <template id="top-eu-regions-row">
                     <span class="leading-relaxed"></span>
-                    <dt class="leading-relaxed text-ellipsis overflow-hidden">EU Region</dt>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">EU Region</dt>
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
             </sl-card>
 
+            <!-- top as regions -->
+            <sl-card id="top-as-regions-card" class="card-basic flex justify-center">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Asian regions</div>
+                    <sl-icon-button id="top-as-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-as-regions-month-previous"></sl-icon-button>
+                    <span id="top-as-regions-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="Next" id="top-as-regions-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-as-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
+                <template id="top-as-regions-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">Asia Region</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
+            
             <!-- top au regions -->
             <sl-card id="top-au-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Australasia regions</div>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Australasian regions</div>
                     <sl-icon-button id="top-au-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
                 </div>
             
@@ -253,7 +295,7 @@ const sessionToken = '${sessionToken}';
                 <dl id="top-au-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max"></dl>
                 <template id="top-au-regions-row">
                     <span class="leading-relaxed"></span>
-                    <dt class="leading-relaxed text-ellipsis overflow-hidden">AU Region</dt>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">AU Region</dt>
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
             </sl-card>

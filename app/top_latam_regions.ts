@@ -2,9 +2,9 @@ import { makeTopBox } from './top_box.ts';
 
 type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number> };
 
-export const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth }: Opts) => {
+export const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth }: Opts) => {
 
-    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['euRegion'] ?? {}]));
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['latamRegion'] ?? {}]));
     Object.values(monthlyDownloads).forEach(v => {
         for (const name of Object.keys(v)) {
             if (name.startsWith('Unknown, ')) {
@@ -19,18 +19,18 @@ export const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, download
     };
 
     return makeTopBox({
-        type: 'eu-regions',
+        type: 'latam-regions',
         showSlug,
-        exportId: 'top-eu-regions-export',
-        previousId: 'top-eu-regions-month-previous',
-        nextId: 'top-eu-regions-month-next',
-        monthId: 'top-eu-regions-month',
-        listId: 'top-eu-regions',
-        templateId: 'top-eu-regions-row',
-        cardId: 'top-eu-regions-card',
+        exportId: 'top-latam-regions-export',
+        previousId: 'top-latam-regions-month-previous',
+        nextId: 'top-latam-regions-month-next',
+        monthId: 'top-latam-regions-month',
+        listId: 'top-latam-regions',
+        templateId: 'top-latam-regions-row',
+        cardId: 'top-latam-regions-card',
         monthlyDownloads,
         downloadsPerMonth,
-        tsvHeaderNames: [ 'euRegion' ],
+        tsvHeaderNames: [ 'latamRegion' ],
         computeEmoji,
         computeName: computeRegionName,
     });
@@ -40,6 +40,10 @@ export const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, download
 
 function computeRegionName(regionCountry: string): string {
     let region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
-    region = { 'Free and Hanseatic City of Hamburg': 'Hamburg' }[region] ?? region;
+    let m = /^(Departamento del? |Region del? |Provincia del? |Provincia )(.*)$/.exec(region);
+    if (m) region = m[2];
+    m = /^(.*)( Department| Region)$/.exec(region);
+    if (m) region = m[1];
+    region = { 'Santo Domingo de los Tsachilas': 'Santo Domingo' }[region] ?? region;
     return region;
 }

@@ -13,8 +13,8 @@ export const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, download
         }
     });
     const regionalIndicators = Object.fromEntries([...new Array(26).keys()].map(v => [ String.fromCharCode('A'.charCodeAt(0) + v), String.fromCodePoint('🇦'.codePointAt(0)! + v) ]));
-    const computeEmoji = (euRegion: string) => {
-        const countryCode = euRegion.split(',').at(-1)!.trim();
+    const computeEmoji = (regionCountry: string) => {
+        const countryCode = regionCountry.split(',').at(-1)!.trim();
         return ({ 'T1': '🧅', 'XX': '❔' })[countryCode] ?? [...countryCode].map(v => regionalIndicators[v]).join('');
     };
 
@@ -38,7 +38,7 @@ export const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, download
 
 //
 
-function computeRegionName(auRegion: string): string {
-    const region = auRegion.substring(0, auRegion.length - ', XX'.length).trim();
+function computeRegionName(regionCountry: string): string {
+    const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }

@@ -10023,8 +10023,8 @@ const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             String.fromCharCode('A'.charCodeAt(0) + v),
             String.fromCodePoint('🇦'.codePointAt(0) + v)
         ]));
-    const computeEmoji = (euRegion)=>{
-        const countryCode = euRegion.split(',').at(-1).trim();
+    const computeEmoji = (regionCountry)=>{
+        const countryCode = regionCountry.split(',').at(-1).trim();
         return ({
             'T1': '🧅',
             'XX': '❔'
@@ -10051,8 +10051,8 @@ const makeTopEuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
         computeName: computeRegionName
     });
 };
-function computeRegionName(euRegion) {
-    let region = euRegion.substring(0, euRegion.length - ', XX'.length).trim();
+function computeRegionName(regionCountry) {
+    let region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     region = ({
         'Free and Hanseatic City of Hamburg': 'Hamburg'
     })[region] ?? region;
@@ -10076,8 +10076,8 @@ const makeTopAuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
             String.fromCharCode('A'.charCodeAt(0) + v),
             String.fromCodePoint('🇦'.codePointAt(0) + v)
         ]));
-    const computeEmoji = (euRegion)=>{
-        const countryCode = euRegion.split(',').at(-1).trim();
+    const computeEmoji = (regionCountry)=>{
+        const countryCode = regionCountry.split(',').at(-1).trim();
         return ({
             'T1': '🧅',
             'XX': '❔'
@@ -10104,8 +10104,8 @@ const makeTopAuRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
         computeName: computeRegionName1
     });
 };
-function computeRegionName1(auRegion) {
-    const region = auRegion.substring(0, auRegion.length - ', XX'.length).trim();
+function computeRegionName1(regionCountry) {
+    const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
 const makeTopCaRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
@@ -10134,6 +10134,113 @@ const makeTopCaRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerM
         computeName: (v)=>v
     });
 };
+const makeTopAsRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['asRegion'] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        for (const name1 of Object.keys(v)){
+            if (name1.startsWith('Unknown, ')) {
+                delete v[name1];
+            }
+        }
+    });
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    const computeEmoji = (regionCountry)=>{
+        const countryCode = regionCountry.split(',').at(-1).trim();
+        return ({
+            'T1': '🧅',
+            'XX': '❔'
+        })[countryCode] ?? [
+            ...countryCode
+        ].map((v)=>regionalIndicators[v]).join('');
+    };
+    return makeTopBox({
+        type: 'as-regions',
+        showSlug,
+        exportId: 'top-as-regions-export',
+        previousId: 'top-as-regions-month-previous',
+        nextId: 'top-as-regions-month-next',
+        monthId: 'top-as-regions-month',
+        listId: 'top-as-regions',
+        templateId: 'top-as-regions-row',
+        cardId: 'top-as-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'asRegion'
+        ],
+        computeEmoji,
+        computeName: computeRegionName2
+    });
+};
+function computeRegionName2(regionCountry) {
+    const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
+    return region;
+}
+const makeTopLatamRegions = ({ showSlug , monthlyDimensionDownloads , downloadsPerMonth  })=>{
+    const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
+            n,
+            v['latamRegion'] ?? {}
+        ]));
+    Object.values(monthlyDownloads).forEach((v)=>{
+        for (const name1 of Object.keys(v)){
+            if (name1.startsWith('Unknown, ')) {
+                delete v[name1];
+            }
+        }
+    });
+    const regionalIndicators = Object.fromEntries([
+        ...new Array(26).keys()
+    ].map((v)=>[
+            String.fromCharCode('A'.charCodeAt(0) + v),
+            String.fromCodePoint('🇦'.codePointAt(0) + v)
+        ]));
+    const computeEmoji = (regionCountry)=>{
+        const countryCode = regionCountry.split(',').at(-1).trim();
+        return ({
+            'T1': '🧅',
+            'XX': '❔'
+        })[countryCode] ?? [
+            ...countryCode
+        ].map((v)=>regionalIndicators[v]).join('');
+    };
+    return makeTopBox({
+        type: 'latam-regions',
+        showSlug,
+        exportId: 'top-latam-regions-export',
+        previousId: 'top-latam-regions-month-previous',
+        nextId: 'top-latam-regions-month-next',
+        monthId: 'top-latam-regions-month',
+        listId: 'top-latam-regions',
+        templateId: 'top-latam-regions-row',
+        cardId: 'top-latam-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'latamRegion'
+        ],
+        computeEmoji,
+        computeName: computeRegionName3
+    });
+};
+function computeRegionName3(regionCountry) {
+    let region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
+    let m = /^(Departamento del? |Region del? |Provincia del? |Provincia )(.*)$/.exec(region);
+    if (m) region = m[2];
+    m = /^(.*)( Department| Region)$/.exec(region);
+    if (m) region = m[1];
+    region = ({
+        'Santo Domingo de los Tsachilas': 'Santo Domingo'
+    })[region] ?? region;
+    return region;
+}
 const app = (()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -10232,6 +10339,16 @@ const app = (()=>{
         downloadsPerMonth
     });
     makeTopAuRegions({
+        showSlug,
+        monthlyDimensionDownloads,
+        downloadsPerMonth
+    });
+    makeTopAsRegions({
+        showSlug,
+        monthlyDimensionDownloads,
+        downloadsPerMonth
+    });
+    makeTopLatamRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth

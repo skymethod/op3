@@ -16,6 +16,8 @@ import { makeFooter } from './footer.ts';
 import { makeTopEuRegions } from './top_eu_regions.ts';
 import { makeTopAuRegions } from './top_au_regions.ts';
 import { makeTopCaRegions } from './top_ca_regions.ts';
+import { makeTopAsRegions } from './top_as_regions.ts';
+import { makeTopLatamRegions } from './top_latam_regions.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -73,6 +75,8 @@ const app = (() => {
     makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
+    makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
+    makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
     makeFooter({ mostRecentDate });
 
     function update() {
