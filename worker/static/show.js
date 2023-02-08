@@ -9041,7 +9041,7 @@ async function downloadDownloads(e, showUuid, showSlug, month, previewToken1, in
     const { type  } = parts[0];
     download(parts, {
         type,
-        filename: `${showSlug}-downloads-${month}.tsv`
+        filename: `${showSlug}-downloads-${month}${includeBots ? `-including-bots` : ''}.tsv`
     });
 }
 const makeHeadlineStats = ({ hourlyDownloads , dailyFoundAudience  })=>{

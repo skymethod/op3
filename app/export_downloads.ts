@@ -111,5 +111,5 @@ async function downloadDownloads(e: Event, showUuid: string, showSlug: string, m
     if (signal.aborted) return;
 
     const { type } = parts[0];
-    download(parts, { type, filename: `${showSlug}-downloads-${month}.tsv`});
+    download(parts, { type, filename: `${showSlug}-downloads-${month}${includeBots ? `-including-bots` : ''}.tsv`});
 }
