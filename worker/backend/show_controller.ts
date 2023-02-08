@@ -13,7 +13,7 @@ import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
-import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowRecord, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowRecord, WorkRecord } from './show_controller_model.ts';
+import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowRecord, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 
@@ -139,7 +139,7 @@ export class ShowController {
         }
 
         {
-            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls)$/.exec(targetPath);
+            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls|show-episodes-by-pubdate)$/.exec(targetPath);
             if (m && operationKind === 'select') {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
@@ -148,6 +148,7 @@ export class ShowController {
                     'feed-to-show': IndexType.FeedRecordIdToShowUuid,
                     'show-episodes': IndexType.ShowEpisodes,
                     'feed-media-urls': IndexType.FeedMediaUrls,
+                    'show-episodes-by-pubdate': IndexType.ShowEpisodesByPubdate,
                 }[m[1]];
                 const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
                 const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
@@ -693,8 +694,9 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
                         }
                     }
                 }
-                const { title, pubdate, pubdateInstant } = item;
-                const update: FeedItemRecord = { ...record, lastOkFetch, lastSeenInstant: instant, relevantUrls, title, pubdate, pubdateInstant };
+                const { title, pubdate, pubdateInstant, transcripts } = item;
+                const hasTranscripts = transcripts && transcripts.length > 0;
+                const update: FeedItemRecord = { ...record, lastOkFetch, lastSeenInstant: instant, relevantUrls, title, pubdate, pubdateInstant, hasTranscripts };
                 newRecords[feedItemRecordKey] = update;
                 if (isInsert) {
                     inserts++;
@@ -721,16 +723,21 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
 
     if (showUuid !== undefined) {
         // update show attributes if necessary
-        await setShowAttributesFromFeed(feedRecord, storage, rt);
+        const show = await setShowAttributesFromFeed(feedRecord, storage, rt);
 
-        // ensure show episodes exist for all feed items
-        const { inserts, updates, indexWrites } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, storage });
-        if (inserts > 0) rt.push(`${inserts} ep inserts`);
-        if (updates > 0) rt.push(`${updates} ep updates`);
-        if (indexWrites > 0) rt.push(`${indexWrites} ep index writes`);
+        const podcastGuid = show?.podcastGuid;
+        await ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage, rt });
     }
 
     return rt.join(', ');
+}
+
+async function ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage, rt }: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined, storage: DurableObjectStorage, rt: string[] }) {
+    const { inserts, updates, index1Writes, index2Writes } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage });
+    if (inserts > 0) rt.push(`${inserts} ep inserts`);
+    if (updates > 0) rt.push(`${updates} ep updates`);
+    if (index1Writes > 0) rt.push(`${index1Writes} ep index writes`);
+    if (index2Writes > 0) rt.push(`${index2Writes} ep-by-pubdate index writes`);
 }
 
 function needsAnotherFetch(record: MediaUrlIndexRecord): boolean {
@@ -832,11 +839,8 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
         [ computeFeedRecordIdToShowUuidIndexKey(feedRecord.id), showUuid ],
     ]));
 
-    // ensure show episodes exist for all feed items
-    const { inserts, updates, indexWrites } = await ensureEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, storage });
-    if (inserts > 0) rt.push(`${inserts} ep inserts`);
-    if (updates > 0) rt.push(`${updates} ep updates`);
-    if (indexWrites > 0) rt.push(`${indexWrites} ep index writes`);
+    const { podcastGuid } = showRecord;
+    await ensureShowEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, podcastGuid, storage, rt });
 
     return rt.join(', ');
 }
@@ -854,7 +858,7 @@ async function removeShowUuid(feedRecord: FeedRecord, storage: DurableObjectStor
     return showUuid;
 }
 
-async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: DurableObjectStorage, messages: string[]): Promise<void> {
+async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: DurableObjectStorage, messages: string[]): Promise<ShowRecord | undefined> {
     const { showUuid } = feedRecord;
     if (!showUuid) return;
     const showKey = computeShowKey(showUuid);
@@ -866,15 +870,18 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
         await storage.put(showKey, update);
         messages.push(`show.title ${show.title} -> ${ title }`);
     }
+    return show;
 }
 
-async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number, indexWrites: number }> {
-    const { feedRecordId, showUuid, storage } = opts;
+async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined,  storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number, index1Writes: number, index2Writes: number }> {
+    const { feedRecordId, showUuid, podcastGuid, storage } = opts;
     const map = await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) });
     let inserts = 0;
     let updates = 0;
-    let indexWrites = 0;
-    const indexRecords: Record<string, Record<string, unknown>> = {};
+    let index1Writes = 0;
+    let index2Writes = 0;
+    const index1Records: Record<string, Record<string, unknown>> = {};
+    const index2Records: Record<string, ShowEpisodesByPubdateIndexRecord> = {};
     const epRecords: Record<string, EpisodeRecord> = {};
     for (const batch of chunk([...map.values()].filter(isFeedItemRecord), 128)) {
         const itemGuids = batch.map(v => v.guid);
@@ -887,32 +894,33 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
             const episodeId = episodeIds[i];
             const episodeKey = episodeKeys[i];
             const existing = map.get(episodeKey);
-            const { title, pubdate, pubdateInstant } = feedItem;
+            const { title, pubdate, pubdateInstant, hasTranscripts } = feedItem;
             if (isEpisodeRecord(existing)) {
                 const firstSeenInstant = [ feedItem.firstSeenInstant, existing.firstSeenInstant ].filter(isString).sort()[0];
                 const lastSeenInstant = [ feedItem.lastSeenInstant, existing.lastSeenInstant ].filter(isString).sort().reverse()[0];
-                if (title !== existing.title || pubdate !== existing.pubdate || pubdateInstant !== existing.pubdateInstant || firstSeenInstant !== existing.firstSeenInstant || lastSeenInstant !== existing.lastSeenInstant) {
-                    const update: EpisodeRecord = { ...existing, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant };
+                if (title !== existing.title || pubdate !== existing.pubdate || pubdateInstant !== existing.pubdateInstant || firstSeenInstant !== existing.firstSeenInstant || lastSeenInstant !== existing.lastSeenInstant || hasTranscripts !== existing.hasTranscripts) {
+                    const update: EpisodeRecord = { ...existing, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant, hasTranscripts };
                     epRecords[computeEpisodeKey(update)] = update;
                     updates++;
                 }
             } else {
                 const { firstSeenInstant, lastSeenInstant } = feedItem;
-                const insert: EpisodeRecord = { showUuid, id: episodeId, itemGuid, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant };
+                const insert: EpisodeRecord = { showUuid, id: episodeId, itemGuid, title, pubdate, pubdateInstant, firstSeenInstant, lastSeenInstant, hasTranscripts };
                 epRecords[computeEpisodeKey(insert)] = insert;
                 inserts++;
             }
-            indexRecords[computeShowEpisodesIndexKey(showUuid, episodeId)] = {};
-            indexWrites++;
+            index1Records[computeShowEpisodesIndexKey(showUuid, episodeId)] = {};
+            index1Writes++;
+            if (pubdateInstant) {
+                index2Records[computeShowEpisodesByPubdateIndexKey({ pubdateInstant, episodeId, showUuid })] = { showUuid, podcastGuid, episodeId, itemGuid, pubdateInstant, hasTranscripts };
+                index2Writes++;
+            }
         }
     }
-    for (const batch of chunk(Object.entries(epRecords), 128)) {
+    for (const batch of chunk([...Object.entries(epRecords), ...Object.entries(index1Records), ...Object.entries(index2Records)], 128)) {
         await storage.put(Object.fromEntries(batch));
     }
-    for (const batch of chunk(Object.entries(indexRecords), 128)) {
-        await storage.put(Object.fromEntries(batch));
-    }
-    return { inserts, updates, indexWrites };
+    return { inserts, updates, index1Writes, index2Writes };
 }
 
 type LookupShowMetrics = { messages: string[], storageListCalls: number, indexRecordsScanned: number, feedItemGetCalls: number, feedGetCalls: number, episodeGetCalls: number };
@@ -1069,6 +1077,7 @@ enum IndexType {
     FeedRecordIdToShowUuid = 4,
     ShowEpisodes = 5,
     FeedMediaUrls = 6,
+    ShowEpisodesByPubdate = 7,
 }
 
 function computePodcastGuidIndexKey(podcastGuid: string) {
@@ -1141,3 +1150,6 @@ function computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }: { feedRecordId: st
     return `sc.i0.${IndexType.FeedMediaUrls}.${feedRecordId}.`;
 }
 
+function computeShowEpisodesByPubdateIndexKey({ pubdateInstant, showUuid, episodeId }: { pubdateInstant: string, showUuid: string, episodeId: string }) {
+    return `sc.i0.${IndexType.ShowEpisodesByPubdate}.${pubdateInstant}.${showUuid}.${episodeId}`;
+}

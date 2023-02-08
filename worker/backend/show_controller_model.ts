@@ -144,6 +144,7 @@ export interface FeedItemRecord {
     readonly lastSeenInstant: string;
     readonly lastOkFetch?: FetchInfo;
     readonly relevantUrls: Record<string, string>; // tiny jpath string (e.0.url or ae.0.s.0.uri) -> op3 url
+    readonly hasTranscripts?: boolean;
 }
 
 export function isFeedItemRecord(obj: unknown): obj is FeedItemRecord {
@@ -158,6 +159,7 @@ export function isFeedItemRecord(obj: unknown): obj is FeedItemRecord {
         && typeof obj.lastSeenInstant === 'string'
         && (obj.lastOkFetch === undefined || isFetchInfo(obj.lastOkFetch))
         && isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string')
+        && (obj.hasTranscripts === undefined || typeof obj.hasTranscripts === 'boolean')
         ;
 }
 
@@ -184,6 +186,7 @@ export interface EpisodeRecord {
     readonly pubdateInstant?: string;
     readonly firstSeenInstant?: string;
     readonly lastSeenInstant?: string;
+    readonly hasTranscripts?: boolean;
 }
 
 export function isEpisodeRecord(obj: unknown): obj is EpisodeRecord {
@@ -196,6 +199,7 @@ export function isEpisodeRecord(obj: unknown): obj is EpisodeRecord {
         && (obj.pubdateInstant === undefined || typeof obj.pubdateInstant === 'string')
         && (obj.firstSeenInstant === undefined || typeof obj.firstSeenInstant === 'string')
         && (obj.lastSeenInstant === undefined || typeof obj.lastSeenInstant === 'string')
+        && (obj.hasTranscripts === undefined || typeof obj.hasTranscripts === 'boolean')
         ;
 }
 
@@ -226,5 +230,27 @@ export function isMediaUrlIndexRecord(obj: unknown): obj is MediaUrlIndexRecord 
         && (obj.responseInstant === undefined || typeof obj.responseInstant === 'string')
         && (obj.responseHeaders === undefined || Array.isArray(obj.responseHeaders) && obj.responseHeaders.every(v => Array.isArray(v) && v.length === 2 && v.every(w => typeof w === 'string')))
         && (obj.redirectUrls === undefined || Array.isArray(obj.redirectUrls) && obj.redirectUrls.every(v => typeof v === 'string'))
+        ;
+}
+
+export interface ShowEpisodesByPubdateIndexRecord {
+    // show-level
+    readonly showUuid: string;
+    readonly podcastGuid?: string;
+    // item-level
+    readonly episodeId: string;
+    readonly itemGuid: string;
+    readonly pubdateInstant: string;
+    readonly hasTranscripts?: boolean;
+}
+
+export function isShowEpisodesByPubdateIndexRecord(obj: unknown): obj is ShowEpisodesByPubdateIndexRecord {
+    return isStringRecord(obj)
+        && typeof obj.showUuid === 'string'
+        && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
+        && typeof obj.episodeId === 'string'
+        && typeof obj.itemGuid === 'string'
+        && typeof obj.pubdateInstant === 'string'
+        && (obj.hasTranscripts === undefined || typeof obj.hasTranscripts === 'boolean')
         ;
 }
