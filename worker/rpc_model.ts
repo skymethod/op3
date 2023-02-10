@@ -194,7 +194,6 @@ export interface QueryRedirectLogsRequest {
     readonly source?: string;
     readonly ulid?: string;
     readonly method?: string;
-    readonly uuid?: string;
 }
 
 export interface QueryDownloadsRequest {

@@ -1,5 +1,5 @@
 export type { CfGlobalCaches, CfCache, IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage, DurableObjectStorageMethods, 
-    AnalyticsEngine, DurableObjectStorageValue, AnalyticsEngineEvent, DurableObjectStorageListOptions, 
+    AnalyticsEngine, DurableObjectStorageValue, AnalyticsEngineEvent, DurableObjectStorageListOptions, DurableObjectStorageReadOptions,
     R2Bucket, R2ListOptions, KVNamespace, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody,
     QueueMessageBatch, QueueMessage, Queue } from 'https://raw.githubusercontent.com/skymethod/denoflare/a760274c0e0f62f0512c0d14de08614d6dc1d5b4/common/cloudflare_workers_types.d.ts';
 export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/a760274c0e0f62f0512c0d14de08614d6dc1d5b4/common/bytes.ts';

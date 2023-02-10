@@ -7,7 +7,6 @@ import { packError } from '../errors.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { writeTraceEvent } from '../tracer.ts';
-import { isValidUuid } from '../uuid.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeApiQueryCommonParameters } from './api_query_common.ts';
 
@@ -30,9 +29,9 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
 
 async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined): Promise<Unkinded<QueryRedirectLogsRequest>> {
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_REDIRECT_LOGS) };
-    const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method, uuid } = Object.fromEntries(searchParams);
+    const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method } = Object.fromEntries(searchParams);
 
-    if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method, uuid ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
+    if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
     if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
     if (typeof url === 'string') {
         const m = /^(https?:\/\/.+?)\*$/.exec(url);
@@ -82,17 +81,13 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         checkMatches('method', method, /^(HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$/);
         request = { ...request, method };
     }
-    if (typeof uuid === 'string') {
-        check('uuid', uuid, isValidUuid);
-        request = { ...request, uuid };
-    }
     return request;
 }
 
 function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
-    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid } = request;
-    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method, uuid };
+    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method } = request;
+    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method };
     let filterName = '';
     let filterValue = '';
     for (const [ name, value ] of Object.entries(filters)) {

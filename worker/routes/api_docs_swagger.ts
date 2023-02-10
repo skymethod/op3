@@ -187,15 +187,6 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "required": false,
                             "format": "http method",
                         },
-                        {
-                            "name": "uuid",
-                            "in": "query",
-                            "description": "Filter to a single log request (find by id)\n\nEach redirect request is given a private, globally-unique identifier at the edge colo to serve as the primary key of this table",
-                            "example": `d20ddd1f239848c9b9aaa4095864b969`,
-                            "required": false,
-                            "format": "32-character hex",
-                        },
-
                     ],
                     "responses": {
                         "200": {

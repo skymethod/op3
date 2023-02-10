@@ -537,7 +537,7 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
     [ 'source', IndexId.Source, v => v ],
     [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
-    [ 'uuid', IndexId.Uuid, v => v ],
+    [ 'uuid', IndexId.Uuid, _ => undefined ], // disabled 2023-02-10 [ 'uuid', IndexId.Uuid, v => v ],
     [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${computeServerUrl(v).substring(0, 1024)}` ],
 ];
 
