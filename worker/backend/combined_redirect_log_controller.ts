@@ -175,6 +175,19 @@ export class CombinedRedirectLogController {
             return { results };
         }
 
+        const m = /^\/crl\/indexes\/(\d+)$/.exec(targetPath);
+        if (operationKind === 'select' && m) {
+            const indexId = parseInt(m[1]);
+            const map = await this.storage.list(computeListOpts(`crl.i0.${indexId}.`, parameters));
+            const results: unknown[] = [];
+            for (const [ key, value ] of map) {
+                const obj = isStringRecord(value) ? value : { _unknown: value };
+                obj._key = key;
+                results.push(obj);
+            }
+            return { results };
+        }
+
         throw new Error(`Unsupported crl-related query`);
     }
 
