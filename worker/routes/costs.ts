@@ -42,6 +42,21 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2023-02-10',
+        description: 'Cloudflare invoice',
+        cost: 383.92,
+        detail: [
+            { description: 'Workers Paid Subscription', cost: 5.00 },
+            { description: 'Workers requests', cost: 20.05 },
+            { description: 'Durable Objects Compute', cost: 12.50 },
+            { description: 'Durable Objects Reads/Writes/Deletes', cost: 284.60 },
+            { description: 'Durable Objects Storage', cost: 27.80 },
+            { description: 'R2 Data Storage', cost: 0.20 },
+            { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
+            { description: 'Sales Tax', cost: 23.77 },
+        ]
+    },
+    {
         date: '2023-01-10',
         daysInYear: { '2022': 22, '2023': 9 },
         description: 'Cloudflare invoice',
