@@ -1,4 +1,4 @@
-import { Bytes, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
+import { Bytes, chunk, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { checkMatches, isStringRecord } from '../check.ts';
 import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
@@ -176,16 +176,36 @@ export class CombinedRedirectLogController {
         }
 
         const m = /^\/crl\/indexes\/(\d+)$/.exec(targetPath);
-        if (operationKind === 'select' && m) {
+        if (m && (operationKind === 'select' || operationKind === 'delete')) {
             const indexId = parseInt(m[1]);
+            if (typeof parameters.limit !== 'string') throw new Error(`Must provide a limit`);
             const map = await this.storage.list(computeListOpts(`crl.i0.${indexId}.`, parameters));
-            const results: unknown[] = [];
-            for (const [ key, value ] of map) {
-                const obj = isStringRecord(value) ? value : { _unknown: value };
-                obj._key = key;
-                results.push(obj);
+            if (operationKind === 'select') {
+                const results: unknown[] = [];
+                for (const [ key, value ] of map) {
+                    const obj = isStringRecord(value) ? value : { _unknown: value };
+                    obj._key = key;
+                    results.push(obj);
+                }
+                return { results };
             }
-            return { results };
+            if (operationKind === 'delete') {
+                const allowedToDelete = [ IndexId.Uuid ];
+                if (!allowedToDelete.includes(indexId)) throw new Error(`Not allowed to delete index ${indexId}`);
+                const keys = [...map.keys()];
+                const firstKey = keys.at(0);
+                const lastKey = keys.at(-1);
+                let toDelete = 0;
+                let deleted = 0;
+                let deleteCalls = 0;
+                for (const batch of chunk(keys, 128)) {
+                    toDelete += batch.length;
+                    deleted += await this.storage.delete(batch);
+                    deleteCalls++;
+                }
+                const results = [ { firstKey, lastKey, keys: keys.length, toDelete, deleted, deleteCalls } ];
+                return { results };
+            }
         }
 
         throw new Error(`Unsupported crl-related query`);
