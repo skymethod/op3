@@ -68,7 +68,7 @@ function tryParseTimestampFromTimestampAndUuid(timestampAndUuid: string): string
 }
 
 async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Map<string, DurableObjectStorageValue>> {
-    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, rawIpAddress, edgeColo, doColo, source, ulid, method } = request;
+    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, rawIpAddress, ulid, method } = request;
     // parameters validated in edge worker
 
     // compute hashedIpAddress for caller if necessary
@@ -86,7 +86,7 @@ async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, sto
         prefix = `crl.i0.${IndexId.UrlSha256}.${urlSha256}.`;
         index = IndexId[IndexId.UrlSha256];
     } else {
-        for (const [ name, value ] of Object.entries({ userAgent, referer, range, hashedIpAddress, edgeColo, doColo, source, ulid, method })) {
+        for (const [ name, value ] of Object.entries({ userAgent, referer, range, hashedIpAddress, ulid, method })) {
             if (value === undefined) continue;
             const property = name === 'other.colo' ? 'edgeColo' : name;
             const def = INDEX_DEFINITIONS.find(v => v[0] === property);

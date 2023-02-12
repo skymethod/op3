@@ -191,7 +191,7 @@ export class CombinedRedirectLogController {
                 return { results };
             }
             if (operationKind === 'delete') {
-                const allowedToDelete = [ IndexId.Uuid ];
+                const allowedToDelete = [ IndexId.Uuid, IndexId.EdgeColo, IndexId.DoColo, IndexId.Source ];
                 if (!allowedToDelete.includes(indexId)) throw new Error(`Not allowed to delete index ${indexId}`);
                 const keys = [...map.keys()];
                 const firstKey = keys.at(0);
@@ -553,9 +553,9 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
     [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
     [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
     [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
-    [ 'other.colo', IndexId.EdgeColo, v => v ],
-    [ 'doColo', IndexId.DoColo, v => v ],
-    [ 'source', IndexId.Source, v => v ],
+    [ 'other.colo', IndexId.EdgeColo, _ => undefined ], // disabled 2023-02-12 [ 'other.colo', IndexId.EdgeColo, v => v ],
+    [ 'doColo', IndexId.DoColo, _ => undefined ], // disabled 2023-02-12 [ 'doColo', IndexId.DoColo, v => v ],
+    [ 'source', IndexId.Source, _ => undefined ], // disabled 2023-02-12 [ 'source', IndexId.Source, v => v ],
     [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
     [ 'uuid', IndexId.Uuid, _ => undefined ], // disabled 2023-02-10 [ 'uuid', IndexId.Uuid, v => v ],

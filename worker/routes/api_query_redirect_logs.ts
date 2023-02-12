@@ -69,10 +69,6 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
             request = { ...request, hashedIpAddress };
         }
     }
-    if (typeof edgeColo === 'string') {
-        check('edgeColo', edgeColo, isNotBlank);
-        request = { ...request, edgeColo };
-    }
     if (typeof ulid === 'string') {
         check('ulid', ulid, isNotBlank);
         request = { ...request, ulid };
@@ -86,8 +82,8 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
 
 function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
-    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method } = request;
-    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, edgeColo, doColo, source, ulid, method };
+    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, ulid, method } = request;
+    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, ulid, method };
     let filterName = '';
     let filterValue = '';
     for (const [ name, value ] of Object.entries(filters)) {

@@ -189,9 +189,6 @@ export interface QueryRedirectLogsRequest {
     readonly range?: string;
     readonly hashedIpAddress?: string;
     readonly rawIpAddress?: string; // only allow caller ip
-    readonly edgeColo?: string;
-    readonly doColo?: string;
-    readonly source?: string;
     readonly ulid?: string;
     readonly method?: string;
 }

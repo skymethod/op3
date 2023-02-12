@@ -166,13 +166,6 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "type": "40-character hex",
                         },
                         {
-                            "name": "edgeColo",
-                            "in": "query",
-                            "description": "Filter by a specific CDN edge colo",
-                            "example": `DFW`,
-                            "required": false,
-                        },
-                        {
                             "name": "ulid",
                             "in": "query",
                             "description": "Filter by a specific ULID\n\nLearn more about ULIDs at [podcastlistening.com](https://podcastlistening.com/)",
