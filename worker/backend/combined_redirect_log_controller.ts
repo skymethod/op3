@@ -110,16 +110,17 @@ export class CombinedRedirectLogController {
         await storage.put(`crl.ss.${doName}`, newState);
         this.updateSourceStateCache(newState);
 
-        await storage.transaction(async txn => {
+        const setAlarm = await storage.transaction(async txn => {
             const existing = txn.getAlarm();
             if (typeof existing === 'number' && (existing - Date.now()) < (10 * 1000)) {
                 // we are already scheduled in the near future
-                return;
+                return false;
             }
             await txn.put('alarm.payload', { kind: CombinedRedirectLogController.processAlarmKind } as AlarmPayload);
             await txn.setAlarm(Date.now());
+            return true;
         });
-        writeTraceEvent({ kind: 'storage-write', durableObjectName, spot: 'crlc.receive-notification', alarms: 1 });
+        if (setAlarm) writeTraceEvent({ kind: 'storage-write', durableObjectName, spot: 'crlc.receive-notification', alarms: 1 });
     }
 
     async process(): Promise<void> {
