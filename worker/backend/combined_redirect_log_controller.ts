@@ -111,6 +111,11 @@ export class CombinedRedirectLogController {
         this.updateSourceStateCache(newState);
 
         await storage.transaction(async txn => {
+            const existing = txn.getAlarm();
+            if (typeof existing === 'number' && (existing - Date.now()) < (10 * 1000)) {
+                // we are already scheduled in the near future
+                return;
+            }
             await txn.put('alarm.payload', { kind: CombinedRedirectLogController.processAlarmKind } as AlarmPayload);
             await txn.setAlarm(Date.now());
         });
