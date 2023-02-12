@@ -124,7 +124,7 @@ export class BackendDO {
                             if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init ShowController`);
                             const feedBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'feed/' });
                             const statsBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' });
-                            this.showController = new ShowController({ storage, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient });
+                            this.showController = new ShowController({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient });
                         }
                         return this.showController;
                     }

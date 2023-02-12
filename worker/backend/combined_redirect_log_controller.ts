@@ -7,7 +7,7 @@ import { isValidUuid } from '../uuid.ts';
 import { getOrInit } from '../maps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
-import { consoleError, consoleWarn } from '../tracer.ts';
+import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { newTextResponse } from '../responses.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { computeListOpts } from './storage.ts';
@@ -101,7 +101,7 @@ export class CombinedRedirectLogController {
     async receiveNotification(opts: { doName: string; timestampId: string; fromColo: string; }) {
         await this.ensureInit();
         const { doName, timestampId, fromColo } = opts;
-        const { storage } = this;
+        const { storage, durableObjectName } = this;
 
         // update source state
         const notificationTime = new Date().toISOString();
@@ -114,6 +114,7 @@ export class CombinedRedirectLogController {
             await txn.put('alarm.payload', { kind: CombinedRedirectLogController.processAlarmKind } as AlarmPayload);
             await txn.setAlarm(Date.now());
         });
+        writeTraceEvent({ kind: 'storage-write', durableObjectName, spot: 'crlc.receive-notification', alarms: 1 });
     }
 
     async process(): Promise<void> {

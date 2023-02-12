@@ -4,7 +4,7 @@ import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
 import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect, Unkinded, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { check, tryParseInt } from '../check.ts';
-import { consoleError } from '../tracer.ts';
+import { consoleError, writeTraceEvent } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { computeListOpts } from './storage.ts';
@@ -158,6 +158,7 @@ async function scheduleNotification(doName: string, notificationDelaySeconds: nu
         await txn.put('alarm.payload', { kind: RedirectLogController.notificationAlarmKind, doName } as AlarmPayload);
         await txn.setAlarm(Date.now() + 1000 * notificationDelaySeconds);
     });
+    writeTraceEvent({ kind: 'storage-write', durableObjectName: doName, spot: 'rlc.scheduleNotification', alarms: 1 });
 }
 
 async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {

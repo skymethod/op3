@@ -55,6 +55,7 @@ export type TraceEvent =
     | ConsoleError
     | AdminDataJob
     | Generic
+    | StorageWrite
     ;
 
 export interface ErrorSavingRedirect {
@@ -159,4 +160,11 @@ export interface Generic {
     readonly type: string;
     readonly strings?: string[];
     readonly doubles?: number[];
+}
+
+export interface StorageWrite {
+    readonly kind: 'storage-write',
+    readonly durableObjectName: string;
+    readonly spot: string;
+    readonly alarms?: number;
 }

@@ -7,7 +7,7 @@ import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
-import { consoleInfo, consoleWarn } from '../tracer.ts';
+import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
@@ -21,6 +21,7 @@ export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
 
     private readonly storage: DurableObjectStorage;
+    private readonly durableObjectName: string;
     private readonly podcastIndexClient: PodcastIndexClient;
     private readonly notifications: ShowControllerNotifications;
     private readonly origin: string;
@@ -28,8 +29,9 @@ export class ShowController {
     private readonly statsBlobs: Blobs;
     private readonly rpcClient: RpcClient;
 
-    constructor({ storage, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
+    constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
         this.storage = storage;
+        this.durableObjectName = durableObjectName;
         this.podcastIndexClient = podcastIndexClient;
         this.origin = origin;
         this.feedBlobs = feedBlobs;
@@ -43,7 +45,7 @@ export class ShowController {
                 if (newPodcastGuids.size === 0) return;
                 consoleInfo('sc-on-pg', `ShowController: onPodcastGuids: ${[...newPodcastGuids].join(', ')}`);
                 await savePodcastGuidIndexRecords(newPodcastGuids, storage);
-                await enqueueWork([...newPodcastGuids].map(v => ({ uuid: generateUuid(), kind: 'lookup-pg', podcastGuid: v, attempt: 1 })), storage);
+                await enqueueWork([...newPodcastGuids].map(v => ({ uuid: generateUuid(), kind: 'lookup-pg', podcastGuid: v, attempt: 1 })), storage, durableObjectName);
             },
             onFeedUrls: async feedUrls => {
                 // update associated feed records, and enqueue lookup-feed work if necessary
@@ -79,7 +81,7 @@ export class ShowController {
                         await storage.put(newRecords);
                     }
                 }
-                await enqueueWork(work, storage);
+                await enqueueWork(work, storage, durableObjectName);
             }
         }
     }
@@ -299,7 +301,7 @@ export class ShowController {
     }
 
     async work(): Promise<void> {
-        const { storage, podcastIndexClient } = this;
+        const { storage, podcastIndexClient, durableObjectName } = this;
         const infos: string[] = [];
         try {
             const limit = 20;
@@ -332,7 +334,7 @@ export class ShowController {
                         const minAllowedInstant = new Date(Date.now() + 1000 * 30).toISOString(); // for now only allow a retrigger every 30 seconds in case we infinite loop
                         if (notBeforeInstant < minAllowedInstant) notBeforeInstant = minAllowedInstant;
                         console.log(`ShowController: more work, rescheduling alarm for ${notBeforeInstant}`); infos.push(`more work, rescheduling alarm for ${notBeforeInstant}`);
-                        await rescheduleAlarm(notBeforeInstant, storage);
+                        await rescheduleAlarm(notBeforeInstant, storage, durableObjectName);
                     }
                 }
             }
@@ -413,7 +415,7 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
 const WORK_EPOCH_TIMESTAMP = computeStartOfYearTimestamp(2020);
 const WORK_EPOCH_INSTANT = timestampToInstant(WORK_EPOCH_TIMESTAMP);
 
-async function rescheduleAlarm(soonestNotBeforeInstant: string, storage: DurableObjectStorage) {
+async function rescheduleAlarm(soonestNotBeforeInstant: string, storage: DurableObjectStorage, durableObjectName: string) {
     const soonestNotBeforeTime = new Date(soonestNotBeforeInstant).getTime();
     await storage.transaction(async tx => {
         const alarm = await tx.getAlarm();
@@ -421,9 +423,10 @@ async function rescheduleAlarm(soonestNotBeforeInstant: string, storage: Durable
         await tx.put('alarm.payload', { kind: ShowController.processAlarmKind } as AlarmPayload);
         await tx.setAlarm(soonestNotBeforeTime);
     });
+    writeTraceEvent({ kind: 'storage-write', durableObjectName, spot: 'sc.rescheduleAlarm', alarms: 1 });
 }
 
-async function enqueueWork(work: WorkRecord | WorkRecord[], storage: DurableObjectStorage): Promise<void> {
+async function enqueueWork(work: WorkRecord | WorkRecord[], storage: DurableObjectStorage, durableObjectName: string): Promise<void> {
     const works = Array.isArray(work) ? work : [ work ];
     if (works.length === 0) return;
     for (const batch of chunk(works, 128)) {
@@ -431,7 +434,7 @@ async function enqueueWork(work: WorkRecord | WorkRecord[], storage: DurableObje
         await storage.put(records);
     }
     const soonestNotBeforeInstant = works.map(v => v.notBeforeInstant ?? WORK_EPOCH_INSTANT).sort()[0];
-    await rescheduleAlarm(soonestNotBeforeInstant, storage);
+    await rescheduleAlarm(soonestNotBeforeInstant, storage, durableObjectName);
 }
 
 function computeWorkRecordKey(record: WorkRecord): string {
