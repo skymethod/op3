@@ -112,8 +112,8 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodes, debug }: Opts) =
         }
 
         downloadsGraphPreviousButton.disabled = rangeStartHourIndex === 0;
-        downloadsGraphRangeSpan.textContent = `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
-        downloadsGraphNextButton.disabled = rangeEndHourIndex === (hours.length - 1);
+        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
+        downloadsGraphNextButton.disabled = hours.length === 0 || rangeEndHourIndex === (hours.length - 1);
     }
 
     update();

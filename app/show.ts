@@ -52,13 +52,14 @@ const app = (() => {
     const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...showObj.episodes.find(v => v.id === episodeId)! }));
     const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
-    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)!.substring(0, 10);
+    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)?.substring(0, 10);
 
     if (debug) {
         debugDiv.textContent = Object.entries(times).map(v => v.join(': ')).join('\n')
     } else {
         debugDiv.style.display = 'none';
     }
+
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });

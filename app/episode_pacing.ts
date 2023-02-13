@@ -4,7 +4,7 @@ import { Chart, distinct } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined };
 
 export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate }: Opts) => {
 
@@ -32,12 +32,16 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         element<HTMLTemplateElement>('episode-pacing-legend-item'),
     ];
 
+    let onComplete: () => void;
     if (new URLSearchParams(document.location.search).has('shot')) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
         document.body.style.backgroundColor = 'black';
+        const marker = document.createElement('span');
+        marker.id = 'shot-done-marker';
+        onComplete = () => document.body.appendChild(marker);
     }
 
     const episodeIdsWithData = episodes.filter(v => episodeHourlyDownloads[v.id]).map(v => v.id);
@@ -56,7 +60,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         const pageEpisodeRelativeSummaries = Object.fromEntries(pageEpisodeIds.map(v => [ v, episodeRelativeSummaries[v] ]));
         const suggestedMax = Math.max(...Object.values(pageEpisodeRelativeSummaries).map(v => Math.max(...Object.values(v.cumulative))));
         const episodeInfos = Object.fromEntries(episodes.map(v => [v.id, v]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, onComplete);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
@@ -78,7 +82,8 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         }
     }
 
-    episodePacingExportButton.onclick = () => {
+
+    if (mostRecentDate) episodePacingExportButton.onclick = () => {
         const tsvRows: string[][] = [];
         tsvRows.push([ 'episode_title', 'episode_pub_date', 'downloads_3_day', 'downloads_7_day', 'downloads_30_day', 'downloads_all_time', 'downloads_asof' ]);
         const formatForTsv = (downloads: number | undefined) => (downloads === undefined || downloads === 0) ? '' : downloads.toString();
@@ -191,7 +196,7 @@ function computeRelativeSummary(hourlyDownloads: Record<string, number>): Relati
     return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
 }
 
-function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>): Chart {
+function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, onComplete?: () => void): Chart {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap(v => Object.keys(v.cumulative)).sort());
 
     const parseHourLabel = (label: string) => {
@@ -228,6 +233,9 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
         options: {
             animation: {
                 duration: 100,
+                onComplete: ({ initial }) => {
+                    if ((initial === true || initial === undefined) && onComplete) onComplete();
+                }
             },
             maintainAspectRatio: false,
             interaction: {

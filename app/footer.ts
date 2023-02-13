@@ -2,9 +2,9 @@ import { addDaysToDateString } from '../worker/timestamp.ts';
 import { element, SlRelativeTime } from './elements.ts';
 import { pluralize } from './util.ts';
 
-type Opts = { mostRecentDate: string };
+type Opts = { mostRecentDate: string | undefined };
 
-export const makeFooter = ({ mostRecentDate }: Opts) => {
+export const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10) }: Opts) => {
 
     const [ lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan ] = [ 
         element('footer-last-updated-date'),

@@ -8505,8 +8505,8 @@ const makeDownloadsGraph = ({ hourlyDownloads , episodes , debug  })=>{
             }
         }
         downloadsGraphPreviousButton.disabled = rangeStartHourIndex === 0;
-        downloadsGraphRangeSpan.textContent = `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
-        downloadsGraphNextButton.disabled = rangeEndHourIndex === hours.length - 1;
+        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
+        downloadsGraphNextButton.disabled = hours.length === 0 || rangeEndHourIndex === hours.length - 1;
     }
     update();
     redrawChart();
@@ -8675,12 +8675,16 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , sho
         element('episode-pacing-export'),
         element('episode-pacing-legend-item')
     ];
+    let onComplete;
     if (new URLSearchParams(document.location.search).has('shot')) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
         document.body.style.backgroundColor = 'black';
+        const marker = document.createElement('span');
+        marker.id = 'shot-done-marker';
+        onComplete = ()=>document.body.appendChild(marker);
     }
     const episodeIdsWithData = episodes.filter((v)=>episodeHourlyDownloads[v.id]).map((v)=>v.id);
     const pages = Math.ceil(episodeIdsWithData.length / 8);
@@ -8704,7 +8708,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , sho
                 v.id,
                 v
             ]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, onComplete);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
@@ -8723,7 +8727,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , sho
             update();
         }
     };
-    episodePacingExportButton.onclick = ()=>{
+    if (mostRecentDate) episodePacingExportButton.onclick = ()=>{
         const tsvRows = [];
         tsvRows.push([
             'episode_title',
@@ -8838,7 +8842,7 @@ function computeRelativeSummary(hourlyDownloads) {
         downloads30
     };
 }
-function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos) {
+function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, onComplete) {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
@@ -8872,7 +8876,10 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
         },
         options: {
             animation: {
-                duration: 100
+                duration: 100,
+                onComplete: ({ initial  })=>{
+                    if ((initial === true || initial === undefined) && onComplete) onComplete();
+                }
             },
             maintainAspectRatio: false,
             interaction: {
@@ -9082,7 +9089,7 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
     if (Object.keys(nDayDownloads).length === 0) {
         valueDiv.textContent = withCommas2.format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
-        asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
+        asofSpan.textContent = Object.keys(hourlyDownloads).length === 0 ? '' : asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
         return;
     }
     const init = ()=>{
@@ -9216,7 +9223,10 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
         '',
         0
     ];
-    const [thisMonth, thisMonthCount] = Object.entries(monthlyCounts).at(-1);
+    const [thisMonth, thisMonthCount] = Object.entries(monthlyCounts).at(-1) ?? [
+        '',
+        0
+    ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
     const hoverListeners = [];
     const onHoverMonth = (hoverMonth)=>{
@@ -9225,7 +9235,7 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
         countDiv.textContent = withCommas2.format(value);
         periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
     };
-    onHoverMonth(initialMonth);
+    if (initialMonth !== '') onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, {
         onHover: (v)=>{
             onHoverMonth(v?.label);
@@ -10011,7 +10021,7 @@ const makeTopMetros = ({ showSlug , monthlyDimensionDownloads , downloadsPerMont
 function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
-const makeFooter = ({ mostRecentDate  })=>{
+const makeFooter = ({ mostRecentDate =new Date().toISOString().substring(0, 10)  })=>{
     const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan] = [
         element('footer-last-updated-date'),
         element('footer-last-updated-ago'),
@@ -10211,7 +10221,7 @@ const app = (()=>{
         }));
     const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
-    const mostRecentDate = Object.keys(hourlyDownloads).at(-1).substring(0, 10);
+    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)?.substring(0, 10);
     if (debug) {
         debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
     } else {

@@ -52,9 +52,10 @@ function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, va
     const asofFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
+
     if (Object.keys(nDayDownloads).length === 0) {
         valueDiv.textContent = withCommas.format(Object.values(hourlyDownloads).reduce((a, b) => a + b, 0));
-        asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1)!.substring(0, 10)}T00:00:00.000Z`));
+        asofSpan.textContent = Object.keys(hourlyDownloads).length === 0 ? '' : asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1)!.substring(0, 10)}T00:00:00.000Z`));
         return;
     }
     const init = () => {
@@ -192,7 +193,7 @@ type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler:
 
 function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement): MonthlyBox {
     const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2) ?? [ '', 0 ];
-    const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1)!;
+    const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1) ?? [ '', 0 ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
 
     const hoverListeners: HoverMonthHandler[] = [];
@@ -202,7 +203,7 @@ function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLEle
         countDiv.textContent = withCommas.format(value);
         periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
     }
-    onHoverMonth(initialMonth);
+    if (initialMonth !== '') onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, { onHover: v => {
         onHoverMonth(v?.label);
         hoverListeners.forEach(w => w(v?.label));
