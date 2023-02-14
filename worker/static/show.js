@@ -8675,16 +8675,23 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , sho
         element('episode-pacing-export'),
         element('episode-pacing-legend-item')
     ];
-    let onComplete;
-    if (new URLSearchParams(document.location.search).has('shot')) {
+    const shot = new URLSearchParams(document.location.search).has('shot');
+    if (shot) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
         document.body.style.backgroundColor = 'black';
-        const marker = document.createElement('span');
-        marker.id = 'shot-done-marker';
-        onComplete = ()=>document.body.appendChild(marker);
+        document.querySelector('footer').style.display = 'none';
+        const main = document.querySelector('main');
+        for (const node of main.childNodes){
+            if (node instanceof HTMLElement) {
+                if (node.id === 'episode-pacing-container') {
+                    break;
+                }
+                node.style.display = 'none';
+            }
+        }
     }
     const episodeIdsWithData = episodes.filter((v)=>episodeHourlyDownloads[v.id]).map((v)=>v.id);
     const pages = Math.ceil(episodeIdsWithData.length / 8);
@@ -8708,7 +8715,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads , episodes , showTitle , sho
                 v.id,
                 v
             ]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, onComplete);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
@@ -8842,7 +8849,7 @@ function computeRelativeSummary(hourlyDownloads) {
         downloads30
     };
 }
-function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, onComplete) {
+function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot) {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
@@ -8875,11 +8882,8 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
                 }))
         },
         options: {
-            animation: {
-                duration: 100,
-                onComplete: ({ initial  })=>{
-                    if ((initial === true || initial === undefined) && onComplete) onComplete();
-                }
+            animation: shot ? false : {
+                duration: 100
             },
             maintainAspectRatio: false,
             interaction: {

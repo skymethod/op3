@@ -32,16 +32,23 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         element<HTMLTemplateElement>('episode-pacing-legend-item'),
     ];
 
-    let onComplete: () => void;
-    if (new URLSearchParams(document.location.search).has('shot')) {
+    const shot = new URLSearchParams(document.location.search).has('shot');
+    if (shot) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
         episodePacingShotFooter.classList.remove('hidden');
         episodePacingCanvas.style.marginLeft = episodePacingCanvas.style.marginRight = '4rem';
         document.body.style.backgroundColor = 'black';
-        const marker = document.createElement('span');
-        marker.id = 'shot-done-marker';
-        onComplete = () => document.body.appendChild(marker);
+        (document.querySelector('footer')! as HTMLElement).style.display = 'none';
+        const main = document.querySelector('main');
+        for (const node of main!.childNodes) {
+            if (node instanceof HTMLElement) {
+                if (node.id === 'episode-pacing-container') {
+                    break;
+                }
+                node.style.display = 'none';
+            }
+        }
     }
 
     const episodeIdsWithData = episodes.filter(v => episodeHourlyDownloads[v.id]).map(v => v.id);
@@ -60,7 +67,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         const pageEpisodeRelativeSummaries = Object.fromEntries(pageEpisodeIds.map(v => [ v, episodeRelativeSummaries[v] ]));
         const suggestedMax = Math.max(...Object.values(pageEpisodeRelativeSummaries).map(v => Math.max(...Object.values(v.cumulative))));
         const episodeInfos = Object.fromEntries(episodes.map(v => [v.id, v]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, onComplete);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
@@ -196,7 +203,7 @@ function computeRelativeSummary(hourlyDownloads: Record<string, number>): Relati
     return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
 }
 
-function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, onComplete?: () => void): Chart {
+function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean): Chart {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap(v => Object.keys(v.cumulative)).sort());
 
     const parseHourLabel = (label: string) => {
@@ -231,11 +238,8 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
             }))
         },
         options: {
-            animation: {
+            animation: shot ? false : {
                 duration: 100,
-                onComplete: ({ initial }) => {
-                    if ((initial === true || initial === undefined) && onComplete) onComplete();
-                }
             },
             maintainAspectRatio: false,
             interaction: {
