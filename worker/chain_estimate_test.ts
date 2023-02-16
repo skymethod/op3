@@ -270,6 +270,14 @@ Deno.test({
             { kind: 'prefix', prefix: 'podtrac', url: 'http://www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/chrt.fm/track/123ABC/https%3A//verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/chrt.fm/track/123ABC/https%3A//verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/123ABC/https%3A//verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podscribe', url: 'https://verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 

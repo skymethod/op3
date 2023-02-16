@@ -52,9 +52,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://chrt.fm/track/CHRT123/
     // also chtbl.com/track/12345
     // http redirects to target http
-    m = /^(https?):\/\/(chrt\.fm|chtbl\.com)\/track\/[^/]+\/((https?):\/\/?)?(.*?)$/.exec(url);
+    // suffix protocol doesn't actually forward https%3A, but include it here to compute target hostname (found from podhero)
+    m = /^(https?):\/\/(chrt\.fm|chtbl\.com)\/track\/[^/]+\/((https?)(:|%3A)\/\/?)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, _domain, _suffixProtocol, suffixScheme, suffix ] = m;
+        const [ _, scheme, _domain, _suffixProtocol, suffixScheme, _suffixColon, suffix ] = m;
         const targetUrl = `${suffixScheme ?? scheme}://${suffix}`;
         return [ { kind: 'prefix', prefix: 'chartable', url }, ...computeChainEstimate(targetUrl) ];
     }
