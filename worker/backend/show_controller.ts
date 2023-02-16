@@ -173,6 +173,17 @@ export class ShowController {
                 const results = [...map.values()].filter(isFeedItemRecord);
                 return { results };
             }
+            if (m && operationKind === 'delete') {
+                const feedUrl = m[1];
+                const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
+                const feedRecord = await storage.get(computeFeedRecordKey(feedRecordId));
+                if (!isFeedRecord(feedRecord)) throw new Error(`No feed record for: ${feedUrl}`);
+                if (feedRecord.showUuid) throw new Error(`Not allowed to delete items for feeds assigned to a show`);
+                const go = parameters.go === 'true';
+                const { matchUrlPrefix } = parameters;
+                const results = [ await deleteFeedItems({ feedRecordId, go, matchUrlPrefix, storage }) ];
+                return { results };
+            }
         }
     
         {
@@ -733,6 +744,41 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     }
 
     return rt.join(', ');
+}
+
+async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, storage }: { feedRecordId: string, go: boolean, matchUrlPrefix: string | undefined, storage: DurableObjectStorage }) {
+    const feedItemRecords = [...(await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) })).values()].filter(isFeedItemRecord);
+    const feedItemRecordIds = new Set(feedItemRecords.map(v => v.feedRecordId));
+    const indexRecordKeysToDelete: string[] = [];
+    let indexRecordsDeleted = 0;
+    
+    // first, delete any match url index records (found by provided prefix) pointing to these items
+    if (matchUrlPrefix) {
+        for (const prefix of [ computeMatchUrlToFeedItemIndexKeyPrefix(), computeQuerylessMatchUrlToFeedItemIndexKeyPrefix() ]) {
+            const matchUrlsMap = await storage.list({ prefix: prefix + matchUrlPrefix });
+            for (const [ key, feedItemIndexRecord ] of matchUrlsMap) {
+                if (!isFeedItemIndexRecord(feedItemIndexRecord)) throw new Error(`Bad index record ${key}`);
+                const { feedItemRecordId } = unpackMatchUrlToFeedItemIndexKey(key);
+                if (feedItemRecordIds.has(feedItemRecordId)) {
+                    indexRecordKeysToDelete.push(key);
+                }
+            }
+        }
+    }
+
+    // now, delete the items themselves
+    const feedItemRecordKeysToDelete = [...feedItemRecordIds].map(v => computeFeedItemRecordKey(feedRecordId, v));
+    let feedItemRecordsDeleted = 0;
+    if (go) {
+        for (const batch of chunk(indexRecordKeysToDelete, 128)) {
+            indexRecordsDeleted += await storage.delete(batch);
+        }
+        for (const batch of chunk(feedItemRecordKeysToDelete, 128)) {
+            feedItemRecordsDeleted += await storage.delete(batch);
+        }
+    }
+
+    return { indexRecordKeysToDelete: indexRecordKeysToDelete.length, indexRecordsDeleted, feedItemRecordKeysToDelete: feedItemRecordKeysToDelete.length, feedItemRecordsDeleted, go };
 }
 
 async function ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage, rt }: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined, storage: DurableObjectStorage, rt: string[] }) {
