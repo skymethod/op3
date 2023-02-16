@@ -105,9 +105,9 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
 export type ShowOgImageRequest = { showUuid: string };
 
-export function tryParseShowOgImageRequest({ method, pathname }: { method: string, pathname: string }): ShowRequest | undefined {
+export function tryParseShowOgImageRequest({ method, pathname }: { method: string, pathname: string }): ShowOgImageRequest | undefined {
     const m = /^\/show\/([0-9a-f]{32})\/og-.*?\.png$/.exec(pathname);
-    return method === 'GET' && m ? { type: 'show-uuid', id: m[1] } : undefined;
+    return method === 'GET' && m ? { showUuid: m[1] } : undefined;
 }
 
 export async function computeShowOgImageResponse(req: ShowOgImageRequest, opts: Opts): Promise<Response> {
