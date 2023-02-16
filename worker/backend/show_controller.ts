@@ -749,10 +749,10 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
 async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, storage }: { feedRecordId: string, go: boolean, matchUrlPrefix: string | undefined, storage: DurableObjectStorage }) {
     const feedItemRecords = [...(await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) })).values()].filter(isFeedItemRecord);
     const feedItemRecordIds = new Set(feedItemRecords.map(v => v.feedRecordId));
+
+    // first, delete any match url index records (found by provided prefix) pointing to these items
     const indexRecordKeysToDelete: string[] = [];
     let indexRecordsDeleted = 0;
-    
-    // first, delete any match url index records (found by provided prefix) pointing to these items
     if (matchUrlPrefix) {
         for (const prefix of [ computeMatchUrlToFeedItemIndexKeyPrefix(), computeQuerylessMatchUrlToFeedItemIndexKeyPrefix() ]) {
             const matchUrlsMap = await storage.list({ prefix: prefix + matchUrlPrefix });
