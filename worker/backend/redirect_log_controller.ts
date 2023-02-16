@@ -226,7 +226,7 @@ export async function computePutBatches(rawRedirects: readonly RawRedirect[], at
 }
 
 export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums, doColo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
-    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, other } = rawRedirect;
+    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, other } = rawRedirect;
     const rt: Record<string, string> = {};
     if (typeof uuid === 'string') rt.uuid = uuid;
     if (typeof time !== 'number') throw new Error(`Bad rawRedirect ${uuid}: no time!`);
@@ -242,6 +242,7 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof referer === 'string') rt.referer = referer;
     if (typeof range === 'string') rt.range = range;
     if (typeof ulid === 'string') rt.ulid = ulid;
+    if (typeof xpsId === 'string') rt.xpsId = xpsId;
 
     for (const [ name, value ] of Object.entries(other ?? {})) {
         if (typeof name === 'string' && typeof value === 'string') {

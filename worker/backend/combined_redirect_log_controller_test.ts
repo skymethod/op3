@@ -36,6 +36,7 @@ Deno.test({
         const userAgent = 'test/0.0.0';
         const referer = 'https://example.com';
         const range = 'bytes: 0-1';
+        const xpsId = '2C2A32DC-F9D1-4C21-A1D2-7EE48B4B8DEF';
         const edgeColo = 'TST';
         const rpcClient = new class extends StubRpcClient {
             async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
@@ -44,7 +45,7 @@ Deno.test({
                     const seq = new TimestampSequence(3);
                     const key1 = seq.next();
                     const attNums = new AttNums();
-                    const packed = attNums.packRecord({ uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, 'other.colo': edgeColo  });
+                    const packed = attNums.packRecord({ uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, xpsId, 'other.colo': edgeColo  });
                     const records: Record<string, string> = {};
                     records[key1] = packed;
                     return {
@@ -75,7 +76,7 @@ Deno.test({
             assertEquals(res.status, 200);
             const { rows } = await res.json();
             // console.log(rows);
-            assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, referer, range, ulid, edgeColo } ], rows);
+            assertEquals([ { time: timestampToInstant(timestamp), uuid, url, hashedIpAddress, method, userAgent, referer, range, ulid, edgeColo, xpsId } ], rows);
             // ensure the hashed ip address is a sha, not equal to the input raw ip address
             assertNotEquals(hashedIpAddress, '1.2.3.4')
             assert(isValidSha1Hex(hashedIpAddress));
@@ -83,13 +84,13 @@ Deno.test({
             // ensure saved row count
             const data = await storage.list();
             // console.log(data);
-            assertEquals(data.size, 7 /* index records: 8 - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */ + 1 /* url record (pending was sent) */);
+            assertEquals(data.size, 8 /* index records: 8 - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */ + 1 /* url record (pending was sent) */);
 
             // ensure attnums
             const namesToNums = data.get('crl.attNums');
             assert(isStringRecord(namesToNums));
             const attNums2 = new AttNums(namesToNums as Record<string, number>);
-            assertEquals(attNums2.max(), 10);
+            assertEquals(attNums2.max(), 11);
 
             // ensure data record
             const record = data.get(`crl.r.${timestampAndUuid}`);
@@ -130,6 +131,16 @@ Deno.test({
             // console.log(rows);
             assert(Array.isArray(rows));
             assertEquals(rows.length, 0);
+        }
+
+        {
+            // ensure successful xpsId query
+            const res = await controller.queryRedirectLogs({ limit: 10, format: 'json', xpsId });
+            assertEquals(res.status, 200);
+            const { rows } = await res.json();
+            // console.log(rows);
+            assert(Array.isArray(rows));
+            assertEquals(rows.length, 1);
         }
     }
 });

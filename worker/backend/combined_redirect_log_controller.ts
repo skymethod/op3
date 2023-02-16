@@ -552,6 +552,7 @@ export enum IndexId {
     Method = 10,
     Uuid = 11,
     DayUrl = 12,
+    XpsId = 13,
 }
 
 export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string) => string | undefined | Promise<string | undefined> ][] = [
@@ -567,6 +568,7 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
     [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
     [ 'uuid', IndexId.Uuid, _ => undefined ], // disabled 2023-02-10 [ 'uuid', IndexId.Uuid, v => v ],
     [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${computeServerUrl(v).substring(0, 1024)}` ],
+    [ 'xpsId', IndexId.XpsId, (v: string) => v.substring(0, 1024) ],
 ];
 
 //

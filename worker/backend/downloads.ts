@@ -42,7 +42,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             hits++;
             if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
             const obj = attNums.unpackRecord(record);
-            const { method, range, ulid: _, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
+            const { method, range, ulid: _, xpsId, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
             if (method !== 'GET') continue; // ignore all non-GET requests
             const ranges = range ? tryParseRangeHeader(range) : undefined;
             const isFirstTwoBytes = ranges && ranges.length === 1 && 'start' in ranges[0] && ranges[0].start === 0 && ranges[0].end === 1; // bytes=0-1
@@ -73,7 +73,9 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const deviceName = result?.device?.name;
             const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
             const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
-            const tags = isFirstTwoBytes ? 'first-two' : undefined;
+            let tags = isFirstTwoBytes ? 'first-two' : undefined;
+            const streaming = typeof xpsId === 'string' && xpsId !== '' || agentName === 'AppleCoreMedia';
+            if (streaming) tags = (tags ? `${tags},streaming` : 'streaming');
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
             chunks.push(encoder.encode(line));

@@ -17,7 +17,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
     const rows: unknown[] = [];
     for (const record of map.values()) {
         if (typeof record !== 'string') continue;
-        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, referer, range, ulid, 
+        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, referer, range, ulid, xpsId,
             'other.colo': edgeColo,
             'other.continent': continent,
             'other.country': country,
@@ -32,10 +32,10 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
         if (format === 'tsv' || format === 'json-a') {
-            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode ];
+            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode ];
             rows.push(format === 'tsv' ? arr.join('\t') : arr);
         } else {
-            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode });
+            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode });
         }
     }
     return newQueryResponse({ startTime, format, headers, rows, continuationToken: undefined });
@@ -43,7 +43,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
 
 //
 
-const headers = [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode' ];
+const headers = [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode' ];
 
 let _earliestTimestamp: string | undefined;
 
@@ -68,7 +68,7 @@ function tryParseTimestampFromTimestampAndUuid(timestampAndUuid: string): string
 }
 
 async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Map<string, DurableObjectStorageValue>> {
-    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, rawIpAddress, ulid, method } = request;
+    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, urlSha256, urlStartsWith, userAgent, referer, range, rawIpAddress, ulid, xpsId, method } = request;
     // parameters validated in edge worker
 
     // compute hashedIpAddress for caller if necessary
@@ -86,7 +86,7 @@ async function computeResultMap(request: Unkinded<QueryRedirectLogsRequest>, sto
         prefix = `crl.i0.${IndexId.UrlSha256}.${urlSha256}.`;
         index = IndexId[IndexId.UrlSha256];
     } else {
-        for (const [ name, value ] of Object.entries({ userAgent, referer, range, hashedIpAddress, ulid, method })) {
+        for (const [ name, value ] of Object.entries({ userAgent, referer, range, hashedIpAddress, ulid, xpsId, method })) {
             if (value === undefined) continue;
             const property = name === 'other.colo' ? 'edgeColo' : name;
             const def = INDEX_DEFINITIONS.find(v => v[0] === property);

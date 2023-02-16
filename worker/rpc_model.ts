@@ -55,6 +55,7 @@ export interface RawRedirect {
     readonly referer?: string;
     readonly range?: string;
     readonly ulid?: string;
+    readonly xpsId?: string;
     readonly other?: Readonly<Record<string, string>>;
 }
 
@@ -190,6 +191,7 @@ export interface QueryRedirectLogsRequest {
     readonly hashedIpAddress?: string;
     readonly rawIpAddress?: string; // only allow caller ip
     readonly ulid?: string;
+    readonly xpsId?: string;
     readonly method?: string;
 }
 

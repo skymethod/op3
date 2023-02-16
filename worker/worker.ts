@@ -208,7 +208,8 @@ function computeRawRedirect(request: Request, opts: { time: number, method: stri
     const userAgent = request.headers.get('user-agent') ?? undefined;
     const referer = request.headers.get('referer') ?? undefined;
     const range = request.headers.get('range') ?? undefined;
-    return { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, other };
+    const xpsId = request.headers.get('x-playback-session-id') ?? undefined;
+    return { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, other };
 }
 
 function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
