@@ -141,7 +141,7 @@ export class ShowController {
         }
 
         {
-            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls|show-episodes-by-pubdate)$/.exec(targetPath);
+            const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls|show-episodes-by-pubdate|podcast-guid-to-show-uuid)$/.exec(targetPath);
             if (m && operationKind === 'select') {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
@@ -151,6 +151,7 @@ export class ShowController {
                     'show-episodes': IndexType.ShowEpisodes,
                     'feed-media-urls': IndexType.FeedMediaUrls,
                     'show-episodes-by-pubdate': IndexType.ShowEpisodesByPubdate,
+                    'podcast-guid-to-show-uuid': IndexType.PodcastGuidToShowUuid,
                 }[m[1]];
                 const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
                 const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
@@ -889,6 +890,9 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     ]));
 
     const { podcastGuid } = showRecord;
+    // save initial podcastguid -> showuuid index record
+    if (podcastGuid) await storage.put(computePodcastGuidToShowUuidIndexKey({ podcastGuid }), showUuid);
+    
     await ensureShowEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, podcastGuid, storage, rt });
 
     return rt.join(', ');
@@ -911,13 +915,31 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     const { showUuid } = feedRecord;
     if (!showUuid) return;
     const showKey = computeShowKey(showUuid);
-    const show = await storage.get(showKey);
-    if (!isShowRecord(show)) return;
-    const { title } = feedRecord;
+    const record = await storage.get(showKey);
+    if (!isShowRecord(record)) return;
+    let show = record;
+    const upsertRecords: Record<string, DurableObjectStorageValue> = {};
+    let deleteIndexKey: string | undefined;
+    const { title, podcastGuid } = feedRecord;
     if (show.title !== title) {
-        const update: ShowRecord = { ...show, title };
-        await storage.put(showKey, update);
-        messages.push(`show.title ${show.title} -> ${ title }`);
+        messages.push(`show.title ${show.title} -> ${title}`);
+        show = { ...show, title };
+        upsertRecords[showKey] = show;
+    }
+    if (podcastGuid && show.podcastGuid !== podcastGuid) {
+        if (show.podcastGuid) {
+            deleteIndexKey = computePodcastGuidToShowUuidIndexKey({ podcastGuid: show.podcastGuid });
+        }
+        messages.push(`show.podcastGuid ${show.podcastGuid} -> ${podcastGuid}`);
+        show = { ...show, podcastGuid };
+        upsertRecords[showKey] = show;
+        upsertRecords[computePodcastGuidToShowUuidIndexKey({ podcastGuid })] = showUuid;
+    }
+    if (Object.keys(upsertRecords).length > 0 || deleteIndexKey) {
+        await storage.transaction(async tx => {
+            if (deleteIndexKey) await tx.delete(deleteIndexKey);
+            if (Object.keys(upsertRecords).length > 0) await tx.put(upsertRecords);
+        })
     }
     return show;
 }
@@ -1054,6 +1076,10 @@ async function deleteShow(showUuid: string, storage: DurableObjectStorage) {
     const show = await storage.get(showKey);
     const showKeys = show ? [ showKey ] : [];
     const indexKeys = [...(await storage.list({ prefix: computeShowEpisodesIndexKeyPrefix({ showUuid })})).keys()];
+    if (isShowRecord(show)) {
+        const { podcastGuid } = show;
+        if (podcastGuid) indexKeys.push(computePodcastGuidToShowUuidIndexKey({ podcastGuid }));
+    }
     const episodeKeys = [...(await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })})).keys()];
     const keysToDelete = [
         ...indexKeys,
@@ -1127,6 +1153,7 @@ enum IndexType {
     ShowEpisodes = 5,
     FeedMediaUrls = 6,
     ShowEpisodesByPubdate = 7,
+    PodcastGuidToShowUuid = 8,
 }
 
 function computePodcastGuidIndexKey(podcastGuid: string) {
@@ -1201,4 +1228,8 @@ function computeFeedMediaUrlsIndexKeyPrefix({ feedRecordId }: { feedRecordId: st
 
 function computeShowEpisodesByPubdateIndexKey({ pubdateInstant, showUuid, episodeId }: { pubdateInstant: string, showUuid: string, episodeId: string }) {
     return `sc.i0.${IndexType.ShowEpisodesByPubdate}.${pubdateInstant}.${showUuid}.${episodeId}`;
+}
+
+function computePodcastGuidToShowUuidIndexKey({ podcastGuid }: { podcastGuid: string }) {
+    return `sc.i0.${IndexType.PodcastGuidToShowUuid}.${podcastGuid}`;
 }
