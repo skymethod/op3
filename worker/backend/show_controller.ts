@@ -129,7 +129,7 @@ export class ShowController {
                 }
                 return { results, message: messages.join(', ') };
             }
-            const map = await storage.list(computeListOpts('sc.show0.', parameters));
+            const map = await storage.list(computeListOpts(computeShowKeyPrefix(), parameters));
             const results = [...map.values()].filter(isShowRecord);
             return { results };
         }
@@ -142,7 +142,7 @@ export class ShowController {
 
         {
             const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls|show-episodes-by-pubdate|podcast-guid-to-show-uuid)$/.exec(targetPath);
-            if (m && operationKind === 'select') {
+            if (m && (operationKind === 'select' || operationKind === 'update')) {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
                     'match-url': IndexType.MatchUrlToFeedItem,
@@ -153,14 +153,24 @@ export class ShowController {
                     'show-episodes-by-pubdate': IndexType.ShowEpisodesByPubdate,
                     'podcast-guid-to-show-uuid': IndexType.PodcastGuidToShowUuid,
                 }[m[1]];
-                const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
-                const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
-                if (expectStringValues) {
-                    const results = [...map].filter(v => typeof v[1] === 'string').map(v => ({ _key: v[0], _value: v[1] as string }));
-                    return { results };
-                } else {
-                    const results = [...map].filter(v => isStringRecord(v[1])).map(v => ({ _key: v[0], ...v[1] as Record<string, unknown> }));
-                    return { results };
+                if (operationKind === 'select') {
+                    const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
+                    const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
+                    if (expectStringValues) {
+                        const results = [...map].filter(v => typeof v[1] === 'string').map(v => ({ _key: v[0], _value: v[1] as string }));
+                        return { results };
+                    } else {
+                        const results = [...map].filter(v => isStringRecord(v[1])).map(v => ({ _key: v[0], ...v[1] as Record<string, unknown> }));
+                        return { results };
+                    }
+                }
+                if (operationKind === 'update' && indexType) {
+                    if (indexType === IndexType.PodcastGuidToShowUuid) {
+                        const result = await rebuildPodcastGuidToShowUuidIndex(storage);
+                        return { results: [ result ] };
+                    } else {
+                        throw new Error(`Unsupported index update: ${IndexType[indexType]}`);
+                    }
                 }
             }
         }
@@ -1145,6 +1155,17 @@ async function loadKnownMediaUrls({ feedRecordId, storage }: { feedRecordId: str
     return Object.fromEntries(records.map(v => [ v.url, v ]));
 }
 
+async function rebuildPodcastGuidToShowUuidIndex(storage: DurableObjectStorage) {
+    const map = await storage.list({ prefix: computeShowKeyPrefix() });
+    const shows = [...map.values()].filter(isShowRecord);
+    const indexRecords: Record<string, string> = {};
+    for (const { uuid: showUuid, podcastGuid } of shows) {
+        if (podcastGuid && isValidUuid(showUuid)) indexRecords[computePodcastGuidToShowUuidIndexKey({ podcastGuid })] = showUuid;
+    }
+    await storage.put(indexRecords);
+    return { indexRecords: Object.keys(indexRecords).length };
+}
+
 enum IndexType {
     PodcastGuid = 1,
     MatchUrlToFeedItem = 2,
@@ -1204,6 +1225,10 @@ function computeShowEpisodesIndexKeyPrefix({ showUuid }: { showUuid: string }) {
 
 function computeShowKey(showUuid: string): string {
     return `sc.show0.${showUuid}`;
+}
+
+function computeShowKeyPrefix(): string {
+    return 'sc.show0.';
 }
 
 async function computeEpisodeId(itemGuid: string): Promise<string> {
