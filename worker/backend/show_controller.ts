@@ -163,7 +163,7 @@ export class ShowController {
                 }[m[1]];
                 if (operationKind === 'select') {
                     const map = await storage.list(computeListOpts(`sc.i0.${indexType}.`, parameters));
-                    const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid;
+                    const expectStringValues = indexType === IndexType.FeedRecordIdToShowUuid || indexType === IndexType.PodcastGuidToShowUuid;
                     if (expectStringValues) {
                         const results = [...map].filter(v => typeof v[1] === 'string').map(v => ({ _key: v[0], _value: v[1] as string }));
                         return { results };

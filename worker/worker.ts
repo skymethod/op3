@@ -29,7 +29,7 @@ import { Banlist } from './banlist.ts';
 import { ManualColo } from './backend/manual_colo.ts';
 import { R2BucketBlobs } from './backend/r2_bucket_blobs.ts';
 import { ReadonlyRemoteDataRpcClient } from './rpc_clients.ts';
-import { computeShowOgImageResponse, computeShowResponse, tryParseShowOgImageRequest, tryParseShowRequest } from './routes/show.ts';
+import { computeDemoShowResponse, computeShowOgImageResponse, computeShowResponse, tryParseShowOgImageRequest, tryParseShowRequest } from './routes/show.ts';
 import { CloudflareConfiguration } from './cloudflare_configuration.ts';
 import { computeDownloadCalculationResponse } from './routes/download_calculation.ts';
 import { computeStatsResponse } from './routes/stats.ts';
@@ -229,6 +229,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/download-calculation') return computeDownloadCalculationResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/demo') return computeDemoShowResponse({ origin });
     if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
     if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });

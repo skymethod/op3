@@ -117,7 +117,7 @@ export class BackendDO {
                     const getOrLoadShowController = () => {
                         if (!this.showController) {
                             if (typeof origin !== 'string') throw new Error(`'origin' is required to init ShowController`);
-                            if (!isValidOrigin(origin)) throw new Error(`Valid 'origin' is required to init ShowController`);
+                            if (!isValidOrigin(origin)) throw new Error(`Valid 'origin' is required to init ShowController: ${JSON.stringify(origin)}`);
                             if (typeof podcastIndexCredentials !== 'string') throw new Error(`'podcastIndexCredentials' is required to init ShowController`);
                             const podcastIndexClient = newPodcastIndexClient({ podcastIndexCredentials, origin });
                             if (!podcastIndexClient) throw new Error(`Valid 'podcastIndexCredentials' are required to init ShowController`);

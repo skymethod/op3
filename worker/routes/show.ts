@@ -8,7 +8,7 @@ import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
-import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
+import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1 } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 
@@ -131,6 +131,16 @@ export async function computeShowOgImageResponse(req: ShowOgImageRequest, opts: 
 
 export function computeOgImageKey({ showUuid }: { showUuid: string}): string {
     return `show/${showUuid}/og.png`;
+}
+
+export function computeDemoShowResponse({ origin }: { origin: string }): Response {
+    return new Response(undefined, {
+        status: 302,
+        headers: {
+            'cache-control': 'private, no-cache',
+            'location': `${origin}/show/${DEMO_SHOW_1}`,
+        }
+    });
 }
 
 //
