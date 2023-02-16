@@ -134,6 +134,14 @@ export class ShowController {
             return { results };
         }
 
+        if (operationKind === 'select' && targetPath === '/show/show-uuids') {
+            const { podcastGuid } = parameters;
+            if (podcastGuid) {
+                const result = await storage.get(computePodcastGuidToShowUuidIndexKey({ podcastGuid }));
+                return { results: typeof result === 'string' && isValidUuid(result) ? [ result ] : [] };
+            }
+        }
+
         if (operationKind === 'select' && targetPath === '/show/work') {
             const map = await storage.list(computeListOpts('sc.work0.', parameters));
             const results = [...map.values()].filter(isWorkRecord);

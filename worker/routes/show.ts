@@ -1,7 +1,9 @@
 import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
+import { isString } from '../check.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText } from '../deps.ts';
+import { DoNames } from '../do_names.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -13,11 +15,14 @@ import { computeNonProdHeader } from './instances.ts';
 const showHtm = await importText(import.meta.url, '../static/show.htm');
 const showJs = await importText(import.meta.url, '../static/show.js');
 
-export type ShowRequest = { showUuid: string };
+export type ShowRequest = { id: string, type: 'show-uuid' | 'podcast-guid' };
 
 export function tryParseShowRequest({ method, pathname }: { method: string, pathname: string }): ShowRequest | undefined {
-    const m = /^\/show\/([0-9a-f]{32})$/.exec(pathname);
-    return method === 'GET' && m ? { showUuid: m[1] } : undefined;
+    const m = /^\/show\/([0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(pathname);
+    if (!m) return undefined;
+    const id = m[1].toLowerCase();
+    const type = id.includes('-') ? 'podcast-guid' : 'show-uuid';
+    return method === 'GET' && m ? { id, type } : undefined;
 }
 
 type Opts = {
@@ -38,10 +43,9 @@ type Opts = {
     roAssetBlobs: Blobs | undefined, 
 };
 
-
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
     const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
-    const { showUuid } = req;
+    const { id, type } = req;
 
     const start = Date.now();
 
@@ -50,7 +54,14 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         return compute404Response({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
     }
 
+    let showUuidFromPodcastGuid: string | undefined;
+    if (type === 'podcast-guid') {
+        showUuidFromPodcastGuid = await lookupShowUuid({ podcastGuid: id, rpcClient, roRpcClient , searchParams });
+        if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
+    }
+    const showUuid = showUuidFromPodcastGuid ?? id;
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
+
     const times: Record<string, number> = {};
     
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
@@ -96,7 +107,7 @@ export type ShowOgImageRequest = { showUuid: string };
 
 export function tryParseShowOgImageRequest({ method, pathname }: { method: string, pathname: string }): ShowRequest | undefined {
     const m = /^\/show\/([0-9a-f]{32})\/og-.*?\.png$/.exec(pathname);
-    return method === 'GET' && m ? { showUuid: m[1] } : undefined;
+    return method === 'GET' && m ? { type: 'show-uuid', id: m[1] } : undefined;
 }
 
 export async function computeShowOgImageResponse(req: ShowOgImageRequest, opts: Opts): Promise<Response> {
@@ -123,6 +134,14 @@ export function computeOgImageKey({ showUuid }: { showUuid: string}): string {
 }
 
 //
+
+async function lookupShowUuid({ podcastGuid, rpcClient, roRpcClient, searchParams }: { podcastGuid: string, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
+    const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
+    if (!targetRpcClient) throw new Error(`Need rpcClient`);
+
+    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid } }, DoNames.showServer);
+    return results.filter(isString).filter(isValidUuid).at(0);
+}
 
 async function headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }: { showUuid: string, searchParams: URLSearchParams, assetBlobs: Blobs | undefined, roAssetBlobs: Blobs | undefined }): Promise<{ etag: string } | undefined> {
     const targetAssetBlobs = searchParams.has('ro') ? roAssetBlobs : assetBlobs;
