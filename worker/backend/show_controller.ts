@@ -176,6 +176,10 @@ export class ShowController {
                     if (indexType === IndexType.PodcastGuidToShowUuid) {
                         const result = await rebuildPodcastGuidToShowUuidIndex(storage);
                         return { results: [ result ] };
+                    } else if (indexType === IndexType.MatchUrlToFeedItem || indexType === IndexType.QuerylessMatchUrlToFeedItem) { 
+                        const go = parameters.go === 'true';
+                        const result = await rebuildMatchUrlToFeedItemIndex({ indexType, storage, go });
+                        return { results: [ result ] };
                     } else {
                         throw new Error(`Unsupported index update: ${IndexType[indexType]}`);
                     }
@@ -1172,6 +1176,38 @@ async function rebuildPodcastGuidToShowUuidIndex(storage: DurableObjectStorage) 
     }
     await storage.put(indexRecords);
     return { indexRecords: Object.keys(indexRecords).length };
+}
+
+async function rebuildMatchUrlToFeedItemIndex({ indexType, storage, go }: { indexType: IndexType, storage: DurableObjectStorage, go: boolean }) {
+    const prefix = indexType === IndexType.MatchUrlToFeedItem ? computeMatchUrlToFeedItemIndexKeyPrefix()
+        : indexType === IndexType.QuerylessMatchUrlToFeedItem ? computeQuerylessMatchUrlToFeedItemIndexKeyPrefix()
+        : undefined;
+    if (prefix === undefined) throw new Error();
+    const map = await storage.list({ prefix });
+    const badKeys: string[] = [];
+    const badValueKeys: string[] = [];
+    let good = 0;
+    for (const [ key, value ] of map) {
+        try {
+            unpackMatchUrlToFeedItemIndexKey(key);
+        } catch {
+            badKeys.push(key);
+            continue;
+        }
+        if (!isFeedItemIndexRecord(value)) {
+            badValueKeys.push(key);
+            continue;
+        }
+        good++;
+    }
+
+    if (go) {
+        for (const batch of chunk([ ...badKeys, ...badValueKeys ], 128)) {
+            await storage.delete(batch);
+        }
+    }
+
+    return { badKeys: badKeys.length, badValueKeys: badValueKeys.length, good, go };
 }
 
 enum IndexType {
