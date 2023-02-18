@@ -40,7 +40,7 @@ function parseRequest(path: string, searchParams: URLSearchParams): QueryDownloa
     const [ _, showUuid ] = m;
     check('showUuid', showUuid, isValidUuid);
 
-    let request: QueryDownloadsRequest = {  kind: 'query-downloads', showUuid, ...computeApiQueryCommonParameters(searchParams, QUERY_DOWNLOADS) };
+    let request: QueryDownloadsRequest = { kind: 'query-downloads', showUuid, ...computeApiQueryCommonParameters(searchParams, QUERY_DOWNLOADS) };
     const { bots, episodeId } = Object.fromEntries(searchParams);
     if (typeof bots === 'string') {
         checkMatches('bots', bots, /^(include|exclude)$/);

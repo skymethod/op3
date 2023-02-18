@@ -205,7 +205,8 @@ export interface QueryDownloadsRequest {
     readonly startTimeExclusive?: string; // instant
     readonly endTimeExclusive?: string; // instant
 
-    readonly continuationToken?: string, skipHeaders?: boolean
+    readonly continuationToken?: string;
+    readonly skipHeaders?: boolean;
 
     readonly showUuid: string;
     readonly episodeId?: string;
