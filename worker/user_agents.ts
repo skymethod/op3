@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@8cf396e6db3da86b511098a52cb138e26afa1010 (2023-01-22T22:39:44Z)
+// from user-agents-v2@e155d1028550022975c66914bb4749596be04ea0 (2023-02-19T19:04:02Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -311,6 +311,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^FaithPlay FaithPlay\//.test(userAgent)) return { name: `FaithPlay`, type: 'app' };
     if (/^Fallound\//.test(userAgent)) return { name: `Fallound`, type: 'app' };
     if (/^FancyMusic\//.test(userAgent)) return { name: `FancyMusic`, type: 'app' };
+    if (/^Fathom\//.test(userAgent)) return { name: `Fathom`, type: 'app' };
     if (/^Feeder\//.test(userAgent)) return { name: `Feeder`, type: 'app' };
     if (/^feedly\//.test(userAgent)) return { name: `Feedly`, type: 'app' };
     if (/^FeedStation\/\d/.test(userAgent)) return { name: `FeedStation`, type: 'app' };
@@ -481,6 +482,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Pods\//.test(userAgent)) return { name: `Pods`, type: 'app' };
     if (/^Podurama/.test(userAgent)) return { name: `Podurama`, type: 'app' };
     if (/^PodTrapper/.test(userAgent)) return { name: `PodTrapper`, type: 'app' };
+    if (/^Podvine\/\d/.test(userAgent)) return { name: `Podvine`, type: 'app' };
     if (/^[Pp]odverse\//.test(userAgent)) return { name: `Podverse`, type: 'app' };
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };

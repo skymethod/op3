@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8cf396e6db3da86b511098a52cb138e26afa1010 (2023-01-22T22:39:44Z)
+// from user-agents-v2@e155d1028550022975c66914bb4749596be04ea0 (2023-02-19T19:04:02Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -310,6 +310,7 @@ const appTests = {
     'CastBox/8.18.1-200917153 (Linux;Android 8.0.0) ExoPlayerLib/2.10.4': { type: 'app', name: `CastBox` },
     'CastBox/8.5.1 (fm.castbox.audiobook.radio.podcast; build:11; iOS 13.1.2)': { type: 'app', name: `CastBox` },
     'CastBox/5.7.5-190508115.r1a805d3': { type: 'app', name: `CastBox` },
+    'CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4, CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4, CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4': { type: 'app', name: `CastBox` },
     'Casterbate/1 CFNetwork/744.5 Darwin/14.4.0': { type: 'app', name: `Casterbate` },
     'castget 1.2.4 (castget rss enclosure downloader)': { type: 'app', name: `castget` },
     'Castro 2019.13/1167': { type: 'app', name: `Castro` },
@@ -396,6 +397,7 @@ const appTests = {
     'FaithPlay FaithPlay/1.1.5 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `FaithPlay` },
     'Fallound/16 CFNetwork/975.0.3 Darwin/18.2.0': { type: 'app', name: `Fallound` },
     'FancyMusic/2 CFNetwork/758.1.6 Darwin/15.0.0': { type: 'app', name: `FancyMusic` },
+    'Fathom/5 CFNetwork/1406.0.2 Darwin/22.4.0': { type: 'app', name: `Fathom` },
     'Feeder/2785 CFNetwork/720.5.7 Darwin/14.5.0 (x86_64)': { type: 'app', name: `Feeder` },
     'feedly/81.0.1 CFNetwork/1206 Darwin/20.1.0': { type: 'app', name: `Feedly` },
     'FeedStation/4.5 (http://www.newsgator.com/; Microsoft Windows)': { type: 'app', name: `FeedStation` },
@@ -645,6 +647,7 @@ const appTests = {
     'Pods/1 CFNetwork/1312 Darwin/21.0.0': { type: 'app', name: `Pods` },
     'Podurama/4.0.8.1 CFNetwork/1390 Darwin/22.0.0': { type: 'app', name: `Podurama` },
     'PodTrapper': { type: 'app', name: `PodTrapper` },
+    'Podvine/3.3.1 (www.podvine.com)': { type: 'app', name: `Podvine` },
     'Podverse/Android Mobile App': { type: 'app', name: `Podverse` },
     'Podverse/F-Droid Android Mobile App/': { type: 'app', name: `Podverse` },
     'Podverse/Android Mobile App/Mozilla/5.0 (Linux; Android 12; SM-S134DL Build/SP1A.210812.016; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/105.0.5195.136 Mobile Safari/537.36': { type: 'app', name: `Podverse` },
