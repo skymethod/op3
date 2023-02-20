@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@e155d1028550022975c66914bb4749596be04ea0 (2023-02-19T19:04:02Z)
+// from user-agents-v2@46115683ea87edebe4ac3448dc50bb7e8a687196 (2023-02-20T23:22:28Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -569,6 +569,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Dalvik[\/ ]/.test(userAgent)) return { name: `Dalvik`, type: 'library' };
     if (/^Dart\//.test(userAgent)) return { name: `Dart`, type: 'library', category: 'bot' };
     if (/^Deno\//.test(userAgent)) return { name: `Deno`, type: 'library', category: 'bot' };
+    if (/^Down\/\d/.test(userAgent)) return { name: `Down (ruby)`, type: 'library', category: 'bot' };
     if (/^Lavf\//.test(userAgent)) return { name: `ffmpeg`, type: 'library', category: 'bot' };
     if (/^FileDownloader\//.test(userAgent)) return { name: `FileDownloader (Android)`, type: 'library' };
     if (/^Go-http-client/.test(userAgent)) return { name: `Go Http Client`, type: 'library', category: 'bot' };

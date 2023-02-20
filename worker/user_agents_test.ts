@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@e155d1028550022975c66914bb4749596be04ea0 (2023-02-19T19:04:02Z)
+// from user-agents-v2@46115683ea87edebe4ac3448dc50bb7e8a687196 (2023-02-20T23:22:28Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -297,6 +297,7 @@ const appTests = {
     'Bullhorn/1.0 (+http://bullhorn.fm/)': { type: 'app', name: `Bullhorn` },
     'Bullhorn': { type: 'app', name: `Bullhorn` },
     'Bullhorn (https://bullhorn.fm)': { type: 'app', name: `Bullhorn` },
+    'Bullhorn/1 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Bullhorn` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Bygdanytt Hermes/90.0.0 _app_': { type: 'app', name: `Bygdanytt iOS app` },
     'Canvas/7369 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Canvas` },
     'Capital/1528207522 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Capital` },
@@ -779,6 +780,7 @@ const libraryTests = {
     'Dalvik (Linux; U; Android 4.1.1;aries/JRO03L)': { type: 'library', name: `Dalvik` },
     'Dart/2.18 (dart:io)': { type: 'library', name: `Dart` },
     'Deno/1.26.1': { type: 'library', name: `Deno` },
+    'Down/5.3.1': { type: 'library', name: `Down (ruby)` },
     'FileDownloader/1.7.7': { type: 'library', name: `FileDownloader (Android)` },
     'Go-http-client/2.0': { type: 'library', name: `Go Http Client` },
     'got (https://github.com/sindresorhus/got)': { type: 'library', name: `Got (node)` },
