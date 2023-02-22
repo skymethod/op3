@@ -58,8 +58,11 @@
 
         <h4>IP Address Handling</h2>
         <p>
-            IP addresses are not personally-identifiable in and of themselves, and the service does not have any associated data that makes them so.  
-            However, the service takes extra precautions to avoid republishing them back out to Data API users, who only ever see a secure hash, computed by the service using a monthly-rotating secret key.
+            IP addresses are network-specific identifiers associated with each podcast listener request, allocated by the listener's <a href="https://en.wikipedia.org/wiki/Internet_service_provider">internet service provider</a> (ISP).
+            These addresses are an important part of the industry-standard way of computing podcast Downloads, but also considered personal data (under "online identifiers") in many jurisdictions.
+        </p>
+        <p>
+            As such, OP3 handles IP addresses with special care, and takes extra precautions to avoid republishing them back out to Data API users, who only ever see a secure hash, computed by the service using a monthly-rotating secret key.
         </p>
         <p>
             Internally, the service also stores a separate symmetrically-encrypted version with another set of monthly-rotating secret keys.
@@ -90,6 +93,7 @@
         <p>2022-09-17: Published initial version.</p>
         <p>2022-10-20: Documented new list of captured request attributes, consensus derived from a <a href="https://github.com/skymethod/op3/discussions/7">project discussion</a>.</p>
         <p>2023-02-17: Added X-Playback-Session-Id to captured request headers.</p>
+        <p>2023-02-22: Updated the wording around why we treat IP addresses with special care.</p>
 
     </div>
    
