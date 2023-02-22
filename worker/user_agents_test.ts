@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@46115683ea87edebe4ac3448dc50bb7e8a687196 (2023-02-20T23:22:28Z)
+// from user-agents-v2@11ba0e6e6a08e114b75478dd514f21acdbb9883a (2023-02-22T23:58:19Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -469,6 +469,7 @@ const appTests = {
     'HalfTunes/7 CFNetwork/893.14 Darwin/16.7.0': { type: 'app', name: `HalfTunes` },
     'Hammel/1.5 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Hammel` },
     'HardCast/11 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `HardCast` },
+    'Hark/10678 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Hark Audio` },
     'Heart/1528207522 CFNetwork/897.15 Darwin/17.5.0': { type: 'app', name: `Heart` },
     'hermespod.com/v1.5.x': { type: 'app', name: `HermesPod` },
     'HiCast/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `HiCast` },

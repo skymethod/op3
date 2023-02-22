@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@46115683ea87edebe4ac3448dc50bb7e8a687196 (2023-02-20T23:22:28Z)
+// from user-agents-v2@11ba0e6e6a08e114b75478dd514f21acdbb9883a (2023-02-22T23:58:19Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -356,6 +356,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^HalfTunes\//.test(userAgent)) return { name: `HalfTunes`, type: 'app' };
     if (/^Hammel\//.test(userAgent)) return { name: `Hammel`, type: 'app' };
     if (/^HardCast\//.test(userAgent)) return { name: `HardCast`, type: 'app' };
+    if (/^Hark\//.test(userAgent)) return { name: `Hark Audio`, type: 'app' };
     if (/^Heart\//.test(userAgent)) return { name: `Heart`, type: 'app' };
     if (/hermespod\.com\//.test(userAgent)) return { name: `HermesPod`, type: 'app' };
     if (/^HiCast\//.test(userAgent)) return { name: `HiCast`, type: 'app' };
