@@ -99,7 +99,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "start",
                             "in": "query",
-                            "description": "Filter by start time (inclusive) using a timestamp or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
+                            "description": "Filter by start time (inclusive) using a timestamp, date, or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
@@ -108,7 +108,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "startAfter",
                             "in": "query",
-                            "description": "Filter by start time (exclusive) using a timestamp or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
+                            "description": "Filter by start time (exclusive) using a timestamp, date, or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
@@ -117,7 +117,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "end",
                             "in": "query",
-                            "description": "Filter by end time (exclusive) using a timestamp or relative time (e.g. `-24h`)",
+                            "description": "Filter by end time (exclusive) using a timestamp, date, or relative time (e.g. `-24h`)",
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
@@ -160,7 +160,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "hashedIpAddress",
                             "in": "query",
-                            "description": "Filter by a specific IP address secure hash\n\nRaw IP addresses are never stored, only their secure hash, using rotating keys",
+                            "description": "Filter by a specific IP address secure hash\n\nRaw IP addresses are never stored, only their secure hash, using rotating keys\n\nYou can specify `hashedIpAddress=current` to use the value corresponding to your current IP address",
                             "example": `a3f1b92bc53ff9512253be45bc9c60047bddad55`,
                             "required": false,
                             "type": "40-character hex",
@@ -219,8 +219,17 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "type": "array",
                         "items": {
                             "$ref": "#/definitions/LogRow"
-                        }
+                        },
+                        "description": "Logs that match the query"
                     },
+                    "count": {
+                        "type": "integer",
+                        "description": "Number of logs in the response"
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
                 }
             },
             "LogRow": {
