@@ -1,12 +1,12 @@
 import { timed } from '../async.ts';
 import { AudienceSummary, computeAudienceSummaryKey, isValidAudienceSummary } from '../backend/audience.ts';
 import { Blobs } from '../backend/blobs.ts';
-import { isEpisodeRecord } from '../backend/show_controller_model.ts';
+import { isEpisodeRecord, isFeedRecord } from '../backend/show_controller_model.ts';
 import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
 import { check, isString } from '../check.ts';
 import { compareByDescending } from '../collections.ts';
 import { Configuration } from '../configuration.ts';
-import { decodeXml } from '../deps.ts';
+import { Bytes, decodeXml } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
@@ -16,19 +16,25 @@ import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
-type ShowsOpts = { showUuidOrPodcastGuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
+type ShowsOpts = { showUuidOrPodcastGuidOrFeedUrlBase64: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
 
-export async function computeShowsResponse({ showUuidOrPodcastGuid, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
+export async function computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
     let showUuid: string;
     let showUuidInput: string;
     try {
-        if (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(showUuidOrPodcastGuid)) {
-            const result = await lookupShowUuid({ podcastGuid: showUuidOrPodcastGuid.toLowerCase(), rpcClient, roRpcClient, searchParams });
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
+            const result = await lookupShowUuidForPodcastGuid(showUuidOrPodcastGuidOrFeedUrlBase64.toLowerCase(), { rpcClient, roRpcClient, searchParams });
+            if (!result) return newJsonResponse({ message: 'not found' }, 404);
+            showUuidInput = result;
+        } else if (isValidUuid(showUuidOrPodcastGuidOrFeedUrlBase64)) {
+            showUuidInput = showUuidOrPodcastGuidOrFeedUrlBase64;
+        } else if (/^[0-9a-zA-Z_-]{15,}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
+            const result = await lookupShowUuidForFeedUrl(Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8(), { rpcClient, roRpcClient, searchParams });
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
         } else {
-            showUuidInput = showUuidOrPodcastGuid;
+            throw new Error(`Provide a show-uuid, podcast-guid, or feed-url-base64`);
         }
         check('showUuid', showUuidInput, isValidUuid);
         showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
@@ -114,12 +120,21 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
 }
 
-export async function lookupShowUuid({ podcastGuid, rpcClient, roRpcClient, searchParams }: { podcastGuid: string, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
+export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcClient, roRpcClient, searchParams }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
     const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid } }, DoNames.showServer);
     return results.filter(isString).filter(isValidUuid).at(0);
+}
+
+export async function lookupShowUuidForFeedUrl(feedUrl: string, { rpcClient, roRpcClient, searchParams }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
+    const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
+    if (!targetRpcClient) throw new Error(`Need rpcClient`);
+
+    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/feeds/${feedUrl}`, parameters: { } }, DoNames.showServer);
+    const feed = results.filter(isFeedRecord).at(0);
+    return feed?.showUuid;
 }
 
 export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';

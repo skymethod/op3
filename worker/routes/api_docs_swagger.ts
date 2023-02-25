@@ -348,26 +348,26 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     ]
                 }
             },
-            "/shows/{showUuidOrPodcastGuid}": {
+            "/shows/{showUuidOrPodcastGuidOrFeedUrlBase64}": {
                 "get": {
                     "tags": [
                         "shows"
                     ],
                     "summary": `View show information`,
-                    "description": `Basic show and episode-level information for a given OP3 show uuid or [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid)\.${viewShowDescriptionSuffix}`,
+                    "description": `Basic show and episode-level information for a given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) or podcast feed url (as [urlsafe base-64](https://www.base64url.com/))\.${viewShowDescriptionSuffix}`,
                     "operationId": "viewShowInformation",
                     "produces": [
                         "application/json",
                     ],
                     "parameters": [
                         {
-                            "name": "showUuidOrPodcastGuid",
+                            "name": "showUuidOrPodcastGuidOrFeedUrlBase64",
                             "in": "path",
-                            "description": "A given OP3 show uuid or [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid).",
+                            "description": "A given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid), or podcast feed url (as urlsafe base-64).",
                             "example": `3299ee267635404e9cd660088a755b34`,
                             "required": true,
                             "type": "string",
-                            "format": "32-character hex or guid",
+                            "format": "32-character hex, guid, or urlsafe base-64",
                         },
                         {
                             "name": "token",

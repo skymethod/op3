@@ -6,7 +6,7 @@ import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
-import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuid } from './api_shows.ts';
+import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 
@@ -54,7 +54,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     let showUuidFromPodcastGuid: string | undefined;
     if (type === 'podcast-guid') {
-        showUuidFromPodcastGuid = await lookupShowUuid({ podcastGuid: id, rpcClient, roRpcClient, searchParams });
+        showUuidFromPodcastGuid = await lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams });
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
     const showUuid = showUuidFromPodcastGuid ?? id;
@@ -65,7 +65,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
     const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
-        computeShowsResponse({ method: 'GET', searchParams, showUuidOrPodcastGuid: showUuid, rpcClient, roRpcClient, times, configuration }),
+        computeShowsResponse({ method: 'GET', searchParams, showUuidOrPodcastGuidOrFeedUrlBase64: showUuid, rpcClient, roRpcClient, times, configuration }),
         computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
         headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }),
     ]));
