@@ -10,6 +10,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
     let queryDownloadsDescriptionSuffix = '';
+    let viewShowDescriptionSuffix = '';
     const previewToken = [...previewTokens].at(0);
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
@@ -21,19 +22,22 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
         if (demoShowUuid) {
             const exampleDownloadsApiCall = `${origin}/api/1/downloads/show/${demoShowUuid}?start=2023-02&end=2023-03&limit=10&format=json&token=${previewToken}`;
             queryDownloadsDescriptionSuffix = `\n\nFor example, to view the first ten downloads for show \`${demoShowUuid}\` in the month of February 2023 in json format:\n\n\GET [${exampleDownloadsApiCall}](${exampleDownloadsApiCall})`;
+
+            const exampleViewShowApiCall = `${origin}/api/1/shows/${demoShowUuid}?token=${previewToken}`;
+            viewShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleViewShowApiCall}](${exampleViewShowApiCall})`;
         }
     }
 
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
-    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -344,7 +348,52 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     ]
                 }
             },
+            "/shows/{showUuidOrPodcastGuid}": {
+                "get": {
+                    "tags": [
+                        "shows"
+                    ],
+                    "summary": `View show information`,
+                    "description": `Basic show and episode-level information for a given OP3 show uuid or [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid)\.${viewShowDescriptionSuffix}`,
+                    "operationId": "viewShowInformation",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "showUuidOrPodcastGuid",
+                            "in": "path",
+                            "description": "A given OP3 show uuid or [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid).",
+                            "example": `3299ee267635404e9cd660088a755b34`,
+                            "required": true,
+                            "type": "string",
+                            "format": "32-character hex or guid",
+                        },
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/ViewShowResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
+        
         "securityDefinitions": {
             "bearer_token_or_token_query_param": {
                 "type": "custom",
@@ -520,6 +569,57 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                 },
                 "required": [
                     "time", "url", "audienceId", "showUuid", "episodeId", "hashedIpAddress"
+                ]
+            },
+            "ViewShowResponse": {
+                "type": "object",
+                "properties": {
+                    "showUuid": {
+                        "type": "string",
+                        "description": "Unique OP3 uuid for the show",
+                        "format": "32-character hex",
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the show"
+                    },
+                    "podcastGuid": {
+                        "type": "string",
+                        "description": "[\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) associated with the show",
+                        "format": "guid",
+                    },
+                    "episodes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/EpisodeInfo"
+                        },
+                        "description": "All episodes for the show, from newest to oldest"
+                    },
+                },
+                "required": [
+                    "showUuid", "episodes"
+                ]
+            },
+            "EpisodeInfo": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "OP3 episode id, unique within the show",
+                        "format": "64-character hex",
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the episode"
+                    },
+                    "pubdate": {
+                        "type": "string",
+                        "description": "Publication time of the episode",
+                        "format": "ISO 8601 timestamp",
+                    },
+                },
+                "required": [
+                    "id"
                 ]
             },
         }
