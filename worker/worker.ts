@@ -235,7 +235,8 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
     if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
-    if (method === 'GET' && pathname === '/api/docs/swagger.json') return computeApiDocsSwaggerResponse({ instance, origin, previewTokens });
+    const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
+    if (method === 'GET' && pathname === '/api/docs/swagger.json') return await computeApiDocsSwaggerResponse({ instance, origin, previewTokens, configuration });
     { const r = tryParseReleasesRequest({ method, pathname, headers }); if (r) return computeReleasesResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken }); }
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
@@ -254,7 +255,6 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/stats' && !/staging|prod/.test(instance)) return computeStatsResponse({ searchParams, instance, origin, productionOrigin, cfAnalyticsToken, statsBlobs, roStatsBlobs });
 
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
-    const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
     const { blobs: assetBlobs, roBlobs: roAssetBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'assets/' });
     { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
     { const r = tryParseShowOgImageRequest({ method, pathname }); if (r && configuration) return computeShowOgImageResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }

@@ -1,30 +1,39 @@
-import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
+import { Configuration } from '../configuration.ts';
+import { QUERY_DOWNLOADS, QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeNonProdWarning } from './instances.ts';
 
-export function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string> }): Response {
-    const { instance, origin, previewTokens } = opts;
+export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined }): Promise<Response> {
+    const { instance, origin, previewTokens, configuration } = opts;
     const { host } = new URL(origin);
 
     const versionSuffix = instance === 'prod' ? '' : `-${instance}`;
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
+    let queryDownloadsDescriptionSuffix = '';
     const previewToken = [...previewTokens].at(0);
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
-        const exampleApiCall = `${origin}/api/1/redirect-logs?start=-24h&format=json&token=${previewToken}`;
-        queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleApiCall}](${exampleApiCall})`;
+
+        const exampleRedirectLogsApiCall = `${origin}/api/1/redirect-logs?start=-24h&format=json&token=${previewToken}`;
+        queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleRedirectLogsApiCall}](${exampleRedirectLogsApiCall})`;
+
+        const demoShowUuid = await configuration?.get('demo-show-1');
+        if (demoShowUuid) {
+            const exampleDownloadsApiCall = `${origin}/api/1/downloads/show/${demoShowUuid}?start=2023-02&end=2023-03&limit=10&format=json&token=${previewToken}`;
+            queryDownloadsDescriptionSuffix = `\n\nFor example, to view the first ten downloads for show \`${demoShowUuid}\` in the month of February 2023 in json format:\n\n\GET [${exampleDownloadsApiCall}](${exampleDownloadsApiCall})`;
+        }
     }
 
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
-    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -103,7 +112,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
-                            "format": "ISO 8601 or relative duration",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
                         },
                         {
                             "name": "startAfter",
@@ -112,7 +121,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
-                            "format": "ISO 8601 or relative duration",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
                         },
                         {
                             "name": "end",
@@ -121,7 +130,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "example": "2022-09-15T14:00:52.709Z",
                             "required": false,
                             "type": "string",
-                            "format": "ISO 8601 or relative duration",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
                         },
                         {
                             "name": "url",
@@ -193,6 +202,138 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "description": "successful operation",
                             "schema": {
                                 "$ref": "#/definitions/QueryRedirectLogsResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
+            "/downloads/show/{showUuid}": {
+                "get": {
+                    "tags": [
+                        "downloads"
+                    ],
+                    "summary": `Query show downloads`,
+                    "description": `Perform a query of show [downloads](${origin}/download-calculation).\n\nResults are returned in ascending order by time.${queryDownloadsDescriptionSuffix}`,
+                    "operationId": "queryShowDownloads",
+                    "produces": [
+                        "application/json",
+                        "text/tab-separated-values"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "showUuid",
+                            "in": "path",
+                            "description": "Filter by the OP3 show uuid",
+                            "example": `3299ee267635404e9cd660088a755b34`,
+                            "required": true,
+                            "type": "string",
+                            "format": "32-character hex",
+                        },
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "format",
+                            "in": "query",
+                            "description": "Output format\n\nDefaults to tab-separated text (`tsv`), but also supports a object-based `json` format (aka `json-o`) or a more compact array-based `json-a` format.",
+                            "required": false,
+                            "default": "tsv",
+                            "enum": [
+                                "tsv",
+                                "json",
+                                "json-o",
+                                "json-a",
+                            ]
+                        },
+                        {
+                            "name": "limit",
+                            "in": "query",
+                            "description": "Maximum number of rows to return",
+                            "required": false,
+                            "type": "integer",
+                            "maximum": QUERY_DOWNLOADS.limitMax,
+                            "minimum": QUERY_DOWNLOADS.limitMin,
+                            "default": QUERY_DOWNLOADS.limitDefault,
+                        },
+                        {
+                            "name": "start",
+                            "in": "query",
+                            "description": "Filter by start time (inclusive) using a timestamp, date, or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
+                            "example": "2023-02-23T21:01:45.797Z",
+                            "required": false,
+                            "type": "string",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
+                        },
+                        {
+                            "name": "startAfter",
+                            "in": "query",
+                            "description": "Filter by start time (exclusive) using a timestamp, date, or relative time (e.g. `-24h`)\n\nYou can specify either `start` or `startAfter`, not both",
+                            "example": "2023-02-23T21:01:45.797Z",
+                            "required": false,
+                            "type": "string",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
+                        },
+                        {
+                            "name": "end",
+                            "in": "query",
+                            "description": "Filter by end time (exclusive) using a timestamp, date, or relative time (e.g. `-24h`)",
+                            "example": "2023-02-23T21:01:45.797Z",
+                            "required": false,
+                            "type": "string",
+                            "format": "ISO 8601 timestamp, date, or relative duration",
+                        },
+                        {
+                            "name": "episodeId",
+                            "in": "query",
+                            "description": "Filter by the OP3 episode id",
+                            "example": `6e3c647698c647939f479e6e0b822ec7a2eaa30b4ca5488d8eeb8b08ac22cdf7`,
+                            "required": true,
+                            "type": "string",
+                            "format": "64-character hex",
+                        },
+                        {
+                            "name": "bots",
+                            "in": "query",
+                            "description": `Whether or not to include downloads from known bots`,
+                            "required": false,
+                            "default": "exclude",
+                            "enum": [
+                                "include",
+                                "exclude",
+                            ]
+                        },
+                        {
+                            "name": "skip",
+                            "in": "query",
+                            "description": "Whether or not to skip specific response metadata like TSV headers",
+                            "required": false,
+                            "enum": [
+                                "headers",
+                            ]
+                        },
+                        {
+                            "name": "continuationToken",
+                            "in": "query",
+                            "description": "Continue a prior query if necessary",
+                            "required": false,
+                            "type": "string",
+                            "format": "Opaque token from a prior query response",
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryDownloadsResponse"
                             }
                         }
                     },
@@ -289,6 +430,96 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                 },
                 "required": [
                     "time", "uuid", "hashedIpAddress", "method", "url", "edgeColo"
+                ]
+            },
+            "QueryDownloadsResponse": {
+                "type": "object",
+                "properties": {
+                    "rows": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/DownloadRow"
+                        },
+                        "description": "Download rows that match the query"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "Number of downloads in the response"
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    },
+                    "continuationToken": {
+                        "type": "string",
+                        "description": "Present if there are more results. Pass this opaque value as the `continationToken` parameter in the next query to see the next page"
+                    }
+                }
+            },
+            "DownloadRow": {
+                "type": "object",
+                "properties": {
+                    "time": {
+                        "type": "string",
+                    },
+                    "url": {
+                        "type": "string",
+                    },
+                    "audienceId": {
+                        "type": "string",
+                    },
+                    "showUuid": {
+                        "type": "string",
+                    },
+                    "episodeId": {
+                        "type": "string",
+                    },
+                    "hashedIpAddress": {
+                        "type": "string",
+                    },
+                    "agentType": {
+                        "type": "string",
+                    },
+                    "agentName": {
+                        "type": "string",
+                    },
+                    "deviceType": {
+                        "type": "string",
+                    },
+                    "deviceName": {
+                        "type": "string",
+                    },
+                    "referrerType": {
+                        "type": "string",
+                    },
+                    "referrerName": {
+                        "type": "string",
+                    },
+                    "botType": {
+                        "type": "string",
+                    },
+                    "countryCode": {
+                        "type": "string",
+                    },
+                    "continentCode": {
+                        "type": "string",
+                    },
+                    "regionCode": {
+                        "type": "string",
+                    },
+                    "regionName": {
+                        "type": "string",
+                    },
+                    "timezone": {
+                        "type": "string",
+                    },
+                    "metroCode": {
+                        "type": "string",
+                    },
+                   
+                },
+                "required": [
+                    "time", "url", "audienceId", "showUuid", "episodeId", "hashedIpAddress"
                 ]
             },
         }
