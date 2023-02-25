@@ -2,6 +2,7 @@
 export interface ApiShowsResponse {
     readonly showUuid: string;
     readonly title?: string;
+    readonly podcastGuid?: string;
     readonly episodes: readonly EpisodeInfo[];
 }
 

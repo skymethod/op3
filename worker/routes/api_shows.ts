@@ -3,11 +3,12 @@ import { AudienceSummary, computeAudienceSummaryKey, isValidAudienceSummary } fr
 import { Blobs } from '../backend/blobs.ts';
 import { isEpisodeRecord } from '../backend/show_controller_model.ts';
 import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
-import { check } from '../check.ts';
+import { check, isString } from '../check.ts';
 import { compareByDescending } from '../collections.ts';
 import { Configuration } from '../configuration.ts';
 import { decodeXml } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
+import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { increment } from '../summaries.ts';
@@ -15,14 +16,27 @@ import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
-type ShowsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
+type ShowsOpts = { showUuidOrPodcastGuid: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
 
-export async function computeShowsResponse({ showUuid: showUuidInput, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
+export async function computeShowsResponse({ showUuidOrPodcastGuid, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    check('showUuid', showUuidInput, isValidUuid);
-    const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
-    check('showUuid', showUuid, isValidUuid);
-    
+    let showUuid: string;
+    let showUuidInput: string;
+    try {
+        if (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(showUuidOrPodcastGuid)) {
+            const result = await lookupShowUuid({ podcastGuid: showUuidOrPodcastGuid.toLowerCase(), rpcClient, roRpcClient, searchParams });
+            if (!result) return newJsonResponse({ message: 'not found' }, 404);
+            showUuidInput = result;
+        } else {
+            showUuidInput = showUuidOrPodcastGuid;
+        }
+        check('showUuid', showUuidInput, isValidUuid);
+        showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
+        check('showUuid', showUuid, isValidUuid);
+    } catch (e) {
+        const { message } = packError(e);
+        return newJsonResponse({ message }, 400);
+    }
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
@@ -33,8 +47,9 @@ export async function computeShowsResponse({ showUuid: showUuidInput, method, se
     const { results: showRecords = [] } = selectShowResponse;
     if (showRecords.length === 0) return newJsonResponse({ message: 'not found' }, 404);
 
-    const { title } = showRecords[0] as Record<string, unknown>;
+    const { title, podcastGuid } = showRecords[0] as Record<string, unknown>;
     if (title !== undefined && typeof title !== 'string') throw new Error(`Bad title: ${JSON.stringify(title)}`);
+    if (podcastGuid !== undefined && typeof podcastGuid !== 'string') throw new Error(`Bad podcastGuid: ${JSON.stringify(podcastGuid)}`);
 
     const { results: episodeRecords = [] } = selectEpisodesResponse;
     const episodes = episodeRecords
@@ -42,7 +57,7 @@ export async function computeShowsResponse({ showUuid: showUuidInput, method, se
         .sort(compareByDescending(r => r.pubdateInstant))
         .map(({ id, title, pubdateInstant }) => ({ id, title: cleanTitle(title), pubdate: pubdateInstant }));
 
-    return newJsonResponse(computeApiShowsResponse(showUuidInput, { showUuid, title, episodes }));
+    return newJsonResponse(computeApiShowsResponse(showUuidInput, { showUuid, title, podcastGuid, episodes }));
 }
 
 type StatsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number>, configuration: Configuration };
@@ -97,6 +112,14 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     }
    
     return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
+}
+
+export async function lookupShowUuid({ podcastGuid, rpcClient, roRpcClient, searchParams }: { podcastGuid: string, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
+    const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
+    if (!targetRpcClient) throw new Error(`Need rpcClient`);
+
+    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid } }, DoNames.showServer);
+    return results.filter(isString).filter(isValidUuid).at(0);
 }
 
 export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';

@@ -1,14 +1,12 @@
 import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
-import { isString } from '../check.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText } from '../deps.ts';
-import { DoNames } from '../do_names.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
-import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1 } from './api_shows.ts';
+import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 
@@ -56,7 +54,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     let showUuidFromPodcastGuid: string | undefined;
     if (type === 'podcast-guid') {
-        showUuidFromPodcastGuid = await lookupShowUuid({ podcastGuid: id, rpcClient, roRpcClient , searchParams });
+        showUuidFromPodcastGuid = await lookupShowUuid({ podcastGuid: id, rpcClient, roRpcClient, searchParams });
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
     const showUuid = showUuidFromPodcastGuid ?? id;
@@ -67,7 +65,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
 
     const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
-        computeShowsResponse({ method: 'GET', searchParams, showUuid, rpcClient, roRpcClient, times, configuration }),
+        computeShowsResponse({ method: 'GET', searchParams, showUuidOrPodcastGuid: showUuid, rpcClient, roRpcClient, times, configuration }),
         computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
         headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }),
     ]));
@@ -144,14 +142,6 @@ export function computeDemoShowResponse({ origin }: { origin: string }): Respons
 }
 
 //
-
-async function lookupShowUuid({ podcastGuid, rpcClient, roRpcClient, searchParams }: { podcastGuid: string, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
-    const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
-    if (!targetRpcClient) throw new Error(`Need rpcClient`);
-
-    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid } }, DoNames.showServer);
-    return results.filter(isString).filter(isValidUuid).at(0);
-}
 
 async function headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }: { showUuid: string, searchParams: URLSearchParams, assetBlobs: Blobs | undefined, roAssetBlobs: Blobs | undefined }): Promise<{ etag: string } | undefined> {
     const targetAssetBlobs = searchParams.has('ro') ? roAssetBlobs : assetBlobs;
