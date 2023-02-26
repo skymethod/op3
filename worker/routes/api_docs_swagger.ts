@@ -1,5 +1,5 @@
 import { Configuration } from '../configuration.ts';
-import { QUERY_DOWNLOADS, QUERY_REDIRECT_LOGS } from './api_contract.ts';
+import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeNonProdWarning } from './instances.ts';
 
 export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined }): Promise<Response> {
@@ -11,6 +11,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let queryRedirectLogsDescriptionSuffix = '';
     let queryDownloadsDescriptionSuffix = '';
     let viewShowDescriptionSuffix = '';
+    let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
     const previewToken = [...previewTokens].at(0);
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
@@ -26,18 +27,21 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
             const exampleViewShowApiCall = `${origin}/api/1/shows/${demoShowUuid}?token=${previewToken}`;
             viewShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleViewShowApiCall}](${exampleViewShowApiCall})`;
         }
+
+        const exampleQueryRecentEpisodesApiCall = `${origin}/api/1/queries/recent-episodes-with-transcripts?limit=5&token=${previewToken}`;
+        queryRecentEpisodesWithTranscriptsDescriptionSuffix = `\n\nFor example, to find the last five episodes with transcripts:\n\n\GET [${exampleQueryRecentEpisodesApiCall}](${exampleQueryRecentEpisodesApiCall})`;
     }
 
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
-    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -392,6 +396,51 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     ]
                 }
             },
+            "/queries/recent-episodes-with-transcripts": {
+                "get": {
+                    "tags": [
+                        "queries"
+                    ],
+                    "summary": "Query recent episodes with transcripts",
+                    "description": `List all episodes with [\`podcast:transcript\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript) tags.\n\nResults are returned in reverse chronological order (newest to oldest).${queryRecentEpisodesWithTranscriptsDescriptionSuffix}`,
+                    "operationId": "queryRecentEpisodesWithTranscripts",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "limit",
+                            "in": "query",
+                            "description": "Maximum number of rows to return",
+                            "required": false,
+                            "type": "integer",
+                            "maximum": QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS.limitMax,
+                            "minimum": QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS.limitMin,
+                            "default": QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS.limitDefault,
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryRecentEpisodesWithTranscriptsResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
         
         "securityDefinitions": {
@@ -408,7 +457,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "rows": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/LogRow"
+                            "$ref": "#/definitions/QueryRedirectLogsResponse.Log"
                         },
                         "description": "Logs that match the query"
                     },
@@ -422,7 +471,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     }
                 }
             },
-            "LogRow": {
+            "QueryRedirectLogsResponse.Log": {
                 "type": "object",
                 "properties": {
                     "time": {
@@ -487,7 +536,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "rows": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/DownloadRow"
+                            "$ref": "#/definitions/QueryDownloadsResponse.Download"
                         },
                         "description": "Download rows that match the query"
                     },
@@ -505,7 +554,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     }
                 }
             },
-            "DownloadRow": {
+            "QueryDownloadsResponse.Download": {
                 "type": "object",
                 "properties": {
                     "time": {
@@ -591,7 +640,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "episodes": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/EpisodeInfo"
+                            "$ref": "#/definitions/ViewShowResponse.Episode"
                         },
                         "description": "All episodes for the show, from newest to oldest"
                     },
@@ -600,7 +649,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     "showUuid", "episodes"
                 ]
             },
-            "EpisodeInfo": {
+            "ViewShowResponse.Episode": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -620,6 +669,57 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                 },
                 "required": [
                     "id"
+                ]
+            },
+            "QueryRecentEpisodesWithTranscriptsResponse": {
+                "type": "object",
+                "properties": {
+                    "asof": {
+                        "type": "string",
+                        "description": "Data current as of this time, usually the start of the current UTC day",
+                        "format": "ISO 8601 timestamp",
+                    },
+                    "episodes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/QueryRecentEpisodesWithTranscriptsResponse.Episode"
+                        },
+                        "description": "All episodes using OP3 with a [\`podcast:transcript\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript) tag, from newest to oldest"
+                    },
+                },
+                "required": [
+                    "asof", "episodes"
+                ]
+            },
+            "QueryRecentEpisodesWithTranscriptsResponse.Episode": {
+                "type": "object",
+                "properties": {
+                    "pubdate": {
+                        "type": "string",
+                        "description": "Publication time of the episode",
+                        "format": "ISO 8601 timestamp",
+                    },
+                    "podcastGuid": {
+                        "type": "string",
+                        "description": "The [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) of the associated show",
+                    },
+                    "episodeItemGuid": {
+                        "type": "string",
+                        "description": "The episode's item-level `<guid>` tag value",
+                    },
+                    "hasTranscripts": {
+                        "type": "boolean",
+                        "description": "Whether or not the episode has a [\`podcast:transcript\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript) tag (always true for this query)",
+                    },
+                    "dailyDownloads": {
+                        "type": "object",
+                        "description": "Number of downloads (object value) per day (object key)",
+                        "additionalProperties": true,
+                        "format": "{ \"yyyy-mm-dd\": number }"
+                    },
+                },
+                "required": [
+                    "pubdate", "podcastGuid", "episodeItemGuid", "hasTranscripts", "dailyDownloads"
                 ]
             },
         }

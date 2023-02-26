@@ -9,3 +9,9 @@ export const QUERY_DOWNLOADS = {
     limitMax: 20000,
     limitMin: 0,
 }
+
+export const QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS = {
+    limitDefault: 100,
+    limitMax: 100,
+    limitMin: 1,
+}
