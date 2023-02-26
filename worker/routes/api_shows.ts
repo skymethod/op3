@@ -18,8 +18,7 @@ import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
 type ShowsOpts = { showUuidOrPodcastGuidOrFeedUrlBase64: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
 
-export async function computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64, method, searchParams, rpcClient, roRpcClient, times = {}, configuration }: ShowsOpts): Promise<Response> {
-    if (method !== 'GET') return newMethodNotAllowedResponse(method);
+export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration }: ShowsOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
     let showUuid: string;
     let showUuidInput: string;
     try {
@@ -34,7 +33,7 @@ export async function computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase6
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
         } else {
-            throw new Error(`Provide a show-uuid, podcast-guid, or feed-url-base64`);
+            throw new Error(`Provide a showUuid, podcastGuid, or feedUrlBase64`);
         }
         check('showUuid', showUuidInput, isValidUuid);
         showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
@@ -43,6 +42,17 @@ export async function computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase6
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
     }
+    return { showUuid, showUuidInput };
+}
+
+export async function computeShowsResponse(opts: ShowsOpts): Promise<Response> {
+    const { method, searchParams, rpcClient, roRpcClient, times = {} } = opts;
+    if (method !== 'GET') return newMethodNotAllowedResponse(method);
+  
+    const lookupResult = await lookupShowId(opts);
+    if (lookupResult instanceof Response) return lookupResult;
+    const { showUuid, showUuidInput } = lookupResult;
+
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 

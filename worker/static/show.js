@@ -2730,8 +2730,8 @@ var te = class extends st {
             b = Math.max(Math.min(b, x), v), p = b + g, s && !h && (l._stacks[e.axis]._visualValues[n] = e.getValueForPixel(p) - e.getValueForPixel(b));
         }
         if (b === e.getPixelForValue(r)) {
-            let _1 = rt(g) * e.getLineWidthForValue(r) / 2;
-            b += _1, g -= _1;
+            let _ = rt(g) * e.getLineWidthForValue(r) / 2;
+            b += _, g -= _;
         }
         return {
             size: g,
@@ -3706,8 +3706,8 @@ function mn(i, t, e, s) {
             let d = t.w * h, u = c.size || l.height;
             it(c.start) && (a = c.start), l.fullSize ? ei(l, n.left, a, e.outerWidth - n.right - n.left, u) : ei(l, t.left + c.placed, a, d, u), c.start = a, c.placed += d, a = l.bottom;
         } else {
-            let d1 = t.h * h, u1 = c.size || l.width;
-            it(c.start) && (o = c.start), l.fullSize ? ei(l, o, n.top, u1, e.outerHeight - n.bottom - n.top) : ei(l, o, t.top + c.placed, u1, d1), c.start = o, c.placed += d1, o = l.right;
+            let d = t.h * h, u = c.size || l.width;
+            it(c.start) && (o = c.start), l.fullSize ? ei(l, o, n.top, u, e.outerHeight - n.bottom - n.top) : ei(l, o, t.top + c.placed, u, d), c.start = o, c.placed += d, o = l.right;
         }
     }
     t.x = o, t.y = a;
@@ -3828,8 +3828,8 @@ function er(i, t) {
     }
     if (bn(s)) if (i.style.height === "") i.height = i.width / (t || 2);
     else {
-        let o1 = Hi(i, "height");
-        o1 !== void 0 && (i.height = o1);
+        let o = Hi(i, "height");
+        o !== void 0 && (i.height = o);
     }
     return i;
 }
@@ -4088,8 +4088,8 @@ function wr(i, t, e, s) {
         u = r - o;
     } else {
         if (A1(e)) {
-            let b1 = Object.keys(e)[0], _1 = e[b1];
-            f = h[b1].getPixelForValue(_1) - m + t;
+            let b = Object.keys(e)[0], _ = e[b];
+            f = h[b].getPixelForValue(_) - m + t;
         } else e === "center" ? f = (c.left + c.right) / 2 - m + t : f = xn(i, e, t);
         p = X1(s, a, n), d = e === "left" ? -N1 : N1;
     }
@@ -4273,8 +4273,8 @@ var Mt = class extends nt {
                     let b = s.mirror ? 0 : m * d.width + g * u.height;
                     t.height = Math.min(this.maxHeight, t.height + b + f);
                 } else {
-                    let b1 = s.mirror ? 0 : g * d.width + m * u.height;
-                    t.width = Math.min(this.maxWidth, t.width + b1 + f);
+                    let b = s.mirror ? 0 : g * d.width + m * u.height;
+                    t.width = Math.min(this.maxWidth, t.width + b + f);
                 }
                 this._calculatePadding(c, h, m, g);
             }
@@ -4287,8 +4287,8 @@ var Mt = class extends nt {
             let h = this.getPixelForTick(0) - this.left, d = this.right - this.getPixelForTick(this.ticks.length - 1), u = 0, f = 0;
             l ? c ? (u = n * t.width, f = s * e.height) : (u = s * t.height, f = n * e.width) : o === "start" ? f = e.width : o === "end" ? u = t.width : o !== "inner" && (u = t.width / 2, f = e.width / 2), this.paddingLeft = Math.max((u - h + a) * this.width / (this.width - h), 0), this.paddingRight = Math.max((f - d + a) * this.width / (this.width - d), 0);
         } else {
-            let h1 = e.height / 2, d1 = t.height / 2;
-            o === "start" ? (h1 = 0, d1 = t.height) : o === "end" && (h1 = e.height, d1 = 0), this.paddingTop = h1 + a, this.paddingBottom = d1 + a;
+            let h = e.height / 2, d = t.height / 2;
+            o === "start" ? (h = 0, d = t.height) : o === "end" && (h = e.height, d = 0), this.paddingTop = h + a, this.paddingBottom = d + a;
         }
     }
     _handleMargins() {
@@ -4405,14 +4405,14 @@ var Mt = class extends nt {
         } else if (e === "y") {
             if (a === "center") _ = b((t.left + t.right) / 2);
             else if (A1(a)) {
-                let V1 = Object.keys(a)[0], j1 = a[V1];
-                _ = b(this.chart.scales[V1].getPixelForValue(j1));
+                let V = Object.keys(a)[0], j = a[V];
+                _ = b(this.chart.scales[V].getPixelForValue(j));
             }
             M = _ - m, w = M - u, O = t.left, L = t.right;
         }
         let et = D1(n.ticks.maxTicksLimit, d), E = Math.max(1, Math.ceil(d / et));
         for(y = 0; y < d; y += E){
-            let V2 = this.getContext(y), j2 = o.setContext(V2), at = r.setContext(V2), q = j2.lineWidth, Nt = j2.color, Fe = at.dash || [], Wt = at.dashOffset, he = j2.tickWidth, de = j2.tickColor, ue = j2.tickBorderDash || [], fe = j2.tickBorderDashOffset;
+            let V = this.getContext(y), j = o.setContext(V), at = r.setContext(V), q = j.lineWidth, Nt = j.color, Fe = at.dash || [], Wt = at.dashOffset, he = j.tickWidth, de = j.tickColor, ue = j.tickBorderDash || [], fe = j.tickBorderDashOffset;
             v = xr(this, y, l), v !== void 0 && (x = St(s, v, q), c ? M = w = O = L = x : k = P = C = Y = x, f.push({
                 tx1: M,
                 ty1: k,
@@ -4442,20 +4442,20 @@ var Mt = class extends nt {
             let E = this._getYAxisLabelAlignment(u);
             k = E.textAlign, x = E.x;
         } else if (n === "right") {
-            let E1 = this._getYAxisLabelAlignment(u);
-            k = E1.textAlign, x = E1.x;
+            let E = this._getYAxisLabelAlignment(u);
+            k = E.textAlign, x = E.x;
         } else if (e === "x") {
             if (n === "center") M = (t.top + t.bottom) / 2 + f;
             else if (A1(n)) {
-                let E2 = Object.keys(n)[0], V = n[E2];
-                M = this.chart.scales[E2].getPixelForValue(V) + f;
+                let E = Object.keys(n)[0], V = n[E];
+                M = this.chart.scales[E].getPixelForValue(V) + f;
             }
             k = this._getXAxisLabelAlignment();
         } else if (e === "y") {
             if (n === "center") x = (t.left + t.right) / 2 - f;
             else if (A1(n)) {
-                let E3 = Object.keys(n)[0], V1 = n[E3];
-                x = this.chart.scales[E3].getPixelForValue(V1);
+                let E = Object.keys(n)[0], V = n[E];
+                x = this.chart.scales[E].getPixelForValue(V);
             }
             k = this._getYAxisLabelAlignment(u).textAlign;
         }
@@ -4463,13 +4463,13 @@ var Mt = class extends nt {
         let et = this._getLabelSizes();
         for(b = 0, _ = r.length; b < _; ++b){
             y = r[b], v = y.label;
-            let E4 = o.setContext(this.getContext(b));
+            let E = o.setContext(this.getContext(b));
             w = this.getPixelForTick(b) + o.labelOffset, P = this._resolveTickFontOptions(b), O = P.lineHeight, C = z1(v) ? v.length : 1;
-            let V2 = C / 2, j = E4.color, at = E4.textStrokeColor, q = E4.textStrokeWidth, Nt = k;
-            a ? (x = w, k === "inner" && (b === _ - 1 ? Nt = this.options.reverse ? "left" : "right" : b === 0 ? Nt = this.options.reverse ? "right" : "left" : Nt = "center"), n === "top" ? c === "near" || g !== 0 ? L = -C * O + O / 2 : c === "center" ? L = -et.highest.height / 2 - V2 * O + O : L = -et.highest.height + O / 2 : c === "near" || g !== 0 ? L = O / 2 : c === "center" ? L = et.highest.height / 2 - V2 * O : L = et.highest.height - C * O, d && (L *= -1), g !== 0 && !E4.showLabelBackdrop && (x += O / 2 * Math.sin(g))) : (M = w, L = (1 - C) * O / 2);
+            let V = C / 2, j = E.color, at = E.textStrokeColor, q = E.textStrokeWidth, Nt = k;
+            a ? (x = w, k === "inner" && (b === _ - 1 ? Nt = this.options.reverse ? "left" : "right" : b === 0 ? Nt = this.options.reverse ? "right" : "left" : Nt = "center"), n === "top" ? c === "near" || g !== 0 ? L = -C * O + O / 2 : c === "center" ? L = -et.highest.height / 2 - V * O + O : L = -et.highest.height + O / 2 : c === "near" || g !== 0 ? L = O / 2 : c === "center" ? L = et.highest.height / 2 - V * O : L = et.highest.height - C * O, d && (L *= -1), g !== 0 && !E.showLabelBackdrop && (x += O / 2 * Math.sin(g))) : (M = w, L = (1 - C) * O / 2);
             let Fe;
-            if (E4.showLabelBackdrop) {
-                let Wt = K1(E4.backdropPadding), he = et.heights[b], de = et.widths[b], ue = L - Wt.top, fe = 0 - Wt.left;
+            if (E.showLabelBackdrop) {
+                let Wt = K1(E.backdropPadding), he = et.heights[b], de = et.widths[b], ue = L - Wt.top, fe = 0 - Wt.left;
                 switch(Y){
                     case "middle":
                         ue -= he / 2;
@@ -4491,7 +4491,7 @@ var Mt = class extends nt {
                     top: ue,
                     width: de + Wt.width,
                     height: he + Wt.height,
-                    color: E4.backdropColor
+                    color: E.backdropColor
                 };
             }
             m.push({
@@ -4824,8 +4824,8 @@ function Or(i) {
     let t = {}, e = [], s = Object.keys(ut.plugins.items);
     for(let o = 0; o < s.length; o++)e.push(ut.getPlugin(s[o]));
     let n = i.plugins || [];
-    for(let o1 = 0; o1 < n.length; o1++){
-        let a = n[o1];
+    for(let o = 0; o < n.length; o++){
+        let a = n[o];
         e.indexOf(a) === -1 && (e.push(a), t[a.id] = !0);
     }
     return {
@@ -5046,7 +5046,7 @@ var ke = (i, t, e)=>{
             let c = this.createResolver(t, s, r);
             l = Lt(a, s, c);
         }
-        for (let c1 of e)o[c1] = l[c1];
+        for (let c of e)o[c] = l[c];
         return o;
     }
     createResolver(t, e, s = [
@@ -5334,8 +5334,8 @@ var xt = class {
             cancelable: !0
         }) !== !1) {
             for(let e = 0, s = this.data.datasets.length; e < s; ++e)this.getDatasetMeta(e).controller.configure();
-            for(let e1 = 0, s1 = this.data.datasets.length; e1 < s1; ++e1)this._updateDataset(e1, gt(t) ? t({
-                datasetIndex: e1
+            for(let e = 0, s = this.data.datasets.length; e < s; ++e)this._updateDataset(e, gt(t) ? t({
+                datasetIndex: e
             }) : t);
             this.notifyPlugins("afterDatasetsUpdate", {
                 mode: t
@@ -5621,32 +5621,32 @@ function fi(i, t, e, s, n, o) {
     }
     let g = Math.max(.001, p * d - e / B1) / d, m = (p - g) / 2, b = l + m + f, _ = n - m - f, { outerStart: y , outerEnd: v , innerStart: x , innerEnd: M  } = Xr(t, u, d, _ - b), k = d - y, w = d - v, P = b + y / k, O = _ - v / w, C = u + x, L = u + M, Y = b + x / C, et = _ - M / L;
     if (i.beginPath(), o) {
-        let E1 = (P + O) / 2;
-        if (i.arc(a, r, d, P, E1), i.arc(a, r, d, E1, O), v > 0) {
+        let E = (P + O) / 2;
+        if (i.arc(a, r, d, P, E), i.arc(a, r, d, E, O), v > 0) {
             let q = Zt(w, O, a, r);
             i.arc(q.x, q.y, v, O, _ + N1);
         }
-        let V1 = Zt(L, _, a, r);
-        if (i.lineTo(V1.x, V1.y), M > 0) {
-            let q1 = Zt(L, et, a, r);
-            i.arc(q1.x, q1.y, M, _ + N1, et + Math.PI);
+        let V = Zt(L, _, a, r);
+        if (i.lineTo(V.x, V.y), M > 0) {
+            let q = Zt(L, et, a, r);
+            i.arc(q.x, q.y, M, _ + N1, et + Math.PI);
         }
-        let j1 = (_ - M / u + (b + x / u)) / 2;
-        if (i.arc(a, r, u, _ - M / u, j1, !0), i.arc(a, r, u, j1, b + x / u, !0), x > 0) {
-            let q2 = Zt(C, Y, a, r);
-            i.arc(q2.x, q2.y, x, Y + Math.PI, b - N1);
+        let j = (_ - M / u + (b + x / u)) / 2;
+        if (i.arc(a, r, u, _ - M / u, j, !0), i.arc(a, r, u, j, b + x / u, !0), x > 0) {
+            let q = Zt(C, Y, a, r);
+            i.arc(q.x, q.y, x, Y + Math.PI, b - N1);
         }
-        let at1 = Zt(k, b, a, r);
-        if (i.lineTo(at1.x, at1.y), y > 0) {
-            let q3 = Zt(k, P, a, r);
-            i.arc(q3.x, q3.y, y, b - N1, P);
+        let at = Zt(k, b, a, r);
+        if (i.lineTo(at.x, at.y), y > 0) {
+            let q = Zt(k, P, a, r);
+            i.arc(q.x, q.y, y, b - N1, P);
         }
     } else {
         i.moveTo(a, r);
-        let E2 = Math.cos(P) * d + a, V2 = Math.sin(P) * d + r;
-        i.lineTo(E2, V2);
-        let j2 = Math.cos(O) * d + a, at2 = Math.sin(O) * d + r;
-        i.lineTo(j2, at2);
+        let E = Math.cos(P) * d + a, V = Math.sin(P) * d + r;
+        i.lineTo(E, V);
+        let j = Math.cos(O) * d + a, at = Math.sin(O) * d + r;
+        i.lineTo(j, at);
     }
     i.closePath();
 }
@@ -6456,7 +6456,7 @@ function zl(i) {
             radius: t.getDistanceFromCenterForValue(a)
         });
     }
-    for(let l1 = 0; l1 < n; ++l1)r.push(t.getPointPositionForValue(l1, a));
+    for(let l = 0; l < n; ++l)r.push(t.getPointPositionForValue(l, a));
     return r;
 }
 function es(i, t, e) {
@@ -6636,8 +6636,8 @@ var Vl = {
             let r = 0, l = X1(s, this.left + n, this.right - this.lineWidths[r]);
             for (let c of e)r !== c.row && (r = c.row, l = X1(s, this.left + n, this.right - this.lineWidths[r])), c.top += this.top + t + n, c.left = a.leftForLtr(a.x(l), c.width), l += c.width + n;
         } else {
-            let r1 = 0, l1 = X1(s, this.top + t + n, this.bottom - this.columnSizes[r1].height);
-            for (let c1 of e)c1.col !== r1 && (r1 = c1.col, l1 = X1(s, this.top + t + n, this.bottom - this.columnSizes[r1].height)), c1.top = l1, c1.left += this.left + n, c1.left = a.leftForLtr(a.x(c1.left), c1.width), l1 += c1.height + n;
+            let r = 0, l = X1(s, this.top + t + n, this.bottom - this.columnSizes[r].height);
+            for (let c of e)c.col !== r && (r = c.col, l = X1(s, this.top + t + n, this.bottom - this.columnSizes[r].height)), c.top = l, c.left += this.left + n, c.left = a.leftForLtr(a.x(c.left), c.width), l += c.height + n;
         }
     }
     isHorizontal() {
@@ -6665,14 +6665,14 @@ var Vl = {
                 }, C = l.xPlus(M, p / 2), L = k + u;
                 Ei(n, O, C, L, a.pointStyleWidth && p);
             } else {
-                let O1 = k + Math.max((d - g) / 2, 0), C1 = l.leftForLtr(M, p), L1 = Dt(w.borderRadius);
-                n.beginPath(), Object.values(L1).some((Y)=>Y !== 0) ? Jt(n, {
-                    x: C1,
-                    y: O1,
+                let O = k + Math.max((d - g) / 2, 0), C = l.leftForLtr(M, p), L = Dt(w.borderRadius);
+                n.beginPath(), Object.values(L).some((Y)=>Y !== 0) ? Jt(n, {
+                    x: C,
+                    y: O,
                     w: p,
                     h: g,
-                    radius: L1
-                }) : n.rect(C1, O1, p, g), n.fill(), P !== 0 && n.stroke();
+                    radius: L
+                }) : n.rect(C, O, p, g), n.fill(), P !== 0 && n.stroke();
             }
             n.restore();
         }, _ = function(M, k, w) {
@@ -7003,8 +7003,8 @@ var Xl = {
             }
         }
         if (r) {
-            let l1 = r.tooltipPosition();
-            e = l1.x, s = l1.y;
+            let l = r.tooltipPosition();
+            e = l.x, s = l.y;
         }
         return {
             x: e,
@@ -7263,20 +7263,20 @@ var Te = class extends nt {
             t.strokeStyle = o.multiKeyBackground, t.fillStyle = o.multiKeyBackground, Ge(t, m, b, _), t.strokeStyle = a.borderColor, t.fillStyle = a.backgroundColor, Ge(t, m, b, _);
         } else {
             t.lineWidth = A1(a.borderWidth) ? Math.max(...Object.values(a.borderWidth)) : a.borderWidth || 1, t.strokeStyle = a.borderColor, t.setLineDash(a.borderDash || []), t.lineDashOffset = a.borderDashOffset || 0;
-            let m1 = n.leftForLtr(f, c - h), b1 = n.leftForLtr(n.xPlus(f, 1), c - h - 2), _1 = Dt(a.borderRadius);
-            Object.values(_1).some((y)=>y !== 0) ? (t.beginPath(), t.fillStyle = o.multiKeyBackground, Jt(t, {
-                x: m1,
+            let m = n.leftForLtr(f, c - h), b = n.leftForLtr(n.xPlus(f, 1), c - h - 2), _ = Dt(a.borderRadius);
+            Object.values(_).some((y)=>y !== 0) ? (t.beginPath(), t.fillStyle = o.multiKeyBackground, Jt(t, {
+                x: m,
                 y: g,
                 w: c,
                 h: l,
-                radius: _1
+                radius: _
             }), t.fill(), t.stroke(), t.fillStyle = a.backgroundColor, t.beginPath(), Jt(t, {
-                x: b1,
+                x: b,
                 y: g + 1,
                 w: c - 2,
                 h: l - 2,
-                radius: _1
-            }), t.fill()) : (t.fillStyle = o.multiKeyBackground, t.fillRect(m1, g, c, l), t.strokeRect(m1, g, c, l), t.fillStyle = a.backgroundColor, t.fillRect(b1, g + 1, c - 2, l - 2));
+                radius: _
+            }), t.fill()) : (t.fillStyle = o.multiKeyBackground, t.fillRect(m, g, c, l), t.strokeRect(m, g, c, l), t.fillStyle = a.backgroundColor, t.fillRect(b, g + 1, c - 2, l - 2));
         }
         t.fillStyle = this.labelTextColors[s];
     }
@@ -7601,8 +7601,8 @@ var ce = class extends Mt {
             l < 0 && c < 0 ? r(0) : l > 0 && c > 0 && a(0);
         }
         if (n === o) {
-            let l1 = o === 0 ? 1 : Math.abs(o * .05);
-            r(o + l1), t || a(n - l1);
+            let l = o === 0 ? 1 : Math.abs(o * .05);
+            r(o + l), t || a(n - l);
         }
         this.min = n, this.max = o;
     }
@@ -8335,8 +8335,8 @@ function sortBy(array, selector) {
         if (b === null) return -1;
         return a > b ? 1 : a < b ? -1 : 0;
     });
-    for(let i1 = 0; i1 < len; i1++){
-        indexes[i1] = array[indexes[i1]];
+    for(let i = 0; i < len; i++){
+        indexes[i] = array[indexes[i]];
     }
     return indexes;
 }
@@ -9428,21 +9428,21 @@ const makeTopBox = ({ type , showSlug , exportId , previousId , monthId , nextId
         nextButton.disabled = monthIndex === months.length - 1;
         tsvRows.splice(1);
         let rank = 1;
-        for (const [keyStr, downloads1] of sorted){
-            const key1 = keyStr.startsWith('https://') ? new URL(keyStr).hostname : keyStr;
-            const name11 = computeName(key1);
-            const pct1 = (downloads1 / totalDownloads * 100).toFixed(4);
+        for (const [keyStr, downloads] of sorted){
+            const key = keyStr.startsWith('https://') ? new URL(keyStr).hostname : keyStr;
+            const name1 = computeName(key);
+            const pct = (downloads / totalDownloads * 100).toFixed(4);
             const fields = tsvHeaderNames.length === 1 ? [
-                name11
+                name1
             ] : [
-                key1,
-                name11
+                key,
+                name1
             ];
             tsvRows.push([
                 `${rank++}`,
                 ...fields,
-                downloads1.toString(),
-                pct1
+                downloads.toString(),
+                pct
             ]);
         }
     };
@@ -9490,8 +9490,8 @@ function regionCountryFunctions(implicitCountry) {
             if (m) query = `${m[1]}, ${tryComputeRegionNameInEnglish(m[2]) ?? m[2]}`;
         }
         {
-            const m1 = /^([A-Z]{2})$/.exec(query);
-            if (m1) query = tryComputeRegionNameInEnglish(m1[1]) ?? m1[1];
+            const m = /^([A-Z]{2})$/.exec(query);
+            if (m) query = tryComputeRegionNameInEnglish(m[1]) ?? m[1];
         }
         return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     };
@@ -9553,6 +9553,20 @@ const makeTopCountries = ({ showSlug , monthlyDimensionDownloads  })=>{
         computeUrl
     });
 };
+function computeAppDownloads(dimensionDownloads) {
+    const rt = dimensionDownloads['appName'] ?? {};
+    const libs = dimensionDownloads['libraryName'] ?? {};
+    const appleCoreMedia = libs['AppleCoreMedia'];
+    if (appleCoreMedia) rt['Unknown Apple App'] = appleCoreMedia;
+    const referrers = dimensionDownloads['referrer'] ?? {};
+    for (const [referrer, downloads] of Object.entries(referrers)){
+        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
+        if (type === 'app') {
+            increment(rt, name1, downloads);
+        }
+    }
+    return rt;
+}
 const makeTopApps = ({ showSlug , monthlyDimensionDownloads  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
@@ -9574,20 +9588,6 @@ const makeTopApps = ({ showSlug , monthlyDimensionDownloads  })=>{
         computeName: (key)=>key
     });
 };
-function computeAppDownloads(dimensionDownloads) {
-    const rt = dimensionDownloads['appName'] ?? {};
-    const libs = dimensionDownloads['libraryName'] ?? {};
-    const appleCoreMedia = libs['AppleCoreMedia'];
-    if (appleCoreMedia) rt['Unknown Apple App'] = appleCoreMedia;
-    const referrers = dimensionDownloads['referrer'] ?? {};
-    for (const [referrer, downloads] of Object.entries(referrers)){
-        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
-        if (type === 'app') {
-            increment(rt, name1, downloads);
-        }
-    }
-    return rt;
-}
 const makeTopDevices = ({ showSlug , monthlyDimensionDownloads  })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
