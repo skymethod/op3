@@ -58,7 +58,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
         "tags": [
             {
                 "name": "redirect-logs",
-                "description": "Lowest-level log records saved for every prefix redirect processed.\n\nThis is the raw material on which higher-level metrics like downloads can be later derived.",
+                "description": `Lowest-level log records saved for every prefix redirect processed.\n\nThis is the raw material on which higher-level metrics like [downloads](#tag/downloads) can be [derived](${origin}/download-calculation).`,
 
             },
         ],
