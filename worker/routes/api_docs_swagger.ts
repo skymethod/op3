@@ -33,6 +33,12 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
             queryTopAppsForShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsForShowApiCall}](${exampleQueryTopAppsForShowApiCall})`;
         }
 
+        viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>All OP3 show stats pages are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
+        if (demoShowUuid) {
+            const exampleShowPageUrl = `${origin}/show/${demoShowUuid}`;
+            viewShowDescriptionSuffix += `\n>\n> e.g. [${exampleShowPageUrl}](${exampleShowPageUrl})`
+        }
+
         const exampleQueryRecentEpisodesApiCall = `${origin}/api/1/queries/recent-episodes-with-transcripts?limit=5&token=${previewToken}`;
         queryRecentEpisodesWithTranscriptsDescriptionSuffix = `\n\nFor example, to find the last five episodes with transcripts:\n\n\GET [${exampleQueryRecentEpisodesApiCall}](${exampleQueryRecentEpisodesApiCall})`;
 

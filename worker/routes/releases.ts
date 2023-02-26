@@ -56,6 +56,18 @@ interface Release {
 
 const RELEASES: Release[] = [
     {
+        id: '2023-02-26',
+        time: '2023-02-26T21:28:39.191Z',
+        title: '2023-02-26: Show stats pages + new API calls for show downloads and other queries',
+        bulletPoints: [
+            ({ origin }) => `All OP3 stats pages are available at the conventional url: ${origin}/show/<show-uuid-or-podcast-guid>`,
+            ({ origin }) => `New API call to [query downloads](${origin}/api/docs#tag/downloads/operation/queryShowDownloads) for a given show.`,
+            ({ origin }) => `New API call to [view basic show information](${origin}/api/docs#tag/shows/operation/viewShowInformation) such as title and episode metadata.`,
+            ({ origin }) => `New API call to [find recent episodes with transcripts](${origin}/api/docs#tag/queries/operation/queryRecentEpisodesWithTranscripts).`,
+            ({ origin }) => `New API call to [find the top apps for a given show](${origin}/api/docs#tag/queries/operation/queryTopAppsForShow).`,
+        ]
+    },
+    {
         id: '2023-01-12',
         time: '2023-01-12T15:40:00.000Z',
         title: '2023-01-12: Download calculation page',
