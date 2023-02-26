@@ -2,9 +2,9 @@ import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { isValidShowSummary } from '../backend/show_summaries.ts';
 import { computeShowSummaryKey } from '../backend/show_summaries.ts';
-import { tryParseInt } from '../check.ts';
+import { isValidHttpUrl, tryParseInt } from '../check.ts';
 import { Configuration } from '../configuration.ts';
-import { sortBy } from '../deps.ts';
+import { Bytes, sortBy } from '../deps.ts';
 import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -50,11 +50,22 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
         if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
 
-        const { showUuid: showUuidParam } = Object.fromEntries(searchParams);
+        const { showUuid: showUuidParam, podcastGuid, feedUrlBase64 } = Object.fromEntries(searchParams);
         let showUuidOrPodcastGuidOrFeedUrlBase64 = '';
-        if (typeof showUuidParam === 'string') {
-            if (!isValidUuid(showUuidParam)) throw new Error(`Bad showUuid: ${showUuidParam}`);
-            showUuidOrPodcastGuidOrFeedUrlBase64 = showUuidParam;
+        try {
+            if (typeof showUuidParam === 'string') {
+                if (!isValidUuid(showUuidParam)) throw new Error(`Bad showUuid: ${showUuidParam}`);
+                showUuidOrPodcastGuidOrFeedUrlBase64 = showUuidParam;
+            } else if (typeof podcastGuid === 'string') {
+                if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(podcastGuid)) throw new Error(`Bad podcastGuid: ${podcastGuid}`);
+                showUuidOrPodcastGuidOrFeedUrlBase64 = podcastGuid;
+            } else if (typeof feedUrlBase64 === 'string') {
+                if (!/^[0-9a-zA-Z_-]{15,}$/i.test(feedUrlBase64) || !isValidFeedUrlBase64(feedUrlBase64)) throw new Error(`Bad feedUrlBase64: ${feedUrlBase64}`);
+                showUuidOrPodcastGuidOrFeedUrlBase64 = feedUrlBase64;
+            }
+        } catch (e) {
+            const { message } = packError(e);
+            return newJsonResponse({ message }, 400);
         }
         const times: Record<string, number> = {};
         const lookupResult = await lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, method: 'GET', searchParams, rpcClient, roRpcClient, configuration, times });
@@ -86,4 +97,15 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
     }
 
     return newJsonResponse({ error: 'not found' }, 404);
+}
+
+//
+
+function isValidFeedUrlBase64(feedUrlBase64: string): boolean {
+    try {
+        const str = Bytes.ofBase64(feedUrlBase64, { urlSafe: true }).utf8();
+        return isValidHttpUrl(str);
+    } catch {
+        return false;
+    }
 }

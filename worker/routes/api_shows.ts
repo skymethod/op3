@@ -18,18 +18,18 @@ import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
 
 type ShowsOpts = { showUuidOrPodcastGuidOrFeedUrlBase64: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
 
-export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration }: ShowsOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
+export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration, times = {} }: ShowsOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
     let showUuid: string;
     let showUuidInput: string;
     try {
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
-            const result = await lookupShowUuidForPodcastGuid(showUuidOrPodcastGuidOrFeedUrlBase64.toLowerCase(), { rpcClient, roRpcClient, searchParams });
+            const result = await timed(times, 'lookup-show-uuid-for-podcast-guid', () => lookupShowUuidForPodcastGuid(showUuidOrPodcastGuidOrFeedUrlBase64.toLowerCase(), { rpcClient, roRpcClient, searchParams }));
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
         } else if (isValidUuid(showUuidOrPodcastGuidOrFeedUrlBase64)) {
             showUuidInput = showUuidOrPodcastGuidOrFeedUrlBase64;
         } else if (/^[0-9a-zA-Z_-]{15,}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
-            const result = await lookupShowUuidForFeedUrl(Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8(), { rpcClient, roRpcClient, searchParams });
+            const result = await timed(times, 'lookup-show-uuid-for-feed-url', () => lookupShowUuidForFeedUrl(Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8(), { rpcClient, roRpcClient, searchParams }));
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
         } else {

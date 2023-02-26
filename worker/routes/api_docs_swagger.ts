@@ -367,7 +367,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         {
                             "name": "showUuidOrPodcastGuidOrFeedUrlBase64",
                             "in": "path",
-                            "description": "A given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid), or podcast feed url (as urlsafe base-64).",
+                            "description": "A given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid), or podcast feed url (as [urlsafe base-64](https://www.base64url.com/)).",
                             "example": `3299ee267635404e9cd660088a755b34`,
                             "required": true,
                             "type": "string",
