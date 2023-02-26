@@ -12,6 +12,8 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let queryDownloadsDescriptionSuffix = '';
     let viewShowDescriptionSuffix = '';
     let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
+    let queryTopAppsForShowDescriptionSuffix = '';
+
     const previewToken = [...previewTokens].at(0);
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
@@ -26,22 +28,26 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
 
             const exampleViewShowApiCall = `${origin}/api/1/shows/${demoShowUuid}?token=${previewToken}`;
             viewShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleViewShowApiCall}](${exampleViewShowApiCall})`;
+
+            const exampleQueryTopAppsForShowApiCall = `${origin}/api/1/queries/top-apps-for-show?showUuid=${demoShowUuid}&token=${previewToken}`;
+            queryTopAppsForShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsForShowApiCall}](${exampleQueryTopAppsForShowApiCall})`;
         }
 
         const exampleQueryRecentEpisodesApiCall = `${origin}/api/1/queries/recent-episodes-with-transcripts?limit=5&token=${previewToken}`;
         queryRecentEpisodesWithTranscriptsDescriptionSuffix = `\n\nFor example, to find the last five episodes with transcripts:\n\n\GET [${exampleQueryRecentEpisodesApiCall}](${exampleQueryRecentEpisodesApiCall})`;
+
     }
 
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
-    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix);
     return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -441,6 +447,65 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                     ]
                 }
             },
+            "/queries/top-apps-for-show": {
+                "get": {
+                    "tags": [
+                        "queries"
+                    ],
+                    "summary": "Query the top apps for a given show",
+                    "description": `List all apps downloading a given show over the last three calendar months.\n\nResults are returned in reverse order (most downloads to fewest).${queryTopAppsForShowDescriptionSuffix}`,
+                    "operationId": "queryTopAppsForShow",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "showUuid",
+                            "in": "query",
+                            "description": "Specify the show by OP3 show uuid.\n\nMust provide either `showUuid`, `podcastGuid` or `feedUrlBase64`.",
+                            "required": false,
+                            "type": "string",
+                            "format": "32-character hex",
+                        },
+                        {
+                            "name": "podcastGuid",
+                            "in": "query",
+                            "description": "Specify the show by [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid).\n\nMust provide either `showUuid`, `podcastGuid` or `feedUrlBase64`.",
+                            "required": false,
+                            "type": "string",
+                            "format": "32-character hex",
+                        },
+                        {
+                            "name": "feedUrlbase64",
+                            "in": "query",
+                            "description": "Specify the show by podcast feed url (as [urlsafe base-64](https://www.base64url.com/)).\n\nMust provide either `showUuid`, `podcastGuid` or `feedUrlBase64`.",
+                            "required": false,
+                            "type": "string",
+                            "format": "urlsafe base-64",
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryTopAppsForShowResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
         
         "securityDefinitions": {
@@ -686,9 +751,13 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         },
                         "description": "All episodes using OP3 with a [\`podcast:transcript\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript) tag, from newest to oldest"
                     },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
                 },
                 "required": [
-                    "asof", "episodes"
+                    "asof", "episodes", "queryTime"
                 ]
             },
             "QueryRecentEpisodesWithTranscriptsResponse.Episode": {
@@ -720,6 +789,29 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                 },
                 "required": [
                     "pubdate", "podcastGuid", "episodeItemGuid", "hasTranscripts", "dailyDownloads"
+                ]
+            },
+            "QueryTopAppsForShowResponse": {
+                "type": "object",
+                "properties": {
+                    "showUuid": {
+                        "type": "string",
+                        "description": "OP3 show uuid",
+                        "format": "32-character hex",
+                    },
+                    "appDownloads": {
+                        "type": "object",
+                        "description": "Total downloads per app over the last three calendar months. Sorted by most to fewest downloads",
+                        "additionalProperties": true,
+                        "format": "{ \"App Name\": number }"
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
+                },
+                "required": [
+                    "showUuid", "appDownloads", "queryTime"
                 ]
             },
         }

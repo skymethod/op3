@@ -22,6 +22,8 @@ type Opts = { name: string, method: string, searchParams: URLSearchParams, miscB
 export async function computeQueriesResponse({ name, method, searchParams, miscBlobs, roMiscBlobs, rpcClient, roRpcClient, configuration, statsBlobs, roStatsBlobs }: Opts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
+    const start = Date.now();
+
     if (name === 'recent-episodes-with-transcripts') {
         const targetMiscBlobs = searchParams.has('ro') ? roMiscBlobs : miscBlobs;
         if (!targetMiscBlobs) throw new Error(`Need miscBlobs`);
@@ -42,13 +44,15 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         } else {
             let rt = res;
             if (typeof limit === 'number') rt = { ...res, episodes: res.episodes.slice(0, limit) };
-            return newJsonResponse(rt);
+            const queryTime = Date.now() - start;
+            return newJsonResponse({ rt, queryTime });
         }
     }
 
     if (name === 'top-apps-for-show') {
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
         if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
+        const debug = searchParams.has('debug');
 
         const { showUuid: showUuidParam, podcastGuid, feedUrlBase64 } = Object.fromEntries(searchParams);
         let showUuidOrPodcastGuidOrFeedUrlBase64 = '';
@@ -92,8 +96,8 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         }
         const unsortedAppDownloads = computeAppDownloads(relevantDimensionDownloads);
         const appDownloads = Object.fromEntries(sortBy(Object.entries(unsortedAppDownloads), v => -v[1]));
-        
-        return newJsonResponse({ showUuid: showUuidInput, appDownloads, times });
+        const queryTime = Date.now() - start;
+        return newJsonResponse({ showUuid: showUuidInput, appDownloads, queryTime, ...(debug ? { times } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);
