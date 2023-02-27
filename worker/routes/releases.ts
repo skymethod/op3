@@ -156,10 +156,10 @@ ${RELEASES.map(v => `
       <link>${origin}/releases#${v.id}</link>
       <pubDate>${computeRfc822(v.time)}</pubDate>
       <guid>${origin}/releases#${v.id}</guid>
-      <description>${computeBulletPointsDescription(v.bulletPoints, { origin })}</description>
+      <description>${encodeXml(computeBulletPointsDescription(v.bulletPoints, { origin }))}</description>
       <content:encoded>${encodeXml(computeBulletPointsHtml(v.bulletPoints, { origin }))}</content:encoded>
     </item>  
-`)}
+`).join('')}
   </channel>
 </rss>
 `
