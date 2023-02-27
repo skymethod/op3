@@ -63,9 +63,10 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const times: Record<string, number> = {};
     
     const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
-    searchParams.set('episodes', 'include'); // required to load episodes
+    const showsSearchParams = new URLSearchParams(searchParams);
+    showsSearchParams.set('episodes', 'include'); // required to load episodes
     const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
-        computeShowsResponse({ method: 'GET', searchParams, showUuidOrPodcastGuidOrFeedUrlBase64: showUuid, rpcClient, roRpcClient, times, configuration, origin }),
+        computeShowsResponse({ method: 'GET', searchParams: showsSearchParams, showUuidOrPodcastGuidOrFeedUrlBase64: showUuid, rpcClient, roRpcClient, times, configuration, origin }),
         computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
         headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }),
     ]));
