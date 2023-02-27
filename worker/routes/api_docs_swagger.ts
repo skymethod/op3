@@ -27,13 +27,13 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
             queryDownloadsDescriptionSuffix = `\n\nFor example, to view the first ten downloads for show \`${demoShowUuid}\` in the month of February 2023 in json format:\n\n\GET [${exampleDownloadsApiCall}](${exampleDownloadsApiCall})`;
 
             const exampleViewShowApiCall = `${origin}/api/1/shows/${demoShowUuid}?token=${previewToken}`;
-            viewShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleViewShowApiCall}](${exampleViewShowApiCall})`;
+            viewShowDescriptionSuffix = `\n\nExample call (without episodes):\n\n\GET [${exampleViewShowApiCall}](${exampleViewShowApiCall})`;
 
             const exampleQueryTopAppsForShowApiCall = `${origin}/api/1/queries/top-apps-for-show?showUuid=${demoShowUuid}&token=${previewToken}`;
             queryTopAppsForShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsForShowApiCall}](${exampleQueryTopAppsForShowApiCall})`;
         }
 
-        viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>All OP3 show stats pages are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
+        viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>The canonical OP3 stats page for the show is returned in the \`statsPageUrl\` response field, but in general are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
         if (demoShowUuid) {
             const exampleShowPageUrl = `${origin}/show/${demoShowUuid}`;
             viewShowDescriptionSuffix += `\n>\n> e.g. [${exampleShowPageUrl}](${exampleShowPageUrl})`
@@ -370,7 +370,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "shows"
                     ],
                     "summary": `View show information`,
-                    "description": `Basic show and episode-level information for a given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) or podcast feed url (as [urlsafe base-64](https://www.base64url.com/))\.${viewShowDescriptionSuffix}`,
+                    "description": `Look up show-level information for a given OP3 show uuid, [\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) or podcast feed url (as [urlsafe base-64](https://www.base64url.com/)).\n\nIf an HTTP 404 response code is returned, OP3 doesn't know about the show.\n\nEpisode information is not included by default, but can be included with \`episodes=include\`.${viewShowDescriptionSuffix}`,
                     "operationId": "viewShowInformation",
                     "produces": [
                         "application/json",
@@ -392,6 +392,18 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "required": false,
                             "type": "string",
                         },
+                        {
+                            "name": "episodes",
+                            "in": "query",
+                            "type": "enum",
+                            "description": `Whether or not to include episode information as well.`,
+                            "required": false,
+                            "default": "exclude",
+                            "enum": [
+                                "include",
+                                "exclude",
+                            ]
+                        }
                     ],
                     "responses": {
                         "200": {
@@ -708,16 +720,21 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                         "description": "[\`podcast:guid\`](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid) associated with the show",
                         "format": "guid",
                     },
+                    "statsPageUrl": {
+                        "type": "string",
+                        "description": "Canonical public stats page url for the show",
+                        "format": "url",
+                    },
                     "episodes": {
                         "type": "array",
                         "items": {
                             "$ref": "#/definitions/ViewShowResponse.Episode"
                         },
-                        "description": "All episodes for the show, from newest to oldest"
+                        "description": "If included, all episodes for the show (from newest to oldest)"
                     },
                 },
                 "required": [
-                    "showUuid", "episodes"
+                    "showUuid", "statsPageUrl"
                 ]
             },
             "ViewShowResponse.Episode": {

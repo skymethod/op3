@@ -14,11 +14,12 @@ import { RpcClient } from '../rpc_model.ts';
 import { increment } from '../summaries.ts';
 import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
-import { ApiShowsResponse, ApiShowStatsResponse } from './api_shows_model.ts';
+import { ApiShowsResponse, ApiShowStatsResponse, EpisodeInfo } from './api_shows_model.ts';
 
-type ShowsOpts = { showUuidOrPodcastGuidOrFeedUrlBase64: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration };
 
-export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration, times = {} }: ShowsOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
+type LookupShowIdOpts = Omit<ShowsOpts, 'method' | 'origin'>;
+
+export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration, times = {} }: LookupShowIdOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
     let showUuid: string;
     let showUuidInput: string;
     try {
@@ -45,8 +46,10 @@ export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searc
     return { showUuid, showUuidInput };
 }
 
+type ShowsOpts = { showUuidOrPodcastGuidOrFeedUrlBase64: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, roRpcClient?: RpcClient, times?: Record<string, number>, configuration: Configuration, origin: string };
+
 export async function computeShowsResponse(opts: ShowsOpts): Promise<Response> {
-    const { method, searchParams, rpcClient, roRpcClient, times = {} } = opts;
+    const { method, searchParams, rpcClient, roRpcClient, times = {}, origin } = opts;
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
   
     const lookupResult = await lookupShowId(opts);
@@ -56,9 +59,13 @@ export async function computeShowsResponse(opts: ShowsOpts): Promise<Response> {
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
+    const episodesParam = searchParams.get('episodes') ?? undefined;
+    if (typeof episodesParam === 'string' && !/^include|exclude$/.test(episodesParam)) return newJsonResponse({ message: `Bad episodes: ${episodesParam}, expected 'include' or 'exclude'` }, 400);
+    const includeEpisodes = episodesParam === 'include';
+
     const [ selectShowResponse, selectEpisodesResponse ] = await timed(times, 'select-show+select-episodes', () => Promise.all([
         timed(times, 'select-show', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}` }, DoNames.showServer)),
-        timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)),
+        includeEpisodes ? timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)) : Promise.resolve(),
     ]));
     const { results: showRecords = [] } = selectShowResponse;
     if (showRecords.length === 0) return newJsonResponse({ message: 'not found' }, 404);
@@ -66,14 +73,18 @@ export async function computeShowsResponse(opts: ShowsOpts): Promise<Response> {
     const { title, podcastGuid } = showRecords[0] as Record<string, unknown>;
     if (title !== undefined && typeof title !== 'string') throw new Error(`Bad title: ${JSON.stringify(title)}`);
     if (podcastGuid !== undefined && typeof podcastGuid !== 'string') throw new Error(`Bad podcastGuid: ${JSON.stringify(podcastGuid)}`);
+    const statsPageUrl = computeStatsPageUrl({ showUuid, origin });
 
-    const { results: episodeRecords = [] } = selectEpisodesResponse;
-    const episodes = episodeRecords
-        .filter(isEpisodeRecord)
-        .sort(compareByDescending(r => r.pubdateInstant))
-        .map(({ id, title, pubdateInstant }) => ({ id, title: cleanTitle(title), pubdate: pubdateInstant }));
+    let episodes: EpisodeInfo[] | undefined;
+    if (typeof selectEpisodesResponse === 'object') {
+        const { results: episodeRecords = [] } = selectEpisodesResponse;
+        episodes = episodeRecords
+            .filter(isEpisodeRecord)
+            .sort(compareByDescending(r => r.pubdateInstant))
+            .map(({ id, title, pubdateInstant }) => ({ id, title: cleanTitle(title), pubdate: pubdateInstant }));
+    }
 
-    return newJsonResponse(computeApiShowsResponse(showUuidInput, { showUuid, title, podcastGuid, episodes }));
+    return newJsonResponse(computeApiShowsResponse(showUuidInput, { showUuid, title, podcastGuid, statsPageUrl, episodes }, origin));
 }
 
 type StatsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number>, configuration: Configuration };
@@ -159,13 +170,18 @@ async function computeUnderlyingShowUuid(showUuidInput: string, configuration: C
     return showUuidInput === DEMO_SHOW_1 ? await configuration.get('demo-show-1') ?? showUuidInput : showUuidInput;
 }
 
-function computeApiShowsResponse(showUuidInput: string, underlyingResponse: ApiShowsResponse): ApiShowsResponse {
+function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, origin: string }): string {
+    return `${origin}/show/${showUuid}`;
+}
+
+function computeApiShowsResponse(showUuidInput: string, underlyingResponse: ApiShowsResponse, origin: string): ApiShowsResponse {
     if (showUuidInput === DEMO_SHOW_1) {
         // swap out real titles with fake ones
         return {
             showUuid: showUuidInput,
+            statsPageUrl: computeStatsPageUrl({ showUuid: showUuidInput, origin}),
             title: DEMO_SHOW_1_TITLE,
-            episodes: underlyingResponse.episodes.map((v, i) => {
+            episodes: underlyingResponse.episodes === undefined ? undefined : underlyingResponse.episodes.map((v, i) => {
                 const { id, pubdate } = v;
                 return {
                     id,

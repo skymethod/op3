@@ -72,7 +72,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
             return newJsonResponse({ message }, 400);
         }
         const times: Record<string, number> = {};
-        const lookupResult = await lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, method: 'GET', searchParams, rpcClient, roRpcClient, configuration, times });
+        const lookupResult = await lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration, times });
         if (lookupResult instanceof Response) return lookupResult;
         const { showUuid, showUuidInput } = lookupResult;
 

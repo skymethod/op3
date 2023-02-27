@@ -3,7 +3,8 @@ export interface ApiShowsResponse {
     readonly showUuid: string;
     readonly title?: string;
     readonly podcastGuid?: string;
-    readonly episodes: readonly EpisodeInfo[];
+    readonly statsPageUrl: string;
+    readonly episodes?: readonly EpisodeInfo[];
 }
 
 export type EpisodeInfo = { readonly id: string, readonly title?: string, readonly pubdate?: string };
