@@ -2,8 +2,9 @@ import { timed } from '../async.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText } from '../deps.ts';
+import { packError } from '../errors.ts';
+import { newJsonResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
-import { computeSessionToken } from '../session_token.ts';
 import { isValidUuid } from '../uuid.ts';
 import { compute404Response } from './404.ts';
 import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
@@ -42,7 +43,7 @@ type Opts = {
 };
 
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
-    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
+    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
     const { id, type } = req;
 
     const start = Date.now();
@@ -62,22 +63,24 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     const times: Record<string, number> = {};
     
-    const sessionToken = podcastIndexCredentials ? await timed(times, 'compute-session-token', () => computeSessionToken({ k: 's', t: new Date().toISOString() }, podcastIndexCredentials)) : '';
-    const showsSearchParams = new URLSearchParams(searchParams);
-    showsSearchParams.set('episodes', 'include'); // required to load episodes
-    const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
-        computeShowsResponse({ method: 'GET', searchParams: showsSearchParams, showUuidOrPodcastGuidOrFeedUrlBase64: showUuid, rpcClient, roRpcClient, times, configuration, origin }),
-        computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
-        headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }),
-    ]));
-    if (showRes.status !== 200) return compute404(`Unexpected show response status: ${JSON.stringify(showRes.status)}`);
-    const showObj = await showRes.json();
+    const tryLoadData = async () => {
+        try {
+            const cachedData = await configuration.getObj(`cached-show-data/${showUuid}`);
+            if (cachedData) {
+                return cachedData as LoadDataResult;
+            }
+            return await loadData({ searchParams, times, showUuid, rpcClient, roRpcClient, configuration, origin, statsBlobs, roStatsBlobs, assetBlobs, roAssetBlobs });
+        } catch (e) {
+            const { message } = packError(e);
+            return newJsonResponse({ message }, 500);
+        }
+    };
+    const loadDataResult = await tryLoadData();
+    if (loadDataResult instanceof Response) return loadDataResult;
+    const { showObj, statsObj, ogImageRes } = loadDataResult;
     const { title } = showObj;
-
     const showTitle = title ?? '(untitled)';
-    if (statsRes.status !== 200) return compute404(`Unexpected stats response status: ${JSON.stringify(statsRes.status)}`);
-    const statsObj = await statsRes.json();
-
+   
     times.compute = Date.now() - start;
 
     const initialData = JSON.stringify({ showObj, statsObj, times });
@@ -96,10 +99,41 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         origin,
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
-        sessionToken,
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
+}
+
+type LoadDataOpts = {
+    searchParams: URLSearchParams,
+    times: Record<string, number>,
+    showUuid: string,
+    rpcClient: RpcClient, 
+    roRpcClient: RpcClient | undefined, 
+    origin: string,
+    configuration: Configuration,
+    statsBlobs: Blobs | undefined, 
+    roStatsBlobs: Blobs | undefined,
+    assetBlobs: Blobs | undefined, 
+    roAssetBlobs: Blobs | undefined, 
+};
+
+// deno-lint-ignore no-explicit-any
+type LoadDataResult = { showObj: any, statsObj: any, ogImageRes?: { etag: string } };
+
+export async function loadData({ searchParams, times, showUuid, rpcClient, roRpcClient, configuration, origin, statsBlobs, roStatsBlobs, assetBlobs, roAssetBlobs }: LoadDataOpts): Promise<LoadDataResult> {
+    const showsSearchParams = new URLSearchParams(searchParams);
+    showsSearchParams.set('episodes', 'include'); // required to load episodes
+    const [ showRes, statsRes, ogImageRes ] = await timed(times, 'compute-shows+compute-stats+head-og-image', () => Promise.all([
+        computeShowsResponse({ method: 'GET', searchParams: showsSearchParams, showUuidOrPodcastGuidOrFeedUrlBase64: showUuid, rpcClient, roRpcClient, times, configuration, origin }),
+        computeShowStatsResponse({ showUuid, method: 'GET', searchParams, statsBlobs, roStatsBlobs, times, configuration }),
+        headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }),
+    ]));
+    if (showRes.status !== 200) throw new Error(`Unexpected show response status: ${JSON.stringify(showRes.status)}`);
+    if (statsRes.status !== 200) throw new Error(`Unexpected stats response status: ${JSON.stringify(statsRes.status)}`);
+
+    const [ showObj, statsObj ] = await Promise.all([ showRes.json(), statsRes.json() ]);
+    return { showObj, statsObj, ogImageRes };
 }
 
 export type ShowOgImageRequest = { showUuid: string };

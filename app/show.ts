@@ -43,13 +43,13 @@ const app = (() => {
     console.log(initialData);
 
     const { showObj, statsObj, times } = initialData;
-    const { showUuid, episodes, title: showTitle } = showObj;
+    const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
     const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
-    const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...showObj.episodes.find(v => v.id === episodeId)! }));
+    const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...episodes.find(v => v.id === episodeId)! }));
     const showSlug = computeShowSlug(showTitle);
     const debug = new URLSearchParams(document.location.search).has('debug');
     const mostRecentDate = Object.keys(hourlyDownloads).at(-1)?.substring(0, 10);

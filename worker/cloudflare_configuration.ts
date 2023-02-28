@@ -13,4 +13,9 @@ export class CloudflareConfiguration implements Configuration {
         return typeof value === 'string' ? value : undefined;
     }
 
+    async getObj(name: string): Promise<Record<string, unknown> | undefined> {
+        const value = await this.namespace.get(name, { type: 'json' });
+        return value ? value : undefined;
+    }
+
 }
