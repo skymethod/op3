@@ -46,7 +46,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
     const { id, type } = req;
 
-    const start = Date.now();
+    const times: Record<string, number> = {};
 
     const compute404 = (reason: string) => {
         console.log(`Returning 404: ${reason}`);
@@ -55,17 +55,15 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     let showUuidFromPodcastGuid: string | undefined;
     if (type === 'podcast-guid') {
-        showUuidFromPodcastGuid = await lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams });
+        showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams }));
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
     const showUuid = showUuidFromPodcastGuid ?? id;
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
 
-    const times: Record<string, number> = {};
-    
     const tryLoadData = async () => {
         try {
-            const cachedData = await configuration.getObj(`cached-show-data/${showUuid}`);
+            const cachedData = await timed(times, 'read-cached-data', () => configuration.getObj(`cached-show-data/${showUuid}`));
             if (cachedData) {
                 return cachedData as LoadDataResult;
             }
@@ -75,13 +73,11 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
             return newJsonResponse({ message }, 500);
         }
     };
-    const loadDataResult = await tryLoadData();
+    const loadDataResult = await timed(times, 'try-load-data', () => tryLoadData());
     if (loadDataResult instanceof Response) return loadDataResult;
     const { showObj, statsObj, ogImageRes } = loadDataResult;
     const { title } = showObj;
     const showTitle = title ?? '(untitled)';
-   
-    times.compute = Date.now() - start;
 
     const initialData = JSON.stringify({ showObj, statsObj, times });
     const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
