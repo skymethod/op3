@@ -278,6 +278,15 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/pfx.vpixl.com/12xyZ/arttrk.com/p/AZ123/chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/pfx.vpixl.com/12xyZ/arttrk.com/p/AZ123/chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/pfx.vpixl.com/12xyZ/arttrk.com/p/AZ123/chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'vpixl', url: 'https://pfx.vpixl.com/12xyZ/arttrk.com/p/AZ123/chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'artsai', url: 'https://arttrk.com/p/AZ123/chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chtbl.com/track/AZ123/verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podscribe', url: 'https://verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

@@ -200,6 +200,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'letscast', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://pfx.vpixl.com/123az/a.com/path/to/episode.mp3
+    // only https supported, suffix protocol supported but ignored, always forwards to https
+    m = /^(https?):\/\/pfx\.vpixl\.com\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, _scheme, _suffixProtocol, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'vpixl', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -240,6 +249,7 @@ export interface ChainItem {
         | 'podsights'
         | 'podtrac'
         | 'veritonic'
+        | 'vpixl'
         | 'zencastr'
         ;
 }
