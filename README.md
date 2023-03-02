@@ -53,33 +53,39 @@ A free service for podcasters and podcast hosts to compute standard episode/show
   - Although the service runs on serverless infrastructure, there will still be monthly costs involved, and ongoing administration (combatting fraud and abuse, managing current IP lists)
   - [op3.dev](https://op3.dev) (and the [staging](https://staging.op3.dev) and [ci](https://ci.op3.dev) subdomains) run under a dedicated Cloudflare paid account, these are the only hosting costs
   - Monthly bills and usage details are [published](https://op3.dev/costs) as a public part of the project
-  - Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships
-    - For initial development, there is a [Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) as a way to gauge interest
-    - Sponsors will be listed on the project page below (if desired)
+  - Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships (see [below](#sponsors))
 
 # Roadmap
 The production [op3.dev](https://op3.dev) prefix service is ready to use, it's been tested with large shows and is safely storing and returning episode request logs. 
-Basic request-level data is available in the API, all other future features will build on top in a layered approach.
+Basic request and download-level data is available in the API, all other future features will build on top in a layered approach.
+
+Free public stats pages are available for every show using OP3 - see an [example](https://op3.dev/show/dc1852e4d1ee4bce9c4fb7f5d8be8908).
 
 ## Work plan
  - ✅ Launch highly-available, performant prefix redirect service
  - ✅ Make low-level minimized **request** data available in the API
  - ✅ Identify podcast show and episode information for each episode url using the service
- - 👨‍💻 Make high-quality podcast and episode **download** data available in the API
+ - ✅ Make high-quality podcast and episode **download** data available in the API
    - (This will be the most useful data for podcast use cases such as verifying downloads for advertisers or comparing shows)
    - Filter out duplicate requests from the same listener
    - Distinguish apps from bots by User-Agent, building on the [public OPAWG User agent list](https://github.com/opawg/user-agents)
    - Categorize request IPs using known IP ranges of cloud services, vpns, tor traffic, etc, and exclude ranges representing automated traffic
    - Implement a solid first-pass calculation along the lines of the [Open Downloads](https://github.com/open-downloads/odl) criteria
- - 🔜 Publish documentation site with setup guides for every podcast hosting company and FAQs on how to audit the project claims and policies
+ - 👨‍💻 Publish documentation site with setup guides for every podcast hosting company and FAQs on how to audit the project claims and policies
  - 🔜 Build user-friendly charts and widgets for podcasters to easily reference and/or integrate into their own sites
  - 🔜 Build useful data exports to Google Sheets, Zapier, etc
  - 🔜 Build operational tools to support ongoing maintenance, data management, and abuse/fraud detection with minimal staffing needs
 
 # Sponsors
-Public list coming soon...
+Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships.
 
-Support initial build-out and operations by purchasing a [Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148).
+For initial development, there are two monthly sponsorship levels:
+ - [OP3 Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) to help fund development and drive future features
+ - [OP3 Sponsorship](https://buy.stripe.com/cN2eXueyP07f3W83ch) to help fund development
+ - Sponsors will eventually be listed here on the project page
+
+For podcasters using OP3 or anyone else wanting to support this effort, consider our:
+ - [Early Supporter Sponsorship](https://buy.stripe.com/8wM6qYeyPg6d9gsdQW) to help offset monthly infrastructure costs
 
 # Questions?
 Email [john@op3.dev](mailto:john@op3.dev) or [start a discussion](https://github.com/skymethod/op3/discussions).
