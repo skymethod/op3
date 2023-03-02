@@ -112,9 +112,13 @@ export function isItunesCategory(obj: unknown): obj is ItunesCategory {
 export function equalItunesCategories(lhs: ItunesCategory[] | undefined, rhs: ItunesCategory[] | undefined): boolean {
     if (lhs === undefined && rhs === undefined) return true;
     if (lhs !== undefined && rhs !== undefined) {
-        return lhs.length === rhs.length && lhs.every((v, i) => v === rhs[i]);
+        return lhs.length === rhs.length && lhs.every((v, i) => equalItunesCategory(v, rhs[i]));
     }
     return false;
+}
+
+export function equalItunesCategory(lhs: ItunesCategory, rhs: ItunesCategory): boolean {
+    return lhs.length === rhs.length && lhs.every((v, i) => v === rhs[i]);
 }
 
 export function stringifyItunesCategories(itunesCategories: ItunesCategory[] | undefined): string | undefined {
