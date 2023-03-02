@@ -96,7 +96,7 @@ export class ShowController {
         if (res) return res;
 
         const { operationKind, targetPath, parameters = {} } = req;
-        
+
         if (operationKind === 'select' && targetPath === '/show/feeds') {
             const map = await storage.list(computeListOpts('sc.fr0.', parameters));
             const results = [...map.values()].filter(isFeedRecord);
@@ -176,7 +176,7 @@ export class ShowController {
                     if (indexType === IndexType.PodcastGuidToShowUuid) {
                         const result = await rebuildPodcastGuidToShowUuidIndex(storage);
                         return { results: [ result ] };
-                    } else if (indexType === IndexType.MatchUrlToFeedItem || indexType === IndexType.QuerylessMatchUrlToFeedItem) { 
+                    } else if (indexType === IndexType.MatchUrlToFeedItem || indexType === IndexType.QuerylessMatchUrlToFeedItem) {
                         const go = parameters.go === 'true';
                         const result = await rebuildMatchUrlToFeedItemIndex({ indexType, storage, go });
                         return { results: [ result ] };
@@ -208,7 +208,7 @@ export class ShowController {
                 return { results };
             }
         }
-    
+
         {
             const m = /^\/show\/feeds\/(.*?)$/.exec(targetPath);
             if (m && (operationKind === 'select' || operationKind === 'update')) {
@@ -306,7 +306,7 @@ export class ShowController {
                 const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
                 return { results: [ result ] };
             }
-            
+
             // compute daily download tsv
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
@@ -398,7 +398,7 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
     const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
     const preloadMillis = Date.now() - start;
     const unableToComputeMatchUrls = new Set<string>();
-    
+
     const lookupShow = async (url: string, messages?: string[]) => {
         await Promise.resolve();
         messages?.push(`url: ${url}`);
@@ -486,7 +486,7 @@ async function getPodcastIndexFeed(type: 'podcastGuid' | 'feedUrl', value: strin
         const url = tryCleanUrl(feed.url);
         if (typeof url !== 'string') throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`);
         const podcastGuidCleaned = typeof podcastGuidRaw === 'string' ? podcastGuidRaw.trim().toLowerCase() : undefined;
-        if (typeof podcastGuidCleaned === 'string' && !isValidGuid(podcastGuidCleaned)) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`); 
+        if (typeof podcastGuidCleaned === 'string' && !isValidGuid(podcastGuidCleaned)) throw new Error(`Bad piFeed: ${JSON.stringify(feed)} for ${tag}`);
         return { id, url, podcastGuid: podcastGuidCleaned };
     }
 }
@@ -541,7 +541,7 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
     }
 
     const feedRecordId = await computeFeedRecordId(feedUrl);
-    
+
     await storage.transaction(async tx => {
         const existing = await tx.get(computeFeedRecordKey(feedRecordId));
         if (!existing) {
@@ -567,8 +567,8 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const rt = [ feedUrl ];
 
     // try to make a conditional request, based on last ok response received
-    const headers = new Headers({ 
-        'user-agent': computeUserAgent({ origin }), 
+    const headers = new Headers({
+        'user-agent': computeUserAgent({ origin }),
     });
     if (!disableGzip) {
         rt.push('gzip');
@@ -650,7 +650,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
 
     const blobKey = tryParseBlobKey(body);
     if (!blobKey) return [ ...rt, `unknown ok response body: ${body}` ].join(', ');
-        
+
     const text = await blobs.get(blobKey, 'text'); // assumes utf-8
     if (!text) return [ ...rt, `ok response body text not found: ${body}` ].join(', ');
 
@@ -658,19 +658,28 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     console.log(JSON.stringify(feed, undefined, 2));
 
     rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosures ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosures ?? []).length} alternate enclosures`);
-    
+
     const feedRecordId = feedRecord.id;
 
     // update feed-level attributes if necessary
-    if (feedRecord.title !== feed.title 
-            || feedRecord.podcastGuid !== feed.podcastGuid 
-            || feedRecord.generator !== feed.generator 
-            || feedRecord.link !== feed.link 
-            || feedRecord.itunesAuthor !== feed.itunesAuthor 
+    if (feedRecord.title !== feed.title
+            || feedRecord.podcastGuid !== feed.podcastGuid
+            || feedRecord.generator !== feed.generator
+            || feedRecord.link !== feed.link
+            || feedRecord.itunesAuthor !== feed.itunesAuthor
             || feedRecord.itunesType !== feed.itunesType
             || !equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)
         ) {
-        const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid, generator: feed.generator, updated: new Date().toISOString() };
+        const update: FeedRecord = { ...feedRecord,
+            title: feed.title,
+            podcastGuid: feed.podcastGuid,
+            generator: feed.generator,
+            link: feed.link,
+            itunesAuthor: feed.itunesAuthor,
+            itunesType: feed.itunesType,
+            itunesCategories: feed.itunesCategories,
+            updated: new Date().toISOString(),
+        };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
         if (feedRecord.title !== feed.title) rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
         if (feedRecord.podcastGuid !== feed.podcastGuid) rt.push(`updated podcastGuid from ${feedRecord.podcastGuid} -> ${feed.podcastGuid}`);
@@ -925,7 +934,7 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     const { podcastGuid } = showRecord;
     // save initial podcastguid -> showuuid index record
     if (podcastGuid) await storage.put(computePodcastGuidToShowUuidIndexKey({ podcastGuid }), showUuid);
-    
+
     await ensureShowEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, podcastGuid, storage, rt });
 
     return rt.join(', ');
@@ -1052,7 +1061,7 @@ async function lookupShow(url: string, storage: DurableObjectStorage, metrics: L
         const matchUrl = computeMatchUrl(url, { queryless });
         messages.push(`${queryless ? 'querylessMatchUrl' : 'matchUrl'}: ${matchUrl}`);
         const indexType = queryless ? IndexType.QuerylessMatchUrlToFeedItem : IndexType.MatchUrlToFeedItem;
-        
+
         const map = await storage.list({ prefix: `sc.i0.${indexType}.${matchUrl.substring(0, 1024)}.`});
         metrics.storageListCalls++;
         metrics.indexRecordsScanned += map.size;
@@ -1071,7 +1080,7 @@ async function lookupShow(url: string, storage: DurableObjectStorage, metrics: L
             }
         }
         messages.push(`${feedItemRecords.size} FeedItemRecords`);
-        
+
         // and associated feed records (with shows)
         const feedRecordKeys = distinct([...feedItemRecords.values()].map(v => computeFeedRecordKey(v.feedRecordId)));
         messages.push(`${feedRecordKeys.length} feedRecordKeys`);
@@ -1202,7 +1211,7 @@ async function rebuildPodcastGuidToShowUuidIndex(storage: DurableObjectStorage) 
     for (const batch of chunk(Object.entries(indexRecords), 128)) {
         await storage.put(Object.fromEntries(batch));
     }
-    
+
     return { shows: shows.length, oldIndexRecords: oldKeys.length, newIndexRecords: Object.keys(indexRecords).length };
 }
 
