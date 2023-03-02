@@ -158,6 +158,10 @@ export async function lookupShowUuidForFeedUrl(feedUrl: string, { rpcClient, roR
     return feed?.showUuid;
 }
 
+export function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, origin: string }): string {
+    return `${origin}/show/${showUuid}`;
+}
+
 export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
 
 //
@@ -168,10 +172,6 @@ function cleanTitle(title: string | undefined): string | undefined {
 
 async function computeUnderlyingShowUuid(showUuidInput: string, configuration: Configuration): Promise<string> {
     return showUuidInput === DEMO_SHOW_1 ? await configuration.get('demo-show-1') ?? showUuidInput : showUuidInput;
-}
-
-function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, origin: string }): string {
-    return `${origin}/show/${showUuid}`;
 }
 
 function computeApiShowsResponse(showUuidInput: string, underlyingResponse: ApiShowsResponse, origin: string): ApiShowsResponse {
