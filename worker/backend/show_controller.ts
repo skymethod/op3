@@ -637,7 +637,7 @@ async function findShowRecord(showUuid: string, storage: DurableObjectStorage): 
 
 async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean, origin: string }): Promise<string> {
     const { storage, blobs, forceResave = false, origin } = opts;
-    const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
+    let feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl, showUuid } = feedRecord;
 
     const rt = [ feedUrl ];
@@ -688,6 +688,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         if (feedRecord.itunesAuthor !== feed.itunesAuthor) rt.push(`updated itunesAuthor from ${feedRecord.itunesAuthor} -> ${feed.itunesAuthor}`);
         if (feedRecord.itunesType !== feed.itunesType) rt.push(`updated itunesType from ${feedRecord.itunesType} -> ${feed.itunesType}`);
         if (!equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)) rt.push(`updated itunesCategories from ${stringifyItunesCategories(feedRecord.itunesCategories)} -> ${stringifyItunesCategories(feed.itunesCategories)}`);
+        feedRecord = update;
     }
 
     // collect items by trimmed item guid
