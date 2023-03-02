@@ -1,5 +1,6 @@
 import { isStringRecord } from '../check.ts';
 import { ErrorInterface, isErrorInterface } from '../errors.ts';
+import { isItunesCategory, ItunesCategory } from '../feed_parser.ts';
 
 export type WorkRecord = FeedWorkRecord | PodcastGuidWorkRecord;
 
@@ -47,7 +48,11 @@ export interface FeedRecord {
     readonly podcastGuid?: string;
     readonly created?: string; // instant
     readonly updated?: string; // instant
-    readonly generator?: string; // instant
+    readonly generator?: string;
+    readonly link?: string;
+    readonly itunesAuthor?: string;
+    readonly itunesType?: string;
+    readonly itunesCategories?: ItunesCategory[];
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -70,6 +75,10 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.created === undefined || typeof obj.created === 'string')
         && (obj.updated === undefined || typeof obj.updated === 'string')
         && (obj.generator === undefined || typeof obj.generator === 'string')
+        && (obj.link === undefined || typeof obj.link === 'string')
+        && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
+        && (obj.itunesType === undefined || typeof obj.itunesType === 'string')
+        && (obj.itunesCategories === undefined || Array.isArray(obj.itunesCategories) && obj.itunesCategories.every(isItunesCategory))
         ;
 }
 
@@ -167,6 +176,8 @@ export interface ShowRecord {
     readonly uuid: string;
     readonly podcastGuid?: string;
     readonly title?: string;
+    readonly link?: string;
+    readonly itunesAuthor?: string;
 }
 
 export function isShowRecord(obj: unknown): obj is ShowRecord {
@@ -174,6 +185,8 @@ export function isShowRecord(obj: unknown): obj is ShowRecord {
         && typeof obj.uuid === 'string'
         && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
         && (obj.title === undefined || typeof obj.title === 'string')
+        && (obj.link === undefined || typeof obj.link === 'string')
+        && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
         ;
 }
 

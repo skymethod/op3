@@ -1,7 +1,7 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
-import { Item, parseFeed } from '../feed_parser.ts';
+import { equalItunesCategories, Item, parseFeed, stringifyItunesCategories } from '../feed_parser.ts';
 import { fetchOp3RedirectUrls, hasOp3Reference, isRedirectFetchingRequired } from '../fetch_redirects.ts';
 import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
@@ -662,12 +662,23 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const feedRecordId = feedRecord.id;
 
     // update feed-level attributes if necessary
-    if (feedRecord.title !== feed.title || feedRecord.podcastGuid !== feed.podcastGuid || feedRecord.generator !== feed.generator) {
+    if (feedRecord.title !== feed.title 
+            || feedRecord.podcastGuid !== feed.podcastGuid 
+            || feedRecord.generator !== feed.generator 
+            || feedRecord.link !== feed.link 
+            || feedRecord.itunesAuthor !== feed.itunesAuthor 
+            || feedRecord.itunesType !== feed.itunesType
+            || !equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)
+        ) {
         const update: FeedRecord = { ...feedRecord, title: feed.title, podcastGuid: feed.podcastGuid, generator: feed.generator, updated: new Date().toISOString() };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
         if (feedRecord.title !== feed.title) rt.push(`updated title from ${feedRecord.title} -> ${feed.title}`);
         if (feedRecord.podcastGuid !== feed.podcastGuid) rt.push(`updated podcastGuid from ${feedRecord.podcastGuid} -> ${feed.podcastGuid}`);
         if (feedRecord.generator !== feed.generator) rt.push(`updated generator from ${feedRecord.generator} -> ${feed.generator}`);
+        if (feedRecord.link !== feed.link) rt.push(`updated link from ${feedRecord.link} -> ${feed.link}`);
+        if (feedRecord.itunesAuthor !== feed.itunesAuthor) rt.push(`updated itunesAuthor from ${feedRecord.itunesAuthor} -> ${feed.itunesAuthor}`);
+        if (feedRecord.itunesType !== feed.itunesType) rt.push(`updated itunesType from ${feedRecord.itunesType} -> ${feed.itunesType}`);
+        if (!equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)) rt.push(`updated itunesCategories from ${stringifyItunesCategories(feedRecord.itunesCategories)} -> ${stringifyItunesCategories(feed.itunesCategories)}`);
     }
 
     // collect items by trimmed item guid
@@ -942,10 +953,20 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     let show = record;
     const upsertRecords: Record<string, DurableObjectStorageValue> = {};
     let deleteIndexKey: string | undefined;
-    const { title, podcastGuid } = feedRecord;
+    const { title, podcastGuid, link, itunesAuthor } = feedRecord;
     if (show.title !== title) {
         messages.push(`show.title ${show.title} -> ${title}`);
         show = { ...show, title };
+        upsertRecords[showKey] = show;
+    }
+    if (show.link !== link) {
+        messages.push(`show.link ${show.link} -> ${link}`);
+        show = { ...show, link };
+        upsertRecords[showKey] = show;
+    }
+    if (show.itunesAuthor !== itunesAuthor) {
+        messages.push(`show.itunesAuthor ${show.itunesAuthor} -> ${itunesAuthor}`);
+        show = { ...show, itunesAuthor };
         upsertRecords[showKey] = show;
     }
     if (podcastGuid && show.podcastGuid !== podcastGuid) {
