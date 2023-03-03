@@ -80,12 +80,12 @@ Free public stats pages are available for every show using OP3 - see an [example
 Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships.
 
 For initial development, there are two monthly sponsorship levels:
- - [OP3 Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) to help fund development and drive future features
- - [OP3 Sponsorship](https://buy.stripe.com/cN2eXueyP07f3W83ch) to help fund development
+ - $500/mo [OP3 Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) to help fund development and drive future features
+ - $100/mo [OP3 Sponsorship](https://buy.stripe.com/cN2eXueyP07f3W83ch) to help fund development
  - Sponsors will eventually be listed here on the project page
 
 For podcasters using OP3 or anyone else wanting to support this effort, consider our:
- - [Early Supporter Sponsorship](https://buy.stripe.com/8wM6qYeyPg6d9gsdQW) to help offset monthly infrastructure costs
+ - $10/mo [Early Supporter Sponsorship](https://buy.stripe.com/8wM6qYeyPg6d9gsdQW) to help offset monthly infrastructure costs
 
 # Questions?
 Email [john@op3.dev](mailto:john@op3.dev) or [start a discussion](https://github.com/skymethod/op3/discussions).
