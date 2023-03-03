@@ -75,10 +75,10 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         && (obj.created === undefined || typeof obj.created === 'string')
         && (obj.updated === undefined || typeof obj.updated === 'string')
         && (obj.generator === undefined || typeof obj.generator === 'string')
-        && (obj.link === undefined || typeof obj.link === 'string')
-        && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
-        && (obj.itunesType === undefined || typeof obj.itunesType === 'string')
-        && (obj.itunesCategories === undefined || Array.isArray(obj.itunesCategories) && obj.itunesCategories.every(isItunesCategory))
+        // && (obj.link === undefined || typeof obj.link === 'string')
+        // && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
+        // && (obj.itunesType === undefined || typeof obj.itunesType === 'string')
+        // && (obj.itunesCategories === undefined || Array.isArray(obj.itunesCategories) && obj.itunesCategories.every(isItunesCategory))
         ;
 }
 
