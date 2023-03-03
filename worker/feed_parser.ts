@@ -66,8 +66,15 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                         if (typeof text !== 'string' || text === '') throw new Error(`Invalid itunes:category text in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
                         if (level === 3) {
                             feedItunesCategories.push([ text ]);
-                        } else {
-                            feedItunesCategories.at(-1)!.push(text);
+                        } else if (level === 4) {
+                            const latestCategory = feedItunesCategories.at(-1);
+                            if (latestCategory) {
+                                if (latestCategory.length === 1) {
+                                    latestCategory.push(text);
+                                } else if (latestCategory.length === 2) {
+                                    feedItunesCategories.push([ latestCategory[0], text ]);
+                                }
+                            }
                         }
                     }
                 }
@@ -100,6 +107,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
         },
     };
     parseXml(feedContents, callback);
+    if (feedItunesCategories && !feedItunesCategories.every(isItunesCategory)) throw new Error(`Invalid itunesCategories: ${JSON.stringify(feedItunesCategories)}`);
     return { title: feedTitle, link: feedLink, podcastGuid: feedPodcastGuid, generator: feedGenerator, itunesAuthor: feedItunesAuthor, itunesType: feedItunesType, itunesCategories: feedItunesCategories, items };
 }
 
