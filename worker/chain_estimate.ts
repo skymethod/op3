@@ -209,6 +209,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'vpixl', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://bktrks.co/t/1234abcd1234abcd/a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol trumps
+    m = /^(https?):\/\/bktrks\.co\/t\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'backtracks', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -235,12 +244,13 @@ export interface ChainItem {
     readonly prefix?: 'op3'
         | 'adbarker'
         | 'artsai'
+        | 'backtracks'
         | 'blubrry'
         | 'chartable'
         | 'claritas'
         | 'glystn'
-        | 'letscast'
         | 'gumball'
+        | 'letscast'
         | 'magellan'
         | 'podcorn'
         | 'podder'

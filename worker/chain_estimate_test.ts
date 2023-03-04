@@ -287,6 +287,12 @@ Deno.test({
             { kind: 'prefix', prefix: 'podscribe', url: 'https://verifi.podscribe.com/rss/p/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://bktrks.co/t/1234abcd1234abcd/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'backtracks', url: 'https://bktrks.co/t/1234abcd1234abcd/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 
