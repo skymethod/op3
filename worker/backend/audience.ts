@@ -1,8 +1,10 @@
 import { check, checkMatches, isStringRecord, isValidDate, isValidMonth } from '../check.ts';
+import { executeWithRetries } from '../sleep.ts';
 import { computeLinestream } from '../streams.ts';
 import { increment } from '../summaries.ts';
 import { isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
+import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 
 export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, part: partObj }: { showUuid: string, month: string, statsBlobs: Blobs, part?: { partNum: number, numParts: number } }) {
     const { keys } = await statsBlobs.list({ keyPrefix: computeAudienceKeyPrefix({ showUuid, month }) });
@@ -56,12 +58,14 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
         await putPromise;
     };
 
+    const putAudienceWithRetries = () => executeWithRetries(putAudience, { tag: 'putAudience', maxRetries: 2, isRetryable: isRetryableErrorFromR2 });
+
     const putAudienceSummary = async () => {
         const audienceSummaryPartKey = computeAudienceSummaryKey(audienceSummary);
         await statsBlobs.put(audienceSummaryPartKey, JSON.stringify(audienceSummary));
     }
 
-    await Promise.all([ putAudience(), putAudienceSummary() ]);
+    await Promise.all([ putAudienceWithRetries(), putAudienceSummary() ]);
 
     return { audience: count, contentLength, part };
 }
