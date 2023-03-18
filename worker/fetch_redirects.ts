@@ -41,7 +41,7 @@ export async function fetchWithRedirects(url: string, { method, userAgent, stopW
             location = new URL(requestUrl).origin + location;
         }
         if (!/^https?:\/\/.+?$/.test(location)) return rt;
-        if (requestUrls.has(requestUrl)) return rt;
+        if (requestUrls.has(location)) return rt;
         if (requestUrls.size >= 10) return rt;
         if (stopWhenLocationMatches && stopWhenLocationMatches(location)) return rt;
         requestUrl = location;
