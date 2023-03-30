@@ -293,6 +293,11 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://pdrl.fm/123abc/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podroll', url: 'https://pdrl.fm/123abc/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 

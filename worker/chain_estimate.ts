@@ -218,6 +218,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'backtracks', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://pdrl.fm/123abc/a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol trumps
+    m = /^(https?):\/\/pdrl\.fm\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podroll', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -255,6 +264,7 @@ export interface ChainItem {
         | 'podcorn'
         | 'podder'
         | 'podkite'
+        | 'podroll'
         | 'podscribe'
         | 'podsights'
         | 'podtrac'
