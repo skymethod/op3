@@ -1,5 +1,5 @@
 import { computeOther, computeRawIpAddress, tryComputeColo } from './cloudflare_request.ts';
-import { ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
+import { CfGlobalCaches, ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
@@ -45,7 +45,7 @@ export default {
             const colo = tryComputeColo(request);
             setWorkerInfo({ colo: colo ?? 'XXX', name: 'eyeball' });
 
-            if (!banlist) banlist = new Banlist(env.kvNamespace);
+            if (!banlist) banlist = new Banlist(env.kvNamespace, (globalThis.caches as unknown as CfGlobalCaches).default);
         
             // first, handle redirects - the most important function
             // be careful here: must never throw

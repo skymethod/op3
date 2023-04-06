@@ -229,13 +229,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://a.pdcst.to/abcdWXYZ01234567/a.com/path/to/episode.mp3
+    // https://help.voxalyze.com/article/61-tracking-prefix
     // https?/ and https?:// are supported, but ignored: https is always used
     m = /^(https?):\/\/a\.pdcst\.to\/[^/]+\/(https?(:\/)?\/)?(.*?)$/.exec(url);
     if (m) {
         const [ _, _scheme, _suffixProtocolOrPrefix, __, suffix ] = m;
         const targetUrl = `https://${suffix}`;
-        return [ { kind: 'prefix', prefix: 'apdcstto', url }, ...computeChainEstimate(targetUrl) ];
+        return [ { kind: 'prefix', prefix: 'voxalyze', url }, ...computeChainEstimate(targetUrl) ];
     }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -261,7 +263,6 @@ export interface ChainItem {
     readonly kind: 'prefix' | 'destination';
     readonly prefix?: 'op3'
         | 'adbarker'
-        | 'apdcstto'
         | 'artsai'
         | 'backtracks'
         | 'blubrry'
@@ -279,6 +280,7 @@ export interface ChainItem {
         | 'podsights'
         | 'podtrac'
         | 'veritonic'
+        | 'voxalyze'
         | 'vpixl'
         | 'zencastr'
         ;

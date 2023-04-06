@@ -1,31 +1,33 @@
 import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { tryParseJson } from './check.ts';
-import { KVNamespace, CfGlobalCaches } from './deps.ts';
+import { KVNamespace, CfCache } from './deps.ts';
 import { consoleWarn } from './tracer.ts';
 
 export class Banlist {
     private readonly namespace?: KVNamespace;
+    private readonly cache?: CfCache;
 
     private bannedHostnames: Set<string> | undefined;
 
-    constructor(namespace?: KVNamespace) {
+    constructor(namespace: KVNamespace | undefined, cache: CfCache | undefined) {
         this.namespace = namespace;
+        this.cache = cache;
     }
 
     async isBanned(targetUrl: string): Promise<boolean> {
         // must never throw!
         if (targetUrl.includes('js/netsoltrademark.php')) return true; // ban /e/http://bad.domain/__media__/js/netsoltrademark.php?d=anotherbad.domain%2Fpath%2F
 
-        const { namespace } = this;
+        const { namespace, cache } = this;
         if (!namespace) return false;
 
         try {
-            if (/\.(mp3|mp4)$/i.test(targetUrl)) return false;
+            if (/\.(mp3|mp4)(\?.*)?$/i.test(targetUrl)) return false;
             const targetHostname = computeChainDestinationHostname(targetUrl, { urlDecodeIfNecessary: true }); // evil urls will try to urlencode / to %2F
             if (targetHostname === undefined) return false;
             if (isReservedForTesting(targetHostname)) return true;
-            // if (!targetHostname.includes('.')) return true; // ban /e/whatever/path/to/file.mp3
-            if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace);
+            if (!targetHostname.includes('.')) return true; // ban /e/whatever/path/to/file.mp3
+            if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace, cache);
             return this.bannedHostnames.has(targetHostname);
         } catch (e) {
             consoleWarn('banlist', `Unexpected error inside banlist.isBanned(${targetUrl}): ${e.stack || e}`);
@@ -42,9 +44,8 @@ function isReservedForTesting(hostname: string): boolean {
     return /^(.+?\.)?(test|example|invalid|localhost)$/.test(hostname);
 }
 
-async function loadBannedHostnames(namespace: KVNamespace): Promise<Set<string>> {
+async function loadBannedHostnames(namespace: KVNamespace, cache: CfCache | undefined): Promise<Set<string>> {
     const cacheKey = 'http://op3.com/banlist'; // must be a valid hostname, but never routable to avoid conflicts with worker fetch
-    const cache = (globalThis.caches as unknown as CfGlobalCaches).default;
     if (cache) {
         const res = await cache.match(cacheKey);
         if (res) {
