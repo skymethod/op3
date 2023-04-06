@@ -109,11 +109,12 @@ export function computeChainEstimate(url: string): ChainEstimate {
     // https://verifi.podscribe.com/rss/p/
     // https://podscribe.com/blog/impression-verification-mb45x
     // http not supported
+    // suffix protocol supported
     // 2022-12-05: alt https://pscrb.fm/rss/p/
-    m = /^https:\/\/(verifi\.podscribe\.com|pscrb\.fm)\/rss\/p\/(.*?)$/.exec(url);
+    m = /^https:\/\/(verifi\.podscribe\.com|pscrb\.fm)\/rss\/p\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, _hostname, suffix ] = m;
-        const targetUrl = `https://${suffix}`;
+        const [ _, _hostname, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? 'https://'}${suffix}`;
         return [ { kind: 'prefix', prefix: 'podscribe', url }, ...computeChainEstimate(targetUrl) ];
     }
 
@@ -227,6 +228,14 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podroll', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://a.pdcst.to/abcdWXYZ01234567/a.com/path/to/episode.mp3
+    // https?/ and https?:// are supported, but ignored: https is always used
+    m = /^(https?):\/\/a\.pdcst\.to\/[^/]+\/(https?(:\/)?\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, _scheme, _suffixProtocolOrPrefix, __, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'apdcstto', url }, ...computeChainEstimate(targetUrl) ];
+    }
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -252,6 +261,7 @@ export interface ChainItem {
     readonly kind: 'prefix' | 'destination';
     readonly prefix?: 'op3'
         | 'adbarker'
+        | 'apdcstto'
         | 'artsai'
         | 'backtracks'
         | 'blubrry'
