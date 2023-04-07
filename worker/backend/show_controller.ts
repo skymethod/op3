@@ -203,7 +203,7 @@ export class ShowController {
                 if (!isFeedRecord(feedRecord)) throw new Error(`No feed record for: ${feedUrl}`);
                 if (feedRecord.showUuid) throw new Error(`Not allowed to delete items for feeds assigned to a show`);
                 const go = parameters.go === 'true';
-                const { matchUrlPrefix, itemGuidsStr } = parameters;
+                const { matchUrlPrefix, itemGuids: itemGuidsStr } = parameters;
                 const itemGuids = typeof itemGuidsStr === 'string' ? itemGuidsStr.split(',').map(v => v.trim()).filter(v => v !== '') : undefined;
                 const results = [ await deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, storage }) ];
                 return { results };
