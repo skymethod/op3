@@ -306,6 +306,11 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 

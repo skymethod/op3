@@ -28,11 +28,12 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://dts.podtrac.com/redirect.mp3/
     // https://www.podtrac.com/pts/redirect.mp3/
+    // https://podtrac.com/pts/redirect.mp3/
     // https://dts.podtrac.com/redirect.m4a/
     // https://play.podtrac.com/ABC-Whatever/
     // http redirects to https for registered feeds
     // supports explicit protocol as well: https://dts.podtrac.com/redirect.mp3/http://example.com/path-to-file.mp3
-    m = /^https?:\/\/(dts\.podtrac\.com|www\.podtrac\.com\/pts|play\.podtrac\.com)\/(redirect\.[a-z0-9]+|[a-zA-Z0-9-]+)\/(https?:\/\/)?(.*?)$/.exec(url);
+    m = /^https?:\/\/(dts\.podtrac\.com|www\.podtrac\.com\/pts|podtrac\.com\/pts|play\.podtrac\.com)\/(redirect\.[a-z0-9]+|[a-zA-Z0-9-]+)\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
         const [ _, _domain, _redirect, suffixProtocol, suffix ] = m;
         const targetUrl = `${suffixProtocol ?? `https://`}${suffix}`;
