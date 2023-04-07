@@ -203,8 +203,9 @@ export class ShowController {
                 if (!isFeedRecord(feedRecord)) throw new Error(`No feed record for: ${feedUrl}`);
                 if (feedRecord.showUuid) throw new Error(`Not allowed to delete items for feeds assigned to a show`);
                 const go = parameters.go === 'true';
-                const { matchUrlPrefix } = parameters;
-                const results = [ await deleteFeedItems({ feedRecordId, go, matchUrlPrefix, storage }) ];
+                const { matchUrlPrefix, itemGuidsStr } = parameters;
+                const itemGuids = typeof itemGuidsStr === 'string' ? itemGuidsStr.split(',').map(v => v.trim()).filter(v => v !== '') : undefined;
+                const results = [ await deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, storage }) ];
                 return { results };
             }
         }
@@ -790,8 +791,11 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     return rt.join(', ');
 }
 
-async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, storage }: { feedRecordId: string, go: boolean, matchUrlPrefix: string | undefined, storage: DurableObjectStorage }) {
-    const feedItemRecords = [...(await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) })).values()].filter(isFeedItemRecord);
+async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, storage }: { feedRecordId: string, go: boolean, matchUrlPrefix: string | undefined, itemGuids: string[] | undefined, storage: DurableObjectStorage }) {
+    const feedItemRecords = [...(await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) })).values()]
+        .filter(isFeedItemRecord)
+        .filter(v => !itemGuids || itemGuids.includes(v.guid))
+        ;
     const feedItemRecordIds = new Set(feedItemRecords.map(v => v.id));
 
     // first, delete any match url index records (found by provided prefix) pointing to these items
