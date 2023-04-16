@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@11ba0e6e6a08e114b75478dd514f21acdbb9883a (2023-02-22T23:58:19Z)
+// from user-agents-v2@af0d55896187223a491a49e089dc49d6aebe4b72 (2023-04-16T20:25:47Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -581,6 +581,7 @@ const appTests = {
     'MobileSMS/1.0 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `MobileSMS` },
     'MoonFM/128 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `MoonFM` },
     'Moon FM/4.0.33': { type: 'app', name: `MoonFM` },
+    'MPlayer 1.3.0 (Debian), built with gcc-6.2.1': { type: 'app', name: `MPlayer` },
     'libmpv': { type: 'app', name: `mpv` },
     'MusicBee': { type: 'app', name: `MusicBee` },
     'Music%20Download/45 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Music Download App` },
@@ -708,6 +709,7 @@ const appTests = {
     'Stoler Report/1.4 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Stoler Report` },
     'StoryShots/1.9.72 (Linux;Android 9) ExoPlayerLib/2.11.4': { type: 'app', name: `StoryShots` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Strilen Hermes/90.0.0 _app_': { type: 'app', name: `Strilen iOS app` },
+    'Substack/1457 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Substack` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS SvD Hermes/90.0.0 _app_': { type: 'app', name: `Svenska Dagbladet iOS app` },
     'SvD Hermes/999999999 _app_': { type: 'app', name: `Svenska Dagbladet Android app` },
     'Swinsian/472 CFNetwork/978.0.7 Darwin/18.7.0 (x86_64)': { type: 'app', name: `Swinsian` },

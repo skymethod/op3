@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@11ba0e6e6a08e114b75478dd514f21acdbb9883a (2023-02-22T23:58:19Z)
+// from user-agents-v2@af0d55896187223a491a49e089dc49d6aebe4b72 (2023-04-16T20:25:47Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -436,6 +436,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^MobileApp\//.test(userAgent)) return { name: `MobileApp`, type: 'app' };
     if (/^MobileSMS\//.test(userAgent)) return { name: `MobileSMS`, type: 'app' };
     if (/^Moon ?FM\//.test(userAgent)) return { name: `MoonFM`, type: 'app' };
+    if (/^MPlayer \d/.test(userAgent)) return { name: `MPlayer`, type: 'app' };
     if (/^mpv 0\.|^libmpv$/.test(userAgent)) return { name: `mpv`, type: 'app' };
     if (/^MusicBee/.test(userAgent)) return { name: `MusicBee`, type: 'app' };
     if (/^Music%20Download\//.test(userAgent)) return { name: `Music Download App`, type: 'app' };
@@ -524,6 +525,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^StoryShots\//.test(userAgent)) return { name: `StoryShots`, type: 'app' };
     if (/iOS Strilen Hermes\//.test(userAgent)) return { name: `Strilen iOS app`, type: 'app' };
     if (/^Subcast/.test(userAgent)) return { name: `Subcast`, type: 'app' };
+    if (/^Substack\//.test(userAgent)) return { name: `Substack`, type: 'app' };
     if (/iOS SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet iOS app`, type: 'app' };
     if (/SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet Android app`, type: 'app' };
     if (/^Swinsian\//.test(userAgent)) return { name: `Swinsian`, type: 'app' };
