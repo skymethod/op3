@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@af0d55896187223a491a49e089dc49d6aebe4b72 (2023-04-16T20:25:47Z)
+// from user-agents-v2@053eece1230dc1dcf2138d7bb5366fd2a2c029fb (2023-04-20T16:08:59Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -489,7 +489,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
-    if (/^radio\.de\//.test(userAgent)) return { name: `radio.de`, type: 'app' };
+    if (/^(radio\.[a-z]{2,3}|GetPodcast)[ \/]\d/.test(userAgent)) return { name: `radio.de`, type: 'app' };
     if (/^Radioline%202\/|^Radioline$/.test(userAgent)) return { name: `Radioline`, type: 'app' };
     if (/(^Radioplayer Android app|^Radioplayer iOS app)/.test(userAgent)) return { name: `RadioPlayer`, type: 'app' };
     if (/^RadioPublic\/android-|^RadioPublic Android|RadioPublic iOS|RadioPublic.+CFNetwork|^RadioPublic\/iOS|^RadioPublicDraper\//.test(userAgent)) return { name: `RadioPublic`, type: 'app' };

@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@af0d55896187223a491a49e089dc49d6aebe4b72 (2023-04-16T20:25:47Z)
+// from user-agents-v2@053eece1230dc1dcf2138d7bb5366fd2a2c029fb (2023-04-20T16:08:59Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -661,7 +661,19 @@ const appTests = {
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
+    'radio.fr 5.6.22 (iPhone; iPhone OS 16.4; fr_FR)': { type: 'app', name: `radio.de` },
+    'radio.de 5.6.22 (iPad; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
+    'radio.de 5.6.22 (iPhone; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
+    'radio.net 5.7.3 (iPhone; iPhone OS 17.0.1; fr_FR)': { type: 'app', name: `radio.de` },
+    'GetPodcast 5.6.22 (iPhone; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
+    'GetPodcast 5.6.22 (iPhone; 16.4; de_DE)': { type: 'app', name: `radio.de` },
     'radio.de/4671 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `radio.de` },
+    'radio.de/5.10.5.3 (Linux; 13) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
+    'radio.de/5.10.3.0 (Linux;Android 13) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
+    'radio.de/5.10.5.3 (Linux; Android 13) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
+    'radio.de/5.10.5.3 (Linux; Android 13; de_DE) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
+    'radio.de/5.10.5.3 (Linux; Android 13; zn-Hans) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
+    'GetPodcast/5.10.5.3 (Linux; Android 13; de_DE) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
     'Radioline%202/5.8.4 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Radioline` },
     'Radioline': { type: 'app', name: `Radioline` },
     'RadioPublic/android-2.2': { type: 'app', name: `RadioPublic` },
