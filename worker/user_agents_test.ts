@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@053eece1230dc1dcf2138d7bb5366fd2a2c029fb (2023-04-20T16:08:59Z)
+// from user-agents-v2@0f1737247f77df044c798f9e5debf760c25e9b54 (2023-04-25T20:58:35Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -523,6 +523,8 @@ const appTests = {
     'Ivoox 2.3 (iPod touch; iPhone OS 6.1.5; es_MX)': { type: 'app', name: `iVoox` },
     'iWeb/1.3.0 CFNetwork/711.1.12 Darwin/14.0.0': { type: 'app', name: `iWeb` },
     'Jabbercast/16 CFNetwork/711.1.16 Darwin/14.0.0': { type: 'app', name: `Jabbercast` },
+    'Jam/1.11.1 iOS/16.2 (www.listentojam.com)': { type: 'app', name: `Jam` },
+    'Jam/1.11.1 Android/12 (www.listentojam.com)': { type: 'app', name: `Jam` },
     'Jimcast/1.0 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `Jimcast` },
     'com.jio.media.jiobeats/7.3.1 (Linux;Android 8.1.0) ExoPlayerLib/2.11.4': { type: 'app', name: `JioSaavn` },
     'Saavn Player': { type: 'app', name: `JioSaavn` },

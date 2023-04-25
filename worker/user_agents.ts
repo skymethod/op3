@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@053eece1230dc1dcf2138d7bb5366fd2a2c029fb (2023-04-20T16:08:59Z)
+// from user-agents-v2@0f1737247f77df044c798f9e5debf760c25e9b54 (2023-04-25T20:58:35Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -389,6 +389,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^[iI][Vv]oox/.test(userAgent)) return { name: `iVoox`, type: 'app' };
     if (/^iWeb\//.test(userAgent)) return { name: `iWeb`, type: 'app' };
     if (/^Jabbercast\//.test(userAgent)) return { name: `Jabbercast`, type: 'app' };
+    if (/^Jam\/\d.*listentojam/.test(userAgent)) return { name: `Jam`, type: 'app' };
     if (/^Jimcast\//.test(userAgent)) return { name: `Jimcast`, type: 'app' };
     if (/(^com\.jio\.media\.jiobeats|^com\.saavn\.android|^[sS]aavn)/.test(userAgent)) return { name: `JioSaavn`, type: 'app' };
     if (/J\. River Internet Reader/.test(userAgent)) return { name: `JRiver Media Center`, type: 'app' };
