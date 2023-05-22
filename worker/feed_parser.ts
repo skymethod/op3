@@ -1,5 +1,6 @@
 import { Callback, parseXml } from './xml_parser.ts';
 import { tryParsePubdate } from './pubdates.ts';
+import { tryParseUrl } from './check.ts';
 
 export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
@@ -51,9 +52,17 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
                     transcripts = transcripts ?? [];
                     const url = attributes.get('url');
-                    const type = attributes.get('type');
+                    let type = attributes.get('type');
+                    if (type === undefined && url) {
+                        // workaround for RedCircle feeds with srt urls, but no type
+                        const u = tryParseUrl(url);
+                        if (u && /\.srt$/i.test(u.pathname)) {
+                            type = 'application/x-subrip';
+                        }
+                    }
                     const language = attributes.get('language');
                     const rel = attributes.get('rel');
+
                     if (url === undefined || type === undefined) throw new Error(`Invalid transcript in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
                     transcripts.push({ url, type, language, rel });
                 }
