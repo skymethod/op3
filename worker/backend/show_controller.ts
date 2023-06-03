@@ -1,5 +1,6 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { isValidSha256Hex } from '../crypto.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { equalItunesCategories, Item, parseFeed, stringifyItunesCategories } from '../feed_parser.ts';
 import { fetchOp3RedirectUrls, hasOp3Reference, isRedirectFetchingRequired } from '../fetch_redirects.ts';
@@ -213,8 +214,8 @@ export class ShowController {
         {
             const m = /^\/show\/feeds\/(.*?)$/.exec(targetPath);
             if (m && (operationKind === 'select' || operationKind === 'update')) {
-                const feedUrl = m[1];
-                const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
+                const feedUrlOrRecordId = m[1];
+                const feedRecordId = isValidSha256Hex(feedUrlOrRecordId) ? feedUrlOrRecordId : await computeFeedRecordId(cleanUrl(feedUrlOrRecordId));
                 const result = await storage.get(computeFeedRecordKey(feedRecordId));
                 if (operationKind === 'select') {
                     if (!isFeedRecord(result)) return { results: [] };
