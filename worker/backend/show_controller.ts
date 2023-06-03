@@ -1,7 +1,7 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isString, isStringRecord, isValidGuid } from '../check.ts';
+import { check, checkMatches, isString, isStringRecord, isValidGuid, tryParseInt } from '../check.ts';
 import { isValidSha256Hex } from '../crypto.ts';
-import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
+import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue, sortBy } from '../deps.ts';
 import { equalItunesCategories, Item, parseFeed, stringifyItunesCategories } from '../feed_parser.ts';
 import { fetchOp3RedirectUrls, hasOp3Reference, isRedirectFetchingRequired } from '../fetch_redirects.ts';
 import { computeUserAgent } from '../outbound.ts';
@@ -14,7 +14,7 @@ import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
-import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowRecord, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
+import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowRecord, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 
@@ -333,6 +333,44 @@ export class ShowController {
             return { results };
         }
 
+        if (targetPath === '/show/showgroups' && operationKind === 'select') {
+            const map = await storage.list(computeListOpts(computeShowgroupKeyPrefix(), parameters));
+            const results = [...map.values()].filter(isShowgroupRecord);
+            return { results };
+        }
+
+        {
+            const m = /^\/show\/showgroups\/(.*?)$/.exec(targetPath);
+            if (m) {
+                const showgroupId = m[1];
+                if (!isValidShowgroupId(showgroupId)) throw new Error(`Bad showgroupId: ${showgroupId}`);
+                const key = computeShowgroupKey(showgroupId);
+                if (operationKind === 'select') {
+                    const result = await storage.get(key);
+                    if (!isShowgroupRecord(result)) return { results: [] };
+                    return { results: [ result ]};
+                } else if (operationKind === 'delete') {
+                    const existed = await storage.delete(key);
+                    return { results: [ { existed } ]};
+                } else if (operationKind === 'update') {
+                    const { showUuid, weight: weightStr } = parameters;
+                    if (!isValidUuid(showUuid)) throw new Error(`Bad showUuid: ${showUuid}`);
+                    const result = await storage.get(key);
+                    const record: ShowgroupRecord = isShowgroupRecord(result) ? result : { id: showgroupId, showUuidWeights: {} };
+                    if (weightStr) {
+                        const weight = tryParseInt(weightStr);
+                        if (typeof weight !== 'number') throw new Error(`Bad weight: ${weightStr}`);
+                        record.showUuidWeights[showUuid] = weight;
+                    } else {
+                        delete record.showUuidWeights[showUuid];
+                    }
+                    if (!isShowgroupRecord(record)) throw new Error(`Bad update: ${JSON.stringify(record)}`);
+                    await storage.put(key, record);
+                    return { results: [ record ] };
+                }
+            }
+        }
+
         throw new Error(`Unsupported show-related query`);
     }
 
@@ -395,9 +433,23 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
         }
         return rt;
     };
+    // preload showgroups in memory for fast lookup
+    const loadShowgroupWeightsByShowUuid = async () => {
+        const map = await storage.list({ prefix: computeShowgroupKeyPrefix() });
+        const showgroups = [...map.values()].filter(isShowgroupRecord);
+        const rt = new Map<string, { showgroupId: string, weight: number }>();
+        for (const showgroup of showgroups) {
+            const showgroupId = showgroup.id;
+            for (const [ showUuid, weight ] of Object.entries(showgroup.showUuidWeights)) {
+                rt.set(showUuid, { showgroupId, weight });
+            }
+        }
+        return rt;
+    };
     const matchUrls = await loadMatchUrls(computeMatchUrlToFeedItemIndexKeyPrefix());
     const querylessMatchUrls = await loadMatchUrls(computeQuerylessMatchUrlToFeedItemIndexKeyPrefix());
     const feedRecordIdsToShowUuids = await loadFeedRecordIdsToShowUuids(storage);
+    const showgroupWeightsByShowUuid = await loadShowgroupWeightsByShowUuid();
     const preloadMillis = Date.now() - start;
     const unableToComputeMatchUrls = new Set<string>();
 
@@ -439,6 +491,20 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
                 const feedItemRecordIds = distinct(showMatches.map(v => v.feedItemRecordId));
                 const episodeId = feedItemRecordIds.length === 1 ? feedItemRecordIds[0] : undefined;
                 return { showUuid, episodeId };
+            }
+            if (showUuids.length > 1) {
+                const showUuidsWithShowgroupInfo = showUuids.map(showUuid => ({ showUuid, ...(showgroupWeightsByShowUuid.get(showUuid) ?? { showgroupId: '', weight: 0 }) }));
+                if (showUuidsWithShowgroupInfo.every(v => v.showgroupId !== '') && distinct(showUuidsWithShowgroupInfo.map(v => v.showgroupId)).length === 1) {
+                    // url exists in multiple show feeds, but they are all part of the same showgroup - choose the max weighted show as the winner (show-uuid breaks ties)
+                    const maxWeight = Math.max(...showUuidsWithShowgroupInfo.map(v => v.weight));
+                    const winnerShowUuid = sortBy(showUuidsWithShowgroupInfo.filter(v => v.weight === maxWeight), v => v.showUuid).at(0)?.showUuid;
+                    messages?.push(`queryless(${queryless}): single showgroup: ${JSON.stringify({ showUuidsWithShowgroupInfo, maxWeight, winnerShowUuid })}`);
+                    if (winnerShowUuid) {
+                        const feedItemRecordIds = distinct(showMatches.filter(v => v.showUuid === winnerShowUuid).map(v => v.feedItemRecordId));
+                        const episodeId = feedItemRecordIds.length === 1 ? feedItemRecordIds[0] : undefined;
+                        return { showUuid: winnerShowUuid, episodeId };
+                    }
+                }
             }
         }
         return undefined;
@@ -1316,6 +1382,13 @@ function computeShowKey(showUuid: string): string {
 
 function computeShowKeyPrefix(): string {
     return 'sc.show0.';
+}
+
+function computeShowgroupKey(showgroupId: string): string {
+    return `sc.showgroup0.${showgroupId}`;
+}
+function computeShowgroupKeyPrefix(): string {
+    return 'sc.showgroup0.';
 }
 
 async function computeEpisodeId(itemGuid: string): Promise<string> {

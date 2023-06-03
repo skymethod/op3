@@ -1,6 +1,6 @@
 import { isStringRecord } from '../check.ts';
 import { ErrorInterface, isErrorInterface } from '../errors.ts';
-import { isItunesCategory, ItunesCategory } from '../feed_parser.ts';
+import { ItunesCategory } from '../feed_parser.ts';
 
 export type WorkRecord = FeedWorkRecord | PodcastGuidWorkRecord;
 
@@ -170,6 +170,22 @@ export function isFeedItemRecord(obj: unknown): obj is FeedItemRecord {
         && isStringRecord(obj.relevantUrls) && Object.values(obj.relevantUrls).every(v => typeof v === 'string')
         && (obj.hasTranscripts === undefined || typeof obj.hasTranscripts === 'boolean')
         ;
+}
+
+export interface ShowgroupRecord {
+    readonly id: string; // unique immutable readable tag
+    readonly showUuidWeights: Record<string, number>; // key=show-uuid  if multiple matches but within the same showgroup, pick the show with the highest value here
+}
+
+export function isShowgroupRecord(obj: unknown): obj is ShowgroupRecord {
+    return isStringRecord(obj)
+        && typeof obj.id === 'string' && isValidShowgroupId(obj.id)
+        && isStringRecord(obj.showUuidWeights) && Object.values(obj.showUuidWeights).every(v => typeof v === 'number')
+        ;
+}
+
+export function isValidShowgroupId(id: string): boolean {
+    return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(id);
 }
 
 export interface ShowRecord {
