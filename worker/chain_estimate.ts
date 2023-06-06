@@ -195,9 +195,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://letscast.fm/track/https://a.com/path/to/episode.mp3
     // http and https supported, suffix protocol is required
-    m = /^(https?):\/\/letscast\.fm\/track\/(https?:\/\/)(.*?)$/.exec(url);
+    m = /^(https?):\/\/letscast\.fm\/track\/(https?:\/\/?)(.*?)$/.exec(url);
     if (m) {
-        const [ _, _scheme, suffixProtocol, suffix ] = m;
+        const [ _, _scheme, suffixProtocolStr, suffix ] = m;
+        const suffixProtocol = suffixProtocolStr.endsWith(':/') ? (suffixProtocolStr + '/') : suffixProtocolStr;
         const targetUrl = `${suffixProtocol}${suffix}`;
         return [ { kind: 'prefix', prefix: 'letscast', url }, ...computeChainEstimate(targetUrl) ];
     }

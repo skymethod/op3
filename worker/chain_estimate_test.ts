@@ -264,6 +264,11 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://letscast.fm/track/https:/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'letscast', url: 'https://letscast.fm/track/https:/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
         assertEquals(computeChainEstimate('http://media.blubrry.com/asdf/p/media.blubrry.com/asdf/p/www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3'), [
             { kind: 'prefix', prefix: 'blubrry', url: 'http://media.blubrry.com/asdf/p/media.blubrry.com/asdf/p/www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
             { kind: 'prefix', prefix: 'blubrry', url: 'http://media.blubrry.com/asdf/p/www.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3' },
