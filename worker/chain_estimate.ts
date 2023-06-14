@@ -99,10 +99,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://s.gum.fm/r1/<24-hex-char>
+    // https://s.gum.fm/s-631f86ba3727560f9608b68b
     // http 308s to itself https
-    m = /^https:\/\/s\.gum\.fm\/r1\/[0-9a-f]+\/(.*?)$/.exec(url);
+    m = /^https:\/\/s\.gum\.fm\/(r1\/|s-)[0-9a-f]+\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
+        const [ _, __, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'gumball', url }, ...computeChainEstimate(targetUrl) ];
     }

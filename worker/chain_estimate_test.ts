@@ -316,6 +316,12 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://op3.dev/e/s.gum.fm/s-123456abcdef123456abcdef/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/s.gum.fm/s-123456abcdef123456abcdef/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'gumball', url: 'https://s.gum.fm/s-123456abcdef123456abcdef/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 
