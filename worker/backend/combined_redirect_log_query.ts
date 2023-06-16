@@ -11,10 +11,11 @@ import { IndexId, INDEX_DEFINITIONS } from './combined_redirect_log_controller.t
 import { IpAddressHashingFn } from './redirect_log_controller.ts';
 
 export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, mostBehindTimestamp: string | undefined, attNums: AttNums, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Response> {
-    const { format = 'tsv' } = request;
+    const { format = 'tsv', include = '' } = request;
     const startTime = Date.now();
     const map = await computeResultMap(request, storage, hashIpAddress);
     const rows: unknown[] = [];
+    const includeAsn = include === 'asn';
     for (const record of map.values()) {
         if (typeof record !== 'string') continue;
         const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, referer, range, ulid, xpsId,
@@ -25,6 +26,7 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
             'other.regionCode': regionCode,
             'other.region': region,
             'other.metroCode': metroCode,
+            'other.asn': asn,
         } = attNums.unpackRecord(record);
         if (typeof timestamp !== 'string') continue;
         if (typeof mostBehindTimestamp === 'string' && timestamp > mostBehindTimestamp) continue;
@@ -32,18 +34,19 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
         if (format === 'tsv' || format === 'json-a') {
-            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode ];
+            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, ...(includeAsn ? [ asn ] : []) ];
             rows.push(format === 'tsv' ? arr.join('\t') : arr);
         } else {
-            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode });
+            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, ...(includeAsn ? { asn } : {}) });
         }
     }
+    const headers = computeHeaders(includeAsn);
     return newQueryResponse({ startTime, format, headers, rows, continuationToken: undefined });
 }
 
 //
 
-const headers = [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode' ];
+const computeHeaders = (includeAsn: boolean) => [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode', ...(includeAsn ? [ 'asn' ] : []) ];
 
 let _earliestTimestamp: string | undefined;
 

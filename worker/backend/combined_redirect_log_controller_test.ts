@@ -45,7 +45,7 @@ Deno.test({
                     const seq = new TimestampSequence(3);
                     const key1 = seq.next();
                     const attNums = new AttNums();
-                    const packed = attNums.packRecord({ uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, xpsId, 'other.colo': edgeColo  });
+                    const packed = attNums.packRecord({ uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, xpsId, 'other.colo': edgeColo, 'other.asn': '123'  });
                     const records: Record<string, string> = {};
                     records[key1] = packed;
                     return {
@@ -90,7 +90,7 @@ Deno.test({
             const namesToNums = data.get('crl.attNums');
             assert(isStringRecord(namesToNums));
             const attNums2 = new AttNums(namesToNums as Record<string, number>);
-            assertEquals(attNums2.max(), 11);
+            assertEquals(attNums2.max(), 12);
 
             // ensure data record
             const record = data.get(`crl.r.${timestampAndUuid}`);
@@ -141,6 +141,16 @@ Deno.test({
             // console.log(rows);
             assert(Array.isArray(rows));
             assertEquals(rows.length, 1);
+        }
+
+        {
+            // ensure successful asn query
+            const res = await controller.queryRedirectLogs({ limit: 10, format: 'json', include: 'asn' });
+            assertEquals(res.status, 200);
+            const { rows } = await res.json();
+            assert(Array.isArray(rows));
+            assertEquals(rows.length, 1);
+            assertEquals(rows[0].asn, '123');
         }
     }
 });

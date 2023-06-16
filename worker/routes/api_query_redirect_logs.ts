@@ -16,8 +16,9 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
 
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
-        request = await parseRequest(searchParams, rawIpAddress);
-        if (!permissions.has('admin')) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request, permissions.has('preview')) });
+        const admin = permissions.has('admin');
+        request = await parseRequest(searchParams, rawIpAddress, admin);
+        if (!admin) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request, permissions.has('preview')) });
     } catch (e) {
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
@@ -27,9 +28,9 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
 
 //
 
-async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined): Promise<Unkinded<QueryRedirectLogsRequest>> {
+async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined, admin: boolean): Promise<Unkinded<QueryRedirectLogsRequest>> {
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_REDIRECT_LOGS) };
-    const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method } = Object.fromEntries(searchParams);
+    const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
 
     if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
     if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
@@ -80,6 +81,9 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     if (typeof method === 'string') {
         checkMatches('method', method, /^(HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$/);
         request = { ...request, method };
+    }
+    if (typeof include === 'string' && admin) {
+        request = { ...request, include };
     }
     return request;
 }
