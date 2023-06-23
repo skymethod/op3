@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@5062582a1444096ba9d1cd21d790191a1c2112d7 (2023-06-09T17:38:37Z)
+// from user-agents-v2@084ec16771020cfd71186a138207c27199d7ab6e (2023-06-23T16:06:34Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -336,6 +336,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^freemusic\//.test(userAgent)) return { name: `freemusic`, type: 'app' };
     if (/^FreeMusicDownloadPro\//.test(userAgent)) return { name: `FreeMusicDownloadPro`, type: 'app' };
     if (/^FreeMusicPlusFree\//.test(userAgent)) return { name: `FreeMusicPlusFree`, type: 'app' };
+    if (/^FrequencePlus\//.test(userAgent)) return { name: `Fréquence Plus`, type: 'app' };
     if (/^GaanaAndroid-|^Gaana-iOS|^Gaana\//.test(userAgent)) return { name: `Gaana`, type: 'app' };
     if (/^Garmin fenix 5X Plus/.test(userAgent)) return { name: `Garmin fenix 5X`, type: 'app' };
     if (/^Garmin Forerunner/.test(userAgent)) return { name: `Garmin Forerunner`, type: 'app' };
@@ -405,6 +406,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^KaoticRadio\.com\//.test(userAgent)) return { name: `KaoticRadio.com`, type: 'app' };
     if (/^Kasts\/|^kasts /.test(userAgent)) return { name: `Kasts`, type: 'app' };
     if (/^Kids(%20| )Listen\//.test(userAgent)) return { name: `Kids Listen`, type: 'app' };
+    if (/^KidspodMobileClient\//.test(userAgent)) return { name: `KidsPod`, type: 'app' };
     if (/^KKBOX\//.test(userAgent)) return { name: `KKBOX`, type: 'app' };
     if (/^Kloudie\//.test(userAgent)) return { name: `Kloudie`, type: 'app' };
     if (/^Knomad\//.test(userAgent)) return { name: `Knomad`, type: 'app' };
@@ -536,6 +538,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet iOS app`, type: 'app' };
     if (/SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet Android app`, type: 'app' };
     if (/^Swinsian\//.test(userAgent)) return { name: `Swinsian`, type: 'app' };
+    if (/^SYOK\//.test(userAgent)) return { name: `SYOK`, type: 'app' };
     if (/^TED |^TED\//.test(userAgent)) return { name: `TED`, type: 'app' };
     if (/^The God Minute\//.test(userAgent)) return { name: `The God Minute`, type: 'app' };
     if (/(^lamarr-iOS|^TheEconomist-Lamarr-ios|^lamarr-android|^TheEconomist-Lamarr-android)/.test(userAgent)) return { name: `The Economist`, type: 'app' };
@@ -560,6 +563,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^WeCast\//.test(userAgent)) return { name: `WeCast`, type: 'app' };
     if (/^WhatsApp\//.test(userAgent)) return { name: `WhatsApp`, type: 'app' };
     if (/^NSPlayer|WMPlayer\/|^Windows-Media-Player\//.test(userAgent)) return { name: `Windows Media Player`, type: 'app' };
+    if (/^WynkMusic\//.test(userAgent)) return { name: `WynkMusic`, type: 'app' };
     if (/^Xiaoyuzhou\//.test(userAgent)) return { name: `Xiao Yu Zhou`, type: 'app' };
     if (/iPhone.*XING/.test(userAgent)) return { name: `XING`, type: 'app' };
     if (/^Yandex\.Music\//.test(userAgent)) return { name: `Yandex Music`, type: 'app' };

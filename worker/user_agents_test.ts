@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@5062582a1444096ba9d1cd21d790191a1c2112d7 (2023-06-09T17:38:37Z)
+// from user-agents-v2@084ec16771020cfd71186a138207c27199d7ab6e (2023-06-23T16:06:34Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -427,6 +427,7 @@ const appTests = {
     'freemusic/2.3 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `freemusic` },
     'FreeMusicDownloadPro/1.8 CFNetwork/711.1.16 Darwin/14.0.0': { type: 'app', name: `FreeMusicDownloadPro` },
     'FreeMusicPlusFree/2.5 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `FreeMusicPlusFree` },
+    'FrequencePlus/2.1.1 (Linux;Android 12) ExoPlayerLib/2.15.0': { type: 'app', name: `Fréquence Plus` },
     'GaanaAndroid-8.13.0/Dalvik/2.1.0 (Linux; U; Android 9; vivo 1906 Build/PKQ1.190616.001)': { type: 'app', name: `Gaana` },
     'GaanaAndroid-8.13.0/Dalvik/2.1.0 (Linux; U; Android 5.1; Micromax P701 Build/LMY47D)': { type: 'app', name: `Gaana` },
     'Gaana-iOS': { type: 'app', name: `Gaana` },
@@ -544,6 +545,8 @@ const appTests = {
     'kasts LibVLC': { type: 'app', name: `Kasts` },
     'Kids%20Listen/55 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Kids Listen` },
     'Kids Listen/55 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Kids Listen` },
+    'KidspodMobileClient/111 CFNetwork/1465.2 Darwin/23.0.0': { type: 'app', name: `KidsPod` },
+    'KidspodMobileClient/111 CFNetwork/1408.0.4 Darwin/22.5.0': { type: 'app', name: `KidsPod` },
     'KKBOX/7.10.70/iOS/14.2': { type: 'app', name: `KKBOX` },
     'Kloudie/1.0 CFNetwork/758.1.6 Darwin/15.0.0': { type: 'app', name: `Kloudie` },
     'Knomad/1.1.9 CFNetwork/711.1.12 Darwin/14.0.0': { type: 'app', name: `Knomad` },
@@ -734,6 +737,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS SvD Hermes/90.0.0 _app_': { type: 'app', name: `Svenska Dagbladet iOS app` },
     'SvD Hermes/999999999 _app_': { type: 'app', name: `Svenska Dagbladet Android app` },
     'Swinsian/472 CFNetwork/978.0.7 Darwin/18.7.0 (x86_64)': { type: 'app', name: `Swinsian` },
+    'SYOK/965 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `SYOK` },
     'TED POD-2.0.2': { type: 'app', name: `TED` },
     'TED/2941 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `TED` },
     'TED Android; Version 3.3.3; OPPO R15 9': { type: 'app', name: `TED` },
@@ -779,6 +783,7 @@ const appTests = {
     'NSPlayer/12.00.18362.0418 WMFSDK/12.00.18362.0418': { type: 'app', name: `Windows Media Player` },
     'Windows-Media-Player/12.0.15063.1805': { type: 'app', name: `Windows Media Player` },
     'Lavf52.104.0 WMPlayer/10.0.0.364 guid/3300AD50-2C39-46C0-AE0A-AC7B8159E203': { type: 'app', name: `Windows Media Player` },
+    'WynkMusic/3.42.0.21 (Linux;Android 13) ExoPlayerLib/2.11.7': { type: 'app', name: `WynkMusic` },
     'Xiaoyuzhou/1.9.6 Android/10': { type: 'app', name: `Xiao Yu Zhou` },
     'Xiaoyuzhou/1.9.0': { type: 'app', name: `Xiao Yu Zhou` },
     'Xiaoyuzhou/1.5.1': { type: 'app', name: `Xiao Yu Zhou` },
