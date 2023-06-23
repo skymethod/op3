@@ -241,6 +241,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'voxalyze', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://prfx.byspotify.com/e/a.com/path/to/episode.mp3
+    // https://help.adanalytics.spotify.com/install-the-spotify-ad-analytics-podcast-prefix
+    // https by default, suffix protocol trumps
+    m = /^https?:\/\/prfx\.byspotify\.com\/e\/((https?):\/\/?)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, __, suffixScheme, suffix ] = m;
+        const targetUrl = `${suffixScheme ?? 'https' }://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'spotify', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -282,6 +292,7 @@ export interface ChainItem {
         | 'podscribe'
         | 'podsights'
         | 'podtrac'
+        | 'spotify'
         | 'veritonic'
         | 'voxalyze'
         | 'vpixl'

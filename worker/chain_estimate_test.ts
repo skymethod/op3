@@ -322,6 +322,31 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://prfx.byspotify.com/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'spotify', url: 'https://prfx.byspotify.com/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://prfx.byspotify.com/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'spotify', url: 'http://prfx.byspotify.com/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://prfx.byspotify.com/e/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'spotify', url: 'https://prfx.byspotify.com/e/http://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://prfx.byspotify.com/e/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'spotify', url: 'http://prfx.byspotify.com/e/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://prfx.byspotify.com/e/https:/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'spotify', url: 'http://prfx.byspotify.com/e/https:/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 
