@@ -32,8 +32,8 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         const { error } = event;
         return { blobs: [ kind, trim(error) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'worker-request') {
-        const { colo, pathname, country, method, contentType, millis, status } = event;
-        return { blobs: [ kind, colo, trim(pathname), country, method, trim(contentType) ], doubles: [ 1, millis, status ], indexes: [ kind ] };
+        const { colo, pathname, search = '', country, method, contentType, millis, status } = event;
+        return { blobs: [ kind, colo, trim(pathname), country, method, trim(contentType), trim(search) ], doubles: [ 1, millis, status ], indexes: [ kind ] };
     } else if (kind === 'do-fetch') {
         const { colo, durableObjectName, durableObjectClass, durableObjectId, isolateId, method, pathname } = event;
         return { blobs: [ kind, colo, durableObjectName, durableObjectClass, durableObjectId, isolateId, method, pathname ], doubles: [ 1 ], indexes: [ kind ] };

@@ -96,6 +96,7 @@ export interface WorkerRequest {
     readonly kind: 'worker-request',
     readonly colo: string;
     readonly pathname: string;
+    readonly search: string;
     readonly country: string;
     readonly method: string;
     readonly millis: number;

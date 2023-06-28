@@ -67,9 +67,9 @@ export default {
                 const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
                 const { method } = request;
                 const { status } = response;
-                const { pathname } = new URL(request.url);
+                const { pathname, search } = new URL(request.url);
                 const contentType = response.headers.get('content-type') ?? '<unspecified>';
-                return { kind: 'worker-request', colo, pathname, country, method, contentType, millis, status };
+                return { kind: 'worker-request', colo, pathname, search, country, method, contentType, millis, status };
             });
 
             return response;
