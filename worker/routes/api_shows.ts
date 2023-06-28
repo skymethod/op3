@@ -30,7 +30,9 @@ export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searc
         } else if (isValidUuid(showUuidOrPodcastGuidOrFeedUrlBase64)) {
             showUuidInput = showUuidOrPodcastGuidOrFeedUrlBase64;
         } else if (/^[0-9a-zA-Z_-]{15,}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
-            const result = await timed(times, 'lookup-show-uuid-for-feed-url', () => lookupShowUuidForFeedUrl(Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8(), { rpcClient, roRpcClient, searchParams }));
+            const feedUrl = Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8();
+            if (feedUrl.includes('\r') || feedUrl.includes('\n') || feedUrl.trim() !== feedUrl) throw new Error(`Invalid feedUrl: ${JSON.stringify(feedUrl)}`);
+            const result = await timed(times, 'lookup-show-uuid-for-feed-url', () => lookupShowUuidForFeedUrl(feedUrl, { rpcClient, roRpcClient, searchParams }));
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
         } else {
