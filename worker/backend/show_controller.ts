@@ -371,7 +371,7 @@ export class ShowController {
             }
         }
 
-        throw new Error(`Unsupported show-related query`);
+        throw new Error(`Unsupported show-related query: ${JSON.stringify(req)}`);
     }
 
     async work(): Promise<void> {
