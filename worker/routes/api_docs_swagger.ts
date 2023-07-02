@@ -316,7 +316,7 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
                             "in": "query",
                             "description": "Filter by the OP3 episode id",
                             "example": `6e3c647698c647939f479e6e0b822ec7a2eaa30b4ca5488d8eeb8b08ac22cdf7`,
-                            "required": true,
+                            "required": false,
                             "type": "string",
                             "format": "64-character hex",
                         },
