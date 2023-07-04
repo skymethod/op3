@@ -2,8 +2,8 @@ import { timed } from '../async.ts';
 import { AudienceSummary, computeAudienceSummaryKey, isValidAudienceSummary } from '../backend/audience.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { isEpisodeRecord, isFeedRecord } from '../backend/show_controller_model.ts';
-import { computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
-import { check, isString } from '../check.ts';
+import { ShowSummary, computeShowSummaryKey, isValidShowSummary } from '../backend/show_summaries.ts';
+import { check, checkMatches, isString, isValidMonth } from '../check.ts';
 import { compareByDescending } from '../collections.ts';
 import { Configuration } from '../configuration.ts';
 import { Bytes, decodeXml } from '../deps.ts';
@@ -98,19 +98,26 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     check('showUuid', showUuidInput, isValidUuid);
     const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
     check('showUuid', showUuid, isValidUuid);
+    const overallParam = searchParams.get('overall') ?? undefined;
+    if (overallParam !== undefined) checkMatches('overall', overallParam, /^stub$/);
+    const latestMonth = searchParams.get('latestMonth') ?? new Date().toISOString().substring(0, 7);
+    check('latestMonth', latestMonth, isValidMonth);
+    const lookbackMonthsParam = searchParams.get('lookbackMonths') ?? '2';
+    const lookbackMonths = parseInt(checkMatches('lookbackMonths', lookbackMonthsParam, /^[0123]$/)[0]);
+    const monthOffsets = [...Array(lookbackMonths + 1).keys()].map(v => -v).reverse(); // 2 = [ -2, -1, 0 ]
     
-    const thisMonth = new Date().toISOString().substring(0, 7);
-    const latestThreeMonths = [ -2, -1, 0 ].map(v => addMonthsToMonthString(thisMonth, v));
+    const months = monthOffsets.map(v => addMonthsToMonthString(latestMonth, v));
+    const monthsTag = `${months.length}mo`;
 
-    const [ overall, latestThreeMonthSummaries, latestThreeMonthAudiences ] = await timed(times, 'get-overall+get-3mo-summary+get-3mo-audience', () => Promise.all([
-        timed(times, 'get-overall', () => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json')),
-        timed(times, 'get-3mo-summary', async () => (await Promise.all(latestThreeMonths.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidShowSummary)),
-        timed(times, 'get-3mo-audience', async () => (await Promise.all(latestThreeMonths.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidAudienceSummary)),
+    const [ overall, monthsSummaries, monthsAudiences ] = await timed(times, `get-overall+get-${monthsTag}-summary+get-${monthsTag}-audience`, () => Promise.all([
+        timed(times, 'get-overall', () => overallParam === 'stub' ? Promise.resolve(computeStubShowSummary(showUuid, 'overall')) : targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json')),
+        timed(times, `get-${monthsTag}-summary`, async () => (await Promise.all(months.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidShowSummary)),
+        timed(times, `get-${monthsTag}-audience`, async () => (await Promise.all(months.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidAudienceSummary)),
     ]));
-    let latestThreeMonthAudiencesLarge: AudienceSummary[] | undefined;
-    if (latestThreeMonthAudiences.length === 0) {
-        const monthParts = latestThreeMonths.flatMap(month => [1, 2, 3, 4].map(v => ({ month, part: `${v}of4`})));
-        latestThreeMonthAudiencesLarge = await timed(times, 'get-3mo-audience-large', async () => (await Promise.all(monthParts.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v.month, part: v.part }), 'json')))).filter(isValidAudienceSummary));
+    let monthsAudiencesLarge: AudienceSummary[] | undefined;
+    if (monthsAudiences.length === 0) {
+        const monthParts = months.flatMap(month => [1, 2, 3, 4].map(v => ({ month, part: `${v}of4`})));
+        monthsAudiencesLarge = await timed(times, `get-${monthsTag}-audience-large`, async () => (await Promise.all(monthParts.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v.month, part: v.part }), 'json')))).filter(isValidAudienceSummary));
     }
 
     let episodeFirstHours: Record<string, string> = {};
@@ -122,25 +129,25 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
 
-        hourlyDownloads = Object.fromEntries(latestThreeMonthSummaries.flatMap(v => Object.entries(v.hourlyDownloads)));
+        hourlyDownloads = Object.fromEntries(monthsSummaries.flatMap(v => Object.entries(v.hourlyDownloads)));
 
         episodeHourlyDownloads = {};
-        for (const summary of latestThreeMonthSummaries) {
+        for (const summary of monthsSummaries) {
             for (const [ episodeId, record ] of Object.entries(summary.episodes)) {
                 episodeHourlyDownloads[episodeId] = { ...episodeHourlyDownloads[episodeId], ...record.hourlyDownloads };
             }
         }
         dailyFoundAudience = {};
-        for (const summary of latestThreeMonthAudiencesLarge ?? latestThreeMonthAudiences) {
+        for (const summary of monthsAudiencesLarge ?? monthsAudiences) {
             for (const [ date, audience ] of Object.entries(summary.dailyFoundAudience)) {
                 increment(dailyFoundAudience, date, audience);
             }
         }
 
-        monthlyDimensionDownloads = Object.fromEntries(latestThreeMonthSummaries.map(v => [ v.period, v.dimensionDownloads ?? {} ]));
+        monthlyDimensionDownloads = Object.fromEntries(monthsSummaries.map(v => [ v.period, v.dimensionDownloads ?? {} ]));
     }
    
-    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
+    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
 }
 
 export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcClient, roRpcClient, searchParams }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
@@ -167,6 +174,14 @@ export function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, or
 export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
 
 //
+
+const computeStubShowSummary = (showUuid: string, period: string): ShowSummary => ({
+    showUuid,
+    period,
+    episodes: {},
+    hourlyDownloads: {},
+    sources: {},
+});
 
 function cleanTitle(title: string | undefined): string | undefined {
     return title === undefined ? undefined : decodeXml(title);

@@ -11,6 +11,7 @@ export type EpisodeInfo = { readonly id: string, readonly title?: string, readon
 
 export interface ApiShowStatsResponse {
     readonly showUuid: string;
+    readonly months: string[];
     readonly episodeFirstHours: Record<string, string>;
     readonly hourlyDownloads: Record<string, number>;
     readonly episodeHourlyDownloads: Record<string, Record<string, number>>;
