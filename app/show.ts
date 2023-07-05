@@ -11,7 +11,7 @@ import { makeTopDevices } from './top_devices.ts';
 import { makeTopDeviceTypes } from './top_device_types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
 import { makeTopMetros } from './top_metros.ts';
-import { addHoursToHourString } from '../worker/timestamp.ts';
+import { addHoursToHourString, addMonthsToMonthString } from '../worker/timestamp.ts';
 import { makeFooter } from './footer.ts';
 import { makeTopEuRegions } from './top_eu_regions.ts';
 import { makeTopAuRegions } from './top_au_regions.ts';
@@ -23,7 +23,7 @@ import { makeTopLatamRegions } from './top_latam_regions.ts';
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
 declare const previewToken: string;
 
-const app = (() => {
+const app = await (async () => {
 
     Chart.register(TimeScale);
     Chart.register(Tooltip);
@@ -45,6 +45,44 @@ const app = (() => {
     const { showObj, statsObj, times } = initialData;
     const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
+
+    const grabMoreDataIfNecessary = async () => {
+        const { episodeHourlyDownloads, months } = statsObj;
+        const pubdates = episodes.map(v => v.pubdate).filter(v => typeof v === 'string').sort().reverse().slice(0, 8);
+        try {
+            const pubdate = pubdates[pubdates.length - 1];
+            if (pubdate === undefined) return;
+            const needMonth = pubdate.substring(0, 7);
+            if (months.includes(needMonth)) return;
+            const haveMonth = statsObj.months[0];
+            if (!haveMonth) return;
+            
+            const latestMonth = addMonthsToMonthString(haveMonth, -1);
+            const lookbackMonths = 2;
+
+            const qp = new URLSearchParams(document.location.search);
+            const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
+            if (qp.has('ro')) u.searchParams.set('ro', 'true');
+            u.searchParams.set('token', previewToken);
+            u.searchParams.set('overall', 'stub');
+            u.searchParams.set('latestMonth', latestMonth);
+            u.searchParams.set('lookbackMonths', lookbackMonths.toString());
+            console.log(`grab more show stats: ${JSON.stringify({ latestMonth, lookbackMonths })}`);
+            const res = await fetch(u.toString());
+            if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+
+            const moreStats = await res.json() as ApiShowStatsResponse;
+            for (const [ episodeId, hourlyDownloads ] of Object.entries(moreStats.episodeHourlyDownloads)) {
+                const merged = { ...hourlyDownloads, ...episodeHourlyDownloads[episodeId] };
+                episodeHourlyDownloads[episodeId] = merged;
+            }
+        } finally {
+            // signal page ready to show
+            class DataLoaded extends HTMLElement {}
+            customElements.define('data-loaded', DataLoaded);
+        }
+    }
+    await grabMoreDataIfNecessary();
 
     const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);

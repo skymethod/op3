@@ -10195,7 +10195,7 @@ function computeRegionName3(regionCountry) {
     })[region] ?? region;
     return region;
 }
-const app = (()=>{
+const app = await (async ()=>{
     xt.register(Vt);
     xt.register(ic);
     xt.register(De);
@@ -10213,6 +10213,45 @@ const app = (()=>{
     const { showObj , statsObj , times  } = initialData;
     const { showUuid , episodes =[] , title: showTitle  } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
+    const grabMoreDataIfNecessary = async ()=>{
+        const { episodeHourlyDownloads , months  } = statsObj;
+        const pubdates = episodes.map((v)=>v.pubdate).filter((v)=>typeof v === 'string').sort().reverse().slice(0, 8);
+        try {
+            const pubdate = pubdates[pubdates.length - 1];
+            if (pubdate === undefined) return;
+            const needMonth = pubdate.substring(0, 7);
+            if (months.includes(needMonth)) return;
+            const haveMonth = statsObj.months[0];
+            if (!haveMonth) return;
+            const latestMonth = addMonthsToMonthString(haveMonth, -1);
+            const qp = new URLSearchParams(document.location.search);
+            const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
+            if (qp.has('ro')) u.searchParams.set('ro', 'true');
+            u.searchParams.set('token', previewToken);
+            u.searchParams.set('overall', 'stub');
+            u.searchParams.set('latestMonth', latestMonth);
+            u.searchParams.set('lookbackMonths', 2..toString());
+            console.log(`grab more show stats: ${JSON.stringify({
+                latestMonth,
+                lookbackMonths: 2
+            })}`);
+            const res = await fetch(u.toString());
+            if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+            const moreStats = await res.json();
+            for (const [episodeId, hourlyDownloads] of Object.entries(moreStats.episodeHourlyDownloads)){
+                const merged = {
+                    ...hourlyDownloads,
+                    ...episodeHourlyDownloads[episodeId]
+                };
+                episodeHourlyDownloads[episodeId] = merged;
+            }
+        } finally{
+            class DataLoaded extends HTMLElement {
+            }
+            customElements.define('data-loaded', DataLoaded);
+        }
+    };
+    await grabMoreDataIfNecessary();
     const { episodeFirstHours , dailyFoundAudience , monthlyDimensionDownloads  } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
