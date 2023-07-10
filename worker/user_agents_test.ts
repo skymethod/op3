@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@3aef6189438540850f3f08024ae02561faa33ac4 (2023-06-24T17:58:37Z)
+// from user-agents-v2@4e60eb44fcdd2ec0cbccd9702ea7a33e9a484f23 (2023-07-10T15:18:24Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -86,9 +86,11 @@ const botTests = {
     'Mozilla/5.0 (compatible; FlipboardProxy/1.1; +http://flipboard.com/browserproxy)': { type: 'bot', name: `Flipboard Proxy` },
     'storagegw-v1-go': { type: 'bot', name: `Go Storage Gateway V1` },
     'Goodpods/2.2': { type: 'bot', name: `Goodpods Bot` },
+    'Mediapartners-Google': { type: 'bot', name: `Google Adsense Bot` },
     'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; http://www.google.com/bot.html)': { type: 'bot', name: `Googlebot` },
     'Googlebot-Image/1.0': { type: 'bot', name: `Googlebot` },
     'Feedfetcher-Google; (+http://www.google.com/feedfetcher.html; 1 subscribers; feed-id=4653447469100830145)': { type: 'bot', name: `Googlebot` },
+    'google-xrawler': { type: 'bot', name: `Googlebot` },
     'Gumball.fm Analytics Prefix Checker': { type: 'bot', name: `Gumball` },
     'Headliner/1.0.0 +https://headliner.app': { type: 'bot', name: `Headliner` },
     'Mozilla/5.0 (compatible; HubSpot Crawler; +https://www.hubspot.com)': { type: 'bot', name: `HubSpot Crawler` },
@@ -716,6 +718,7 @@ const appTests = {
     'RSSRadio7/9252 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `RSS Radio` },
     'RSSRadio/9710': { type: 'app', name: `RSS Radio` },
     'RSSOwl/2.2.1.201312301314 (Windows; U; en)': { type: 'app', name: `RSSOwl` },
+    'RTL+': { type: 'app', name: `RTL+` },
     'SachNoi.app/1 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `SachNoi` },
     'SachNoiApp/2 CFNetwork/1128.0.1 Darwin/19.6.0': { type: 'app', name: `SachNoi` },
     'sp-agent': { type: 'app', name: `Samsung Podcasts` },
@@ -880,6 +883,7 @@ const deviceTests = {
     'AppleCoreMedia/1.0.0.20K71 (Apple TV; U; CPU OS 16_1 like Mac OS X; en_au)': { type: 'device', name: `Apple TV` },
     'Fountain/0.5.3 ios https://www.fountain.fm': { type: 'device', name: `Apple iPhone` },
     'Anytime/1.1 b64 (phone;ios Version 15.6.1 (Build 19G82)) https://github.com/amugofjava/anytime_podcast_player': { type: 'device', name: `Apple iPhone` },
+    'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.225 Safari/537.36 CrKey/1.56.500000 DeviceType/SmartSpeaker': { type: 'device', name: `Google Home` },
     'ZTE;Xview;756a522d9f1648b89e76e80be654456a;;tpapi;3.200.454': { type: 'device', name: `Android Tablet` },
     'Funai;PHILIPS4KTV;756a522d9f1648b89e76e80be654456a;;tpapi;3.200.454': { type: 'device', name: `Other Smart TV` },
     'Google;ChromecastHD;756a522d9f1648b89e76e80be654456a;;tpapi;3.200.454': { type: 'device', name: `Other Smart TV` },
@@ -914,6 +918,7 @@ const deviceTests = {
     'PodcastGuru 2.0.2-beta3': { type: 'device', name: `Other Mobile Device` },
     'Pocket Casts': { type: 'device', name: `Other Mobile Device` },
     'AmazonMusic': { type: 'device', name: `Other Mobile Device` },
+    'RTL+': { type: 'device', name: `Other Mobile Device` },
 };
 
 const referrerTests = {
