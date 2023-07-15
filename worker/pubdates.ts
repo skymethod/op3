@@ -14,7 +14,10 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
         if (!/^(gmt|utc)$/i.test(tz)) {
             // use Intl to compute time zone offset from name
             // will be mostly accurate except right on timechange boundaries
-            const timeZone = /^CEST$/.test(tz) ? 'Europe/Berlin' : tz; // central european summer time
+            const timeZone = /^CEST$/.test(tz) ? 'Europe/Berlin' // central european summer time
+                : /^PDT$/.test(tz) ? 'America/Los_Angeles' // pacific daylight time
+                : /^EDT$/.test(tz) ? 'America/New_York' // eastern daylight time
+                : tz; 
             const offset = tryParseOffset(new Intl.DateTimeFormat('UTC', { timeZone, timeZoneName: 'longOffset' }).format(new Date(prefix + ' GMT')));
             if (!offset) throw new Error(`Unsupported pubdate: ${pubdate}`);
             pubdate = prefix + ' ' + offset;
