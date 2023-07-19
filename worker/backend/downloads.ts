@@ -16,6 +16,7 @@ import { AttNums } from './att_nums.ts';
 import { Blobs, Multiput } from './blobs.ts';
 import { computeBotType } from './bots.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
+import { isValidPartition } from './show_controller_model.ts';
 
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
@@ -91,18 +92,20 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
 }
 
-export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number };
+export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
 
 export function parseComputeShowDailyDownloadsRequest(date: string, parameters: Record<string, string>): ComputeDailyDownloadsRequest {
-    const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr } = parameters; // in mb, 20mb is about 50,000 rows
+    const { 'part-size': partSizeStr = '20', 'multipart-mode': multipartModeStr, partition } = parameters; // in mb, 20mb is about 50,000 rows
     const partSizeMb = parseInt(partSizeStr);
     check('part-size', partSizeMb, partSizeMb >= 5); // r2 minimum multipart size
     const multipartMode = multipartModeStr === 'bytes' ? 'bytes' : multipartModeStr === 'stream' ? 'stream' : 'bytes';
     const { mode, showUuids } = parseIncludeExclude(parameters);
-    return { date, mode, showUuids, partSizeMb, multipartMode };
+    if (partition !== undefined) check('partition', partition, isValidPartition);
+    return { date, mode, showUuids, partSizeMb, multipartMode, partition };
 }
 
-export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb }: ComputeDailyDownloadsRequest, { statsBlobs, lookupShow } : { statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+
+export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb, partition }: ComputeDailyDownloadsRequest, { statsBlobs, partitions, lookupShow } : { partitions: Record<string, string>, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     showUuids = checkIncludeExclude(mode, showUuids);
 
@@ -186,6 +189,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
 
             // associate download with a show & episode
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+            if (showUuid && partition && partitions[showUuid] !== partition) continue;
 
             // associate download with bot type
             const botType = computeBotType({ agentType, agentName, deviceType, referrerName });

@@ -14,7 +14,7 @@ import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
-import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowRecord, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
+import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowPartitionsRecord, isShowRecord, isValidPartition, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowPartitionsRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
 import { computeListOpts } from './storage.ts';
 
@@ -314,7 +314,8 @@ export class ShowController {
                 const { statsBlobs } = this;
                 const req = parseComputeShowDailyDownloadsRequest(date, parameters);
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
-                const result = await computeDailyDownloads(req, { statsBlobs, lookupShow } );
+                const { partitions } = await loadShowPartitions(storage);
+                const result = await computeDailyDownloads(req, { statsBlobs, partitions, lookupShow } );
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
         }
@@ -337,6 +338,39 @@ export class ShowController {
             const map = await storage.list(computeListOpts(computeShowgroupKeyPrefix(), parameters));
             const results = [...map.values()].filter(isShowgroupRecord);
             return { results };
+        }
+
+        if (targetPath === '/show/partitions') {
+            const key = computeShowPartitionsKey();
+            const record = await loadShowPartitions(storage);
+            if (operationKind === 'select') {
+                return { results: [ record ] };
+            } else if (operationKind === 'update') {
+                const { show, partition } = parameters;
+                check('show', show, isValidUuid);
+                check('partition', partition, isValidPartition);
+                const existing = record.partitions[show];
+                let updated = false;
+                if (existing !== partition) {
+                    record.partitions[show] = partition;
+                    updated = true;
+                    await storage.put(key, record);
+                }
+                const { partitions } = record;
+                return { results: [ { updated, partitions } ] }
+            } else if (operationKind === 'delete') {
+                const { show } = parameters;
+                check('show', show, isValidUuid);
+                const existing = record.partitions[show];
+                let deleted = false;
+                if (existing) {
+                    delete record.partitions[show];
+                    deleted = true;
+                    await storage.put(key, record);
+                }
+                const { partitions } = record;
+                return { results: [ { deleted, partitions } ] }
+            }
         }
 
         {
@@ -1269,6 +1303,11 @@ async function loadKnownMediaUrls({ feedRecordId, storage }: { feedRecordId: str
     return Object.fromEntries(records.map(v => [ v.url, v ]));
 }
 
+async function loadShowPartitions(storage: DurableObjectStorage): Promise<ShowPartitionsRecord> {
+    const result = await storage.get(computeShowPartitionsKey());
+    return isShowPartitionsRecord(result) ? result : { partitions: {} };
+}
+
 async function rebuildPodcastGuidToShowUuidIndex(storage: DurableObjectStorage) {
     const oldKeys = [...(await storage.list({ prefix: computePodcastGuidToShowUuidIndexKeyPrefix() })).keys()];
     for (const batch of chunk(oldKeys, 128)) {
@@ -1421,4 +1460,8 @@ function computePodcastGuidToShowUuidIndexKey({ podcastGuid }: { podcastGuid: st
 
 function computePodcastGuidToShowUuidIndexKeyPrefix() {
     return `sc.i0.${IndexType.PodcastGuidToShowUuid}.`;
+}
+
+function computeShowPartitionsKey() {
+    return `sc.partitions`;
 }

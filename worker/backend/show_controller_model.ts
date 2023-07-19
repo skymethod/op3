@@ -283,3 +283,15 @@ export function isShowEpisodesByPubdateIndexRecord(obj: unknown): obj is ShowEpi
         && (obj.hasTranscripts === undefined || typeof obj.hasTranscripts === 'boolean')
         ;
 }
+
+export interface ShowPartitionsRecord {
+    readonly partitions: Record<string, string>; // key=show-uuid  value=partition-id
+}
+
+export function isShowPartitionsRecord(obj: unknown): obj is ShowPartitionsRecord {
+    return isStringRecord(obj)
+        && isStringRecord(obj.partitions) && Object.values(obj.partitions).every(v => typeof v === 'string')
+        ;
+}
+
+export const isValidPartition = (str: string) => /^[a-z0-9-]+$/.test(str);
