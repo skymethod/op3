@@ -1,4 +1,4 @@
-import { isStringRecord } from '../check.ts';
+import { isString, isStringRecord } from '../check.ts';
 import { ErrorInterface, isErrorInterface } from '../errors.ts';
 import { ItunesCategory } from '../feed_parser.ts';
 
@@ -91,18 +91,20 @@ export interface FetchInfo {
     readonly bodyLength?: number; // since we're buffering
     readonly error?: ErrorInterface;
     readonly responses?: ResponseInfo[];
+    readonly log?: string[];
 }
 
 export function isFetchInfo(obj: unknown): obj is FetchInfo {
     return isStringRecord(obj)
         && typeof obj.requestInstant === 'string'
         && typeof obj.responseInstant === 'string'
-        &&  (obj.status === undefined || typeof obj.status === 'number')
+        && (obj.status === undefined || typeof obj.status === 'number')
         && (obj.headers === undefined || Array.isArray(obj.headers) && obj.headers.every(v => Array.isArray(v) && v.every(w => typeof w === 'string')))
         && (obj.body === undefined || typeof obj.body === 'string')
         && (obj.bodyLength === undefined || typeof obj.bodyLength === 'number')
         && (obj.error === undefined || isErrorInterface(obj.error))
         && (obj.responses === undefined || Array.isArray(obj.responses) && obj.responses.every(isResponseInfo))
+        && (obj.log === undefined || Array.isArray(obj.log) && obj.log.every(isString))
         ;
 }
 

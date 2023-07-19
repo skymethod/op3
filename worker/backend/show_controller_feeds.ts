@@ -20,6 +20,7 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
     let body: string | undefined;
     let bodyLength: number | undefined;
     let responses: ResponseInfo[] | undefined;
+    const log: string[] = [];
 
     try {
         let redirectNum = 0;
@@ -30,6 +31,7 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
             const { url, status } = res;
             responses.push({ url, status });
             const location = res.headers.get('location');
+            log.push(`${fetchUrl} ${url} ${status} ${location}`);
             if (typeof location === 'string' && (status === 301 || status === 302 || status === 307 || status === 308)) {
                 if (redirectNum >= 10) throw new Error(`Max ${redirectNum} redirects reached`);
                 fetchUrl = new URL(location, url).toString();
@@ -46,7 +48,7 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
     } catch (e) {
         const responseInstant = new Date().toISOString();
         error = packError(e);
-        return { requestInstant, responseInstant, error };
+        return { requestInstant, responseInstant, error, responses, log };
     }
 
     const responseInstant = new Date().toISOString();
