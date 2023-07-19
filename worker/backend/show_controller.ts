@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isString, isStringRecord, isValidGuid, tryParseInt } from '../check.ts';
+import { check, checkMatches, isString, isStringRecord, isValidGuid, isValidHttpUrl, tryParseInt } from '../check.ts';
 import { isValidSha256Hex } from '../crypto.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue, sortBy } from '../deps.ts';
 import { equalItunesCategories, Item, parseFeed, stringifyItunesCategories } from '../feed_parser.ts';
@@ -403,6 +403,14 @@ export class ShowController {
                     return { results: [ record ] };
                 }
             }
+        }
+        
+        if (targetPath === '/show/fetch' && operationKind === 'select') {
+            const { url, ...rest } = parameters;
+            check('url', url, isValidHttpUrl);
+            const headers = new Headers(Object.entries(rest).filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ]));
+            const fetchInfo = await computeFetchInfo(url, headers, 'tmp', { put: () => Promise.resolve({ etag: '' }) });
+            return { results: [ { url, headers: [...headers].map(v => v.join(': ')), fetchInfo } ] };
         }
 
         throw new Error(`Unsupported show-related query: ${JSON.stringify(req)}`);
