@@ -409,8 +409,12 @@ export class ShowController {
             const { url, ...rest } = parameters;
             check('url', url, isValidHttpUrl);
             const headers = new Headers(Object.entries(rest).filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ]));
-            const fetchInfo = await computeFetchInfo(url, headers, 'tmp', { put: () => Promise.resolve({ etag: '' }) });
-            return { results: [ { url, headers: [...headers].map(v => v.join(': ')), fetchInfo } ] };
+            const blobs: Record<string, string> = {};
+            const fetchInfo = await computeFetchInfo(url, headers, 'tmp', { put: (key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string) => {
+                blobs[key] = new Bytes(new Uint8Array(body as ArrayBuffer)).utf8();
+                return Promise.resolve({ etag: '' });
+            } });
+            return { results: [ { url, headers: [...headers].map(v => v.join(': ')), fetchInfo, blobs } ] };
         }
 
         throw new Error(`Unsupported show-related query: ${JSON.stringify(req)}`);

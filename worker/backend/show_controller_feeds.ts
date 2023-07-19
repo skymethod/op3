@@ -21,20 +21,25 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
     let bodyLength: number | undefined;
     let responses: ResponseInfo[] | undefined;
     const log: string[] = [];
+    log.push([...headers].map(v => v.join(': ')).join(', '));
 
+    const fetchUrls = new Set<string>();
     try {
         let redirectNum = 0;
         let fetchUrl = url;
         while (true) {
+            fetchUrls.add(fetchUrl);
             res = await fetch(fetchUrl, { headers, redirect: 'manual' });
             responses = responses ?? [];
             const { url, status } = res;
             responses.push({ url, status });
             const location = res.headers.get('location');
-            log.push(`${fetchUrl} ${url} ${status} ${location}`);
+            log.push(`${fetchUrl} ${url} ${status} ${[...res.headers].map(v => v.join(': ')).join(', ')}`);
             if (typeof location === 'string' && (status === 301 || status === 302 || status === 307 || status === 308)) {
+                log.push(await res.text());
                 if (redirectNum >= 10) throw new Error(`Max ${redirectNum} redirects reached`);
                 fetchUrl = new URL(location, url).toString();
+                if (fetchUrls.has(fetchUrl)) throw new Error(`Redirect loop!`);
                 redirectNum++;
             } else {
                 break;
