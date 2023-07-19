@@ -218,7 +218,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
                 showMap.contentLength += chunk.length;
             }
             if (chunksLength >= partSize) {
-                if (!multiput) multiput = await statsBlobs.startMultiput(computeDailyKey(date));
+                if (!multiput) multiput = await statsBlobs.startMultiput(computeDailyKey(date, partition));
                 await multiputCurrentChunks();
             }
         }
@@ -236,33 +236,34 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             throw new Error(`v6, partSize: ${partSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
         }
     } else {
-        const { contentLength, etag: combinedEtag } = await write(chunks, v => statsBlobs.put(computeDailyKey(date), v));
+        const { contentLength, etag: combinedEtag } = await write(chunks, v => statsBlobs.put(computeDailyKey(date, partition), v));
         totalContentLength = contentLength;
         etag = combinedEtag;
     }
     const map: DailyDownloadsMap = { date, etag, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
-    await statsBlobs.put(computeDailyMapKey(date), JSON.stringify(map));
+    await statsBlobs.put(computeDailyMapKey(date, partition), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
 }
 
-export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[] };
+export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], partition?: string };
 
 export function tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): ComputeShowDailyDownloadsRequest | undefined {
     if (targetPath === '/work/compute-show-daily-downloads' && operationKind === 'update' && parameters) {
-        const { date } = parameters;
+        const { date, partition } = parameters;
         check('date', date, isValidDate);
         const { mode, showUuids } = parseIncludeExclude(parameters);
-        return { date, mode, showUuids };
+        if (partition !== undefined) check('partition', partition, isValidPartition);
+        return { date, mode, showUuids, partition };
     }
 }
 
-export async function computeShowDailyDownloads({ date, mode, showUuids }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
+export async function computeShowDailyDownloads({ date, mode, showUuids, partition }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
     showUuids = checkIncludeExclude(mode, showUuids);
 
-    const mapText = await statsBlobs.get(computeDailyMapKey(date), 'text');
+    const mapText = await statsBlobs.get(computeDailyMapKey(date, partition), 'text');
     if (!mapText) throw new Error(`No daily downloads map for ${date}`);
     const map = JSON.parse(mapText) as DailyDownloadsMap;
 
@@ -270,7 +271,7 @@ export async function computeShowDailyDownloads({ date, mode, showUuids }: Compu
         showUuids = Object.keys(map.showMaps).filter(v => !showUuids.includes(v));
     }
 
-    const stream = await statsBlobs.get(computeDailyKey(date), 'stream', { ifMatch: map.etag });
+    const stream = await statsBlobs.get(computeDailyKey(date, partition), 'stream', { ifMatch: map.etag });
     if (!stream) throw new Error(`No daily downloads for ${date}`);
 
     const indexToShowUuids = new Map<number, string[]>();
@@ -358,12 +359,12 @@ interface ShowMap {
 
 const hexDigits = [...Array(0x100).keys()].map(v => v.toString(16).padStart(2, '0'));
 
-function computeDailyKey(date: string): string {
-    return `downloads/daily/${date}.tsv`;
+function computeDailyKey(date: string, partition: string | undefined): string {
+    return `downloads/daily/${date}${typeof partition === 'string' ? `.${partition}` : ''}.tsv`;
 }
 
-function computeDailyMapKey(date: string): string {
-    return `downloads/daily/${date}.map.json`;
+function computeDailyMapKey(date: string, partition: string | undefined): string {
+    return `downloads/daily/${date}${typeof partition === 'string' ? `.${partition}` : ''}.map.json`;
 }
 
 async function write(chunks: Uint8Array[], put: (stream: ReadableStream) => Promise<{ etag: string }>): Promise<{ contentLength: number, etag: string }> {
