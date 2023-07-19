@@ -189,7 +189,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
 
             // associate download with a show & episode
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            if (showUuid && partition && partitions[showUuid] !== partition) continue;
+            if (showUuid && partitions[showUuid] !== partition) continue;
 
             // associate download with bot type
             const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
