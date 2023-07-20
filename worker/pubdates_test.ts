@@ -20,6 +20,8 @@ Deno.test({
             'Fri, 07 Jul 2023 15:00:00 CDT': '2023-07-07T20:00:00.000Z',
             '02/03/2023 06:34:00': '2023-02-03T06:34:00.000Z',
             'Fri, 16 Jun 2017 13:00:00 MDT': '2017-06-16T19:00:00.000Z',
+            'Wed, 19 Jul 2023 22:48:03 Z': '2023-07-19T22:48:03.000Z',
+            'Fri, 7 Ju1 2023 02:00:00 GMT': '2023-07-07T02:00:00.000Z',
         };
         for (const [ input, expected ] of Object.entries(good)) {
             assertEquals(parsePubdate(input), expected);
