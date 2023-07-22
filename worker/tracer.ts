@@ -73,6 +73,8 @@ interface Redirect {
     readonly destinationHostname: string;
     readonly userAgent: string;
     readonly referer: string;
+    readonly hasForwarded: boolean;
+    readonly hasXForwardedFor: boolean;
 }
 
 export interface ValidRedirect extends Redirect {

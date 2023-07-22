@@ -184,7 +184,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
                 const userAgent = headers.get('user-agent') ?? '<missing>';
                 const referer = headers.get('referer') ?? '<missing>';
-                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer };
+                const hasForwarded = headers.has('forwarded');
+                const hasXForwardedFor = headers.has('x-forwarded-for');
+                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor };
             });
         }
     })());
