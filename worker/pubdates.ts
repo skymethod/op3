@@ -11,7 +11,11 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
 
     if (!/[a-z+/]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
 
-    const m = /^(.+?)\s+([a-z]+)$/i.exec(pubdate);
+     // Fri, 27 Jan 2017 22:36:00 CST 01:00:00 CST
+    let m = /^(.*?\s+\d{2}:\d{2}:\d{2}\s+[a-z]{3})\s+\d{2}:\d{2}:\d{2}\s+[a-z]{3}$/i.exec(pubdate);
+    if (m) pubdate = m[1];
+
+    m = /^(.+?)\s+([a-z]+)$/i.exec(pubdate);
     if (m) {
         const [ _, prefix , tz ] = m;
         if (!/^(gmt|utc|ut)$/i.test(tz)) {
@@ -24,9 +28,14 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
                 : /^MDT$/.test(tz) ? 'America/Denver' // mountain daylight time
                 : /^Z$/.test(tz) ? 'GMT'
                 : tz;
-            const offset = timeZone === 'GMT' ? '+0000' : tryParseOffset(new Intl.DateTimeFormat('UTC', { timeZone, timeZoneName: 'longOffset' }).format(new Date(prefix + ' GMT')));
-            if (!offset) throw new Error(`Unsupported pubdate: ${pubdate}`);
-            pubdate = prefix + ' ' + offset;
+            try {
+                const formatted = new Intl.DateTimeFormat('UTC', { timeZone, timeZoneName: 'longOffset' }).format(new Date(prefix + ' GMT'));
+                const offset = timeZone === 'GMT' ? '+0000' : tryParseOffset(formatted);
+                if (!offset) throw new Error();
+                pubdate = prefix + ' ' + offset;
+            } catch {
+                throw new Error(`Unsupported pubdate: ${pubdate}`);
+            }
         }
     }
     if (/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/.test(pubdate)) {
