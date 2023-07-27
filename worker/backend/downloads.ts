@@ -216,7 +216,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
                     showMaps.set(showUuid, showMap);
                 }
                 if (partitionShowUuid === showUuid) {
-                    showMap.allRows = (showMap.allRows ?? 1) + 1;
+                    showMap.allRows = (showMap.allRows ?? 2) + 1;
                 } else {
                     showMap.rowIndexes.push(rowIndex);
                 }
