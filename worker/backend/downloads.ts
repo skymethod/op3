@@ -104,7 +104,6 @@ export function parseComputeShowDailyDownloadsRequest(date: string, parameters: 
     return { date, mode, showUuids, partSizeMb, multipartMode, partition };
 }
 
-
 export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb, partition }: ComputeDailyDownloadsRequest, { statsBlobs, partitions, lookupShow } : { partitions: Record<string, string>, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     showUuids = checkIncludeExclude(mode, showUuids);
@@ -137,6 +136,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
     let multiput: Multiput | undefined;
     let multiputParts: string[] | undefined;
     let remainder: Uint8Array | undefined;
+    const partitionShowUuid = computePartitionShowUuid(partition, partitions);
 
     const multiputCurrentChunks = async () => {
         if (multipartMode === 'bytes') {
@@ -166,6 +166,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
         if (!stream) continue;
         hours++;
 
+        
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
             const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags } = obj;
@@ -214,7 +215,11 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
                     showMap = { rowIndexes: [ 0 ], contentLength: headerChunk.length }; // header row
                     showMaps.set(showUuid, showMap);
                 }
-                showMap.rowIndexes.push(rowIndex);
+                if (partitionShowUuid === showUuid) {
+                    showMap.allRows = true;
+                } else {
+                    showMap.rowIndexes.push(rowIndex);
+                }
                 showMap.contentLength += chunk.length;
             }
             if (chunksLength >= partSize) {
@@ -243,25 +248,40 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
     const map: DailyDownloadsMap = { date, etag, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
     await statsBlobs.put(computeDailyMapKey(date, partition), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode, partitionShowUuid };
 }
 
-export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], partition?: string };
+export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], partition?: string, partitions: Record<string, string> };
 
 export function tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): ComputeShowDailyDownloadsRequest | undefined {
     if (targetPath === '/work/compute-show-daily-downloads' && operationKind === 'update' && parameters) {
-        const { date, partition } = parameters;
+        const { date, partition, partitions: packedPartitions } = parameters;
         check('date', date, isValidDate);
         const { mode, showUuids } = parseIncludeExclude(parameters);
         if (partition !== undefined) check('partition', partition, isValidPartition);
-        return { date, mode, showUuids, partition };
+        const partitions = unpackPartitions(packedPartitions);
+        return { date, mode, showUuids, partition, partitions };
     }
 }
 
-export async function computeShowDailyDownloads({ date, mode, showUuids, partition }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
+export function unpackPartitions(partitionsStr: string | undefined): Record<string, string> {
+    const rt: Record<string, string> = {};
+    for (const pair of (partitionsStr ?? '').split(',').map(v => v.trim()).filter(v => v.length > 0)) {
+        const [ showUuid, partition ] = pair.split(':');
+        rt[showUuid] = partition;
+    }
+    return rt;
+}
+
+export function packPartitions(partitions: Record<string, string>): string {
+    return Object.entries(partitions).map(v => v.join(':')).join(',');
+}
+
+export async function computeShowDailyDownloads({ date, mode, showUuids, partition, partitions }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
     showUuids = checkIncludeExclude(mode, showUuids);
+    const partitionShowUuid = computePartitionShowUuid(partition, partitions);
 
     const mapText = await statsBlobs.get(computeDailyMapKey(date, partition), 'text');
     if (!mapText) throw new Error(`No daily downloads map for ${date}`);
@@ -291,7 +311,7 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
     let index = 0;
     const showChunks: Record<string, Uint8Array[]> = {};
     for await (const chunk of allChunks) {
-        const showUuids = indexToShowUuids.get(index);
+        const showUuids = partitionShowUuid ? [ partitionShowUuid] : indexToShowUuids.get(index);
         if (showUuids) {
             const chunkWithNewline = concatByteArrays(chunk, newline);
             for (const showUuid of showUuids) {
@@ -312,7 +332,7 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
         return statsBlobs.put(computeShowDailyKey({ date, showUuid }), v);
     })));
 
-    return { date, mode, showUuids, millis: Date.now() - start };
+    return { date, mode, showUuids, partitionShowUuid, millis: Date.now() - start };
 }
 
 export function computeShowDailyKey({ date, showUuid }: { date: string, showUuid: string }): string {
@@ -353,6 +373,7 @@ interface DailyDownloadsMap {
 interface ShowMap {
     readonly rowIndexes: number[];
     contentLength: number;
+    allRows?: boolean; // every row, rowIndexes will be empty to save space
 }
 
 //
@@ -410,4 +431,10 @@ function checkIncludeExclude(mode: 'include' | 'exclude', showUuids: string[]): 
     showUuids = distinct(showUuids);
     if (mode === 'include' && showUuids.length === 0) throw new Error(`Provide at least one show-uuid`);
     return showUuids;
+}
+
+function computePartitionShowUuid(partition: string | undefined, partitions: Record<string, string>): string | undefined {
+    if (partition === undefined) return undefined;
+    if (Object.keys(partitions).length === 0) throw new Error(`Expected partitions for partition call`);
+    return Object.entries(partitions).filter(v => v[1] === partition).length === 1 ? Object.entries(partitions).filter(v => v[1] === partition)[0][0] : undefined;
 }
