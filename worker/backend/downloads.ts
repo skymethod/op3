@@ -216,7 +216,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
                     showMaps.set(showUuid, showMap);
                 }
                 if (partitionShowUuid === showUuid) {
-                    showMap.allRows = true;
+                    showMap.allRows = (showMap.allRows ?? 1) + 1;
                 } else {
                     showMap.rowIndexes.push(rowIndex);
                 }
@@ -327,7 +327,8 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
     }
 
     await Promise.all(Object.entries(showChunks).map(([ showUuid, chunks ]) => write(chunks, v => {
-        const expectedRows = map.showMaps[showUuid].rowIndexes.length;
+        const showMap = map.showMaps[showUuid];
+        const expectedRows = typeof showMap.allRows === 'number' ? showMap.allRows : showMap.rowIndexes.length;
         if (expectedRows !== chunks.length) throw new Error(`Expected ${expectedRows} rows for show ${showUuid}, found ${chunks.length}`);
         return statsBlobs.put(computeShowDailyKey({ date, showUuid }), v);
     })));
@@ -373,7 +374,7 @@ interface DailyDownloadsMap {
 interface ShowMap {
     readonly rowIndexes: number[];
     contentLength: number;
-    allRows?: boolean; // every row, rowIndexes will be empty to save space
+    allRows?: number; // what rowIndexes.length would have been, rowIndexes will be empty to save space
 }
 
 //
