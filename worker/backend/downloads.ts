@@ -190,7 +190,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
 
             // associate download with a show & episode
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            if (showUuid && partitions[showUuid] !== partition) continue;
+            if (partitions[showUuid ?? ''] !== partition) continue;
 
             // associate download with bot type
             const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
@@ -311,7 +311,7 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
     let index = 0;
     const showChunks: Record<string, Uint8Array[]> = {};
     for await (const chunk of allChunks) {
-        const showUuids = partitionShowUuid ? [ partitionShowUuid] : indexToShowUuids.get(index);
+        const showUuids = partitionShowUuid ? [ partitionShowUuid ] : indexToShowUuids.get(index);
         if (showUuids) {
             const chunkWithNewline = concatByteArrays(chunk, newline);
             for (const showUuid of showUuids) {
