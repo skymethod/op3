@@ -128,7 +128,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
     }
     const encoder = new TextEncoder();
     const hourlyColumns: Record<string, { chunksLength: number, contentLength: number, millis: number }> = {};
-    const hourlyHashes: Record<string, { downloads: number, chunksLength: number, contentLength: number, millis: number }> = {};
+    const hourlyHashes: Record<string, { hashes: number, hashChunksLengths: number, contentLength: number, millis: number }> = {};
     let hours = 0;
     let rows = 0;
 
@@ -202,17 +202,16 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
         }
         if (downloads.size > 0) {
             const writeHashesStart = Date.now();
-            const chunks: Uint8Array[] = [];
-            let chunkLengths = 0;
+            const hashChunks: Uint8Array[] = [];
+            let hashChunksLengths = 0;
             for (const hash of downloads) {
                 const chunk = encoder.encode(hash + '\n');
-                chunks.push(chunk); chunkLengths += chunk.length;
+                hashChunks.push(chunk); hashChunksLengths += chunk.length;
             }
-            const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyDownloadHashesKey(hour), v));
-            hourlyHashes[hour] = { downloads: downloads.size, chunksLength, contentLength, millis: Date.now() - writeHashesStart };
+            const { contentLength } = await write(hashChunks, v => statsBlobs.put(computeHourlyDownloadHashesKey(hour), v));
+            hourlyHashes[hour] = { hashes: downloads.size, hashChunksLengths, contentLength, millis: Date.now() - writeHashesStart };
         }
         consoleInfo('downloads', `${tag} finish: ${JSON.stringify(hourlyColumns[hour])}`);
-        if (hourNum === endHour) break;
     }
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
 }
