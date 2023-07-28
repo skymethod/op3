@@ -177,6 +177,10 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             const destinationServerUrl = computeChainDestinationUrl(serverUrl);
             if (destinationServerUrl === undefined) continue;
 
+            // associate download with a show & episode
+            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+            if (partitions[showUuid ?? ''] !== partition) continue;
+
             // optimized, affects CPU + mem limits if done naively
             const arr1 = encoder.encode(destinationServerUrl)
             const arr2 = encoder.encode(audienceId);
@@ -187,10 +191,6 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
 
             if (downloads.has(download)) continue;
             downloads.add(download);
-
-            // associate download with a show & episode
-            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            if (partitions[showUuid ?? ''] !== partition) continue;
 
             // associate download with bot type
             const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
