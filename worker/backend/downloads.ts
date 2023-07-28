@@ -10,6 +10,7 @@ import { RpcClient } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { yieldTsvFromStream } from '../streams.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
+import { consoleInfo } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
@@ -94,7 +95,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 }
 
 // process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
-export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }: { date: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
 
@@ -111,7 +112,7 @@ export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }:
 
     const downloads = new Set<string>();
     const encoder = new TextEncoder();
-    const hourlyColumns: Record<string, { contentLength: number, millis: number }> = {};
+    const hourlyColumns: Record<string, { chunksLength: number, contentLength: number, millis: number }> = {};
     let hours = 0;
     let rows = 0;
 
@@ -119,14 +120,16 @@ export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }:
 
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
+        consoleInfo('downloads', `computeHourlyShowColumns start ${hour}${skipWrite ? ` skip write` : ''}`);
         const key = computeHourlyKey(hour);
         const stream = await statsBlobs.get(key, 'stream');
         if (!stream) continue;
         hours++;
 
         const chunks: Uint8Array[] = [];
-        chunks.push(encoder.encode(`.start\n`));
-
+        let chunksLength = 0;
+        chunks.push(encoder.encode(`.start\n`)); chunksLength += 7;
+      
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
             const { serverUrl, audienceId, agentType } = obj;
@@ -136,7 +139,7 @@ export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }:
 
             const destinationServerUrl = computeChainDestinationUrl(serverUrl);
             if (destinationServerUrl === undefined) {
-                chunks.push(emptyLine);
+                chunks.push(emptyLine); chunksLength++;
                 continue;
             }
 
@@ -149,20 +152,28 @@ export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }:
             const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-256', arr)));
 
             if (downloads.has(download)) {
-                chunks.push(emptyLine);
+                chunks.push(emptyLine); chunksLength++;
                 continue;
             }
             downloads.add(download);
 
             // associate download with a show & episode
             const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            chunks.push(showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine);
+            const chunk = showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine;
+            chunksLength += chunk.length;
+            chunks.push(chunk);
         }
 
         chunks.push(encoder.encode(`.end`));
-        const writeStart = Date.now();
-        const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
-        hourlyColumns[hour] = { contentLength, millis: Date.now() - writeStart };
+        chunksLength += 4;
+        if (skipWrite) {
+            hourlyColumns[hour] = { chunksLength, contentLength: 0, millis: 0 };
+        } else {
+            const writeStart = Date.now();
+            const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
+            hourlyColumns[hour] = { chunksLength, contentLength, millis: Date.now() - writeStart };
+        }
+        consoleInfo('downloads', `computeHourlyShowColumns finish ${hour}${skipWrite ? ` skip write` : ''} ${JSON.stringify(hourlyColumns[hour])}`);
     }
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, cache: cache.size };
 }
