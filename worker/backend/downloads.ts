@@ -18,6 +18,7 @@ import { computeBotType } from './bots.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
+// queries crl for an hour's worth of hits, saves one hourly downloads blob (unassigned to shows)
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
 
@@ -90,6 +91,80 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyKey(hour), v));
 
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
+}
+
+// process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
+export async function computeHourlyShowColumns({ date, statsBlobs, lookupShow }: { date: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+    const start = Date.now();
+    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+
+    const cache = new Map<string, { showUuid?: string, episodeId?: string }>();
+    const lookupShowCached = (function() {
+        return async (url: string) => {
+            const existing = cache.get(url);
+            if (existing) return existing;
+            const result = await lookupShow(url);
+            cache.set(url, result ?? {});
+            return result ?? {};
+        }
+    })();
+
+    const downloads = new Set<string>();
+    const encoder = new TextEncoder();
+    const hourlyColumns: Record<string, { contentLength: number, millis: number }> = {};
+    let hours = 0;
+    let rows = 0;
+
+    const emptyLine = encoder.encode(`\n`);
+
+    for (let hourNum = 0; hourNum < 24; hourNum++) {
+        const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
+        const key = computeHourlyKey(hour);
+        const stream = await statsBlobs.get(key, 'stream');
+        if (!stream) continue;
+        hours++;
+
+        const chunks: Uint8Array[] = [];
+        chunks.push(encoder.encode(`.start\n`));
+
+        for await (const obj of yieldTsvFromStream(stream)) {
+            rows++;
+            const { serverUrl, audienceId, agentType } = obj;
+            if (serverUrl === undefined) throw new Error(`Undefined serverUrl`);
+            if (audienceId === undefined) throw new Error(`Undefined audienceId`);
+            if (agentType === undefined) throw new Error(`Undefined agentType`);
+
+            const destinationServerUrl = computeChainDestinationUrl(serverUrl);
+            if (destinationServerUrl === undefined) {
+                chunks.push(emptyLine);
+                continue;
+            }
+
+            // optimized, affects CPU + mem limits if done naively
+            const arr1 = encoder.encode(destinationServerUrl)
+            const arr2 = encoder.encode(audienceId);
+            const arr = new Uint8Array(arr1.length + arr2.length);
+            arr.set(arr1);
+            arr.set(arr2, arr1.length);
+            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-256', arr)));
+
+            if (downloads.has(download)) {
+                chunks.push(emptyLine);
+                continue;
+            }
+            downloads.add(download);
+
+            // associate download with a show & episode
+            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+            chunks.push(showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine);
+        }
+
+        chunks.push(encoder.encode(`.end`));
+        const writeStart = Date.now();
+        const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
+        hourlyColumns[hour] = { contentLength, millis: Date.now() - writeStart };
+    }
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, cache: cache.size };
 }
 
 export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
@@ -166,7 +241,6 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
         if (!stream) continue;
         hours++;
 
-        
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
             const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags } = obj;
@@ -380,6 +454,10 @@ interface ShowMap {
 //
 
 const hexDigits = [...Array(0x100).keys()].map(v => v.toString(16).padStart(2, '0'));
+
+function computeHourlyShowColumnKey(hour: string) {
+    return `downloads/hourly/${hour}.show-column.txt`;
+}
 
 function computeDailyKey(date: string, partition: string | undefined): string {
     return `downloads/daily/${date}${typeof partition === 'string' ? `.${partition}` : ''}.tsv`;

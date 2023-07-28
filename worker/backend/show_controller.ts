@@ -12,7 +12,7 @@ import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Blobs } from './blobs.ts';
-import { computeDailyDownloads, computeHourlyDownloads, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
+import { computeDailyDownloads, computeHourlyDownloads, computeHourlyShowColumns, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowPartitionsRecord, isShowRecord, isValidPartition, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowPartitionsRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
@@ -296,7 +296,7 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date } = parameters;
+            const { hour, date, type } = parameters;
 
             // compute hourly download tsv
             if (typeof hour === 'string') {
@@ -307,6 +307,14 @@ export class ShowController {
                 const { rpcClient, statsBlobs } = this;
                 const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
                 return { results: [ result ] };
+            }
+
+            // compute hourly show columns
+            if (typeof date === 'string' && type === 'show-columns') {
+                const { statsBlobs } = this;
+                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
+                const result = await computeHourlyShowColumns({ date, statsBlobs, lookupShow });
+                return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
 
             // compute daily download tsv
