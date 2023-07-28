@@ -312,11 +312,12 @@ export class ShowController {
             // compute hourly show columns
             if (typeof date === 'string' && type === 'show-columns') {
                 const { statsBlobs } = this;
-                const { skip = '' } = parameters;
+                const { skip = '', hashAlg } = parameters;
                 const skipWrite = skip.includes('write');
+                const skipLookup = skip.includes('lookup');
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
                 consoleInfo('sc-show-columns', `lookupShowBulk: ${JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids })}`);
-                const result = await computeHourlyShowColumns({ date, skipWrite, statsBlobs, lookupShow });
+                const result = await computeHourlyShowColumns({ date, skipWrite, skipLookup, hashAlg, statsBlobs, lookupShow });
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
 

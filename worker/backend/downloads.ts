@@ -95,7 +95,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 }
 
 // process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
-export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, hashAlg = 'SHA-256', statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, skipLookup?: boolean, hashAlg?: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
 
@@ -120,7 +120,8 @@ export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lo
 
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
-        consoleInfo('downloads', `computeHourlyShowColumns start ${hour}${skipWrite ? ` skip write` : ''}`);
+        const tag = `computeHourlyShowColumns ${hour} ${hashAlg}${skipWrite ? ` skipWrite` : ''}${skipLookup ? ` skipLookup` : ''}`;
+        consoleInfo('downloads', `${tag} start`);
         const key = computeHourlyKey(hour);
         const stream = await statsBlobs.get(key, 'stream');
         if (!stream) continue;
@@ -149,7 +150,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lo
             const arr = new Uint8Array(arr1.length + arr2.length);
             arr.set(arr1);
             arr.set(arr2, arr1.length);
-            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-256', arr)));
+            const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
 
             if (downloads.has(download)) {
                 chunks.push(emptyLine); chunksLength++;
@@ -157,11 +158,16 @@ export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lo
             }
             downloads.add(download);
 
-            // associate download with a show & episode
-            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
-            const chunk = showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine;
-            chunksLength += chunk.length;
-            chunks.push(chunk);
+            if (skipLookup) {
+                chunks.push(emptyLine); chunksLength++;
+                continue;
+            } else {
+                // associate download with a show & episode
+                const { showUuid, episodeId } = await lookupShowCached(serverUrl);
+                const chunk = showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine;
+                chunksLength += chunk.length;
+                chunks.push(chunk);
+            }
         }
 
         chunks.push(encoder.encode(`.end`));
@@ -173,7 +179,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, statsBlobs, lo
             const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
             hourlyColumns[hour] = { chunksLength, contentLength, millis: Date.now() - writeStart };
         }
-        consoleInfo('downloads', `computeHourlyShowColumns finish ${hour}${skipWrite ? ` skip write` : ''} ${JSON.stringify(hourlyColumns[hour])}`);
+        consoleInfo('downloads', `${tag} finish: ${JSON.stringify(hourlyColumns[hour])}`);
     }
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, cache: cache.size };
 }
