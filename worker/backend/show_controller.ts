@@ -315,9 +315,11 @@ export class ShowController {
                 const { skip = '', hashAlg } = parameters;
                 const skipWrite = skip.includes('write');
                 const skipLookup = skip.includes('lookup');
-                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
+                const skipDownloads = skip.includes('downloads');
+                const skipBulk = skip.includes('bulk');
+                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = skipBulk ? { lookupShow: () => Promise.resolve(undefined), feedRecordIdsToShowUuids: undefined, preloadMillis: undefined, matchUrls: undefined, querylessMatchUrls: undefined} : await lookupShowBulk(storage);
                 consoleInfo('sc-show-columns', `lookupShowBulk: ${JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids })}`);
-                const result = await computeHourlyShowColumns({ date, skipWrite, skipLookup, hashAlg, statsBlobs, lookupShow });
+                const result = await computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg, statsBlobs, lookupShow });
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
 

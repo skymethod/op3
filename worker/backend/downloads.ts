@@ -95,7 +95,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 }
 
 // process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
-export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, hashAlg = 'SHA-256', statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, skipLookup?: boolean, hashAlg?: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg = 'SHA-256', statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, skipLookup?: boolean, skipDownloads?: boolean, hashAlg?: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
 
@@ -121,7 +121,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, ha
     for (let hourNum = 0; hourNum < 24; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
         const tag = `computeHourlyShowColumns ${hour} ${hashAlg}${skipWrite ? ` skipWrite` : ''}${skipLookup ? ` skipLookup` : ''}`;
-        consoleInfo('downloads', `${tag} start`);
+        consoleInfo('downloads', `${tag} start downloads=${downloads.size}`);
         const key = computeHourlyKey(hour);
         const stream = await statsBlobs.get(key, 'stream');
         if (!stream) continue;
@@ -144,19 +144,24 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, ha
                 continue;
             }
 
-            // optimized, affects CPU + mem limits if done naively
-            const arr1 = encoder.encode(destinationServerUrl)
-            const arr2 = encoder.encode(audienceId);
-            const arr = new Uint8Array(arr1.length + arr2.length);
-            arr.set(arr1);
-            arr.set(arr2, arr1.length);
-            const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
-
-            if (downloads.has(download)) {
+            if (skipDownloads) {
                 chunks.push(emptyLine); chunksLength++;
                 continue;
+            } else {
+                // optimized, affects CPU + mem limits if done naively
+                const arr1 = encoder.encode(destinationServerUrl)
+                const arr2 = encoder.encode(audienceId);
+                const arr = new Uint8Array(arr1.length + arr2.length);
+                arr.set(arr1);
+                arr.set(arr2, arr1.length);
+                const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
+
+                if (downloads.has(download)) {
+                    chunks.push(emptyLine); chunksLength++;
+                    continue;
+                }
+                downloads.add(download);
             }
-            downloads.add(download);
 
             if (skipLookup) {
                 chunks.push(emptyLine); chunksLength++;
