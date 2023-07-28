@@ -183,7 +183,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             const arr = new Uint8Array(arr1.length + arr2.length);
             arr.set(arr1);
             arr.set(arr2, arr1.length);
-            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-256', arr)));
+            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-1', arr)));
 
             if (downloads.has(download)) continue;
             downloads.add(download);
