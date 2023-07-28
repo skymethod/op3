@@ -19,7 +19,7 @@ import { computeBotType } from './bots.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
-// queries crl for an hour's worth of hits, saves one hourly downloads blob (unassigned to shows)
+// phase 1: query crl for an hour's worth of hits, save one hourly downloads blob (unassigned to shows)
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
     const start = Date.now();
 
@@ -94,11 +94,12 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
 }
 
-// process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
+// phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
 type ComputeHourlyShowColumnsOpts = { 
     date: string, startHour?: number, endHour?: number, partition?: string, partitions: Record<string, string>, skipWrite?: boolean, skipLookup?: boolean, skipDownloads?: boolean, hashAlg?: string, statsBlobs: Blobs, 
     lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined>
 }
+
 export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg = 'SHA-1', statsBlobs, lookupShow , startHour = 0, endHour = 23, partition, partitions }: ComputeHourlyShowColumnsOpts) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
@@ -149,7 +150,6 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
 
         const chunks: Uint8Array[] = [];
         let chunksLength = 0;
-        chunks.push(encoder.encode(`.start\n`)); chunksLength += 7;
       
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
@@ -174,34 +174,31 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
                     chunks.push(emptyLine); chunksLength++;
                     continue;
                 }
-                const chunk = showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine;
-                chunksLength += chunk.length;
-                chunks.push(chunk);
-            }
 
-            if (skipDownloads) {
-                chunks.push(emptyLine); chunksLength++;
-                continue;
-            } else {
-                // optimized, affects CPU + mem limits if done naively
-                const arr1 = encoder.encode(destinationServerUrl)
-                const arr2 = encoder.encode(audienceId);
-                const arr = new Uint8Array(arr1.length + arr2.length);
-                arr.set(arr1);
-                arr.set(arr2, arr1.length);
-                const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
-
-                if (downloads.has(download)) {
+                if (skipDownloads) {
                     chunks.push(emptyLine); chunksLength++;
                     continue;
-                }
-                downloads.add(download);
-            }
+                } else {
+                    // optimized, affects CPU + mem limits if done naively
+                    const arr1 = encoder.encode(destinationServerUrl)
+                    const arr2 = encoder.encode(audienceId);
+                    const arr = new Uint8Array(arr1.length + arr2.length);
+                    arr.set(arr1);
+                    arr.set(arr2, arr1.length);
+                    const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
+    
+                    if (downloads.has(download)) {
+                        chunks.push(emptyLine); chunksLength++;
+                        continue;
+                    }
+                    downloads.add(download);
 
+                    const chunk = showUuid ? encoder.encode(`${showUuid ?? ''}${episodeId ?? ''}\n`) : emptyLine;
+                    chunks.push(chunk); chunksLength += chunk.length;
+                }
+            }
         }
 
-        chunks.push(encoder.encode(`.end`));
-        chunksLength += 4;
         if (skipWrite) {
             hourlyColumns[hour] = { contentLength: chunksLength, millis: 0 };
         } else {
@@ -227,6 +224,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
     return { date, startHour, endHour, partition, hashAlg, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
 }
 
+// phase 3: iterate over hourly download blobs, plus associated show columns, write out daily downloads blobs and show maps (partitioned)
 export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
 
 export function parseComputeShowDailyDownloadsRequest(date: string, parameters: Record<string, string>): ComputeDailyDownloadsRequest {
