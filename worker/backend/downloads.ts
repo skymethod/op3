@@ -224,7 +224,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
         }
         consoleInfo('downloads', `${tag} finish: ${JSON.stringify(hourlyColumns[hour])}`);
     }
-    return { date, startHour, endHour, hashAlg, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
+    return { date, startHour, endHour, partition, hashAlg, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
 }
 
 export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
