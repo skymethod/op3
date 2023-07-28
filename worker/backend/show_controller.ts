@@ -330,10 +330,9 @@ export class ShowController {
             if (typeof date === 'string') {
                 const { statsBlobs } = this;
                 const req = parseComputeShowDailyDownloadsRequest(date, parameters);
-                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = await lookupShowBulk(storage);
                 const { partitions } = await loadShowPartitions(storage);
-                const result = await computeDailyDownloads(req, { statsBlobs, partitions, lookupShow } );
-                return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
+                const result = await computeDailyDownloads(req, { statsBlobs, partitions } );
+                return { results: [ result ] };
             }
         }
 

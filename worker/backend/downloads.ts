@@ -237,22 +237,11 @@ export function parseComputeShowDailyDownloadsRequest(date: string, parameters: 
     return { date, mode, showUuids, partSizeMb, multipartMode, partition };
 }
 
-export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb, partition }: ComputeDailyDownloadsRequest, { statsBlobs, partitions, lookupShow } : { partitions: Record<string, string>, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeDailyDownloads({ date, mode, showUuids, multipartMode, partSizeMb, partition }: ComputeDailyDownloadsRequest, { statsBlobs, partitions } : { partitions: Record<string, string>, statsBlobs: Blobs }) {
     const start = Date.now();
     showUuids = checkIncludeExclude(mode, showUuids);
 
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
-
-    const lookupShowCached = (function() {
-        const cache = new Map<string, { showUuid?: string, episodeId?: string }>();
-        return async (url: string) => {
-            const existing = cache.get(url);
-            if (existing) return existing;
-            const result = await lookupShow(url);
-            cache.set(url, result ?? {});
-            return result ?? {};
-        }
-    })();
 
     let hours = 0;
     let rows = 0;
@@ -299,6 +288,11 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
         if (!stream) continue;
         hours++;
 
+        const columnStream = await statsBlobs.get(computeHourlyShowColumnKey(hour, partition), 'stream');
+        if (!columnStream) throw new Error(`Need show column for hour=${hour} partition=${partition}`);
+
+        const columnLinestream = computeLinestream(columnStream).getReader();
+
         for await (const obj of yieldTsvFromStream(stream)) {
             rows++;
             const { serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags } = obj;
@@ -306,22 +300,16 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             if (audienceId === undefined) throw new Error(`Undefined audienceId`);
             if (agentType === undefined) throw new Error(`Undefined agentType`);
 
-            const destinationServerUrl = computeChainDestinationUrl(serverUrl);
-            if (destinationServerUrl === undefined) continue;
+            const { value, done } = await columnLinestream.read();
+            if (done) throw new Error(`Unexpected column end at row ${rows}`);
 
-            // optimized, affects CPU + mem limits if done naively
-            const arr1 = encoder.encode(destinationServerUrl)
-            const arr2 = encoder.encode(audienceId);
-            const arr = new Uint8Array(arr1.length + arr2.length);
-            arr.set(arr1);
-            arr.set(arr2, arr1.length);
-            const download = fastHex(new Uint8Array(await crypto.subtle.digest('SHA-1', arr)));
+            let showUuid: string | undefined;
+            let episodeId: string | undefined;
+            if (value.length > 0) {
+                showUuid = value.substring(0, 32);
+                episodeId = value.substring(32);
+            }
 
-            if (downloads.has(download)) continue;
-            downloads.add(download);
-
-            // associate download with a show & episode
-            const { showUuid, episodeId } = await lookupShowCached(serverUrl);
             if (partitions[showUuid ?? ''] !== partition) continue;
             
             // associate download with bot type
@@ -359,6 +347,8 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
                 await multiputCurrentChunks();
             }
         }
+        const { value: _, done } = await columnLinestream.read();
+        if (!done) throw new Error(`Expected column end`);
     }
 
     let parts: number | undefined;
@@ -383,6 +373,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
     return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode, partitionShowUuid };
 }
 
+// phase 4: for a set of shows, write out show daily downloads, one per show (partitioned)
 export type ComputeShowDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], partition?: string, partitions: Record<string, string> };
 
 export function tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters }: { operationKind: string, targetPath: string, parameters?: Record<string, string> }): ComputeShowDailyDownloadsRequest | undefined {
@@ -394,19 +385,6 @@ export function tryParseComputeShowDailyDownloadsRequest({ operationKind, target
         const partitions = unpackPartitions(packedPartitions);
         return { date, mode, showUuids, partition, partitions };
     }
-}
-
-export function unpackPartitions(partitionsStr: string | undefined): Record<string, string> {
-    const rt: Record<string, string> = {};
-    for (const pair of (partitionsStr ?? '').split(',').map(v => v.trim()).filter(v => v.length > 0)) {
-        const [ showUuid, partition ] = pair.split(':');
-        rt[showUuid] = partition;
-    }
-    return rt;
-}
-
-export function packPartitions(partitions: Record<string, string>): string {
-    return Object.entries(partitions).map(v => v.join(':')).join(',');
 }
 
 export async function computeShowDailyDownloads({ date, mode, showUuids, partition, partitions }: ComputeShowDailyDownloadsRequest, statsBlobs: Blobs) {
@@ -492,6 +470,19 @@ export function fastHex(bytes: Uint8Array): string {
         rt.push(hexDigits[bytes[i]]);
     }
     return rt.join('');
+}
+
+export function unpackPartitions(partitionsStr: string | undefined): Record<string, string> {
+    const rt: Record<string, string> = {};
+    for (const pair of (partitionsStr ?? '').split(',').map(v => v.trim()).filter(v => v.length > 0)) {
+        const [ showUuid, partition ] = pair.split(':');
+        rt[showUuid] = partition;
+    }
+    return rt;
+}
+
+export function packPartitions(partitions: Record<string, string>): string {
+    return Object.entries(partitions).map(v => v.join(':')).join(',');
 }
 
 //
