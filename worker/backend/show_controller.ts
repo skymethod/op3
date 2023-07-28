@@ -312,14 +312,16 @@ export class ShowController {
             // compute hourly show columns
             if (typeof date === 'string' && type === 'show-columns') {
                 const { statsBlobs } = this;
-                const { skip = '', hashAlg } = parameters;
+                const { skip = '', hashAlg, startHour: startHourStr, endHour: endHourStr } = parameters;
+                const startHour = typeof startHourStr === 'string' ? parseInt(startHourStr) : undefined;
+                const endHour = typeof endHourStr === 'string' ? parseInt(endHourStr) : undefined;
                 const skipWrite = skip.includes('write');
                 const skipLookup = skip.includes('lookup');
                 const skipDownloads = skip.includes('downloads');
                 const skipBulk = skip.includes('bulk');
                 const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = skipBulk ? { lookupShow: () => Promise.resolve(undefined), feedRecordIdsToShowUuids: undefined, preloadMillis: undefined, matchUrls: undefined, querylessMatchUrls: undefined} : await lookupShowBulk(storage);
                 consoleInfo('sc-show-columns', `lookupShowBulk: ${JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids })}`);
-                const result = await computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg, statsBlobs, lookupShow });
+                const result = await computeHourlyShowColumns({ date, startHour, endHour, skipWrite, skipLookup, skipDownloads, hashAlg, statsBlobs, lookupShow });
                 return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
             }
 

@@ -8,7 +8,7 @@ import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { yieldTsvFromStream } from '../streams.ts';
+import { computeLinestream, yieldTsvFromStream } from '../streams.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
@@ -95,9 +95,10 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 }
 
 // process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs
-export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg = 'SHA-256', statsBlobs, lookupShow }: { date: string, skipWrite?: boolean, skipLookup?: boolean, skipDownloads?: boolean, hashAlg?: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
+export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, skipDownloads, hashAlg = 'SHA-256', statsBlobs, lookupShow , startHour = 0, endHour = 23 }: { date: string, startHour?: number, endHour?: number, skipWrite?: boolean, skipLookup?: boolean, skipDownloads?: boolean, hashAlg?: string, statsBlobs: Blobs, lookupShow: (url: string) => Promise<{ showUuid: string, episodeId?: string } | undefined> }) {
     const start = Date.now();
     if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+    if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23 || endHour < startHour) throw new Error(`Bad hours: ${startHour}-${endHour}`);
 
     const cache = new Map<string, { showUuid?: string, episodeId?: string }>();
     const lookupShowCached = (function() {
@@ -111,16 +112,31 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
     })();
 
     const downloads = new Set<string>();
+    let hashesPreloadMillis = 0;
+    let hashesPreloaded = 0;
+    if (startHour > 0) {
+        const startPreload = Date.now();
+        const loadHour = startHour - 1;
+        const hour = `${date}T${loadHour.toString().padStart(2, '0')}`;
+        const stream = await statsBlobs.get(computeHourlyDownloadHashesKey(hour), 'stream');
+        if (!stream) throw new Error(`Need ${hour} to start at ${startHour}`);
+        for await (const line of computeLinestream(stream)) {
+            if (line.length > 0) downloads.add(line);
+        }
+        hashesPreloadMillis = Date.now() - startPreload;
+        hashesPreloaded = downloads.size;
+    }
     const encoder = new TextEncoder();
     const hourlyColumns: Record<string, { chunksLength: number, contentLength: number, millis: number }> = {};
+    const hourlyHashes: Record<string, { downloads: number, chunksLength: number, contentLength: number, millis: number }> = {};
     let hours = 0;
     let rows = 0;
 
     const emptyLine = encoder.encode(`\n`);
 
-    for (let hourNum = 0; hourNum < 24; hourNum++) {
+    for (let hourNum = startHour; hourNum <= endHour; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
-        const tag = `computeHourlyShowColumns ${hour} ${hashAlg}${skipWrite ? ` skipWrite` : ''}${skipLookup ? ` skipLookup` : ''}`;
+        const tag = `computeHourlyShowColumns ${hour} ${startHour}-${endHour} ${hashAlg}${skipWrite ? ` skipWrite` : ''}${skipLookup ? ` skipLookup` : ''}`;
         consoleInfo('downloads', `${tag} start downloads=${downloads.size}`);
         const key = computeHourlyKey(hour);
         const stream = await statsBlobs.get(key, 'stream');
@@ -184,9 +200,21 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
             const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
             hourlyColumns[hour] = { chunksLength, contentLength, millis: Date.now() - writeStart };
         }
+        if (downloads.size > 0) {
+            const writeHashesStart = Date.now();
+            const chunks: Uint8Array[] = [];
+            let chunkLengths = 0;
+            for (const hash of downloads) {
+                const chunk = encoder.encode(hash + '\n');
+                chunks.push(chunk); chunkLengths += chunk.length;
+            }
+            const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyDownloadHashesKey(hour), v));
+            hourlyHashes[hour] = { downloads: downloads.size, chunksLength, contentLength, millis: Date.now() - writeHashesStart };
+        }
         consoleInfo('downloads', `${tag} finish: ${JSON.stringify(hourlyColumns[hour])}`);
+        if (hourNum === endHour) break;
     }
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, cache: cache.size };
+    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
 }
 
 export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
@@ -479,6 +507,10 @@ const hexDigits = [...Array(0x100).keys()].map(v => v.toString(16).padStart(2, '
 
 function computeHourlyShowColumnKey(hour: string) {
     return `downloads/hourly/${hour}.show-column.txt`;
+}
+
+function computeHourlyDownloadHashesKey(hour: string) {
+    return `downloads/hourly/${hour}.hashes.txt`;
 }
 
 function computeDailyKey(date: string, partition: string | undefined): string {
