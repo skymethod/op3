@@ -50,7 +50,7 @@ export function tryParseClientParams(url: string): { serverUrl: string, clientPa
 
 const TUNEIN = new Set([ 'DIST', 'TGT', 'maxServers' ]); // ?DIST=TuneIn&TGT=TuneIn&maxServers=2
 
-const OTHERS = new Set(['played_on', 'source', 'client_source', 'referrer', 'ref', 'from', 'src', 'acid', 'av', 'lo', 'consumer_key', 'country', 'fbclid' ]);
+const OTHERS = new Set(['played_on', 'source', 'client_source', 'referrer', 'ref', 'from', 'src', 'acid', 'av', 'lo', 'consumer_key', 'country', 'fbclid', 'rss_browser' ]);
 
 const isAdsWizz = (v: string) => [ 'companionAds', 'calendar', 'sdkiad' ].includes(v) || v.startsWith('aw_');
 

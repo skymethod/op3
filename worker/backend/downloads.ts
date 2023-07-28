@@ -127,8 +127,8 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
         hashesPreloaded = downloads.size;
     }
     const encoder = new TextEncoder();
-    const hourlyColumns: Record<string, { chunksLength: number, contentLength: number, millis: number }> = {};
-    const hourlyHashes: Record<string, { hashes: number, hashChunksLengths: number, contentLength: number, millis: number }> = {};
+    const hourlyColumns: Record<string, { contentLength: number, millis: number }> = {};
+    const hourlyHashes: Record<string, { hashes: number, contentLength: number, millis: number }> = {};
     let hours = 0;
     let rows = 0;
 
@@ -194,11 +194,12 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
         chunks.push(encoder.encode(`.end`));
         chunksLength += 4;
         if (skipWrite) {
-            hourlyColumns[hour] = { chunksLength, contentLength: 0, millis: 0 };
+            hourlyColumns[hour] = { contentLength: chunksLength, millis: 0 };
         } else {
             const writeStart = Date.now();
             const { contentLength } = await write(chunks, v => statsBlobs.put(computeHourlyShowColumnKey(hour), v));
-            hourlyColumns[hour] = { chunksLength, contentLength, millis: Date.now() - writeStart };
+            if (contentLength !== chunksLength) throw new Error(`Wrote ${contentLength} bytes of hashes, expected ${chunksLength}`);
+            hourlyColumns[hour] = { contentLength, millis: Date.now() - writeStart };
         }
         if (downloads.size > 0) {
             const writeHashesStart = Date.now();
@@ -209,11 +210,12 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
                 hashChunks.push(chunk); hashChunksLengths += chunk.length;
             }
             const { contentLength } = await write(hashChunks, v => statsBlobs.put(computeHourlyDownloadHashesKey(hour), v));
-            hourlyHashes[hour] = { hashes: downloads.size, hashChunksLengths, contentLength, millis: Date.now() - writeHashesStart };
+            if (contentLength !== hashChunksLengths) throw new Error(`Wrote ${contentLength} bytes of hashes, expected ${hashChunksLengths}`);
+            hourlyHashes[hour] = { hashes: downloads.size, contentLength, millis: Date.now() - writeHashesStart };
         }
         consoleInfo('downloads', `${tag} finish: ${JSON.stringify(hourlyColumns[hour])}`);
     }
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
+    return { date, startHour, endHour, hashAlg, millis: Date.now() - start, hours, rows, downloads: downloads.size, hourlyColumns, hourlyHashes, cache: cache.size, hashesPreloadMillis, hashesPreloaded };
 }
 
 export type ComputeDailyDownloadsRequest = { date: string, mode: 'include' | 'exclude', showUuids: string[], multipartMode: 'bytes' | 'stream', partSizeMb: number, partition?: string };
