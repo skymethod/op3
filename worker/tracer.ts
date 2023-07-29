@@ -75,6 +75,7 @@ interface Redirect {
     readonly referer: string;
     readonly hasForwarded: boolean;
     readonly hasXForwardedFor: boolean;
+    readonly ipAddressShape: string;
 }
 
 export interface ValidRedirect extends Redirect {

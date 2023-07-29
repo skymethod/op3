@@ -150,12 +150,13 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
         const { backendNamespace } = env;
         const { method } = request;
         let colo = 'XXX';
+        let rawIpAddress = '';
         try {
             IsolateId.log();
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
             
+            rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
             if (redirectRequest.kind === 'valid' && !banned) {
-                const rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
@@ -186,7 +187,8 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const referer = headers.get('referer') ?? '<missing>';
                 const hasForwarded = headers.has('forwarded');
                 const hasXForwardedFor = headers.has('x-forwarded-for');
-                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor };
+                const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
+                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor, ipAddressShape };
             });
         }
     })());
