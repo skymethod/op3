@@ -188,7 +188,8 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const hasForwarded = headers.has('forwarded');
                 const hasXForwardedFor = headers.has('x-forwarded-for');
                 const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
-                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor, ipAddressShape };
+                const ipAddressVersion = /^n{1,3}\.n{1,3}\.n{1,3}\.n{1,3}$/.test(ipAddressShape) ? 4 : ipAddressShape.includes(':') ? 6 : 0;
+                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor, ipAddressShape, ipAddressVersion };
             });
         }
     })());
