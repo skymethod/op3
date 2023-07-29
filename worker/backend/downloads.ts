@@ -207,10 +207,11 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
             if (contentLength !== chunksLength) throw new Error(`Wrote ${contentLength} bytes of hashes, expected ${chunksLength}`);
             hourlyColumns[hour] = { contentLength, millis: Date.now() - writeStart };
         }
-        if (downloads.size > 0) {
+        if (!skipWrite && !skipDownloads && !skipLookup) {
             const writeHashesStart = Date.now();
             const hashChunks: Uint8Array[] = [];
             let hashChunksLengths = 0;
+            // file must exist, write even if 0 downloads!
             for (const hash of downloads) {
                 const chunk = encoder.encode(hash + '\n');
                 hashChunks.push(chunk); hashChunksLengths += chunk.length;
@@ -245,7 +246,6 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
 
     let hours = 0;
     let rows = 0;
-    const downloads = new Set<string>();
     const encoder = new TextEncoder();
     const chunks: Uint8Array[] = [];
     let chunksLength = 0;
@@ -370,7 +370,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
     const map: DailyDownloadsMap = { date, etag, contentLength: totalContentLength, showMaps: Object.fromEntries(showMaps) };
     await statsBlobs.put(computeDailyMapKey(date, partition), JSON.stringify(map));
     const showSizes = Object.fromEntries(sortBy([...showMaps].map(([ showUuid, v ]) => ([ showUuid, v.contentLength ])), v => v[1] as number).reverse());
-    return { date, millis: Date.now() - start, hours, rows, downloads: downloads.size, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode, partitionShowUuid };
+    return { date, millis: Date.now() - start, hours, rows, contentLength: totalContentLength, showSizes, parts, multiputParts, multipartMode, partitionShowUuid };
 }
 
 // phase 4: for a set of shows, write out show daily downloads, one per show (partitioned)
