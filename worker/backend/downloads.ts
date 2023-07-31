@@ -406,6 +406,7 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
 
     const indexToShowUuids = new Map<number, string[]>();
     for (const [ showUuid, showMap ] of Object.entries(map.showMaps)) {
+        if (!showUuids.includes(showUuid)) continue;
         for (const index of showMap.rowIndexes) {
             let showUuids = indexToShowUuids.get(index);
             if (!showUuids) {
