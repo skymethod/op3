@@ -8421,7 +8421,7 @@ const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC'
 });
 const withCommas = new Intl.NumberFormat('en-US');
-const makeDownloadsGraph = ({ hourlyDownloads , episodes , debug  })=>{
+const makeDownloadsGraph = ({ hourlyDownloads , episodes , episodeHourlyDownloads , debug  })=>{
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
         element('downloads-graph'),
         element('downloads-graph-previous'),
@@ -8486,7 +8486,7 @@ const makeDownloadsGraph = ({ hourlyDownloads , episodes , debug  })=>{
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, showEpisodeMarkers ? episodes : undefined);
     }
     function update() {
         downloadsGraphGranularitySpan.textContent = ({
@@ -8566,7 +8566,7 @@ function computeDownloads(hourlyDownloads, granularity) {
     }
     return rt;
 }
-function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) {
+function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) {
     const rt = new Map();
     for (const ep of episodes){
         const { firstHour , pubdate  } = ep;
@@ -8576,16 +8576,17 @@ function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) {
         if (!pubdate) continue;
         const diff = new Date(`${firstHour}:00:00.000Z`).getTime() - new Date(pubdate).getTime();
         if (diff > 1000 * 60 * 60 * 24 * 5) continue;
+        if (Object.keys(episodeHourlyDownloads[ep.id] ?? {}).length === 0) continue;
         const records = rt.get(index) ?? [];
         rt.set(index, records);
         records.push(ep);
     }
     return rt;
 }
-function drawDownloadsChart(canvas, hourlyDownloads, granularity, debug, episodes) {
+function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, granularity, debug, episodes) {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
-    const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) : undefined;
+    const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
     const ctx = canvas.getContext('2d');
     const data = {
@@ -10277,6 +10278,7 @@ const app = await (async ()=>{
     makeDownloadsGraph({
         hourlyDownloads,
         episodes: episodesWithFirstHours,
+        episodeHourlyDownloads,
         debug
     });
     const exportDownloads = makeExportDownloads({

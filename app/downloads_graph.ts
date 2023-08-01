@@ -8,9 +8,9 @@ import { computeMonthName, pluralize } from './util.ts';
 
 type EpisodeInfoAndFirstHour = EpisodeInfo & { firstHour: string };
 
-type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], debug: boolean };
+type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], episodeHourlyDownloads: Record<string, Record<string, number>>, debug: boolean };
 
-export const makeDownloadsGraph = ({ hourlyDownloads, episodes, debug }: Opts) => {
+export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug }: Opts) => {
 
     const [ 
         downloadsGraphCanvas,
@@ -90,7 +90,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodes, debug }: Opts) =
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, granularity, debug, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, showEpisodeMarkers ? episodes : undefined);
     }
 
     function update() {
@@ -159,7 +159,7 @@ function computeDownloads(hourlyDownloads: Record<string, number>, granularity: 
     return rt;
 }
 
-function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], downloadLabels: string[], granularity: Granularity): Map<number, EpisodeInfoAndFirstHour[]> {
+function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], downloadLabels: string[], granularity: Granularity, episodeHourlyDownloads: Record<string, Record<string, number>>): Map<number, EpisodeInfoAndFirstHour[]> {
     const rt = new Map<number, EpisodeInfoAndFirstHour[]>();
     for (const ep of episodes) {
         const { firstHour, pubdate } = ep;
@@ -169,6 +169,7 @@ function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], download
         if (!pubdate) continue;
         const diff = new Date(`${firstHour}:00:00.000Z`).getTime() - new Date(pubdate).getTime();
         if (diff > 1000 * 60 * 60 * 24 * 5) continue;
+        if (Object.keys(episodeHourlyDownloads[ep.id] ?? {}).length === 0) continue;
         const records = rt.get(index) ?? [];
         rt.set(index, records);
         records.push(ep);
@@ -176,10 +177,10 @@ function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], download
     return rt;
 }
 
-function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, granularity: Granularity, debug: boolean, episodes?: EpisodeInfoAndFirstHour[]): Chart {
+function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, episodeHourlyDownloads: Record<string, Record<string, number>>, granularity: Granularity, debug: boolean, episodes?: EpisodeInfoAndFirstHour[]): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
-    const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity) : undefined;
+    const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
 
     const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
 

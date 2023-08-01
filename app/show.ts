@@ -99,7 +99,7 @@ const app = await (async () => {
     }
 
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
-    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, debug });
+    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
     makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate });
 
