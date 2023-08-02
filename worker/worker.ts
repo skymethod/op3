@@ -226,6 +226,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     IsolateId.log();
     const { origin, hostname, pathname, searchParams } = new URL(request.url);
     const { method, headers } = request;
+    const acceptsHtml = /html/i.test(headers.get('accept') ?? '');
     const adminTokens = parseStringSet(env.adminTokens);
     const previewTokens = parseStringSet(env.previewTokens);
     const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
@@ -238,6 +239,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/demo') return computeDemoShowResponse({ origin });
     if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
+    if (method === 'GET' && pathname === '/api' && acceptsHtml) return new Response('', { status: 302, headers: { location: '/api/docs' } });
     if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;

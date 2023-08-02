@@ -1,4 +1,7 @@
+import { importText } from '../deps.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
+const apiDocsHead = await importText(import.meta.url, '../static/api_docs_head.htm');
+const apiDocsHtml = await importText(import.meta.url, '../static/api_docs_html.htm');
 
 export function computeApiDocsResponse(opts: { instance: string, origin: string, cfAnalyticsToken: string | undefined }): Response {
     const { instance, origin, cfAnalyticsToken } = opts;
@@ -23,34 +26,11 @@ const html = (origin: string, titleSuffix: string, cfAnalyticsSnippet: string) =
         background-color: #d4d4d4;
       }
     </style>
+    ${apiDocsHead}
   </head>
   <body>
-    <div id="redoc-container"></div>
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
-    <script>
-      Redoc.init('/api/docs/swagger.json', {
-        theme: {
-          rightPanel: {
-            backgroundColor: '#171717',
-          },
-          sidebar: {
-            backgroundColor: '#171717',
-            textColor: '#d4d4d4',
-            activeTextColor: '#ea580c',
-          },
-          colors: {
-            primary: {
-              main: '#c2410c', // links
-            },
-          },
-          typography: {
-            code: {
-              color: '#ea580c',
-            }
-          }
-        }
-      }, document.getElementById('redoc-container'));
-    </script>
+    ${apiDocsHtml.replaceAll('${ORIGIN}', origin)}
+   
     ${cfAnalyticsSnippet}
   </body>
 </html>
