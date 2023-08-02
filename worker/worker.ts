@@ -240,10 +240,10 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
     if (method === 'GET' && pathname === '/api' && acceptsHtml) return new Response('', { status: 302, headers: { location: '/api/docs' } });
-    if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/api/keys') return computeApiKeysResponse({ instance, origin, productionOrigin, cfAnalyticsToken, turnstileSitekey, previewTokens });
     const configuration = kvNamespace ? new CloudflareConfiguration(kvNamespace) : undefined;
-    if (method === 'GET' && pathname === '/api/docs/swagger.json') return await computeApiDocsSwaggerResponse({ instance, origin, previewTokens, configuration });
+    if (method === 'GET' && pathname === '/api/docs') return computeApiDocsResponse({ instance, origin, cfAnalyticsToken, configuration, previewTokens });
+    if (method === 'GET' && pathname === '/api/docs/swagger.json') return await computeApiDocsSwaggerResponse({ instance, origin, previewTokens, configuration, searchParams });
     { const r = tryParseReleasesRequest({ method, pathname, headers }); if (r) return computeReleasesResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken }); }
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });

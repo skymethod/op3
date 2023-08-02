@@ -2,10 +2,11 @@ import { Configuration } from '../configuration.ts';
 import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeNonProdWarning } from './instances.ts';
 
-export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined }): Promise<Response> {
-    const { instance, origin, previewTokens, configuration } = opts;
+export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined, searchParams: URLSearchParams }): Promise<Response> {
+    const { instance, origin, previewTokens, configuration, searchParams } = opts;
     const { host } = new URL(origin);
 
+    const templateMode = searchParams.has('template');
     const versionSuffix = instance === 'prod' ? '' : `-${instance}`;
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
@@ -14,14 +15,15 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
     let queryTopAppsForShowDescriptionSuffix = '';
 
-    const previewToken = [...previewTokens].at(0);
+    const previewToken = templateMode ? 'PREVIEW_TOKEN_TEMPLATE' : [...previewTokens].at(0);
+    let demoShowUuid: string | undefined;
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
 
         const exampleRedirectLogsApiCall = `${origin}/api/1/redirect-logs?start=-24h&format=json&token=${previewToken}`;
         queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleRedirectLogsApiCall}](${exampleRedirectLogsApiCall})`;
 
-        const demoShowUuid = await configuration?.get('demo-show-1');
+        demoShowUuid = templateMode ? 'DEMO_SHOW_UUID_TEMPLATE' : await configuration?.get('demo-show-1');
         if (demoShowUuid) {
             const exampleDownloadsApiCall = `${origin}/api/1/downloads/show/${demoShowUuid}?start=2023-02&end=2023-03&limit=10&format=json&token=${previewToken}`;
             queryDownloadsDescriptionSuffix = `\n\nFor example, to view the first ten downloads for show \`${demoShowUuid}\` in the month of February 2023 in json format:\n\n\GET [${exampleDownloadsApiCall}](${exampleDownloadsApiCall})`;
@@ -48,7 +50,8 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
 
     const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix);
-    return new Response(JSON.stringify(swagger, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
+    const json = JSON.stringify(swagger, undefined, 2);
+    return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
