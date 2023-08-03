@@ -62,6 +62,13 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
                 if (existing.isFirstTwoBytes && typeof existing.chunkIndex === 'number' && !isFirstTwoBytes) {
                     // allow any larger request to replace a prior bytes=0-1 request for this download
                     chunks.splice(existing.chunkIndex, 1);
+
+                    // adjust any existing chunk indexes after this one
+                    for (const info of Object.values(downloads)) {
+                        if (typeof info.chunkIndex === 'number' && info.chunkIndex > existing.chunkIndex) {
+                            info.chunkIndex--;
+                        }
+                    }
                 } else {
                     // duplicate download, ignore
                     continue;
