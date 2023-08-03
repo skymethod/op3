@@ -153,18 +153,30 @@ export function regionCountryFunctions(implicitCountry?: string) {
         const countryCode = regionCountry.split(',').at(-1)!.trim();
         return ({ 'T1': '🧅', 'XX': '❔' })[countryCode] ?? [...countryCode].map(v => regionalIndicators[v]).join('');
     };
+    const computeFirstRegion = (region: string) => {
+        // Yakima-Pasco-Richland-Kennwick -> Yakima
+        // Tri-Cities -> Tri-Cities
+
+        return region.replaceAll(/Tri-Cities/g, 'Tri🙄Cities').split('-')[0].trim().replaceAll('🙄', '-');
+    };
     const computeUrl = (str: string) => {
         const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
         let query = regionCountry;
+        let queryForUrl: string | undefined;
         {
             const m = /^(.*), ([A-Z]{2})$/.exec(query);
-            if (m) query = `${m[1]}, ${tryComputeRegionNameInEnglish(m[2]) ?? m[2]}`;
+            if (m) {
+                const region = m[1];
+                const country = tryComputeRegionNameInEnglish(m[2]) ?? m[2];
+                query = `${region}, ${country}`;
+                queryForUrl = `${computeFirstRegion(region)}, ${country}`;
+            }
         }
         {
             const m = /^([A-Z]{2})$/.exec(query);
             if (m) query = tryComputeRegionNameInEnglish(m[1]) ?? m[1];
         }
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryForUrl ?? query)}`;
     };
     return { computeEmoji, computeUrl };
 }

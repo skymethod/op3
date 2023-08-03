@@ -9483,18 +9483,27 @@ function regionCountryFunctions(implicitCountry) {
             ...countryCode
         ].map((v)=>regionalIndicators[v]).join('');
     };
+    const computeFirstRegion = (region)=>{
+        return region.replaceAll(/Tri-Cities/g, 'Tri🙄Cities').split('-')[0].trim().replaceAll('🙄', '-');
+    };
     const computeUrl = (str)=>{
         const regionCountry = implicitCountry ? `${str}, ${implicitCountry}` : str;
         let query = regionCountry;
+        let queryForUrl;
         {
             const m = /^(.*), ([A-Z]{2})$/.exec(query);
-            if (m) query = `${m[1]}, ${tryComputeRegionNameInEnglish(m[2]) ?? m[2]}`;
+            if (m) {
+                const region = m[1];
+                const country = tryComputeRegionNameInEnglish(m[2]) ?? m[2];
+                query = `${region}, ${country}`;
+                queryForUrl = `${computeFirstRegion(region)}, ${country}`;
+            }
         }
         {
             const m = /^([A-Z]{2})$/.exec(query);
             if (m) query = tryComputeRegionNameInEnglish(m[1]) ?? m[1];
         }
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryForUrl ?? query)}`;
     };
     return {
         computeEmoji,
@@ -9805,7 +9814,7 @@ const METROS = {
     '559': `Bluefield-Beckley-Oak Hill`,
     '560': `Raleigh-Durham-Fayettevlle`,
     '561': `Jacksonville`,
-    '563': `Grand Rapids-Kalmzoo-Battlecreek`,
+    '563': `Grand Rapids-Kalamazoo-Battlecreek`,
     '564': `Charleston-Huntington`,
     '565': `Elmira-Corning`,
     '566': `Harrisburg-Lancaster-Lebanon-York,PA`,

@@ -113,7 +113,7 @@ export const METROS: Record<string, string> = {
     '559': `Bluefield-Beckley-Oak Hill`,
     '560': `Raleigh-Durham-Fayettevlle`,
     '561': `Jacksonville`,
-    '563': `Grand Rapids-Kalmzoo-Battlecreek`,
+    '563': `Grand Rapids-Kalamazoo-Battlecreek`,
     '564': `Charleston-Huntington`,
     '565': `Elmira-Corning`,
     '566': `Harrisburg-Lancaster-Lebanon-York,PA`,
