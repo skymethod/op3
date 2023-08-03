@@ -138,6 +138,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
     let rows = 0;
 
     const emptyLine = encoder.encode(`\n`);
+    const excludedLine = encoder.encode(`x\n`);
 
     for (let hourNum = startHour; hourNum <= endHour; hourNum++) {
         const hour = `${date}T${hourNum.toString().padStart(2, '0')}`;
@@ -171,7 +172,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
                 // associate download with a show & episode
                 const { showUuid, episodeId } = await lookupShowCached(serverUrl);
                 if (partitions[showUuid ?? ''] !== partition) {
-                    chunks.push(emptyLine); chunksLength++;
+                    chunks.push(excludedLine); chunksLength += 2;
                     continue;
                 }
 
@@ -303,6 +304,8 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             const { value, done } = await columnLinestream.read();
             if (done) throw new Error(`Unexpected column end at row ${rows}`);
 
+            if (value === 'x') continue;
+            
             let showUuid: string | undefined;
             let episodeId: string | undefined;
             if (value.length > 0) {
