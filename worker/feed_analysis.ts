@@ -58,7 +58,7 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
                                             hasEnclosure = true;
                                             if (hasOp3Reference(url)) {
                                                 hasOp3Enclosure = true;
-                                            } else if (isRedirectFetchingRequired({ generator: channelGenerator })) {
+                                            } else if (isRedirectFetchingRequired({ generator: channelGenerator, enclosureUrl: url })) {
                                                 if (!hasOp3Enclosure && await hasOp3InRedirectChain(url, opts)) {
                                                     hasOp3Enclosure = true;
                                                 }

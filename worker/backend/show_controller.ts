@@ -827,7 +827,9 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     rt.push(`${Object.keys(itemsByTrimmedGuid).length} unique non-empty item guids`);
 
     // manually fetch redirect urls if necessary
-    const knownMediaUrls = isRedirectFetchingRequired({ generator: feed.generator }) ? await loadKnownMediaUrls({ feedRecordId, storage }) : undefined;
+    const computeEnclosureUrls = (item: Item): string[] => [ ...(item.enclosures ?? []).map(v => v.url).filter(isString), ...(item.alternateEnclosures ?? []).flatMap(v => v.sources ?? []).map(v => v.uri).filter(isString) ];
+    const loadMediaUrls = Object.values(itemsByTrimmedGuid).flatMap(computeEnclosureUrls).some(v => isRedirectFetchingRequired({ generator: undefined, enclosureUrl: v }));
+    const knownMediaUrls = loadMediaUrls || isRedirectFetchingRequired({ generator: feed.generator, enclosureUrl: undefined }) ? await loadKnownMediaUrls({ feedRecordId, storage }) : undefined;
     let knownRedirectUrls: Record<string, string[]> | undefined;
     if (knownMediaUrls) {
         const loaded = Object.keys(knownMediaUrls).length;

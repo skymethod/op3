@@ -48,8 +48,10 @@ export async function fetchWithRedirects(url: string, { method, userAgent, stopW
     }
 }
 
-export function isRedirectFetchingRequired({ generator }: { generator: string | undefined }): boolean {
-    return /castopod/i.test(generator ?? ''); // e.g. Castopod - https://castopod.org/
+export function isRedirectFetchingRequired({ generator, enclosureUrl }: { generator: string | undefined, enclosureUrl: string | undefined }): boolean {
+    return /castopod/i.test(generator ?? '') // e.g. Castopod - https://castopod.org/
+        || /\/s\.gum\.fm\//.test(enclosureUrl ?? '') // https://s.gum.fm/s-123123213/pdst.fm/e/traffic.omny.fm/d/clips/123123123/audio.mp3?amp;in_playlist=123123123123
+        ;
 }
 
 //
