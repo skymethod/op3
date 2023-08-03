@@ -196,7 +196,7 @@ export async function computeHourlyShowColumns({ date, skipWrite, skipLookup, sk
                     const download = fastHex(new Uint8Array(await crypto.subtle.digest(hashAlg, arr)));
     
                     if (downloads.has(download)) {
-                        chunks.push(emptyLine); chunksLength++;
+                        chunks.push(excludedLine); chunksLength += 2;
                         continue;
                     }
                     downloads.add(download);
