@@ -24,10 +24,11 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@cf6af2249c8363bfeb7a6c258b85615cb94809e0 (2023-07-26T23:21:57Z)
+// from user-agents-v2@6e03f02ba148bf0c01fb9cb64b282b53fa30897f (2023-08-04T20:32:51Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
+    'AIS VirtualListener': { type: 'bot', name: `Adswizz` },
     'Mozilla/5.0 (compatible; AhrefsBot/7.0; http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
     'Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
     'AirableBot-Podcast/1.0 (+https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
@@ -227,6 +228,8 @@ const appTests = {
     'Anytime/1.2.1 b74 (phone;android QP1A.190711.020.G965USQU9FVB2) https://github.com/amugofjava/anytime_podcast_player': { type: 'app', name: `Anytime Podcast Player` },
     'APKXDL (Linux; U; Android 4.4.4;nb_no; trlte/KTU84P) Downloader': { type: 'app', name: `APK Downloader` },
     'Apollo/11.28 CFNetwork/1085.4 Darwin/19.0.0': { type: 'app', name: `Apollo` },
+    'AirPodcasts/4022.700.8 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `Apple HomePod` },
+    'AirPodcasts/4022.700.8 CFNetwork/1410.0.2 Darwin/22.6.0': { type: 'app', name: `Apple HomePod` },
     'MessagesViewService/1.0 CFNetwork/1120 Darwin/19.0.0': { type: 'app', name: `Apple iMessage` },
     'Messages/5500 CFNetwork/1098 Darwin/19.0.0 (x86_64)': { type: 'app', name: `Apple iMessage` },
     'Messages Share Extension/5500 CFNetwork/1098 Darwin/19.0.0 (x86_64)': { type: 'app', name: `Apple iMessage` },
@@ -505,6 +508,19 @@ const appTests = {
     'Himalaya_test/55 CFNetwork/894 Darwin/17.4.0': { type: 'app', name: `Himalaya` },
     'HopeChurchCleburne/3 CFNetwork/974.2.1 Darwin/18.0.0': { type: 'app', name: `HopeChurchCleburne` },
     'HRN/1900 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Horse Radio Network` },
+    '101 ESPN/iOS 8.1.13 (iPad Air /12.5.7) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    '101.9 THE MIX/iOS 1.6.16 (iPhone XR/16.5.1) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    '92.3 WIL/iOS 4.7.11 (iPhone 12 Pro/16.5.1) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    '97.9 WRMF/iOS 1.2.11 (iPhone 11/16.5.1) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    'The Point/iOS 5.3.11 (iPhone 12 Pro Max/16.5.1) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    'TMA STL/iOS 1.0.6 (iPad Mini 5/16.1.1) HubbardApp/120': { type: 'app', name: `Hubbard Radio` },
+    '98 KUPD/Android 2.2.6 (SM-S918U/Android 13 Build TP1A.220624.014) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    'B-105.1/Android 3.2.5 (GCE x86 phone/Android 9 Build PGR1.190916.001) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    'KDUS 1060/Android 1.0.3 (Pixel 5/Android 13 Build TQ3A.230705.001) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    'KS95/Android 2.5.6 (SM-G973F/Android 12 Build SP1A.210812.016) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    'myTalk 107.1/Android 2.3.6 (cp3705A/Android 9 Build 3705A.210319.0D) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    'SKOR North/Android 3.2.6 (SM-G973U/Android 12 Build SP1A.210812.016) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
+    '105.7 The Point/Android 2.2.5 (HD1907/Android 12 Build SKQ1.220303.001) HubbardApp/20': { type: 'app', name: `Hubbard Radio` },
     'Hubhopper': { type: 'app', name: `Hubhopper` },
     'Hyper/3 CFNetwork/893.14.2 Darwin/17.3.0': { type: 'app', name: `Hyper` },
     'HyperCatcher/1': { type: 'app', name: `HyperCatcher` },
@@ -891,6 +907,7 @@ const browserTests = {
 };
 
 const deviceTests = {
+    'AirPodcasts/4022.700.8 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'device', name: `Apple HomePod` },
     'apple;apple_tv;33ddb95064d1479ab37179579af23b77;;tpapi;3.200.405': { type: 'device', name: `Apple TV` },
     'AppleCoreMedia/1.0.0.20K71 (Apple TV; U; CPU OS 16_1 like Mac OS X; en_au)': { type: 'device', name: `Apple TV` },
     'Fountain/0.5.3 ios https://www.fountain.fm': { type: 'device', name: `Apple iPhone` },

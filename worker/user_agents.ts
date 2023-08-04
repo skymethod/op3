@@ -19,12 +19,13 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@cf6af2249c8363bfeb7a6c258b85615cb94809e0 (2023-07-26T23:21:57Z)
+// from user-agents-v2@6e03f02ba148bf0c01fb9cb64b282b53fa30897f (2023-08-04T20:32:51Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
     // bots
     if (/AAABot/.test(userAgent)) return { name: `AAABot - unknown bot`, type: 'bot' };
+    if (/^AIS VirtualListener/.test(userAgent)) return { name: `Adswizz`, type: 'bot' };
     if (/AhrefsBot\//.test(userAgent)) return { name: `AhrefsBot`, type: 'bot' };
     if (/AirableBot-Podcast\//.test(userAgent)) return { name: `AirableBot`, type: 'bot' };
     if (/^AmazonNewsContentService/.test(userAgent)) return { name: `Alexa Flash Briefing cache`, type: 'bot' };
@@ -196,6 +197,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Anytime\/.*amugofjava/.test(userAgent)) return { name: `Anytime Podcast Player`, type: 'app' };
     if (/^APKXDL/.test(userAgent)) return { name: `APK Downloader`, type: 'app' };
     if (/^Apollo\//.test(userAgent)) return { name: `Apollo`, type: 'app' };
+    if (/^AirPodcasts\/\d/.test(userAgent)) return { name: `Apple HomePod`, type: 'app' };
     if (/^MessagesViewService\/|^Messages\/|^Messages Share Extension\/|^MessagesNotificationExtension\//.test(userAgent)) return { name: `Apple iMessage`, type: 'app' };
     if (/^Mail\//.test(userAgent)) return { name: `Apple Mail`, type: 'app' };
     if (/AppleNews\//.test(userAgent)) return { name: `Apple News`, type: 'app' };
@@ -383,6 +385,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Himalaya(_test)?\//.test(userAgent)) return { name: `Himalaya`, type: 'app' };
     if (/^HopeChurchCleburne\//.test(userAgent)) return { name: `HopeChurchCleburne`, type: 'app' };
     if (/^HRN\//.test(userAgent)) return { name: `Horse Radio Network`, type: 'app' };
+    if (/HubbardApp\//.test(userAgent)) return { name: `Hubbard Radio`, type: 'app' };
     if (/^Hubhopper$/.test(userAgent)) return { name: `Hubhopper`, type: 'app' };
     if (/^Hyper\//.test(userAgent)) return { name: `Hyper`, type: 'app' };
     if (/^HyperCatcher/.test(userAgent)) return { name: `HyperCatcher`, type: 'app' };
@@ -646,7 +649,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
 }
 
 export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined {
-    if (/HomePod/.test(userAgent)) return { name: `Apple HomePod`, type: 'device', category: 'smart_speaker' };
+    if (/HomePod|^AirPodcasts\/\d/.test(userAgent)) return { name: `Apple HomePod`, type: 'device', category: 'smart_speaker' };
     if (/ipad|iPad|IPAD/.test(userAgent)) return { name: `Apple iPad`, type: 'device', category: 'mobile' };
     if (/Apple TV|AppleTV|apple;apple_tv/.test(userAgent)) return { name: `Apple TV`, type: 'device', category: 'smart_tv' };
     if (/iphone|iOS|iPhone|CFNetwork| ios |phone;ios/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
