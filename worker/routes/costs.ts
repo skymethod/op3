@@ -42,6 +42,15 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2023-08-06',
+        description: 'Domains invoice',
+        cost: 54.98,
+        detail: [
+            { description: 'op3.st renew 1 year', cost: 29.99 },
+            { description: 'op3.dev renew 1 year', cost: 24.99 },
+        ]
+    },
+    {
         date: '2023-07-10',
         description: 'Cloudflare invoice',
         cost: 412.61,
