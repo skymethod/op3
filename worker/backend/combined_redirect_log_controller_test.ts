@@ -15,29 +15,18 @@ import { importHmacKey } from '../crypto.ts';
 import { isStringRecord } from '../check.ts';
 import { DoNames } from '../do_names.ts';
 import { IpAddressHashingFn } from './redirect_log_controller.ts';
+import { increment } from '../summaries.ts';
 
 Deno.test({
     name: 'process -> queryRedirectLogs -> index-and-record-storage',
     fn: async () => {
         const storage = new InMemoryDurableObjectStorage();
         await storage.put('crl.ss.test', { doName: 'test' });
-        const timestamp = computeTimestamp();
-        const ulid = generateUuid();
-        const url = `https://example.com/path/to/episode1.mp3`;
-        const uuid = generateUuid();
-        const timestampAndUuid = `${timestamp}-${uuid}`;
-        const keyBytes = await generateHmacKeyBytes();
-        const key = await importHmacKey(keyBytes);
-        const keyId = 'a';
-        const signature = await hmac(Bytes.ofUtf8('1.2.3.4'), key);
-        const packedHashedIpAddress = packHashedIpAddress(keyId, signature);
-        const hashedIpAddress = unpackHashedIpAddressHash(packedHashedIpAddress);
-        const method = 'GET';
-        const userAgent = 'test/0.0.0';
-        const referer = 'https://example.com';
-        const range = 'bytes: 0-1';
-        const xpsId = '2C2A32DC-F9D1-4C21-A1D2-7EE48B4B8DEF';
-        const edgeColo = 'TST';
+       
+        const record = await generateRecord();
+
+        const hashedIpAddress = unpackHashedIpAddressHash(record.hashedIpAddress);
+      
         const rpcClient = new class extends StubRpcClient {
             async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
                 await Promise.resolve();
@@ -45,7 +34,7 @@ Deno.test({
                     const seq = new TimestampSequence(3);
                     const key1 = seq.next();
                     const attNums = new AttNums();
-                    const packed = attNums.packRecord({ uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, xpsId, 'other.colo': edgeColo, 'other.asn': '123'  });
+                    const packed = attNums.packRecord(record);
                     const records: Record<string, string> = {};
                     records[key1] = packed;
                     return {
@@ -60,7 +49,7 @@ Deno.test({
                 await Promise.resolve();
                 if (target === DoNames.showServer && request.notification.type === 'urls') {
                     assertEquals(request.notification.urls.length, 1);
-                    assertEquals(request.notification.urls[0].url, url);
+                    assertEquals(request.notification.urls[0].url, record.url);
                     return { kind: 'ok' };
                 }
                 throw new Error(JSON.stringify({ request, target }));
@@ -69,6 +58,9 @@ Deno.test({
         const hashIpAddress: IpAddressHashingFn = () => { throw new Error() };
         const controller = new CombinedRedirectLogController(storage, rpcClient, 'controller-test', hashIpAddress);
         await controller.process();
+
+        const { timestamp, uuid, url, method, userAgent, referer, range, ulid, 'other.colo': edgeColo, xpsId } = record;
+        const timestampAndUuid = `${timestamp}-${uuid}`;
 
         {
             // ensure basic query returns the saved record
@@ -154,3 +146,81 @@ Deno.test({
         }
     }
 });
+
+Deno.test({
+    name: 'process -> multiples',
+    fn: async () => {
+        const storage = new InMemoryDurableObjectStorage();
+        const colos = [ 'AMS', 'ORD', 'DFW' ];
+        for (const colo of colos) {
+            const doName = DoNames.redirectLogForColo(colo);
+            await storage.put(`crl.ss.${doName}`, { doName });
+        }
+       
+        const record = await generateRecord();
+        const getNewRedirectLogsCallsByColo: Record<string, number> = {};
+
+        const seq = new TimestampSequence(3);
+        const rpcClient = new class extends StubRpcClient {
+            async getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
+                console.log('getNewRedirectLogs');
+                await Promise.resolve();
+                for (const colo of colos) {
+                    const doName = DoNames.redirectLogForColo(colo);
+                    if (target === doName) {
+                        increment(getNewRedirectLogsCallsByColo, colo);
+                       
+                        const key1 = seq.next();
+                        const attNums = new AttNums();
+                        const packed = attNums.packRecord(record);
+                        const records: Record<string, string> = {};
+                        records[key1] = packed;
+                        return {
+                            kind: 'packed-redirect-logs',
+                            namesToNums: attNums.toJson(),
+                            records,
+                        }
+                    }
+                }
+                throw new Error(JSON.stringify({ request, target }));
+            }
+            async receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse> {
+                console.log(`receiveExternalNotification`);
+                await Promise.resolve();
+                if (target === DoNames.showServer && request.notification.type === 'urls') {
+                    assertEquals(request.notification.urls.length, 1);
+                    assertEquals(request.notification.urls[0].url, record.url);
+                    return { kind: 'ok' };
+                }
+                throw new Error(JSON.stringify({ request, target }));
+            }
+        }
+        const hashIpAddress: IpAddressHashingFn = () => { throw new Error() };
+        const controller = new CombinedRedirectLogController(storage, rpcClient, 'controller-test', hashIpAddress);
+        await controller.process();
+
+        // ensure inner loop called the correct number of times
+        assertEquals(getNewRedirectLogsCallsByColo, { AMS: 4, ORD: 2, DFW: 1 });
+    }
+});
+
+//
+
+async function generateRecord() {
+    const uuid = generateUuid();
+    const url = `https://example.com/path/to/episode1.mp3`;
+    const timestamp = computeTimestamp();
+    const keyId = 'a';
+    const keyBytes = await generateHmacKeyBytes();
+    const key = await importHmacKey(keyBytes);
+    const signature = await hmac(Bytes.ofUtf8('1.2.3.4'), key);
+    const packedHashedIpAddress = packHashedIpAddress(keyId, signature);
+    const method = 'GET';
+    const userAgent = 'test/0.0.0';
+    const referer = 'https://example.com';
+    const range = 'bytes: 0-1';
+    const xpsId = '2C2A32DC-F9D1-4C21-A1D2-7EE48B4B8DEF';
+    const edgeColo = 'TST';
+    const ulid = generateUuid();
+    return { uuid, url, timestamp, hashedIpAddress: packedHashedIpAddress, method, userAgent, referer, range, ulid, xpsId, 'other.colo': edgeColo, 'other.asn': '123' };
+}

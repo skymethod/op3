@@ -145,13 +145,13 @@ export class CombinedRedirectLogController {
             const times = multiples[state.doName] ?? 1;
             let currentState = state;
             for (let i = 0; i < times; i++) {
-                let updated = false;
-                await processSource(currentState, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled, v => {
-                    this.updateSourceStateCache(v);
-                    currentState = v;
-                    updated = true;
-                });
-                if (!updated) break;
+                const newState = await processSource(currentState, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled);
+                if (newState) {
+                    this.updateSourceStateCache(newState);
+                    currentState = newState;
+                } else {
+                    break;
+                }
             }
         }
 
@@ -416,7 +416,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     return new AttNums();
 }
 
-async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, knownExistingUrlsMax: number, urlNotificationsEnabled: boolean, stateUpdated: (state: SourceState) => void) {
+async function processSource(state: SourceState, rpcClient: RpcClient, attNums: AttNums, storage: DurableObjectStorage, knownExistingUrls: Set<string>, knownExistingUrlsMax: number, urlNotificationsEnabled: boolean): Promise<SourceState | undefined> {
     const { doName } = state;
     const nothingNew = typeof state.notificationTimestampId === 'string' && typeof state.haveTimestampId === 'string' && state.haveTimestampId >= state.notificationTimestampId;
     if (nothingNew) return;
@@ -458,6 +458,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
     if (attNums.max() > maxBefore) {
         await storage.put('crl.attNums', attNums.toJson());
     }
+    let newState: SourceState | undefined;
     if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId || Object.keys(newPendingUrlNotificationRecords).length > 0) {
         // two transactions to stay under 128
         // it's ok if this first transaction runs more than once
@@ -484,12 +485,12 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
             }
             if (maxTimestampId !== startAfterTimestampId) {
                 console.log(`CombinedRedirectLogController: Updating haveTimestampId from ${startAfterTimestampId} to ${maxTimestampId} for ${doName}`);
-                const newState: SourceState = { ...state, haveTimestampId: maxTimestampId };
+                newState = { ...state, haveTimestampId: maxTimestampId };
                 await txn.put(`crl.ss.${doName}`, newState);
-                stateUpdated(newState);
             }
         });
     }
+    return newState;
 }
 
 async function computeRebuildIndexResponse(request: Unkinded<AdminRebuildIndexRequest>, attNums: AttNums, storage: DurableObjectStorage): Promise<AdminRebuildIndexResponse> {
