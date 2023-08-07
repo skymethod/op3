@@ -224,13 +224,14 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 async function computeResponse(request: Request, colo: string | undefined, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
     const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace } = env;
     IsolateId.log();
-    const { origin, hostname, pathname, searchParams } = new URL(request.url);
+    const { origin, hostname, pathname, searchParams, protocol } = new URL(request.url);
     const { method, headers } = request;
     const acceptsHtml = /html/i.test(headers.get('accept') ?? '');
     const adminTokens = parseStringSet(env.adminTokens);
     const previewTokens = parseStringSet(env.previewTokens);
     const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
 
+    if (protocol === 'http:' && env.origin?.startsWith('https:')) return computeHttpToHttpsRedirectResponse(request.url); // redirect http -> https for all non-episode-redirect requests
     if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime });
     if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
@@ -281,4 +282,8 @@ function initBlobs({ blobsBucket, roBlobsBucket, prefix }: { blobsBucket?: R2Buc
     const blobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix }) : undefined;
     const roBlobs = roBlobsBucket ? new R2BucketBlobs({ bucket: roBlobsBucket, prefix, readonly: true }) : undefined;
     return { blobs, roBlobs };
+}
+
+function computeHttpToHttpsRedirectResponse(requestUrl: string): Response {
+    return new Response(undefined, { status: 308 /* perm redirect, don't change method */, headers: { 'cache-control': 'private, no-cache', 'access-control-allow-origin': '*', 'location': `https://${requestUrl.substring('http://'.length)}` } });
 }
