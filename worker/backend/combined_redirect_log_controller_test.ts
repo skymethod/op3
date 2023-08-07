@@ -200,7 +200,7 @@ Deno.test({
         await controller.process();
 
         // ensure inner loop called the correct number of times
-        assertEquals(getNewRedirectLogsCallsByColo, { AMS: 4, ORD: 2, DFW: 1 });
+        assertEquals(getNewRedirectLogsCallsByColo, { AMS: 6, ORD: 2, DFW: 1 });
     }
 });
 
