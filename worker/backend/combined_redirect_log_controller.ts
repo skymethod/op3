@@ -138,7 +138,7 @@ export class CombinedRedirectLogController {
         
         const highTrafficDoName = DoNames.redirectLogForColo('AMS');
         for (const state of sourceStates) {
-            const times = state.doName === highTrafficDoName ? 2 : 1;
+            const times = state.doName === highTrafficDoName ? 3 : 1;
             for (let i = 0; i < times; i++) {
                 await processSource(state, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled, v => this.updateSourceStateCache(v));
             }
