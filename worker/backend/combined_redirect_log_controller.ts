@@ -136,15 +136,22 @@ export class CombinedRedirectLogController {
 
         const attNums = await this.getOrLoadAttNums();
         
-        const highTrafficDoName = DoNames.redirectLogForColo('AMS');
+        const multiples = Object.fromEntries([
+            [ DoNames.redirectLogForColo('AMS'), 4 ],
+            [ DoNames.redirectLogForColo('ORD'), 2 ],
+        ]);
+
         for (const state of sourceStates) {
-            const times = state.doName === highTrafficDoName ? 3 : 1;
+            const times = multiples[state.doName] ?? 1;
             let currentState = state;
             for (let i = 0; i < times; i++) {
+                let updated = false;
                 await processSource(currentState, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled, v => {
                     this.updateSourceStateCache(v);
                     currentState = v;
+                    updated = true;
                 });
+                if (!updated) break;
             }
         }
 
