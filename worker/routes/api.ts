@@ -1,5 +1,5 @@
 import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest, tryParseRedirectLogRequest } from './admin_api.ts';
-import { AdminDataRequest, AdminDataResponse, ApiTokenPermission, hasPermission, isExternalNotification, RpcClient, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, ApiTokenPermission, hasPermission, isExternalNotification, RpcClient, RpcRequest, Unkinded } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
@@ -68,6 +68,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
 
             if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
+            if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient, rawIpAddress);
         if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
@@ -220,6 +221,15 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient, statsBlobs);
         return newJsonResponse({ results, message });
     }
+}
+
+async function computeAdminRpcResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+
+    const { request, target } = await bodyProvider() as { request: RpcRequest, target: string };
+    if (request.kind === 'query-packed-redirect-logs') return newJsonResponse(await rpcClient.queryPackedRedirectLogs(request, target));
+    
+    throw new Error(`Unsupported rpc call: ${JSON.stringify({ request, target })}`);
 }
 
 async function computeAdminRebuildResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

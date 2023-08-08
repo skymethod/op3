@@ -1,5 +1,5 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
-import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
@@ -100,6 +100,35 @@ export class ReadonlyRemoteDataRpcClient extends StubRpcClient {
         }
         const rt = await res.json() as Unkinded<AdminDataResponse>;
         return { kind: 'admin-data', ...rt };
+    }
+
+}
+
+export class RemoteRpcClient extends StubRpcClient {
+    private readonly origin: string;
+    private readonly token: string;
+
+    constructor({ origin, token}: { origin: string, token: string }) {
+        super();
+        this.origin = origin;
+        this.token = token;
+    }
+
+    async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
+        return await this.call({ kind: 'query-packed-redirect-logs', ...request }, target);
+    }
+
+    //
+    
+    private async call<TResponse extends RpcResponse>(request: RpcRequest, target: string): Promise<TResponse> {
+        const { origin, token } = this;
+        const url = `${origin}/api/1/admin/rpc`;
+        const body = JSON.stringify({ request, target });
+        const res = await fetch(url, { method: 'POST', body, headers: { authorization: `Bearer ${token}`} });
+        if (res.status !== 200) {
+            throw new Error(`RemoteRpcClient: Unexpected response status: ${res.status}, url=${url}, body=${await res.text()}`);
+        }
+        return await res.json() as TResponse;
     }
 
 }

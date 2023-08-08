@@ -296,44 +296,8 @@ export class ShowController {
         }
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
-            const { hour, date, type } = parameters;
-
-            // compute hourly download tsv
-            if (typeof hour === 'string') {
-                const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10' } = parameters;
-                const maxHits = parseInt(maxHitsStr);
-                const querySize = parseInt(querySizeStr);
-                const maxQueries = parseInt(maxQueriesStr);
-                const { rpcClient, statsBlobs } = this;
-                const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
-                return { results: [ result ] };
-            }
-
-            // compute hourly show columns
-            if (typeof date === 'string' && type === 'show-columns') {
-                const { statsBlobs } = this;
-                const { skip = '', hashAlg, startHour: startHourStr, endHour: endHourStr, partition } = parameters;
-                const startHour = typeof startHourStr === 'string' ? parseInt(startHourStr) : undefined;
-                const endHour = typeof endHourStr === 'string' ? parseInt(endHourStr) : undefined;
-                const skipWrite = skip.includes('write');
-                const skipLookup = skip.includes('lookup');
-                const skipDownloads = skip.includes('downloads');
-                const skipBulk = skip.includes('bulk');
-                const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = skipBulk ? { lookupShow: () => Promise.resolve(undefined), feedRecordIdsToShowUuids: undefined, preloadMillis: undefined, matchUrls: undefined, querylessMatchUrls: undefined} : await lookupShowBulk(storage);
-                consoleInfo('sc-show-columns', `lookupShowBulk: ${JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids })}`);
-                const { partitions } = await loadShowPartitions(storage);
-                const result = await computeHourlyShowColumns({ date, startHour, endHour, partition, partitions, skipWrite, skipLookup, skipDownloads, hashAlg, statsBlobs, lookupShow });
-                return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
-            }
-
-            // compute daily download tsv
-            if (typeof date === 'string') {
-                const { statsBlobs } = this;
-                const req = parseComputeShowDailyDownloadsRequest(date, parameters);
-                const { partitions } = await loadShowPartitions(storage);
-                const result = await computeDailyDownloads(req, { statsBlobs, partitions } );
-                return { results: [ result ] };
-            }
+            const { rpcClient, statsBlobs } = this;
+            return await updateShowStats({ parameters, rpcClient, statsBlobs, storage });
         }
 
         if (targetPath === '/show/storage/lookup-show-bulk' && operationKind === 'select') {
@@ -478,6 +442,46 @@ export class ShowController {
             consoleInfo('sc-work', `ShowController: ${infos.join('; ')}`); // for now, keep an eye on every call
         }
     }
+}
+
+export async function updateShowStats({ parameters, rpcClient, statsBlobs, storage }: { parameters: Record<string, string>, rpcClient: RpcClient, statsBlobs: Blobs, storage: DurableObjectStorage }): Promise<Unkinded<AdminDataResponse>> {
+    const { hour, date, type } = parameters;
+
+    // compute hourly download tsv
+    if (typeof hour === 'string') {
+        const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10' } = parameters;
+        const maxHits = parseInt(maxHitsStr);
+        const querySize = parseInt(querySizeStr);
+        const maxQueries = parseInt(maxQueriesStr);
+        const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
+        return { results: [ result ] };
+    }
+
+    // compute hourly show columns
+    if (typeof date === 'string' && type === 'show-columns') {
+        const { skip = '', hashAlg, startHour: startHourStr, endHour: endHourStr, partition } = parameters;
+        const startHour = typeof startHourStr === 'string' ? parseInt(startHourStr) : undefined;
+        const endHour = typeof endHourStr === 'string' ? parseInt(endHourStr) : undefined;
+        const skipWrite = skip.includes('write');
+        const skipLookup = skip.includes('lookup');
+        const skipDownloads = skip.includes('downloads');
+        const skipBulk = skip.includes('bulk');
+        const { lookupShow, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } = skipBulk ? { lookupShow: () => Promise.resolve(undefined), feedRecordIdsToShowUuids: undefined, preloadMillis: undefined, matchUrls: undefined, querylessMatchUrls: undefined} : await lookupShowBulk(storage);
+        consoleInfo('sc-show-columns', `lookupShowBulk: ${JSON.stringify({ preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids })}`);
+        const { partitions } = await loadShowPartitions(storage);
+        const result = await computeHourlyShowColumns({ date, startHour, endHour, partition, partitions, skipWrite, skipLookup, skipDownloads, hashAlg, statsBlobs, lookupShow });
+        return { results: [ { ...result, preloadMillis, matchUrls, querylessMatchUrls, feedRecordIdsToShowUuids } ] };
+    }
+
+    // compute daily download tsv
+    if (typeof date === 'string') {
+        const req = parseComputeShowDailyDownloadsRequest(date, parameters);
+        const { partitions } = await loadShowPartitions(storage);
+        const result = await computeDailyDownloads(req, { statsBlobs, partitions } );
+        return { results: [ result ] };
+    }
+    
+    throw new Error(`Unsupported show stats request: ${JSON.stringify(parameters)}`);
 }
 
 export async function lookupShowBulk(storage: DurableObjectStorage) {
