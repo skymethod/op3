@@ -137,7 +137,7 @@ function insertZeros(hourlyDownloads: Record<string, number>): Record<string, nu
     const maxHour = hours.at(-1)!;
     let hour = hours[0];
     const rt: Record<string, number>  = {};
-    while (hour < maxHour) {
+    while (hour <= maxHour) {
         rt[hour] = hourlyDownloads[hour] ?? 0;
         hour = addHoursToHourString(hour, 1);
     }

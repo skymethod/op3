@@ -10378,7 +10378,7 @@ function insertZeros(hourlyDownloads) {
     const maxHour = hours.at(-1);
     let hour = hours[0];
     const rt = {};
-    while(hour < maxHour){
+    while(hour <= maxHour){
         rt[hour] = hourlyDownloads[hour] ?? 0;
         hour = addHoursToHourString(hour, 1);
     }
