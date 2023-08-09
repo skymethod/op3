@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@6e03f02ba148bf0c01fb9cb64b282b53fa30897f (2023-08-04T20:32:51Z)
+// from user-agents-v2@b28cd1a8404ae15c78f7f7c7c5a04bedb7632553 (2023-08-09T21:52:05Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -406,6 +406,7 @@ const appTests = {
     'TheEconomist-Darwin-ios-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'Elevation_Health/2.9 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Elevation Health` },
     'EMAudioPlayer 2.9.7 (720) / Android 6.0.1 / MotoG3': { type: 'app', name: `EMAudioPlayer` },
+    'URL/Emacs Emacs/28.2 (TTY; x86_64-pc-linux-gnu)': { type: 'app', name: `Emacs` },
     'Encounter/1 CFNetwork/711.3.18 Darwin/14.0.0': { type: 'app', name: `Encounter` },
     'EpisodeFever/21 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `EpisodeFever` },
     'EQu/14101 CFNetwork/711.1.12 Darwin/14.0.0': { type: 'app', name: `EQu` },
@@ -645,6 +646,8 @@ const appTests = {
     'NPR%20One/234 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `NPR One` },
     'NPROneAndroid': { type: 'app', name: `NPR One` },
     'NRC Audio/2.0.0 (nl.nrc.audio; build:29; Android 12; Sdk:31; Manufacturer:samsung; Model: SM-G975F) OkHttp/4.9.3': { type: 'app', name: `NRC Audio` },
+    'NRC%20Audio/1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `NRC Audio` },
+    'NRC-Nieuws/10.3.1 (nl.nrc.nrcapp; build:210; iOS 16.6.0) Alamofire/10.3.1': { type: 'app', name: `NRC` },
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },
@@ -849,6 +852,7 @@ const libraryTests = {
     'aria2/1.36.0': { type: 'library', name: `aria2` },
     'Armadillo/12.19 (Linux;Android 11) ExoPlayerLib/2.17.1': { type: 'library', name: `Armadillo` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
+    'CarrierWave/2.2.4': { type: 'library', name: `CarrierWave (ruby)` },
     'colly - https://github.com/gocolly/colly': { type: 'library', name: `Colly` },
     'Dalvik/2.1.0 (Linux; U; Android 9; SM-N950U Build/PPR1.180610.011)': { type: 'library', name: `Dalvik` },
     'Dalvik (Linux; U; Android 4.1.1;aries/JRO03L)': { type: 'library', name: `Dalvik` },

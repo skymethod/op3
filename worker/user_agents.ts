@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@6e03f02ba148bf0c01fb9cb64b282b53fa30897f (2023-08-04T20:32:51Z)
+// from user-agents-v2@b28cd1a8404ae15c78f7f7c7c5a04bedb7632553 (2023-08-09T21:52:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -319,6 +319,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^TheEconomist-Darwin-/.test(userAgent)) return { name: `Economist Espresso`, type: 'app' };
     if (/^Elevation_Health\//.test(userAgent)) return { name: `Elevation Health`, type: 'app' };
     if (/^EMAudioPlayer /.test(userAgent)) return { name: `EMAudioPlayer`, type: 'app' };
+    if (/^URL\/Emacs /.test(userAgent)) return { name: `Emacs`, type: 'app' };
     if (/^Encounter\//.test(userAgent)) return { name: `Encounter`, type: 'app' };
     if (/^EpisodeFever\//.test(userAgent)) return { name: `EpisodeFever`, type: 'app' };
     if (/^EQu\//.test(userAgent)) return { name: `EQu`, type: 'app' };
@@ -469,7 +470,8 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
     if (/(^NPR%20One\/|^NPROneAndroid)/.test(userAgent)) return { name: `NPR One`, type: 'app' };
-    if (/NRC Audio\/.*Android/.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
+    if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
+    if (/^NRC-Nieuws\//.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
     if (/^Overcast\/|^Overcast.*Apple Watch/.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
@@ -600,6 +602,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^aria2\//.test(userAgent)) return { name: `aria2`, type: 'library', category: 'bot' };
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
+    if (/^CarrierWave\//.test(userAgent)) return { name: `CarrierWave (ruby)`, type: 'library', category: 'bot' };
     if (/github\.com\/gocolly/.test(userAgent)) return { name: `Colly`, type: 'library', category: 'bot' };
     if (/^Dalvik[\/ ]/.test(userAgent)) return { name: `Dalvik`, type: 'library' };
     if (/^Dart\//.test(userAgent)) return { name: `Dart`, type: 'library', category: 'bot' };
