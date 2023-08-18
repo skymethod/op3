@@ -53,7 +53,7 @@ const COSTS: Cost[] = [
             { description: 'Durable Objects Storage', cost: 67.20 },
             { description: 'R2 Data Storage', cost: 1.26 },
             { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
-            { description: 'Sales Tax', cost: 25.57 },
+            { description: 'Sales Tax', cost: 31.15 },
         ]
     },
     {
