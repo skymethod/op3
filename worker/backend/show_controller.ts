@@ -1457,9 +1457,10 @@ function computeShowKeyPrefix(): string {
     return 'sc.show0.';
 }
 
-function computeShowgroupKey(showgroupId: string): string {
+export function computeShowgroupKey(showgroupId: string): string {
     return `sc.showgroup0.${showgroupId}`;
 }
+
 function computeShowgroupKeyPrefix(): string {
     return 'sc.showgroup0.';
 }
