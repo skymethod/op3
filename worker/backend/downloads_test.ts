@@ -26,7 +26,8 @@ Deno.test({
                     const addHit = ({ url, ipAddress, range = '' }: { url: string, ipAddress: string, range?: string }) => {
                         const timestampId = seq.next();
                         const { timestamp } = unpackTimestampId(timestampId);
-                        const hashedIpAddress = packHashedIpAddress('1', Bytes.ofUtf8(ipAddress));
+                        const signature = Bytes.ofUtf8(ipAddress);
+                        const hashedIpAddress = packHashedIpAddress('1', signature);
                         const record = attNums.packRecord({ method: 'GET', range, url, hashedIpAddress, userAgent: 'test-agent', timestamp });
                         records[timestampId] = record;
                     }

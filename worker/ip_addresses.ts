@@ -5,9 +5,38 @@ export function packHashedIpAddress(keyId: string, signature: Bytes): string {
 }
 
 export function unpackHashedIpAddressHash(packedHashedIpAddress: string): string {
-    const m1 = /^1:([0-9a-f]+)$/.exec(packedHashedIpAddress);
-    if (m1) return m1[1];
     const m2 = /^2:(.+?):([0-9a-f]+)$/.exec(packedHashedIpAddress);
     if (m2) return m2[2];
+    const m1 = /^1:([0-9a-f]+)$/.exec(packedHashedIpAddress);
+    if (m1) return m1[1];
     throw new Error(`Bad packedHashedIpAddress: ${packedHashedIpAddress}`);
+}
+
+export function computeIpAddressForDownload(rawIpAddress: string): string {
+    // for ipv6 addresses, take only the first 64 bits (8 bytes)
+    const expanded = tryExpandIpv6(rawIpAddress);
+    if (typeof expanded === 'string') {
+        return `${expanded.substring(0, 19)}:0000:0000:0000:0000`;
+    }
+    return rawIpAddress;
+}
+
+export function tryExpandIpv6(rawIpAddress: string): string | undefined {
+    // :: -> 0000:0000:0000:0000:0000:0000:0000:0000
+    if (!/^[0-9a-f:.]{2,}$/.test(rawIpAddress)) return undefined;
+    const m = /^(.+?):(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(rawIpAddress);
+    if (m) rawIpAddress = `${m[1]}:${decimalToHex(m[2])}${decimalToHex(m[3])}:${decimalToHex(m[4])}${decimalToHex(m[5])}`; // ::1.2.3.4 -> ::0000:0000:0102:0304
+    const [ left, right = '' ] = rawIpAddress.split('::');
+    const leftParts = left.split(':').filter(v => v.length > 0).map(v => v.padStart(4, '0'));
+    const rightParts = right.split(':').filter(v => v.length > 0).map(v => v.padStart(4, '0'));
+    const midParts = new Array(8 - leftParts.length - rightParts.length).fill('0000');
+    const parts = [ ...leftParts, ...midParts, ...rightParts ];
+    const rt = parts.join(':');
+    return /^[0-9a-f]{4}(:[0-9a-f]{4}){7}$/.test(rt) ? rt : undefined;
+}
+
+//
+
+function decimalToHex(decimal: string): string {
+    return parseInt(decimal).toString(16).padStart(2, '0');
 }
