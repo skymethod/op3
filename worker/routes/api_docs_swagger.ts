@@ -3,10 +3,12 @@ import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT
 import { computeNonProdWarning } from './instances.ts';
 
 export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined, searchParams: URLSearchParams }): Promise<Response> {
-    const { instance, origin, previewTokens, configuration, searchParams } = opts;
+    const { instance: instanceOpt, origin, previewTokens, configuration, searchParams } = opts;
     const { host } = new URL(origin);
 
     const templateMode = searchParams.has('template');
+    const instanceParam = templateMode ? (searchParams.get('instance') ?? undefined) : undefined;
+    const instance = instanceParam ?? instanceOpt;
     const versionSuffix = instance === 'prod' ? '' : `-${instance}`;
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
@@ -78,7 +80,6 @@ const computeSwagger = (origin: string, host: string, versionSuffix: string, des
             {
                 "name": "redirect-logs",
                 "description": `Lowest-level log records saved for every prefix redirect processed.\n\nThis is the raw material on which higher-level metrics like [downloads](#tag/downloads) can be [derived](${origin}/download-calculation).`,
-
             },
         ],
         "schemes": [
