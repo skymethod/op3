@@ -15,10 +15,12 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
     const startTime = Date.now();
     const map = await computeResultMap(request, storage, hashIpAddress);
     const rows: unknown[] = [];
-    const includeAsn = include === 'asn';
+    const includes = include.split(',');
+    const includeAsn = includes.includes('asn');
+    const includeHashedIpAddressForDownload = includes.includes('hashedIpAddressForDownload');
     for (const record of map.values()) {
         if (typeof record !== 'string') continue;
-        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, method, url, userAgent, referer, range, ulid, xpsId,
+        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, hashedIpAddressForDownload: packedHashedIpAddressForDownload, method, url, userAgent, referer, range, ulid, xpsId,
             'other.colo': edgeColo,
             'other.continent': continent,
             'other.country': country,
@@ -33,20 +35,30 @@ export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectL
         if (typeof uuid !== 'string') continue;
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
+        const hashedIpAddressForDownload = typeof packedHashedIpAddressForDownload === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddressForDownload) : undefined;
         if (format === 'tsv' || format === 'json-a') {
-            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, ...(includeAsn ? [ asn ] : []) ];
+            const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, 
+                ...(includeAsn ? [ asn ] : []),
+                ...(includeHashedIpAddressForDownload ? [ hashedIpAddressForDownload ] : []),
+            ];
             rows.push(format === 'tsv' ? arr.join('\t') : arr);
         } else {
-            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, ...(includeAsn ? { asn } : {}) });
+            rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode,
+                ...(includeAsn ? { asn } : {}),
+                ...(includeHashedIpAddressForDownload ? { hashedIpAddressForDownload } : {}),
+            });
         }
     }
-    const headers = computeHeaders(includeAsn);
+    const headers = computeHeaders(includeAsn, includeHashedIpAddressForDownload);
     return newQueryResponse({ startTime, format, headers, rows, continuationToken: undefined });
 }
 
 //
 
-const computeHeaders = (includeAsn: boolean) => [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode', ...(includeAsn ? [ 'asn' ] : []) ];
+const computeHeaders = (includeAsn: boolean, includeHashedIpAddressForDownload: boolean) => [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode',
+    ...(includeAsn ? [ 'asn' ] : []),
+    ...(includeHashedIpAddressForDownload ? [ 'hashedIpAddressForDownload' ] : []),
+];
 
 let _earliestTimestamp: string | undefined;
 

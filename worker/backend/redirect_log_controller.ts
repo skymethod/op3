@@ -4,10 +4,11 @@ import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
 import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect, Unkinded, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { check, tryParseInt } from '../check.ts';
-import { consoleError, writeTraceEvent } from '../tracer.ts';
+import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { computeListOpts } from './storage.ts';
+import { computeIpAddressForDownload } from '../ip_addresses.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -196,7 +197,7 @@ async function deleteImportedRecords(latestStartAfterTimestampId: string, limit:
         const maxKey = batch.at(-1)!;
         maxDeletedInstant = timestampToInstant(unpackTimestampId(maxKey.substring('rl.r.'.length)).timestamp);
     }
-    return { deleted,maxInstantToDelete, minDeletedInstant, maxDeletedInstant, error, took: Date.now() - start };
+    return { deleted, maxInstantToDelete, minDeletedInstant, maxDeletedInstant, error, took: Date.now() - start };
 }
 
 //
@@ -235,6 +236,15 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof rawIpAddress === 'string') {
         rt.encryptedIpAddress = await encryptIpAddress(rawIpAddress, { timestamp });
         rt.hashedIpAddress = await hashIpAddress(rawIpAddress, { timestamp });
+        const ipAddressForDownload = (() => {
+            try {
+                return computeIpAddressForDownload(rawIpAddress);
+            } catch (e) {
+                consoleWarn('rlc-pack-raw-redirect', `Error in computeIpAddressForDownload: ${e.stack || e}`);
+                return rawIpAddress;
+            }
+        })(); 
+        rt.hashedIpAddressForDownload = await hashIpAddress(ipAddressForDownload, { timestamp });
     }
     if (typeof method === 'string') rt.method = method;
     if (typeof url === 'string') rt.url = url;
