@@ -1,5 +1,6 @@
 import { Configuration } from '../configuration.ts';
 import { importText } from '../deps.ts';
+import { computeApiVersion } from './api_contract.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
 const apiDocsHead = await importText(import.meta.url, '../static/api_docs_head.htm');
 const apiDocsHtml = await importText(import.meta.url, '../static/api_docs_html.htm');
@@ -16,6 +17,7 @@ export async function computeApiDocsResponse(opts: { instance: string, origin: s
     const demoShowUuid = await configuration?.get('demo-show-1');
     let finalApiDocsHtml = (instance === 'prod' ? apiDocsHtmlProd : apiDocsHtml)
         .replaceAll('${ORIGIN}', origin)
+        .replaceAll('API_VERSION_TEMPLATE', computeApiVersion(instance))
         ;
     if (previewToken) finalApiDocsHtml = finalApiDocsHtml.replaceAll(/PREVIEW_TOKEN_TEMPLATE/g, previewToken);
     if (demoShowUuid) finalApiDocsHtml = finalApiDocsHtml.replaceAll(/DEMO_SHOW_UUID_TEMPLATE/g, demoShowUuid);

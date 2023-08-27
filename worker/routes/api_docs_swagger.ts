@@ -1,5 +1,5 @@
 import { Configuration } from '../configuration.ts';
-import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT_LOGS } from './api_contract.ts';
+import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT_LOGS, computeApiVersion } from './api_contract.ts';
 import { computeNonProdWarning } from './instances.ts';
 
 export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined, searchParams: URLSearchParams }): Promise<Response> {
@@ -9,7 +9,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const templateMode = searchParams.has('template');
     const instanceParam = templateMode ? (searchParams.get('instance') ?? undefined) : undefined;
     const instance = instanceParam ?? instanceOpt;
-    const versionSuffix = instance === 'prod' ? '' : `-${instance}`;
+    const version = templateMode ? 'API_VERSION_TEMPLATE' : computeApiVersion(instance);
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
     let queryRedirectLogsDescriptionSuffix = '';
     let queryDownloadsDescriptionSuffix = '';
@@ -50,20 +50,20 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
 
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
-
-    const swagger = computeSwagger(origin, host, versionSuffix, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix);
+    
+    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix);
     const json = JSON.stringify(swagger, undefined, 2);
     return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, versionSuffix: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
             "description": `The [Open Podcast Prefix Project](${origin}) is an open-source [podcast prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.\n\nThis API serves as an interface to access the data collected in a privacy-preserving way.${descriptionSuffix}`,
-            "version": `0.0.2${versionSuffix}`,
+            "version": version,
             "title": "OP3 API",
             "termsOfService": `${origin}/terms/`,
             "contact": {
