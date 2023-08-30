@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@b28cd1a8404ae15c78f7f7c7c5a04bedb7632553 (2023-08-09T21:52:05Z)
+// from user-agents-v2@f72fbb74030285e2b85f5b0bdd8971dc2b66c137 (2023-08-30T16:34:17Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -115,6 +115,7 @@ const botTests = {
     '(Mozilla/5.0)': { type: 'bot', name: `Mozilla Bot` },
     'Mozilla/5.0 (compatible; Neevabot/1.0; https://neeva.com/neevabot)': { type: 'bot', name: `Neevabot` },
     'Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)': { type: 'bot', name: `Netcraft Survey Agent` },
+    'newspaper/0.3.0': { type: 'bot', name: `Newspaper` },
     'OgScrper': { type: 'bot', name: `OgScrper` },
     'op3-fetcher/1.0 (https://op3.dev)': { type: 'bot', name: `OP3 Fetcher` },
     'Overcast/1.0 Podcast Sync': { type: 'bot', name: `Overcast feed parser` },
@@ -165,6 +166,7 @@ const botTests = {
     'Mozilla/5.0 https://vurbl.com VurblBot/1.0': { type: 'bot', name: `Vurbl` },
     'weborama-fetcher (+http://www.weborama.com)': { type: 'bot', name: `weborama` },
     'ZDM/4.0; Windows Mobile 7.0;': { type: 'bot', name: `Windows Crawler` },
+    'Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.2673': { type: 'bot', name: `Windows PowerShell` },
     'Mozilla/5.0 (compatible; ImageFetcher/9.0; +http://wsrv.nl/)': { type: 'bot', name: `wsrv.nl` },
     'yacybot (/global; amd64 Linux 5.9.8-zen1-1-zen; java 1.8.0_265; Europe/de) http://yacy.net/bot.html': { type: 'bot', name: `YaCy` },
     'Crawler Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)': { type: 'bot', name: `Yahoo Crawler` },
@@ -367,6 +369,7 @@ const appTests = {
     'damus/24 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `Damus` },
     'DataDogApp/0.8.12 CFNetwork/811.5.4 Darwin/16.6.0': { type: 'app', name: `DataDogApp` },
     'DaumWebtoon/1 CFNetwork/975.0.3 Darwin/18.2.0': { type: 'app', name: `DaumWebtoon` },
+    'DS podcast/1.0.5 (be.standaard.audio; build:6; Android 12; Sdk:31; Manufacturer:samsung; Model: SM-A415F) OkHttp/4.9.1': { type: 'app', name: `De Standaard` },
     'Deezer/6.2.2.80 (Android; 9; Mobile; fr) samsung SM-G950F': { type: 'app', name: `Deezer` },
     'Deezer/6.2.3.96 (Android; 10; Mobile; fr) samsung SM-A405FN': { type: 'app', name: `Deezer` },
     'DeezerJukebox/6.2.26.58 (Linux;Android 10) ExoPlayerLib/2.12.1': { type: 'app', name: `Deezer` },
@@ -648,6 +651,8 @@ const appTests = {
     'NRC Audio/2.0.0 (nl.nrc.audio; build:29; Android 12; Sdk:31; Manufacturer:samsung; Model: SM-G975F) OkHttp/4.9.3': { type: 'app', name: `NRC Audio` },
     'NRC%20Audio/1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `NRC Audio` },
     'NRC-Nieuws/10.3.1 (nl.nrc.nrcapp; build:210; iOS 16.6.0) Alamofire/10.3.1': { type: 'app', name: `NRC` },
+    'iPad (compatible; Tablet2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iPadOS 16.6': { type: 'app', name: `NRC` },
+    'iPhone (compatible; Smartphone2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iOS 16.6': { type: 'app', name: `NRC` },
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },
@@ -782,6 +787,7 @@ const appTests = {
     'SvD Hermes/999999999 _app_': { type: 'app', name: `Svenska Dagbladet Android app` },
     'Swinsian/472 CFNetwork/978.0.7 Darwin/18.7.0 (x86_64)': { type: 'app', name: `Swinsian` },
     'SYOK/965 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `SYOK` },
+    'my.com.astro.player': { type: 'app', name: `SYOK` },
     'TED POD-2.0.2': { type: 'app', name: `TED` },
     'TED/2941 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `TED` },
     'TED Android; Version 3.3.3; OPPO R15 9': { type: 'app', name: `TED` },
@@ -950,6 +956,7 @@ const deviceTests = {
     'FileDownloader (Android)': { type: 'device', name: `Android Phone` },
     'PRDownloader': { type: 'device', name: `Android Phone` },
     'TURTLECAST/0.5.1': { type: 'device', name: `Android Phone` },
+    'Amazon;Echo_Pop;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
     'Bose;Bose_Home_Speaker_500;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
     'Bose;Bose_Home_Speaker_500': { type: 'device', name: `Other Smart Speaker` },
     'Bose;Bose_Soundbar_700;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
