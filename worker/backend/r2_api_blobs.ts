@@ -13,7 +13,7 @@ export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: 
 export class R2ApiBlobs implements Blobs {
     private readonly opts: R2ApiBlobsOpts;
 
-    private constructor(opts: R2ApiBlobsOpts) {
+    public constructor(opts: R2ApiBlobsOpts) {
         this.opts = opts;
     }
 
