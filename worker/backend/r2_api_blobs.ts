@@ -1,0 +1,162 @@
+// minimal deps to facilitate sharing across projects
+import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/bytes.ts';
+import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/get_head_object.ts';
+import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/put_object.ts';
+import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/r2.ts';
+import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/r2.ts';
+import { checkMatches } from '../check.ts';
+import { executeWithRetries } from '../sleep.ts';
+import { Blobs, ListBlobsResponse, ListOpts, Multiput } from './blobs.ts';
+
+export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: string, bucket: string, prefix: string };
+
+export class R2ApiBlobs implements Blobs {
+    private readonly opts: R2ApiBlobsOpts;
+
+    private constructor(opts: R2ApiBlobsOpts) {
+        this.opts = opts;
+    }
+
+    async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
+        const { keyPrefix, afterKey } = opts;
+        const { bucket, origin, region, context } = this.opts;
+        const prefix = keyPrefix ? `${this.opts.prefix}${keyPrefix}` : this.opts.prefix;
+        const startAfter = afterKey ? `${this.opts.prefix}${afterKey}` : undefined;
+        const keys: string[] = [];
+        let continuationToken: string | undefined;
+        while (true) {
+            const { isTruncated, contents, continuationToken: token } = await listObjectsV2({ bucket, origin, region, prefix, startAfter, continuationToken }, context);
+            keys.push(...contents.map(v => v.key.substring(this.opts.prefix.length)));
+            if (!isTruncated) return { keys };
+            continuationToken = token;
+        }
+    }
+
+    get(key: string, as: 'stream-and-meta'): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
+    get(key: string, as: 'stream'): Promise<ReadableStream<Uint8Array> | undefined>;
+    get(key: string, as: 'buffer'): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'text-and-meta'): Promise<{ text: string, etag: string } | undefined>;
+    get(key: string, as: 'text'): Promise<string | undefined>;
+    get(key: string, as: 'json'): Promise<unknown | undefined>;
+    async get(key: string, as: string): Promise<unknown> {
+        const { bucket, origin, region, context } = this.opts;
+        const res = await getObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2-api-blobs-get');
+        if (!res) return undefined;
+        if (res.status !== 200) throw new Error(`Unexpected status: ${res.status}`);
+        const etag = computeUnquotedEtag(res.headers);
+        if (as === 'stream') return res.body;
+        if (as === 'stream-and-meta')  return { stream: res.body, etag };
+        if (as === 'text') return await res.text();
+        if (as === 'text-and-meta') return { text: await res.text(), etag };
+        if (as === 'buffer') return await res.arrayBuffer();
+        if (as === 'json') return await res.json();
+                  
+        throw new Error();
+    }
+
+    async put(key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<{ etag: string }> {
+        const bytes = body instanceof ReadableStream ? await Bytes.ofStream(body)
+            : typeof body === 'string' ? Bytes.ofUtf8(body)
+            : new Bytes(new Uint8Array(body));
+        const { bucket, origin, region, context } = this.opts;
+        await putObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region, body: bytes }, context, 'r2blobs-put');
+        const res = await headObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2blobs-put');
+        if (!res) throw new Error();
+        const etag = computeUnquotedEtag(res.headers);
+        return { etag };
+    }
+
+    async head(key: string): Promise<{ etag: string } | undefined> {
+        const { bucket, origin, region, context } = this.opts;
+        const res = await headObject({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context);
+        if (!res) return undefined;
+        const etag = computeUnquotedEtag(res.headers);
+        return etag ? { etag } : undefined;
+    }
+
+    async has(key: string): Promise<boolean> {
+        return await this.head(key) !== undefined;
+    }
+
+    async delete(key: string): Promise<void> {
+        const { bucket, origin, region, context } = this.opts;
+        await deleteObject({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context);
+    }
+
+    async startMultiput(key: string): Promise<Multiput> {
+        const { bucket, origin, region, context } = this.opts;
+        key = `${this.opts.prefix}${key}`;
+
+        const { uploadId } = await createMultipartUpload({ bucket, key, origin, region }, context);
+        let partNumber = 0;
+        const parts: CompletedPart[] = [];
+        const rt: Multiput = {
+            putPart: async b => {
+                partNumber++;
+                const type = b instanceof ReadableStream ? 'stream'
+                    : typeof b === 'string' ? 'string'
+                    : b instanceof Uint8Array ? 'uint8array'
+                    : 'arraybuffer';
+                console.log(`putPart ${type} ${partNumber} ${bucket}/${key}`);
+                const body = b instanceof ReadableStream ? (await Bytes.ofStream(b))
+                    : typeof b === 'string' ? b
+                    : b instanceof Uint8Array ? new Bytes(b)
+                    : new Bytes(new Uint8Array(b));
+                // careful: S3/R2 returns quoted etags, but R2 binding does not
+                const { etag: httpEtag } = await uploadPart({ bucket, key, origin, region, uploadId, partNumber, body }, context);
+                parts.push({ partNumber, etag: httpEtag });
+                const etag = computeUnquotedEtag(httpEtag);
+                return { etag };
+            },
+            complete: async () => {
+                const { etag: httpEtag } = await completeMultipartUpload({ bucket, key, origin, region, uploadId, parts }, context);
+                const etag = computeUnquotedEtag(httpEtag);
+                return { etag, parts: parts.length };
+            },
+            abort: async () => {
+                await abortMultipartUpload({ bucket, key, origin, region, uploadId }, context);
+            },
+        };
+        return rt;
+    }
+
+}
+
+//
+
+function computeUnquotedEtag(headersOrHttpEtag: Headers | string) {
+    const httpEtag = typeof headersOrHttpEtag === 'string' ? headersOrHttpEtag : (headersOrHttpEtag.get('etag') ?? undefined);
+    if (httpEtag === undefined) throw new Error(`No http etag!`);
+    return checkMatches('httpEtag', httpEtag, /^"([0-9a-f]+(-\d)?)"$/)[1];
+}
+
+//
+
+export async function putObjectWithRetries(opts: PutObjectOpts, context: AwsCallContext, tag: string): Promise<void> {
+    if (opts.body instanceof ReadableStream) return await putObject(opts, context);
+    return await executeWithRetries(() => putObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
+        const msg = `${e.stack || e}`;
+        if (msg.includes('Unexpected status: 502')) return true;
+        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
+        if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
+        if (msg.includes('connection closed before message completed')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection closed before message completed
+        return false;
+    } });
+}
+
+export async function headObjectWithRetries(opts: HeadObjectOpts, context: AwsCallContext, tag: string): Promise<Response | undefined> {
+    return await executeWithRetries(() => headObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
+        const msg = `${e.stack || e}`;
+        if (msg.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): error trying to connect: tls handshake eof
+        return false;
+    } });
+}
+
+export async function getObjectWithRetries(opts: GetObjectOpts, context: AwsCallContext, tag: string): Promise<Response | undefined> {
+    return await executeWithRetries(() => getObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
+        const msg = `${e.stack || e}`;
+        if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
+        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502 parseError=Error: !xml: Expected child element Error
+        return false;
+    } });
+}
