@@ -347,6 +347,15 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://pscrb.fm/rss/p/pdst.fm/e/arttrk.com/p/ABC12/clrtpod.com/m/chtbl.com/track/ABC12/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podscribe', url: 'https://pscrb.fm/rss/p/pdst.fm/e/arttrk.com/p/ABC12/clrtpod.com/m/chtbl.com/track/ABC12/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/arttrk.com/p/ABC12/clrtpod.com/m/chtbl.com/track/ABC12/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'artsai', url: 'https://arttrk.com/p/ABC12/clrtpod.com/m/chtbl.com/track/ABC12/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'claritas', url: 'https://clrtpod.com/m/chtbl.com/track/ABC12/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chtbl.com/track/ABC12/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
     }
 });
 
