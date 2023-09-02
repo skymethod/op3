@@ -127,7 +127,7 @@ export class R2ApiBlobs implements Blobs {
 function computeUnquotedEtag(headersOrHttpEtag: Headers | string) {
     const httpEtag = typeof headersOrHttpEtag === 'string' ? headersOrHttpEtag : (headersOrHttpEtag.get('etag') ?? undefined);
     if (httpEtag === undefined) throw new Error(`No http etag!`);
-    return checkMatches('httpEtag', httpEtag, /^"([0-9a-f]+(-\d)?)"$/)[1];
+    return checkMatches('httpEtag', httpEtag, /^(W\/)?"([0-9a-f]+(-\d)?)"$/)[2];
 }
 
 //
