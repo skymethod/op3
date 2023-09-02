@@ -1,9 +1,9 @@
 // minimal deps to facilitate sharing across projects
-import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/bytes.ts';
-import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/get_head_object.ts';
-import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/put_object.ts';
-import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/r2.ts';
-import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/r2/r2.ts';
+import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/bytes.ts';
+import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/get_head_object.ts';
+import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/put_object.ts';
+import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/r2.ts';
+import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/r2.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { Blobs, ListBlobsResponse, ListOpts, Multiput } from './blobs.ts';

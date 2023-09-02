@@ -1,2 +1,2 @@
-export { assert, assertMatch, assertEquals, assertNotEquals, assertRejects, assertThrows, fail } from 'https://deno.land/std@0.200.0/assert/mod.ts';
-export { InMemoryDurableObjectStorage } from 'https://raw.githubusercontent.com/skymethod/denoflare/21410200cdeda2b5f9c93fe9225e3f84ef20f473/common/storage/in_memory_durable_object_storage.ts';
+export { assert, assertMatch, assertEquals, assertNotEquals, assertRejects, assertThrows, fail } from 'https://deno.land/std@0.201.0/assert/mod.ts';
+export { InMemoryDurableObjectStorage } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/storage/in_memory_durable_object_storage.ts';
