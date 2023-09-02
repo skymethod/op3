@@ -140,6 +140,7 @@ export async function putObjectWithRetries(opts: PutObjectOpts, context: AwsCall
         if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
         if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
         if (msg.includes('connection closed before message completed')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection closed before message completed
+        if (msg.includes('Operation timed out')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection error: Operation timed out (os error 60)
         return false;
     } });
 }
