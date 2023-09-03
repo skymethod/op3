@@ -431,7 +431,9 @@ export async function computeShowDailyDownloads({ date, mode, showUuids, partiti
     const allChunks = stream.pipeThrough(new DelimiterStream(newline));
     let index = 0;
     const showChunks: Record<string, Uint8Array[]> = {};
+    const expectedChunkStart = new TextEncoder().encode('202'); // take this out before 2030 :)
     for await (const chunk of allChunks) {
+        if (index > 0 && chunk.length > 0 && !byteArrayStartsWith(chunk, expectedChunkStart)) throw new Error('[' + new TextDecoder().decode(chunk) + ']'); // ensure first char is not dropped, as found in https://github.com/denoland/deno_std/issues/3609
         const showUuids = partitionShowUuid ? [ partitionShowUuid ] : indexToShowUuids.get(index);
         if (showUuids) {
             const chunkWithNewline = concatByteArrays(chunk, newline);
@@ -558,6 +560,14 @@ function concatByteArrays(...arrays: Uint8Array[]): Uint8Array {
         offset += array.byteLength;
     }
     return rt;
+}
+
+function byteArrayStartsWith(bytes: Uint8Array, prefix: Uint8Array): boolean {
+    if (prefix.length === 0 || prefix.length > bytes.length) return false;
+    for (let i = 0; i < prefix.length; i++) {
+        if (bytes[i] !== prefix[i]) return false;
+    }
+    return true;
 }
 
 function parseIncludeExclude(parameters: Record<string, string>): { mode: 'include' | 'exclude', showUuids: string[] } {

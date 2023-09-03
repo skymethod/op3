@@ -15,4 +15,4 @@ export { distinct } from 'https://deno.land/std@0.201.0/collections/distinct.ts'
 export { TextLineStream } from 'https://deno.land/std@0.201.0/streams/text_line_stream.ts';
 export { zip } from 'https://deno.land/std@0.201.0/collections/zip.ts';
 export { ascend, descend } from 'https://deno.land/std@0.201.0/collections/_comparators.ts';
-export { DelimiterStream } from 'https://deno.land/std@0.201.0/streams/delimiter_stream.ts';
+export { DelimiterStream } from 'https://deno.land/std@0.200.0/streams/delimiter_stream.ts'; // regressed in 201: https://github.com/denoland/deno_std/issues/3609
