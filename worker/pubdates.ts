@@ -7,12 +7,18 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
     // Sun, 4 Dec 2022 14:30:00 CEST   tricky: found in the wild, but CEST (summer time) is not observed in december!  pick Europe/Berlin
     // 2023-07-17 12:00:00 +0000
     // 02/03/2023 06:34:00
+    // 2023-09-05 01:59:37
     // Wed, 19 Jul 2023 22:48:03 Z
+    // Wed, 5 Jun 2019 00:00:00 +0000Wed, 19 Apr 2023 14:14:14 +1100
 
-    if (!/[a-z+/]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
+    if (!/[a-z+/:]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
 
-     // Fri, 27 Jan 2017 22:36:00 CST 01:00:00 CST
+    // Fri, 27 Jan 2017 22:36:00 CST 01:00:00 CST
     let m = /^(.*?\s+\d{2}:\d{2}:\d{2}\s+[a-z]{3})\s+\d{2}:\d{2}:\d{2}\s+[a-z]{3}$/i.exec(pubdate);
+    if (m) pubdate = m[1];
+
+    // Wed, 5 Jun 2019 00:00:00 +0000Wed, 19 Apr 2023 14:14:14 +1100
+    m = /^([a-z]+, \d{1,2} [a-z]+ \d{4} \d{2}:\d{2}:\d{2} \+\d{4})[a-z]{3,}.+?$/i.exec(pubdate);
     if (m) pubdate = m[1];
 
     m = /^(.+?)\s+([a-z]+)$/i.exec(pubdate);
@@ -38,7 +44,8 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
             }
         }
     }
-    if (/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/.test(pubdate)) {
+
+    if (/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/.test(pubdate) || /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(pubdate)) {
         pubdate += ' UTC';
     }
     pubdate = pubdate.replace(' Ju1 ', ' Jul ');

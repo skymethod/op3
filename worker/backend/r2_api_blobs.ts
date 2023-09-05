@@ -3,6 +3,7 @@ import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/b94
 import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/get_head_object.ts';
 import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/put_object.ts';
 import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/r2.ts';
+import type { ListBucketResult, ListObjectsOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/list_objects_v2.ts';
 import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/b9482919cbecd59de6ad862043b720de3df50970/common/r2/r2.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
@@ -25,7 +26,7 @@ export class R2ApiBlobs implements Blobs {
         const keys: string[] = [];
         let continuationToken: string | undefined;
         while (true) {
-            const { isTruncated, contents, continuationToken: token } = await listObjectsV2({ bucket, origin, region, prefix, startAfter, continuationToken }, context);
+            const { isTruncated, contents, continuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken }, context, 'r2-api-blobs-list');
             keys.push(...contents.map(v => v.key.substring(this.opts.prefix.length)));
             if (!isTruncated) return { keys };
             continuationToken = token;
@@ -158,6 +159,14 @@ export async function getObjectWithRetries(opts: GetObjectOpts, context: AwsCall
         const msg = `${e.stack || e}`;
         if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
         if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502 parseError=Error: !xml: Expected child element Error
+        return false;
+    } });
+}
+
+export async function listObjectsV2WithRetries(opts: ListObjectsOpts, context: AwsCallContext, tag: string): Promise<ListBucketResult> {
+    return await executeWithRetries(() => listObjectsV2(opts, context), { tag, maxRetries: 3, isRetryable: e => {
+        const msg = `${e.stack || e}`;
+        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
         return false;
     } });
 }
