@@ -10,6 +10,9 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
     // 2023-09-05 01:59:37
     // Wed, 19 Jul 2023 22:48:03 Z
     // Wed, 5 Jun 2019 00:00:00 +0000Wed, 19 Apr 2023 14:14:14 +1100
+    // Sun, 30 Sep 2018 00:00,00 +0000
+    // Wed, 06 Sep 2023 17:37,53 +0000
+    // Fri, 01 Sep 2023 19:15:00, GMT+3
 
     if (!/[a-z+/:]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
 
@@ -20,6 +23,15 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
     // Wed, 5 Jun 2019 00:00:00 +0000Wed, 19 Apr 2023 14:14:14 +1100
     m = /^([a-z]+, \d{1,2} [a-z]+ \d{4} \d{2}:\d{2}:\d{2} \+\d{4})[a-z]{3,}.+?$/i.exec(pubdate);
     if (m) pubdate = m[1];
+
+    // Wed, 06 Sep 2023 17:37,53 +0000
+    pubdate = pubdate.replace(/ (\d{2}:\d{2}),(\d{2}) /, ' $1:$2 ');
+
+    // Fri, 01 Sep 2023 19:15:00, GMT+3
+    pubdate = pubdate.replace(/, GMT\+(\d)/, '+0$100');
+
+    // Wed, 23 September 2020 04:58:48GMT
+    pubdate = pubdate.replace(/(\d)GMT$/, '$1 GMT');
 
     m = /^(.+?)\s+([a-z]+)$/i.exec(pubdate);
     if (m) {
@@ -49,6 +61,11 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
         pubdate += ' UTC';
     }
     pubdate = pubdate.replace(' Ju1 ', ' Jul ');
+    pubdate = pubdate.replace(' Dez ', ' Dec ');
+    pubdate = pubdate.replace(' Abr ', ' Apr ');
+    pubdate = pubdate.replace(' Ene ', ' Jan ');
+    pubdate = pubdate.replace(' Dic ', ' Dec ');
+    pubdate = pubdate.replace(' Ago ', ' Aug ');
     try {
         return new Date(pubdate).toISOString();
     } catch {
