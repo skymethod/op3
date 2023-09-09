@@ -159,6 +159,7 @@ export async function getObjectWithRetries(opts: GetObjectOpts, context: AwsCall
         const msg = `${e.stack || e}`;
         if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
         if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502 parseError=Error: !xml: Expected child element Error
+        if (msg.includes('Unexpected status 503')) return true; // Error: Unexpected status 503, code=ServiceUnavailable, message=Please look at https://www.cloudflarestatus.com for issues or contact customer support.
         return false;
     } });
 }
