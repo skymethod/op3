@@ -131,43 +131,33 @@ function computeUnquotedEtag(headersOrHttpEtag: Headers | string) {
     return checkMatches('httpEtag', httpEtag, /^(W\/)?"([0-9a-f]+(-\d)?)"$/)[2];
 }
 
+function isRetryableR2(e: Error): boolean {
+    const msg = `${e.stack || e}`;
+    if (msg.includes('Unexpected status: 502')) return true;
+    if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
+    if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
+    if (msg.includes('Unexpected status 503')) return true; // Error: Unexpected status 503, code=ServiceUnavailable, message=Please look at https://www.cloudflarestatus.com for issues or contact customer support.
+    if (msg.includes('connection closed before message completed')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection closed before message completed
+    if (msg.includes('Operation timed out')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection error: Operation timed out (os error 60)
+    if (msg.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): error trying to connect: tls handshake eof
+    return false;
+}
+
 //
 
 export async function putObjectWithRetries(opts: PutObjectOpts, context: AwsCallContext, tag: string): Promise<void> {
     if (opts.body instanceof ReadableStream) return await putObject(opts, context);
-    return await executeWithRetries(() => putObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
-        const msg = `${e.stack || e}`;
-        if (msg.includes('Unexpected status: 502')) return true;
-        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
-        if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
-        if (msg.includes('connection closed before message completed')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection closed before message completed
-        if (msg.includes('Operation timed out')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection error: Operation timed out (os error 60)
-        return false;
-    } });
+    return await executeWithRetries(() => putObject(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
 }
 
 export async function headObjectWithRetries(opts: HeadObjectOpts, context: AwsCallContext, tag: string): Promise<Response | undefined> {
-    return await executeWithRetries(() => headObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
-        const msg = `${e.stack || e}`;
-        if (msg.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): error trying to connect: tls handshake eof
-        return false;
-    } });
+    return await executeWithRetries(() => headObject(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
 }
 
 export async function getObjectWithRetries(opts: GetObjectOpts, context: AwsCallContext, tag: string): Promise<Response | undefined> {
-    return await executeWithRetries(() => getObject(opts, context), { tag, maxRetries: 3, isRetryable: e => {
-        const msg = `${e.stack || e}`;
-        if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
-        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502 parseError=Error: !xml: Expected child element Error
-        if (msg.includes('Unexpected status 503')) return true; // Error: Unexpected status 503, code=ServiceUnavailable, message=Please look at https://www.cloudflarestatus.com for issues or contact customer support.
-        return false;
-    } });
+    return await executeWithRetries(() => getObject(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
 }
 
 export async function listObjectsV2WithRetries(opts: ListObjectsOpts, context: AwsCallContext, tag: string): Promise<ListBucketResult> {
-    return await executeWithRetries(() => listObjectsV2(opts, context), { tag, maxRetries: 3, isRetryable: e => {
-        const msg = `${e.stack || e}`;
-        if (msg.includes('Unexpected status 502')) return true; // Error: Unexpected status 502, code=InternalError, message=We encountered an internal connectivity issue. Please try again.
-        return false;
-    } });
+    return await executeWithRetries(() => listObjectsV2(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
 }
