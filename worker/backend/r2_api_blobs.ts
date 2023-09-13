@@ -140,6 +140,7 @@ function isRetryableR2(e: Error): boolean {
     if (msg.includes('connection closed before message completed')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection closed before message completed
     if (msg.includes('Operation timed out')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection error: Operation timed out (os error 60)
     if (msg.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): error trying to connect: tls handshake eof
+    if (msg.includes('Unexpected status 429') && msg.includes('Reduce your rate')) return true; // Error: Unexpected status 429, code=ServiceUnavailable, message=Reduce your rate of simultaneous reads on the same object.
     return false;
 }
 
