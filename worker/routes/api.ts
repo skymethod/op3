@@ -17,7 +17,7 @@ import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesFo
 import { Blobs } from '../backend/blobs.ts';
 import { computeApiQueryDownloadsResponse } from './api_query_downloads.ts';
 import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
-import { computeShowsResponse, computeShowStatsResponse } from './api_shows.ts';
+import { computeShowsResponse, computeShowStatsResponse, computeShowSummaryStatsResponse } from './api_shows.ts';
 import { Configuration } from '../configuration.ts';
 import { computeQueriesResponse } from './api_queries.ts';
 
@@ -80,6 +80,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
         if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
         { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,})$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
         { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
+        { const m = /^\/shows\/([0-9a-f]{32})\/summary-stats$/.exec(path); if (m && configuration) return await computeShowSummaryStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
         { const m = /^\/queries\/([0-9a-z-]+)$/.exec(path); if (m && configuration) return await computeQueriesResponse({ name: m[1], method, searchParams, miscBlobs, roMiscBlobs, configuration, rpcClient, roRpcClient, statsBlobs, roStatsBlobs }); }
     
         // unknown api endpoint

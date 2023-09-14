@@ -11,10 +11,10 @@ import { DoNames } from '../do_names.ts';
 import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
-import { increment } from '../summaries.ts';
+import { increment, total } from '../summaries.ts';
 import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
-import { ApiShowsResponse, ApiShowStatsResponse, EpisodeInfo } from './api_shows_model.ts';
+import { ApiShowsResponse, ApiShowStatsResponse, ApiShowSummaryStatsResponse, EpisodeInfo } from './api_shows_model.ts';
 
 
 type LookupShowIdOpts = Omit<ShowsOpts, 'method' | 'origin'>;
@@ -93,11 +93,7 @@ type StatsOpts = { showUuid: string, method: string, searchParams: URLSearchPara
 
 export async function computeShowStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
-    if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
-    check('showUuid', showUuidInput, isValidUuid);
-    const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
-    check('showUuid', showUuid, isValidUuid);
+    const { showUuid, targetStatsBlobs } = await computeStatsBlobsAndShowUuid({ showUuidInput, searchParams, statsBlobs, roStatsBlobs, configuration });
     const overallParam = searchParams.get('overall') ?? undefined;
     if (overallParam !== undefined) checkMatches('overall', overallParam, /^stub$/);
     const latestMonth = searchParams.get('latestMonth') ?? new Date().toISOString().substring(0, 7);
@@ -150,6 +146,34 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads }));
 }
 
+export async function computeShowSummaryStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
+    if (method !== 'GET') return newMethodNotAllowedResponse(method);
+    const start = Date.now();
+    const { showUuid, targetStatsBlobs } = await computeStatsBlobsAndShowUuid({ showUuidInput, searchParams, statsBlobs, roStatsBlobs, configuration });
+    const debug = searchParams.has('debug');
+
+    const lastCalendarMonth = addMonthsToMonthString(new Date().toISOString().substring(0, 7), -1);
+
+    const [ overall, monthSummary, audienceSummariesSmall ] = await timed(times, `get-overall+get-show-summary+get-audience-summary`, () => Promise.all([
+        timed(times, 'get-overall', () => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json')),
+        timed(times, `get-show-summary`, async () => await targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: lastCalendarMonth }), 'json')),
+        timed(times, `get-audience-summary`, async () => [ await targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: lastCalendarMonth }), 'json') ].filter(isValidAudienceSummary)),
+    ]));
+    if (!isValidShowSummary(overall)) return newJsonResponse({ message: 'not found' }, 404);
+
+    let audienceSummaries = audienceSummariesSmall;
+    if (audienceSummaries.length === 0) {
+        const parts = [1, 2, 3, 4].map(v => `${v}of4`);
+        audienceSummaries = await timed(times, `get-large-audience-summaries`, async () => (await Promise.all(parts.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: lastCalendarMonth, part: v }), 'json')))).filter(isValidAudienceSummary));
+    }
+
+    const lastCalendarMonthDownloads = isValidShowSummary(monthSummary) ? total(monthSummary.hourlyDownloads) : undefined;
+    const lastCalendarMonthAudience = audienceSummaries.length > 0 ? audienceSummaries.map(v => total(v.dailyFoundAudience)).reduce((a, b) => a + b, 0): undefined;
+    times.compute = Date.now() - start;
+    const res: ApiShowSummaryStatsResponse = { showUuid, lastCalendarMonth, lastCalendarMonthDownloads, lastCalendarMonthAudience, ...(debug ? { times } : undefined) };
+    return newJsonResponse(res);
+}
+
 export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcClient, roRpcClient, searchParams }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
@@ -174,6 +198,15 @@ export function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, or
 export const DEMO_SHOW_1 = 'dc1852e4d1ee4bce9c4fb7f5d8be8908';
 
 //
+
+async function computeStatsBlobsAndShowUuid({ showUuidInput, searchParams, statsBlobs, roStatsBlobs, configuration }: { showUuidInput: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, configuration: Configuration }): Promise<{ showUuid: string, targetStatsBlobs: Blobs }> {
+    const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
+    if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
+    check('showUuid', showUuidInput, isValidUuid);
+    const showUuid = await computeUnderlyingShowUuid(showUuidInput, configuration);
+    check('showUuid', showUuid, isValidUuid);
+    return { showUuid, targetStatsBlobs };
+}
 
 const computeStubShowSummary = (showUuid: string, period: string): ShowSummary => ({
     showUuid,

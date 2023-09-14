@@ -18,3 +18,11 @@ export interface ApiShowStatsResponse {
     readonly dailyFoundAudience: Record<string, number>;
     readonly monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>;
 }
+
+export interface ApiShowSummaryStatsResponse {
+    readonly showUuid: string;
+    readonly lastCalendarMonth?: string;
+    readonly lastCalendarMonthDownloads?: number;
+    readonly lastCalendarMonthAudience?: number;
+    readonly times?: Record<string, number>;
+}
