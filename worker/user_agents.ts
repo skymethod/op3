@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@f72fbb74030285e2b85f5b0bdd8971dc2b66c137 (2023-08-30T16:34:17Z)
+// from user-agents-v2@1d8debfdee4ced6966d63abef4842aaff8a0490f (2023-09-14T21:25:24Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -33,7 +33,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Amazon Music Podcast/.test(userAgent)) return { name: `Amazon Music Podcasts Bot`, type: 'bot' };
     if (/AnchorImport/.test(userAgent)) return { name: `Anchor Importer`, type: 'bot' };
     if (/^atc\/|\(null\) watchOS\//.test(userAgent)) return { name: `Apple Podcasts (Watch)`, type: 'bot' };
-    if (/(iTMS|itunesstored)/.test(userAgent)) return { name: `Apple Podcasts automated checks`, type: 'bot' };
+    if (/(iTMS|itunesstored|itms)/.test(userAgent)) return { name: `Apple Podcasts automated checks`, type: 'bot' };
     if (/^Applebot\//.test(userAgent)) return { name: `Applebot`, type: 'bot' };
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
@@ -65,6 +65,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Riddler /.test(userAgent)) return { name: `F-Secure Riddler`, type: 'bot' };
     if (/FacebookBot|f?acebookexternalhit\/?|^podcastbot$|Facebot|facebookexternalua|^facebookplatform\//.test(userAgent)) return { name: `Facebook Bot`, type: 'bot' };
     if (/^Feedly\//.test(userAgent)) return { name: `Feedly`, type: 'bot' };
+    if (/https:\/\/www\.feedspot\.com\/fs\/fetcher/.test(userAgent)) return { name: `Feedspot Fetcher`, type: 'bot' };
     if (/^FlexGet\//.test(userAgent)) return { name: `FlexGet`, type: 'bot' };
     if (/FlipboardProxy\//.test(userAgent)) return { name: `Flipboard Proxy`, type: 'bot' };
     if (/^fyyd-poll/.test(userAgent)) return { name: `Fyyd`, type: 'bot' };
@@ -291,7 +292,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^damus\//.test(userAgent)) return { name: `Damus`, type: 'app' };
     if (/^DataDogApp\//.test(userAgent)) return { name: `DataDogApp`, type: 'app' };
     if (/^DaumWebtoon\//.test(userAgent)) return { name: `DaumWebtoon`, type: 'app' };
-    if (/be\.standaard\.audio/.test(userAgent)) return { name: `De Standaard`, type: 'app' };
+    if (/be\.standaard\.audio|^DS%20Podcast\//.test(userAgent)) return { name: `De Standaard`, type: 'app' };
     if (/(^Deezer\/|^DeezerJukebox\/|^Deezer.*Electron)/.test(userAgent)) return { name: `Deezer`, type: 'app' };
     if (/^Delve\//.test(userAgent)) return { name: `Delve`, type: 'app' };
     if (/^devcasts\/.*CFNetwork/.test(userAgent)) return { name: `DevCasts`, type: 'app' };
@@ -474,7 +475,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
     if (/(^NPR%20One\/|^NPROneAndroid)/.test(userAgent)) return { name: `NPR One`, type: 'app' };
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
-    if (/nl\.nrc\.nrcapp/.test(userAgent)) return { name: `NRC`, type: 'app' };
+    if (/nl\.nrc\.nrcapp|^NRC-Nieuws\//.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
     if (/^Overcast\/|^Overcast.*Apple Watch/.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
@@ -520,6 +521,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
+    if (/^Podcast Provider.*?Radio Downloader/.test(userAgent)) return { name: `Radio Downloader`, type: 'app' };
     if (/^(radio\.[a-z]{2,3}|GetPodcast)[ \/]\d/.test(userAgent)) return { name: `radio.de`, type: 'app' };
     if (/^Radioline%202\/|^Radioline$/.test(userAgent)) return { name: `Radioline`, type: 'app' };
     if (/(^Radioplayer Android app|^Radioplayer iOS app)/.test(userAgent)) return { name: `RadioPlayer`, type: 'app' };
@@ -669,7 +671,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/ServeStream|Android|android|HTC|ExoPlayer|^AntennaPod\/|^GSA\/.*\.arm(64)?$|^sp-agent|^PRDownloader$|^(Turtlecast|TURTLECAST)\//.test(userAgent)) return { name: `Android Phone`, type: 'device', category: 'mobile' };
     if (/Windows|windows|WMPlayer|Winamp|Win32|Win64|NSPlayer|MediaMonkey|NSPlayer|PC/.test(userAgent)) return { name: `Windows Computer`, type: 'device', category: 'computer' };
     if (/Alexa|^Echo\/|^Amazon;Echo/.test(userAgent)) return { name: `Amazon Smart Speaker`, type: 'device', category: 'smart_speaker' };
-    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
+    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON|^Denon;DENON-DWHS/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
     if (/Lavf\/|desktop|Linux|linux|VLC|^okhttp\/|CastBox\//.test(userAgent)) return { name: `Other Computer`, type: 'device', category: 'computer' };
     if (/tablet|Tablet/.test(userAgent)) return { name: `Other Tablet`, type: 'device', category: 'mobile' };
     if (/watch|Watch/.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };

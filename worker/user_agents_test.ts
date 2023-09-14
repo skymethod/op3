@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@f72fbb74030285e2b85f5b0bdd8971dc2b66c137 (2023-08-30T16:34:17Z)
+// from user-agents-v2@1d8debfdee4ced6966d63abef4842aaff8a0490f (2023-09-14T21:25:24Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -83,6 +83,7 @@ const botTests = {
     'facebookplatform/1.0 (+http://developers.facebook.com)': { type: 'bot', name: `Facebook Bot` },
     'acebookexternalhit/1.0 (+http://www.facebook.com/externalhit_uatext.php)': { type: 'bot', name: `Facebook Bot` },
     'Feedly/1.0 (+http://www.feedly.com/fetcher.html; like FeedFetcher-Google)': { type: 'bot', name: `Feedly` },
+    'Mozilla/5.0 (compatible; Feedspot/1.0 (+https://www.feedspot.com/fs/fetcher; like FeedFetcher-Google)': { type: 'bot', name: `Feedspot Fetcher` },
     'FlexGet/3.3.4 (www.flexget.com)': { type: 'bot', name: `FlexGet` },
     'Mozilla/5.0 (compatible; FlipboardProxy/1.1; +http://flipboard.com/browserproxy)': { type: 'bot', name: `Flipboard Proxy` },
     'storagegw-v1-go': { type: 'bot', name: `Go Storage Gateway V1` },
@@ -370,6 +371,7 @@ const appTests = {
     'DataDogApp/0.8.12 CFNetwork/811.5.4 Darwin/16.6.0': { type: 'app', name: `DataDogApp` },
     'DaumWebtoon/1 CFNetwork/975.0.3 Darwin/18.2.0': { type: 'app', name: `DaumWebtoon` },
     'DS podcast/1.0.5 (be.standaard.audio; build:6; Android 12; Sdk:31; Manufacturer:samsung; Model: SM-A415F) OkHttp/4.9.1': { type: 'app', name: `De Standaard` },
+    'DS%20Podcast/2 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `De Standaard` },
     'Deezer/6.2.2.80 (Android; 9; Mobile; fr) samsung SM-G950F': { type: 'app', name: `Deezer` },
     'Deezer/6.2.3.96 (Android; 10; Mobile; fr) samsung SM-A405FN': { type: 'app', name: `Deezer` },
     'DeezerJukebox/6.2.26.58 (Linux;Android 10) ExoPlayerLib/2.12.1': { type: 'app', name: `Deezer` },
@@ -653,6 +655,7 @@ const appTests = {
     'NRC-Nieuws/10.3.1 (nl.nrc.nrcapp; build:210; iOS 16.6.0) Alamofire/10.3.1': { type: 'app', name: `NRC` },
     'iPad (compatible; Tablet2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iPadOS 16.6': { type: 'app', name: `NRC` },
     'iPhone (compatible; Smartphone2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iOS 16.6': { type: 'app', name: `NRC` },
+    'NRC-Nieuws/5.4.0 (com.twipemobile.nrc; build:540; Android:13; Sdk:33; Manufacturer:samsung; Model: SM-A528B) OkHttp/4.11.0': { type: 'app', name: `NRC` },
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },
@@ -720,6 +723,7 @@ const appTests = {
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
+    'Podcast Provider 0.34-9e9009e7 for Radio Downloader 0.34-9e9009e7': { type: 'app', name: `Radio Downloader` },
     'radio.fr 5.6.22 (iPhone; iPhone OS 16.4; fr_FR)': { type: 'app', name: `radio.de` },
     'radio.de 5.6.22 (iPad; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
     'radio.de 5.6.22 (iPhone; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
@@ -961,6 +965,7 @@ const deviceTests = {
     'Bose;Bose_Home_Speaker_500': { type: 'device', name: `Other Smart Speaker` },
     'Bose;Bose_Soundbar_700;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
     'HEOS;DENON-DWA_40-200;3c043256d0a14590ab901fdc062e55c7;;tpapi;3.202.330': { type: 'device', name: `Other Smart Speaker` },
+    'Denon;DENON-DWHS_60-150;8f2c0cd9c29f44b39c868f9c7055662c;;tpapi;3.202.330': { type: 'device', name: `Other Smart Speaker` },
     'Mozilla/5.0 (Mobile; Nokia_8110_4G; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5.1 PodKast': { type: 'device', name: `Other Mobile Device` },
     'Zune/4.8': { type: 'device', name: `Other Mobile Device` },
     'PodcastGuru 2.0.2-beta3': { type: 'device', name: `Other Mobile Device` },
