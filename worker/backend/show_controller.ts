@@ -536,7 +536,11 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
             }
             const matchUrl1024 = matchUrl.substring(0, 1024);
             messages?.push(`queryless(${queryless}): matchUrl1024: ${matchUrl1024}`);
-            const matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
+            let matches = (queryless ? querylessMatchUrls : matchUrls).get(matchUrl1024);
+            if ((!matches || matches.length === 0) && queryless) {
+                // in the second pass, handle the case where the url has qp but the enclosure url doesn't
+                matches = matchUrls.get(matchUrl1024);
+            }
             if (!matches || matches.length === 0) {
                 messages?.push(`queryless(${queryless}): no matches`);
                 continue;
