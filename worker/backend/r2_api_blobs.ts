@@ -4,6 +4,7 @@ import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubuserconten
 import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/e5feea906ba7c14e7656e05041341e6cc9ba819a/common/r2/put_object.ts';
 import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/e5feea906ba7c14e7656e05041341e6cc9ba819a/common/r2/r2.ts';
 import type { ListBucketResult, ListObjectsOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/e5feea906ba7c14e7656e05041341e6cc9ba819a/common/r2/list_objects_v2.ts';
+import type { UploadPartOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/e5feea906ba7c14e7656e05041341e6cc9ba819a/common/r2/upload_part.ts';
 import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/e5feea906ba7c14e7656e05041341e6cc9ba819a/common/r2/r2.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
@@ -60,8 +61,8 @@ export class R2ApiBlobs implements Blobs {
             : typeof body === 'string' ? Bytes.ofUtf8(body)
             : new Bytes(new Uint8Array(body));
         const { bucket, origin, region, context } = this.opts;
-        await putObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region, body: bytes }, context, 'r2blobs-put');
-        const res = await headObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2blobs-put');
+        await putObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region, body: bytes }, context, 'r2-api-blobs-put');
+        const res = await headObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2-api-blobs-put');
         if (!res) throw new Error();
         const etag = computeUnquotedEtag(res.headers);
         return { etag };
@@ -104,7 +105,7 @@ export class R2ApiBlobs implements Blobs {
                     : b instanceof Uint8Array ? new Bytes(b)
                     : new Bytes(new Uint8Array(b));
                 // careful: S3/R2 returns quoted etags, but R2 binding does not
-                const { etag: httpEtag } = await uploadPart({ bucket, key, origin, region, uploadId, partNumber, body }, context);
+                const { etag: httpEtag } = await uploadPartWithRetries({ bucket, key, origin, region, uploadId, partNumber, body }, context, 'r2-api-blobs-upload-part');
                 parts.push({ partNumber, etag: httpEtag });
                 const etag = computeUnquotedEtag(httpEtag);
                 return { etag };
@@ -141,6 +142,7 @@ function isRetryableR2(e: Error): boolean {
     if (msg.includes('Operation timed out')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): connection error: Operation timed out (os error 60)
     if (msg.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf): error trying to connect: tls handshake eof
     if (msg.includes('Unexpected status 429') && msg.includes('Reduce your rate')) return true; // Error: Unexpected status 429, code=ServiceUnavailable, message=Reduce your rate of simultaneous reads on the same object.
+    if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
     return false;
 }
 
@@ -161,4 +163,9 @@ export async function getObjectWithRetries(opts: GetObjectOpts, context: AwsCall
 
 export async function listObjectsV2WithRetries(opts: ListObjectsOpts, context: AwsCallContext, tag: string): Promise<ListBucketResult> {
     return await executeWithRetries(() => listObjectsV2(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
+}
+
+export async function uploadPartWithRetries(opts: UploadPartOpts, context: AwsCallContext, tag: string): Promise<{ etag: string }> {
+    if (opts.body instanceof ReadableStream) return await uploadPart(opts, context);
+    return await executeWithRetries(() => uploadPart(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
 }
