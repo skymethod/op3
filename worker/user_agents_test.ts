@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@93c32a28e8b6ea26a56dfb41d660387b8a703824 (2023-09-15T22:29:52Z)
+// from user-agents-v2@09b717c68e71c528711f949909286bb94b5e9535 (2023-10-01T00:50:05Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -135,6 +135,7 @@ const botTests = {
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
     'Adswizz-podscribe/1.0': { type: 'bot', name: `Podscribe` },
     'Podscribe/1.1': { type: 'bot', name: `Podscribe` },
+    'Mozilla/5.0 (compatible; PodUptime/1.0; +https://poduptime.com)': { type: 'bot', name: `PodUptime` },
     'PodvineBot/4.0.1 (www.podvine.com)': { type: 'bot', name: `PodvineBot` },
     'PostRank/2.0 (postrank.com; 1 subscribers)': { type: 'bot', name: `PostRank Bot` },
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
