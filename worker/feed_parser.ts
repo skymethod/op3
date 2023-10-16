@@ -19,6 +19,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     let pubdate: string | undefined;
     let sources: Source[] | undefined;
     let transcripts: Transcript[] | undefined;
+    let chapters: Chapters | undefined;
     const callback: Callback = {
         onStartElement: (path, attributes, findNamespaceUri) => {
             level++;
@@ -30,6 +31,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 alternateEnclosures = undefined;
                 pubdate = undefined;
                 transcripts = undefined;
+                chapters = undefined;
             }
             if (xpath === '/rss/channel/item/enclosure') {
                 const url = attributes.get('url');
@@ -65,6 +67,15 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
 
                     if (url === undefined || type === undefined) throw new Error(`Invalid transcript in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
                     transcripts.push({ url, type, language, rel });
+                }
+            }
+            if (xpath === '/rss/channel/item/podcast:chapters') {
+                if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                    const url = attributes.get('url');
+                    const type = attributes.get('type');
+                    if (typeof url === 'string' && typeof type === 'string') {
+                        chapters = { url, type };
+                    }
                 }
             }
             if (xpath === '/rss/channel/itunes:category' || xpath === '/rss/channel/itunes:category/itunes:category') {
@@ -110,7 +121,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 }
             }
             if (xpath === '/rss/channel/item') {
-                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts });
+                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters });
             }
             level--;
         },
@@ -167,6 +178,7 @@ export interface Item {
     readonly enclosures?: Enclosure[];
     readonly alternateEnclosures?: AlternateEnclosure[];
     readonly transcripts?: Transcript[];
+    readonly chapters?: Chapters;
 }
 
 export interface Enclosure {
@@ -186,6 +198,11 @@ export interface Transcript {
     readonly type: string;
     readonly language?: string;
     readonly rel?: string;
+}
+
+export interface Chapters {
+    readonly url: string;
+    readonly type: string;
 }
 
 //
