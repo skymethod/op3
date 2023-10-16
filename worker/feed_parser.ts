@@ -22,6 +22,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     let transcripts: Transcript[] | undefined;
     let chapters: Chapters | undefined;
     let value: Value | undefined;
+    let itunesDuration: string | undefined;
     const callback: Callback = {
         onStartElement: (path, attributes, findNamespaceUri) => {
             level++;
@@ -35,6 +36,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 transcripts = undefined;
                 chapters = undefined;
                 value = undefined;
+                itunesDuration = undefined;
             }
             if (xpath === '/rss/channel/item/enclosure') {
                 const url = attributes.get('url');
@@ -147,6 +149,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
             if (xpath === '/rss/channel/item/title') itemTitle = text;
             if (xpath === '/rss/channel/item/pubDate') pubdate = text;
+            if (xpath === '/rss/channel/item/itunes:duration' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) itunesDuration = text;
         },
         onEndElement: (path, _attributes, findNamespaceUri) => {
             const xpath = '/' + path.join('/');
@@ -157,7 +160,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 }
             }
             if (xpath === '/rss/channel/item') {
-                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters, value });
+                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters, value, itunesDuration });
             }
             level--;
         },
@@ -217,6 +220,7 @@ export interface Item {
     readonly transcripts?: Transcript[];
     readonly chapters?: Chapters;
     readonly value?: Value;
+    readonly itunesDuration?: string;
 }
 
 export interface Enclosure {
