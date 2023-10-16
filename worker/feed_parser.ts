@@ -10,6 +10,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedItunesAuthor: string | undefined;
     let feedItunesCategories: ([ string ] | [ string, string ])[] | undefined;
     let feedItunesType: string | undefined;
+    let feedValue: Value | undefined;
     let level = 0;
     let itemGuid: string | undefined;
     let itemTitle: string | undefined;
@@ -20,6 +21,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     let sources: Source[] | undefined;
     let transcripts: Transcript[] | undefined;
     let chapters: Chapters | undefined;
+    let value: Value | undefined;
     const callback: Callback = {
         onStartElement: (path, attributes, findNamespaceUri) => {
             level++;
@@ -32,6 +34,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 pubdate = undefined;
                 transcripts = undefined;
                 chapters = undefined;
+                value = undefined;
             }
             if (xpath === '/rss/channel/item/enclosure') {
                 const url = attributes.get('url');
@@ -78,6 +81,39 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                     }
                 }
             }
+            if (xpath === '/rss/channel/podcast:value' || '/rss/channel/item/podcast:value') {
+                if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                    const method = attributes.get('method');
+                    const type = attributes.get('type');
+                    if (typeof method === 'string' && typeof type === 'string') {
+                        const valueObj: Value = { method, type, recipients: [] };
+                        if (xpath === '/rss/channel/podcast:value') {
+                            feedValue = valueObj;
+                        } else {
+                            value = valueObj;
+                        }
+                    }
+                }
+            }
+            if (xpath === '/rss/channel/podcast:value/podcast:valueRecipient' || xpath === '/rss/channel/item/podcast:value/podcast:valueRecipient') {
+                if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                    const name = attributes.get('name');
+                    const type = attributes.get('type');
+                    const address = attributes.get('address');
+                    const split = attributes.get('split');
+                    const customKey = attributes.get('customKey');
+                    const customValue = attributes.get('customValue');
+                    const fee = attributes.get('fee');
+                    if (typeof name === 'string' && typeof type === 'string' && typeof address === 'string' && typeof split === 'string') {
+                        const rec: ValueRecipient = { name, type, address, split, customKey, customValue, fee };
+                        if (xpath === '/rss/channel/podcast:value/podcast:valueRecipient') {
+                            feedValue?.recipients.push(rec);
+                        } else {
+                            value?.recipients.push(rec);
+                        }
+                    }
+                }
+            }
             if (xpath === '/rss/channel/itunes:category' || xpath === '/rss/channel/itunes:category/itunes:category') {
                 if (ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) {
                     feedItunesCategories = feedItunesCategories ?? [];
@@ -121,14 +157,14 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 }
             }
             if (xpath === '/rss/channel/item') {
-                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters });
+                items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters, value });
             }
             level--;
         },
     };
     parseXml(feedContents, callback);
     if (feedItunesCategories && !feedItunesCategories.every(isItunesCategory)) throw new Error(`Invalid itunesCategories: ${JSON.stringify(feedItunesCategories)}`);
-    return { title: feedTitle, link: feedLink, podcastGuid: feedPodcastGuid, generator: feedGenerator, itunesAuthor: feedItunesAuthor, itunesType: feedItunesType, itunesCategories: feedItunesCategories, items };
+    return { title: feedTitle, link: feedLink, podcastGuid: feedPodcastGuid, generator: feedGenerator, itunesAuthor: feedItunesAuthor, itunesType: feedItunesType, itunesCategories: feedItunesCategories, value: feedValue, items };
 }
 
 //
@@ -168,6 +204,7 @@ export interface Feed {
     readonly itunesType?: string;
     readonly itunesCategories?: ItunesCategory[];
     readonly items: readonly Item[];
+    readonly value?: Value;
 }
 
 export interface Item {
@@ -179,6 +216,7 @@ export interface Item {
     readonly alternateEnclosures?: AlternateEnclosure[];
     readonly transcripts?: Transcript[];
     readonly chapters?: Chapters;
+    readonly value?: Value;
 }
 
 export interface Enclosure {
@@ -203,6 +241,22 @@ export interface Transcript {
 export interface Chapters {
     readonly url: string;
     readonly type: string;
+}
+
+export interface Value {
+    readonly type: string;
+    readonly method: string;
+    readonly recipients: ValueRecipient[];
+}
+
+export interface ValueRecipient {
+    readonly type: string;
+    readonly name?: string;
+    readonly address: string;
+    readonly customKey?: string;
+    readonly customValue?: string;
+    readonly fee?: string;
+    readonly split: string;
 }
 
 //

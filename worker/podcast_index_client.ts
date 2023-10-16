@@ -49,6 +49,13 @@ export class PodcastIndexClient {
         return await this.makeApiCall(u, checkGetPodcastResponse);
     }
 
+    async getEpisodeById(id: number): Promise<GetEpisodeResponse> {
+        // https://podcastindex-org.github.io/docs-api/#get-/episodes/byid
+        const u = new URL('https://api.podcastindex.org/api/1.0/episodes/byid');
+        u.searchParams.set('id', id.toString());
+        return await this.makeApiCall(u, checkGetEpisodeResponse);
+    }
+
     //
 
     private async makeApiCall<T>(url: URL, responseCheck: (obj: unknown) => obj is T): Promise<T> {
@@ -130,5 +137,33 @@ function checkFeed(obj: unknown): obj is Feed {
     if (typeof originalUrl !== 'string') throw new StatusError(`Unexpected originalUrl: ${JSON.stringify(originalUrl)}`);
     if (typeof image !== 'string') throw new StatusError(`Unexpected image: ${JSON.stringify(image)}`);
     if (typeof artwork !== 'string') throw new StatusError(`Unexpected artwork: ${JSON.stringify(artwork)}`);
+    return true;
+}
+
+//
+
+export interface GetEpisodeResponse {
+    readonly status: string; // "true"
+    readonly count?: number; // 0, only present when not found!
+    readonly id: string; // "16795089"
+    readonly episode: Episode | [];
+    readonly description: string; // Found matching item.
+}
+
+function checkGetEpisodeResponse(obj: unknown): obj is GetEpisodeResponse {
+    if (!isStringRecord(obj)) throw new StatusError(`Unexpected GetEpisodeResponse obj: ${JSON.stringify(obj)}`);
+    const { status, id, count, episode, description } = obj;
+    if (status !== 'true') throw new StatusError(`Unexpected status: ${JSON.stringify(status)}`);
+    if (typeof id !== 'string') throw new StatusError(`Unexpected id: ${JSON.stringify(id)}`);
+    if (count !== undefined && count !== count) throw new StatusError(`Unexpected count: ${JSON.stringify(count)}`);
+    if (!(Array.isArray(episode) && episode.length === 0 || checkEpisode(episode))) throw new Error();
+    if (typeof description !== 'string') throw new StatusError(`Unexpected description: ${JSON.stringify(description)}`);
+    return true;
+}
+
+export type Episode = Record<string, unknown>; // TODO fill out when needed
+
+function checkEpisode(obj: unknown): obj is Episode {
+    if (!isStringRecord(obj)) throw new StatusError(`Unexpected Episode obj: ${JSON.stringify(obj)}`);
     return true;
 }
