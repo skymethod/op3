@@ -54,27 +54,36 @@ const app = await (async () => {
             if (pubdate === undefined) return;
             const needMonth = pubdate.substring(0, 7);
             if (months.includes(needMonth)) return;
-            const haveMonth = statsObj.months[0];
-            if (!haveMonth) return;
-            
-            const latestMonth = addMonthsToMonthString(haveMonth, -1);
-            const lookbackMonths = 2;
+            let haveMonth = statsObj.months[0];
+            const moreMonths: string[] = [];
+            let grabs = 0;
+            while (grabs < 10) {
+                if (!haveMonth) return;
+                if (moreMonths.includes(needMonth)) return;
+                console.log(JSON.stringify({ haveMonth, needMonth }));
 
-            const qp = new URLSearchParams(document.location.search);
-            const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
-            if (qp.has('ro')) u.searchParams.set('ro', 'true');
-            u.searchParams.set('token', previewToken);
-            u.searchParams.set('overall', 'stub');
-            u.searchParams.set('latestMonth', latestMonth);
-            u.searchParams.set('lookbackMonths', lookbackMonths.toString());
-            console.log(`grab more show stats: ${JSON.stringify({ latestMonth, lookbackMonths })}`);
-            const res = await fetch(u.toString());
-            if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+                const latestMonth = addMonthsToMonthString(haveMonth, -1);
 
-            const moreStats = await res.json() as ApiShowStatsResponse;
-            for (const [ episodeId, hourlyDownloads ] of Object.entries(moreStats.episodeHourlyDownloads)) {
-                const merged = { ...hourlyDownloads, ...episodeHourlyDownloads[episodeId] };
-                episodeHourlyDownloads[episodeId] = merged;
+                const qp = new URLSearchParams(document.location.search);
+                const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
+                if (qp.has('ro')) u.searchParams.set('ro', 'true');
+                u.searchParams.set('token', previewToken);
+                u.searchParams.set('overall', 'stub');
+                u.searchParams.set('latestMonth', latestMonth);
+                const lookbackMonths = 2;
+                u.searchParams.set('lookbackMonths', lookbackMonths.toString());
+                console.log(`grab more show stats: ${JSON.stringify({ latestMonth, lookbackMonths })}`);
+                const res = await fetch(u.toString());
+                if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+
+                const moreStats = await res.json() as ApiShowStatsResponse;
+                for (const [ episodeId, hourlyDownloads ] of Object.entries(moreStats.episodeHourlyDownloads)) {
+                    const merged = { ...hourlyDownloads, ...episodeHourlyDownloads[episodeId] };
+                    episodeHourlyDownloads[episodeId] = merged;
+                }
+                haveMonth = moreStats.months[0];
+                moreMonths.push(...moreStats.months);
+                grabs++;
             }
         } finally {
             // signal page ready to show

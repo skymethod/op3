@@ -10238,29 +10238,41 @@ const app = await (async ()=>{
             if (pubdate === undefined) return;
             const needMonth = pubdate.substring(0, 7);
             if (months.includes(needMonth)) return;
-            const haveMonth = statsObj.months[0];
-            if (!haveMonth) return;
-            const latestMonth = addMonthsToMonthString(haveMonth, -1);
-            const qp = new URLSearchParams(document.location.search);
-            const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
-            if (qp.has('ro')) u.searchParams.set('ro', 'true');
-            u.searchParams.set('token', previewToken);
-            u.searchParams.set('overall', 'stub');
-            u.searchParams.set('latestMonth', latestMonth);
-            u.searchParams.set('lookbackMonths', 2..toString());
-            console.log(`grab more show stats: ${JSON.stringify({
-                latestMonth,
-                lookbackMonths: 2
-            })}`);
-            const res = await fetch(u.toString());
-            if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
-            const moreStats = await res.json();
-            for (const [episodeId, hourlyDownloads] of Object.entries(moreStats.episodeHourlyDownloads)){
-                const merged = {
-                    ...hourlyDownloads,
-                    ...episodeHourlyDownloads[episodeId]
-                };
-                episodeHourlyDownloads[episodeId] = merged;
+            let haveMonth = statsObj.months[0];
+            const moreMonths = [];
+            let grabs = 0;
+            while(grabs < 10){
+                if (!haveMonth) return;
+                if (moreMonths.includes(needMonth)) return;
+                console.log(JSON.stringify({
+                    haveMonth,
+                    needMonth
+                }));
+                const latestMonth = addMonthsToMonthString(haveMonth, -1);
+                const qp = new URLSearchParams(document.location.search);
+                const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
+                if (qp.has('ro')) u.searchParams.set('ro', 'true');
+                u.searchParams.set('token', previewToken);
+                u.searchParams.set('overall', 'stub');
+                u.searchParams.set('latestMonth', latestMonth);
+                u.searchParams.set('lookbackMonths', 2..toString());
+                console.log(`grab more show stats: ${JSON.stringify({
+                    latestMonth,
+                    lookbackMonths: 2
+                })}`);
+                const res = await fetch(u.toString());
+                if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+                const moreStats = await res.json();
+                for (const [episodeId, hourlyDownloads] of Object.entries(moreStats.episodeHourlyDownloads)){
+                    const merged = {
+                        ...hourlyDownloads,
+                        ...episodeHourlyDownloads[episodeId]
+                    };
+                    episodeHourlyDownloads[episodeId] = merged;
+                }
+                haveMonth = moreStats.months[0];
+                moreMonths.push(...moreStats.months);
+                grabs++;
             }
         } finally{
             class DataLoaded extends HTMLElement {
