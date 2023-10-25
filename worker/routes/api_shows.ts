@@ -9,6 +9,7 @@ import { Configuration } from '../configuration.ts';
 import { Bytes, decodeXml } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { packError } from '../errors.ts';
+import { SHOW_UUID_REDIRECTS } from '../redirects.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { increment, total } from '../summaries.ts';
@@ -221,7 +222,8 @@ function cleanTitle(title: string | undefined): string | undefined {
 }
 
 async function computeUnderlyingShowUuid(showUuidInput: string, configuration: Configuration): Promise<string> {
-    return showUuidInput === DEMO_SHOW_1 ? await configuration.get('demo-show-1') ?? showUuidInput : showUuidInput;
+    const redirectToShowUuid = SHOW_UUID_REDIRECTS[showUuidInput];
+    return redirectToShowUuid ?? (showUuidInput === DEMO_SHOW_1 ? await configuration.get('demo-show-1') ?? showUuidInput : showUuidInput);
 }
 
 function computeApiShowsResponse(showUuidInput: string, underlyingResponse: ApiShowsResponse, origin: string): ApiShowsResponse {

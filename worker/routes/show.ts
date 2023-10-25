@@ -3,6 +3,7 @@ import { Blobs } from '../backend/blobs.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText } from '../deps.ts';
 import { packError } from '../errors.ts';
+import { SHOW_UUID_REDIRECTS } from '../redirects.ts';
 import { newJsonResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -60,6 +61,14 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     }
     const showUuid = showUuidFromPodcastGuid ?? id;
     if (!isValidUuid(showUuid)) return compute404(`Invalid showUuid: ${showUuid}`);
+
+    const redirectToShowUuid = SHOW_UUID_REDIRECTS[showUuid];
+    if (redirectToShowUuid) {
+        const u = new URL(`${origin}/show/${redirectToShowUuid}`);
+        searchParams.forEach((n, v) => u.searchParams.append(n, v));
+        const location = u.toString();
+        return new Response(`👉 ${location}`, { status: 308, headers: { location } });
+    }
 
     const tryLoadData = async () => {
         try {
