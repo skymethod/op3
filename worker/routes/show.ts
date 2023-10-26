@@ -65,7 +65,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const redirectToShowUuid = SHOW_UUID_REDIRECTS[showUuid];
     if (redirectToShowUuid) {
         const u = new URL(`${origin}/show/${redirectToShowUuid}`);
-        searchParams.forEach((n, v) => u.searchParams.append(n, v));
+        searchParams.forEach((v, n) => u.searchParams.append(n, v));
         const location = u.toString();
         return new Response(`👉 ${location}`, { status: 308, headers: { location } });
     }
