@@ -141,11 +141,12 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://media.blubrry.com/something/a.com/path/to/episode.mp3
+    // https://media.blubrry.com/something/https://a.com/path/to/episode.mp3
     // http and https endpoints are supported
-    m = /^(https?):\/\/media\.blubrry\.com\/\w+\/(p\/)?(.*?)$/.exec(url);
+    m = /^(https?):\/\/media\.blubrry\.com\/\w+\/(p\/)?(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, __, suffix ] = m;
-        const targetUrl = `${scheme}://${suffix}`;
+        const [ _, scheme, __, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
         return [ { kind: 'prefix', prefix: 'blubrry', url }, ...computeChainEstimate(targetUrl) ];
     }
 

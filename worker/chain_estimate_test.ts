@@ -113,6 +113,11 @@ Deno.test({
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://media.blubrry.com/something/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'blubrry', url: 'https://media.blubrry.com/something/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
         assertEquals(computeChainEstimate('https://chrt.fm/track/ABC123/https://a.com/path/to/episode.mp3'), [
             { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/ABC123/https://a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
