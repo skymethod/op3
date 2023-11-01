@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@09b717c68e71c528711f949909286bb94b5e9535 (2023-10-01T00:50:05Z)
+// from user-agents-v2@af48ac3d827937022d9eaf60cf88fb51ad2ed1ee (2023-11-01T16:17:08Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -639,6 +639,7 @@ const appTests = {
     'MobileSMS/1.0 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `MobileSMS` },
     'MoonFM/128 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `MoonFM` },
     'Moon FM/4.0.33': { type: 'app', name: `MoonFM` },
+    'mowPod/1.0 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36': { type: 'app', name: `mowPod` },
     'MPlayer 1.3.0 (Debian), built with gcc-6.2.1': { type: 'app', name: `MPlayer` },
     'libmpv': { type: 'app', name: `mpv` },
     'MusicBee': { type: 'app', name: `MusicBee` },

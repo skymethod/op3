@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@09b717c68e71c528711f949909286bb94b5e9535 (2023-10-01T00:50:05Z)
+// from user-agents-v2@af48ac3d827937022d9eaf60cf88fb51ad2ed1ee (2023-11-01T16:17:08Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -468,6 +468,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^MobileApp\//.test(userAgent)) return { name: `MobileApp`, type: 'app' };
     if (/^MobileSMS\//.test(userAgent)) return { name: `MobileSMS`, type: 'app' };
     if (/^Moon ?FM\//.test(userAgent)) return { name: `MoonFM`, type: 'app' };
+    if (/^mowPod\//.test(userAgent)) return { name: `mowPod`, type: 'app' };
     if (/^MPlayer \d/.test(userAgent)) return { name: `MPlayer`, type: 'app' };
     if (/^mpv 0\.|^libmpv$/.test(userAgent)) return { name: `mpv`, type: 'app' };
     if (/^MusicBee/.test(userAgent)) return { name: `MusicBee`, type: 'app' };
