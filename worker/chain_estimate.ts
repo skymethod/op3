@@ -253,6 +253,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'spotify', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // not really a prefix, it takes over the request after grabbing the target once
+    // but useful to include here for estimation
+    m = /^https?:\/\/ipfspodcasting\.net\/e\/((https?):\/\/?)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, __, suffixScheme, suffix ] = m;
+        const targetUrl = `${suffixScheme ?? 'https' }://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'ipfspodcasting', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -285,6 +294,7 @@ export interface ChainItem {
         | 'claritas'
         | 'glystn'
         | 'gumball'
+        | 'ipfspodcasting'
         | 'letscast'
         | 'magellan'
         | 'podcorn'

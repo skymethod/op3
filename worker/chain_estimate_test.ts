@@ -361,6 +361,10 @@ Deno.test({
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://ipfspodcasting.net/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'ipfspodcasting', url: 'https://ipfspodcasting.net/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
