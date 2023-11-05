@@ -120,8 +120,8 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                 if (ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) {
                     feedItunesCategories = feedItunesCategories ?? [];
                     const text = attributes.get('text');
-                    if (text !== undefined) {
-                        if (typeof text !== 'string' || text === '') throw new Error(`Invalid itunes:category text in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
+                    if (text !== undefined && text !== '') { // found <itunes:category text=""/>
+                        if (typeof text !== 'string') throw new Error(`Invalid itunes:category text in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
                         if (level === 3) {
                             feedItunesCategories.push([ text ]);
                         } else if (level === 4) {
