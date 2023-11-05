@@ -13,7 +13,7 @@ import { Blobs, ListBlobsResponse, ListOpts, Multiput } from './blobs.ts';
 export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: string, bucket: string, prefix: string };
 
 export class R2ApiBlobs implements Blobs {
-    private readonly opts: R2ApiBlobsOpts;
+    readonly opts: R2ApiBlobsOpts;
 
     public constructor(opts: R2ApiBlobsOpts) {
         this.opts = opts;
