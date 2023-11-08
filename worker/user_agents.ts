@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@af48ac3d827937022d9eaf60cf88fb51ad2ed1ee (2023-11-01T16:17:08Z)
+// from user-agents-v2@ef1cdfe069251dad28d8967219b26e6ea03d3507 (2023-11-08T19:22:19Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -609,6 +609,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AppleCoreMedia\/1/.test(userAgent)) return { name: `AppleCoreMedia`, type: 'library' };
     if (/^aria2\//.test(userAgent)) return { name: `aria2`, type: 'library', category: 'bot' };
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
+    if (/^AHC\/\d+\.\d+/.test(userAgent)) return { name: `Async Http Client (java)`, type: 'library', category: 'bot' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
     if (/^CarrierWave\//.test(userAgent)) return { name: `CarrierWave (ruby)`, type: 'library', category: 'bot' };
     if (/github\.com\/gocolly/.test(userAgent)) return { name: `Colly`, type: 'library', category: 'bot' };

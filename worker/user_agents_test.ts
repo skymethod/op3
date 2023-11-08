@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@af48ac3d827937022d9eaf60cf88fb51ad2ed1ee (2023-11-01T16:17:08Z)
+// from user-agents-v2@ef1cdfe069251dad28d8967219b26e6ea03d3507 (2023-11-08T19:22:19Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -865,6 +865,8 @@ const libraryTests = {
     'AppleCoreMedia/1.0.0.17J586 (Apple TV; U; CPU OS 13_0 like Mac OS X; en_us)': { type: 'library', name: `AppleCoreMedia` },
     'aria2/1.36.0': { type: 'library', name: `aria2` },
     'Armadillo/12.19 (Linux;Android 11) ExoPlayerLib/2.17.1': { type: 'library', name: `Armadillo` },
+    'AHC/2.1': { type: 'library', name: `Async Http Client (java)` },
+    'AHC/2.0': { type: 'library', name: `Async Http Client (java)` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
     'CarrierWave/2.2.4': { type: 'library', name: `CarrierWave (ruby)` },
     'colly - https://github.com/gocolly/colly': { type: 'library', name: `Colly` },
