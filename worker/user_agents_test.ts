@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@ef1cdfe069251dad28d8967219b26e6ea03d3507 (2023-11-08T19:22:19Z)
+// from user-agents-v2@7dc0680c0d7ac2d90368fe7bc2a3bf06e901b475 (2023-11-09T23:45:15Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -59,6 +59,7 @@ const botTests = {
     'bl.uk_ldfc_bot/3.4.0-20200518 ( http://www.bl.uk/aboutus/legaldeposit/websites/websites/faqswebmaster/index.html)': { type: 'bot', name: `British Library` },
     'Blubrry Migration Service': { type: 'bot', name: `Blubrry Migration Service` },
     'Buzzsprout Importer': { type: 'bot', name: `Buzzsprout Importer` },
+    'Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)': { type: 'bot', name: `Bytespider.*bytedance` },
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
@@ -133,6 +134,7 @@ const botTests = {
     'Podgrab': { type: 'bot', name: `Podgrab` },
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
+    'pdrl.fm Analyzer / 1.0.0': { type: 'bot', name: `Podroll Analyzer` },
     'Adswizz-podscribe/1.0': { type: 'bot', name: `Podscribe` },
     'Podscribe/1.1': { type: 'bot', name: `Podscribe` },
     'Mozilla/5.0 (compatible; PodUptime/1.0; +https://poduptime.com)': { type: 'bot', name: `PodUptime` },
@@ -607,6 +609,7 @@ const appTests = {
     'lifegateburleson/10 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `lifegateburleson` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [LinkedInApp]': { type: 'app', name: `LinkedIn` },
     'LinkedIn/9.14.4868 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `LinkedIn` },
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [LinkedInApp]/9.28.7219': { type: 'app', name: `LinkedIn` },
     'Lisny': { type: 'app', name: `Lisny` },
     'Listen/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Listen` },
     'Listen App/84 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `Listen` },
@@ -685,6 +688,7 @@ const appTests = {
     'PodcastAddict/v2 - Dalvik/2.1.0 (Linux; U; Android 9; SM-N950U Build/PPR1.180610.011)': { type: 'app', name: `Podcast Addict` },
     'PodcastAddict/v5 ( https://podcastaddict.com/; Android podcast app)': { type: 'app', name: `Podcast Addict` },
     'Podcast Addict - Dalvik/2.1.0 (Linux; U; Android 9; SM-G960F Build/PPR1.180610.011)': { type: 'app', name: `Podcast Addict` },
+    'Podcast-Archiver/0.5.1 (https://github.com/janwh/podcast-archiver)': { type: 'app', name: `Podcast Archiver` },
     'Podcast Player/1.0 (phone;android RMX3195_11_A.18)': { type: 'app', name: `Podcast Player` },
     'PodcastRepublic/18.0 (Linux; U; Android 10;blueline/QP1A.190711.020.C3)': { type: 'app', name: `Podcast Republic` },
     'PodcastRepublic/18.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)': { type: 'app', name: `Podcast Republic` },
@@ -695,6 +699,7 @@ const appTests = {
     'Podclipper/4.2 (miguelDSP.Podclipper; build:4; iOS 13.1.3) Alamofire/4.7.3': { type: 'app', name: `Podclipper` },
     'PodCruncher/3.7.1 CFNetwork/1125.2 Darwin/19.4.0': { type: 'app', name: `PodCruncher` },
     'PodCruncher/3.7.1 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `PodCruncher` },
+    'poddl - podcast downloader': { type: 'app', name: `poddl - podcast downloader` },
     'Podeo/4.2.3 (Linux;Android 12) ExoPlayerLib/2.11.7': { type: 'app', name: `Podeo` },
     'Podfriend/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) PodFriend/0.7.11 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36': { type: 'app', name: `Podfriend` },
     'Podhero%20Alpha/4373 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `Podhero` },
@@ -754,6 +759,7 @@ const appTests = {
     'gvfs/1.46.1': { type: 'app', name: `Rhythmbox` },
     'RSSRadio7/9252 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `RSS Radio` },
     'RSSRadio/9710': { type: 'app', name: `RSS Radio` },
+    'com.meecel.feedreader.RssDemonAd': { type: 'app', name: `RSSDemon` },
     'RSSOwl/2.2.1.201312301314 (Windows; U; en)': { type: 'app', name: `RSSOwl` },
     'RTL+': { type: 'app', name: `RTL+` },
     'SachNoi.app/1 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `SachNoi` },
@@ -850,6 +856,9 @@ const appTests = {
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) ; iPhone/13.6 XING/8.15.2 ttt_webview_iosm': { type: 'app', name: `XING` },
     'Yandex.Music/2019-11-01.trunk.5885661': { type: 'app', name: `Yandex Music` },
     'Ya.Music/2022-10-06.trunk.10125214': { type: 'app', name: `Yandex Music` },
+    'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231105.002; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
+    'com.google.android.apps.youtube.music/62251340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
+    'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'Zeno': { type: 'app', name: `Zeno` },
     'Zune/4.8': { type: 'app', name: `Zune` },
     'Mozilla/5.0 (Mobile; LYF/F271i/LYF_F271i-000-01-20-101019; Android; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5': { type: 'app', name: `KAIOS podcast app` },

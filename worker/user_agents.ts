@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@ef1cdfe069251dad28d8967219b26e6ea03d3507 (2023-11-08T19:22:19Z)
+// from user-agents-v2@7dc0680c0d7ac2d90368fe7bc2a3bf06e901b475 (2023-11-09T23:45:15Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -46,6 +46,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^bl\.uk_ldfc_bot/.test(userAgent)) return { name: `British Library`, type: 'bot' };
     if (/^Blubrry Migration Service/.test(userAgent)) return { name: `Blubrry Migration Service`, type: 'bot' };
     if (/^Buzzsprout Importer/.test(userAgent)) return { name: `Buzzsprout Importer`, type: 'bot' };
+    if (/Bytespider/.test(userAgent)) return { name: `Bytespider.*bytedance`, type: 'bot' };
     if (/^CastFeedValidator\//.test(userAgent)) return { name: `CastFeedValidator`, type: 'bot' };
     if (/Castopod\/\d/.test(userAgent)) return { name: `Castopod`, type: 'bot' };
     if (/^Trackable\//.test(userAgent)) return { name: `Chartable`, type: 'bot' };
@@ -118,6 +119,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podio\//.test(userAgent)) return { name: `Podio Bot`, type: 'bot' };
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };
     if (/(podnods-crawler|podnods)/.test(userAgent)) return { name: `Podnods Bot`, type: 'bot' };
+    if (/^pdrl\.fm /.test(userAgent)) return { name: `Podroll Analyzer`, type: 'bot' };
     if (/(^Adswizz-podscribe\/|^Podscribe\/)/.test(userAgent)) return { name: `Podscribe`, type: 'bot' };
     if (/PodUptime\/\d/.test(userAgent)) return { name: `PodUptime`, type: 'bot' };
     if (/^Podverse\/Feed Parser/.test(userAgent)) return { name: `Podverse Feed Parser`, type: 'bot' };
@@ -442,7 +444,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/LG Player/.test(userAgent)) return { name: `LG Player`, type: 'app' };
     if (/^Life(%20)?Essentials(App)?\//.test(userAgent)) return { name: `LifeEssentials`, type: 'app' };
     if (/^lifegateburleson\//.test(userAgent)) return { name: `lifegateburleson`, type: 'app' };
-    if (/iPhone.+\[LinkedInApp\]|^LinkedIn\//.test(userAgent)) return { name: `LinkedIn`, type: 'app' };
+    if (/AppleWebKit.+\[LinkedInApp\]|^LinkedIn\//.test(userAgent)) return { name: `LinkedIn`, type: 'app' };
     if (/Lisny/.test(userAgent)) return { name: `Lisny`, type: 'app' };
     if (/^Listen(( |%20)App)?\//.test(userAgent)) return { name: `Listen`, type: 'app' };
     if (/^Liulo\//.test(userAgent)) return { name: `Liulo`, type: 'app' };
@@ -493,6 +495,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podbean\//.test(userAgent)) return { name: `Podbean`, type: 'app' };
     if (/^PodcastGuru/.test(userAgent)) return { name: `Podcast Guru`, type: 'app' };
     if (/^Podcast.*Addict\/|^Podcast Addict /.test(userAgent)) return { name: `Podcast Addict`, type: 'app' };
+    if (/janwh\/podcast-archiver/.test(userAgent)) return { name: `Podcast Archiver`, type: 'app' };
     if (/^Podcast Player\//.test(userAgent)) return { name: `Podcast Player`, type: 'app' };
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
@@ -500,6 +503,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podclipper\//.test(userAgent)) return { name: `Podclipper`, type: 'app' };
     if (/^Podcoin/.test(userAgent)) return { name: `Podcoin`, type: 'app' };
     if (/^PodCruncher\/.* CFNetwork\//.test(userAgent)) return { name: `PodCruncher`, type: 'app' };
+    if (/poddl - podcast downloader/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'app' };
     if (/^Podeo\//.test(userAgent)) return { name: `Podeo`, type: 'app' };
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
     if (/^Podhero|^Swoot[\/ ]/.test(userAgent)) return { name: `Podhero`, type: 'app' };
@@ -535,6 +539,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Roku\//.test(userAgent)) return { name: `Roku`, type: 'app' };
     if (/(^gvfs\/|^rhythmbox\/)/.test(userAgent)) return { name: `Rhythmbox`, type: 'app' };
     if (/^RSSRadio/.test(userAgent)) return { name: `RSS Radio`, type: 'app' };
+    if (/com\.meecel\.feedreader\.RssDemonAd/.test(userAgent)) return { name: `RSSDemon`, type: 'app' };
     if (/^RSSOwl.*Windows/.test(userAgent)) return { name: `RSSOwl`, type: 'app' };
     if (/RTL\+/.test(userAgent)) return { name: `RTL+`, type: 'app' };
     if (/^SachNoi\.app\/|^SachNoiApp\//.test(userAgent)) return { name: `SachNoi`, type: 'app' };
@@ -598,6 +603,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iPhone.*XING/.test(userAgent)) return { name: `XING`, type: 'app' };
     if (/^Ya(ndex)?\.Music\//.test(userAgent)) return { name: `Yandex Music`, type: 'app' };
     if (/^yapa\//.test(userAgent)) return { name: `Yapa`, type: 'app' };
+    if (/^com\.google\.android\.apps\.youtube\.music\//.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
     if (/^Zeno$/.test(userAgent)) return { name: `Zeno`, type: 'app' };
     if (/Zune\//.test(userAgent)) return { name: `Zune`, type: 'app' };
     if (/^Podcast\/1\./.test(userAgent)) return { name: `小宇宙`, type: 'app' };
