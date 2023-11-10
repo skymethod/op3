@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@7dc0680c0d7ac2d90368fe7bc2a3bf06e901b475 (2023-11-09T23:45:15Z)
+// from user-agents-v2@dbc3c38bcd3f342bb1a1db3260157039cad389a1 (2023-11-10T03:31:49Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -859,6 +859,8 @@ const appTests = {
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231105.002; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62251340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
+    'YouTubeMusic/20231020.1.1 CFNetwork/1474 Darwin/23.0.0': { type: 'app', name: `YouTube Music` },
+    'YouTubeMusic/20230915.1.1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `YouTube Music` },
     'Zeno': { type: 'app', name: `Zeno` },
     'Zune/4.8': { type: 'app', name: `Zune` },
     'Mozilla/5.0 (Mobile; LYF/F271i/LYF_F271i-000-01-20-101019; Android; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5': { type: 'app', name: `KAIOS podcast app` },

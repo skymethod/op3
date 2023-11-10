@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@7dc0680c0d7ac2d90368fe7bc2a3bf06e901b475 (2023-11-09T23:45:15Z)
+// from user-agents-v2@dbc3c38bcd3f342bb1a1db3260157039cad389a1 (2023-11-10T03:31:49Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -603,7 +603,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iPhone.*XING/.test(userAgent)) return { name: `XING`, type: 'app' };
     if (/^Ya(ndex)?\.Music\//.test(userAgent)) return { name: `Yandex Music`, type: 'app' };
     if (/^yapa\//.test(userAgent)) return { name: `Yapa`, type: 'app' };
-    if (/^com\.google\.android\.apps\.youtube\.music\//.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
+    if (/^com\.google\.android\.apps\.youtube\.music\/|^YouTubeMusic\/\d/.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
     if (/^Zeno$/.test(userAgent)) return { name: `Zeno`, type: 'app' };
     if (/Zune\//.test(userAgent)) return { name: `Zune`, type: 'app' };
     if (/^Podcast\/1\./.test(userAgent)) return { name: `小宇宙`, type: 'app' };
