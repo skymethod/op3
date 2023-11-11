@@ -365,6 +365,13 @@ Deno.test({
             { kind: 'prefix', prefix: 'ipfspodcasting', url: 'https://ipfspodcasting.net/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://chrt.fm/track/53A61E/pdst.fm/e/dts.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123'), [
+            { kind: 'prefix', prefix: 'chartable', url: 'https://chrt.fm/track/53A61E/pdst.fm/e/dts.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' },
+            { kind: 'prefix', prefix: 'podsights', url: 'https://pdst.fm/e/dts.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' },
+            { kind: 'prefix', prefix: 'podtrac', url: 'https://dts.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' }
+        ]);
     }
 });
 
