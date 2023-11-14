@@ -263,6 +263,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'ipfspodcasting', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://cohst.app/pdcst/123ABC/a.com/path/to/episode.mp3
+    // http redirects to https
+    // no suffix protocol support
+    m = /^https?:\/\/cohst\.app\/pdcst\/[^/]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'cohost', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -293,6 +303,7 @@ export interface ChainItem {
         | 'blubrry'
         | 'chartable'
         | 'claritas'
+        | 'cohost'
         | 'glystn'
         | 'gumball'
         | 'ipfspodcasting'

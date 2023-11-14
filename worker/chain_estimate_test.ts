@@ -372,6 +372,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'podtrac', url: 'https://dts.podtrac.com/pts/redirect.mp3/a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3?awCollectionId=1234&awEpisodeId=1234123' }
         ]);
+
+        assertEquals(computeChainEstimate('https://cohst.app/pdcst/123ABC/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'cohost', url: 'https://cohst.app/pdcst/123ABC/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
