@@ -51,15 +51,15 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         }
     }
 
-    const episodeIdsWithData = episodes.filter(v => episodeHourlyDownloads[v.id]).map(v => v.id);
     const pageSize = 8;
-    const pages = Math.ceil(episodeIdsWithData.length / pageSize);
-    const maxPageIndex = pages - 1;
+    let episodeIdsWithData: string[] = [];
+    let episodeRelativeSummaries: Record<string, RelativeSummary> = {};
+    let pages = 0;
+    let maxPageIndex = 0;
     let pageIndex = 0;
+    let final_ = false;
     let currentChart: Chart | undefined;
 
-    const episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map(v => [ v[0], computeRelativeSummary(v[1]) ]));
-   
     function redrawChart() {
         if (currentChart) currentChart.destroy();
         currentChart = undefined;
@@ -69,9 +69,24 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         const episodeInfos = Object.fromEntries(episodes.map(v => [v.id, v]));
         const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
+        
         currentChart = chart;
     }
-    redrawChart();
+
+    function updateEpisodeHourlyDownloads(episodeHourlyDownloads: Record<string, Record<string, number>> | undefined, final: boolean) {
+        if (final) console.log(`updateEpisodeHourlyDownloadsFinal: changed=${!!episodeHourlyDownloads}`);
+        final_ = final;
+        if (episodeHourlyDownloads) {
+            episodeIdsWithData = episodes.filter(v => episodeHourlyDownloads[v.id]).map(v => v.id);
+            episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map(v => [ v[0], computeRelativeSummary(v[1]) ]));
+            pages = Math.ceil(episodeIdsWithData.length / pageSize);
+            maxPageIndex = pages - 1;
+            redrawChart();
+        }
+        episodePacingExportButton.style.visibility = final_ ? 'visible' : 'hidden';
+        if (final) update();
+    }
+    updateEpisodeHourlyDownloads(episodeHourlyDownloads, false);
 
     episodePacingPrevious.onclick = () => {
         if (pageIndex > 0) {
@@ -82,7 +97,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
     }
 
     episodePacingNext.onclick = () => {
-        if (pageIndex < maxPageIndex) {
+        if (pageIndex < maxPageIndex && final_) {
             pageIndex++;
             redrawChart();
             update();
@@ -115,13 +130,13 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
 
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;
-        episodePacingNext.disabled = pageIndex === maxPageIndex;
+        episodePacingNext.disabled = !final_ || pageIndex === maxPageIndex;
         episodePacingNavCaption.textContent = `Page ${pageIndex + 1} of ${pages}`;
     }
 
     update();
 
-    return { update };
+    return { update, updateEpisodeHourlyDownloads };
 };
 
 //

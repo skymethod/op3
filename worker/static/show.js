@@ -8701,15 +8701,14 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
             }
         }
     }
-    const episodeIdsWithData = episodes.filter((v)=>episodeHourlyDownloads[v.id]).map((v)=>v.id);
-    const pages = Math.ceil(episodeIdsWithData.length / 8);
-    const maxPageIndex = pages - 1;
+    const pageSize = 8;
+    let episodeIdsWithData = [];
+    let episodeRelativeSummaries = {};
+    let pages = 0;
+    let maxPageIndex = 0;
     let pageIndex = 0;
+    let final_ = false;
     let currentChart;
-    const episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map((v)=>[
-            v[0],
-            computeRelativeSummary(v[1])
-        ]));
     function redrawChart() {
         if (currentChart) currentChart.destroy();
         currentChart = undefined;
@@ -8727,7 +8726,23 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
-    redrawChart();
+    function updateEpisodeHourlyDownloads(episodeHourlyDownloads, __final) {
+        if (__final) console.log(`updateEpisodeHourlyDownloadsFinal: changed=${!!episodeHourlyDownloads}`);
+        final_ = __final;
+        if (episodeHourlyDownloads) {
+            episodeIdsWithData = episodes.filter((v)=>episodeHourlyDownloads[v.id]).map((v)=>v.id);
+            episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map((v)=>[
+                    v[0],
+                    computeRelativeSummary(v[1])
+                ]));
+            pages = Math.ceil(episodeIdsWithData.length / pageSize);
+            maxPageIndex = pages - 1;
+            redrawChart();
+        }
+        episodePacingExportButton.style.visibility = final_ ? 'visible' : 'hidden';
+        if (__final) update();
+    }
+    updateEpisodeHourlyDownloads(episodeHourlyDownloads, false);
     episodePacingPrevious.onclick = ()=>{
         if (pageIndex > 0) {
             pageIndex--;
@@ -8736,7 +8751,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
         }
     };
     episodePacingNext.onclick = ()=>{
-        if (pageIndex < maxPageIndex) {
+        if (pageIndex < maxPageIndex && final_) {
             pageIndex++;
             redrawChart();
             update();
@@ -8777,12 +8792,13 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
     };
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;
-        episodePacingNext.disabled = pageIndex === maxPageIndex;
+        episodePacingNext.disabled = !final_ || pageIndex === maxPageIndex;
         episodePacingNavCaption.textContent = `Page ${pageIndex + 1} of ${pages}`;
     }
     update();
     return {
-        update
+        update,
+        updateEpisodeHourlyDownloads
     };
 };
 const withCommas1 = new Intl.NumberFormat('en-US');
@@ -9359,6 +9375,7 @@ const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, lis
     const card = cardId ? element(cardId) : undefined;
     const months = Object.keys(monthlyDownloads);
     const monthlyDownloadsValues = Object.values(monthlyDownloads);
+    if (monthlyDownloadsValues.length === 0) return;
     const computeInitialMonthIndex = ()=>{
         const lastMonthsDownloads = Object.values(monthlyDownloadsValues.at(-2) ?? {}).reduce((a, b)=>a + b, 0);
         const thisMonthsDownloads = Object.values(monthlyDownloadsValues.at(-1)).reduce((a, b)=>a + b, 0);
@@ -10230,24 +10247,33 @@ const app = await (async ()=>{
     const { showObj, statsObj, times } = initialData;
     const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const grabMoreDataIfNecessary = async ()=>{
+    const grabMoreDataIfNecessary = async (page)=>{
         const { episodeHourlyDownloads, months } = statsObj;
-        const pubdates = episodes.map((v)=>v.pubdate).filter((v)=>typeof v === 'string').sort().reverse().slice(0, 8);
+        let changed = false;
         try {
-            const pubdate = pubdates[pubdates.length - 1];
-            if (pubdate === undefined) return;
-            const needMonth = pubdate.substring(0, 7);
-            if (months.includes(needMonth)) return;
+            let needMonth;
+            let epsByPubdate = sortBy(episodes, (v)=>v.pubdate ?? '1970').reverse();
+            if (page === 'first') epsByPubdate = epsByPubdate.slice(0, 8);
+            for (const ep of epsByPubdate){
+                const firstHour = statsObj.episodeFirstHours[ep.id];
+                if (firstHour) {
+                    const month = firstHour.substring(0, 7);
+                    needMonth = needMonth === undefined ? month : month < needMonth ? month : needMonth;
+                }
+            }
             let haveMonth = statsObj.months[0];
+            console.log(JSON.stringify({
+                page,
+                haveMonth,
+                needMonth
+            }));
+            if (needMonth === undefined) return changed;
+            if (months.includes(needMonth)) return changed;
             const moreMonths = [];
             let grabs = 0;
             while(grabs < 10){
-                if (!haveMonth) return;
-                if (moreMonths.includes(needMonth)) return;
-                console.log(JSON.stringify({
-                    haveMonth,
-                    needMonth
-                }));
+                if (!haveMonth) return changed;
+                if (moreMonths.includes(needMonth)) return changed;
                 const latestMonth = addMonthsToMonthString(haveMonth, -1);
                 const qp = new URLSearchParams(document.location.search);
                 const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
@@ -10270,17 +10296,21 @@ const app = await (async ()=>{
                     };
                     episodeHourlyDownloads[episodeId] = merged;
                 }
+                changed = true;
                 haveMonth = moreStats.months[0];
                 moreMonths.push(...moreStats.months);
                 grabs++;
             }
         } finally{
-            class DataLoaded extends HTMLElement {
+            if (page === 'first') {
+                class DataLoaded extends HTMLElement {
+                }
+                customElements.define('data-loaded', DataLoaded);
             }
-            customElements.define('data-loaded', DataLoaded);
         }
+        return changed;
     };
-    await grabMoreDataIfNecessary();
+    await grabMoreDataIfNecessary('first');
     const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
@@ -10314,7 +10344,7 @@ const app = await (async ()=>{
         showSlug,
         previewToken
     });
-    makeEpisodePacing({
+    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
         episodeHourlyDownloads,
         episodes,
         showTitle,
@@ -10383,6 +10413,13 @@ const app = await (async ()=>{
         exportDownloads.update();
         headlineStats.update();
     }
+    (async ()=>{
+        const changed = await grabMoreDataIfNecessary('all');
+        updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
+                v[0],
+                insertZeros(v[1])
+            ])) : undefined, true);
+    })();
     return {
         update
     };

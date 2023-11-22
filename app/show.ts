@@ -1,5 +1,5 @@
 import { ApiShowsResponse, ApiShowStatsResponse } from '../worker/routes/api_shows_model.ts';
-import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, TimeScale, Tooltip } from './deps.ts';
+import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, TimeScale, Tooltip, sortBy } from './deps.ts';
 import { makeDownloadsGraph } from './downloads_graph.ts';
 import { element } from './elements.ts';
 import { makeEpisodePacing } from './episode_pacing.ts';
@@ -46,22 +46,29 @@ const app = await (async () => {
     const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
-    const grabMoreDataIfNecessary = async () => {
+    const grabMoreDataIfNecessary = async (page: 'first' | 'all') => {
         const { episodeHourlyDownloads, months } = statsObj;
-        const pubdates = episodes.map(v => v.pubdate).filter(v => typeof v === 'string').sort().reverse().slice(0, 8);
+        let changed = false;
         try {
-            const pubdate = pubdates[pubdates.length - 1];
-            if (pubdate === undefined) return;
-            const needMonth = pubdate.substring(0, 7);
-            if (months.includes(needMonth)) return;
+            let needMonth: string | undefined;
+            let epsByPubdate = sortBy(episodes, v => v.pubdate ?? '1970').reverse();
+            if (page === 'first') epsByPubdate = epsByPubdate.slice(0, 8);
+            for (const ep of epsByPubdate) {
+                const firstHour = statsObj.episodeFirstHours[ep.id];
+                if (firstHour) {
+                    const month = firstHour.substring(0, 7);
+                    needMonth = needMonth === undefined ? month : month < needMonth ? month : needMonth;
+                }
+            }
             let haveMonth = statsObj.months[0];
+            console.log(JSON.stringify({ page, haveMonth, needMonth }));
+            if (needMonth === undefined) return changed;
+            if (months.includes(needMonth)) return changed;
             const moreMonths: string[] = [];
             let grabs = 0;
             while (grabs < 10) {
-                if (!haveMonth) return;
-                if (moreMonths.includes(needMonth)) return;
-                console.log(JSON.stringify({ haveMonth, needMonth }));
-
+                if (!haveMonth) return changed;
+                if (moreMonths.includes(needMonth)) return changed;
                 const latestMonth = addMonthsToMonthString(haveMonth, -1);
 
                 const qp = new URLSearchParams(document.location.search);
@@ -81,17 +88,21 @@ const app = await (async () => {
                     const merged = { ...hourlyDownloads, ...episodeHourlyDownloads[episodeId] };
                     episodeHourlyDownloads[episodeId] = merged;
                 }
+                changed = true;
                 haveMonth = moreStats.months[0];
                 moreMonths.push(...moreStats.months);
                 grabs++;
             }
         } finally {
-            // signal page ready to show
-            class DataLoaded extends HTMLElement {}
-            customElements.define('data-loaded', DataLoaded);
+            if (page === 'first') {
+                // signal page ready to show
+                class DataLoaded extends HTMLElement {}
+                customElements.define('data-loaded', DataLoaded);
+            }
         }
+        return changed;
     }
-    await grabMoreDataIfNecessary();
+    await grabMoreDataIfNecessary('first');
 
     const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
@@ -110,7 +121,7 @@ const app = await (async () => {
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
-    makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate });
+    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate });
 
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 
@@ -131,6 +142,11 @@ const app = await (async () => {
         exportDownloads.update();
         headlineStats.update();
     }
+
+    (async () => {
+        const changed = await grabMoreDataIfNecessary('all');
+        updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ])) : undefined, true);
+    })();
 
     return { update };
 })();

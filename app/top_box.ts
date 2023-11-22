@@ -42,6 +42,7 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
 
     const months = Object.keys(monthlyDownloads);
     const monthlyDownloadsValues = Object.values(monthlyDownloads);
+    if (monthlyDownloadsValues.length === 0) return;
     const computeInitialMonthIndex = () => {
         const lastMonthsDownloads = Object.values(monthlyDownloadsValues.at(-2) ?? {}).reduce((a, b) => a + b, 0);
         const thisMonthsDownloads = Object.values(monthlyDownloadsValues.at(-1)!).reduce((a, b) => a + b, 0);
