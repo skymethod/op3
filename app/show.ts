@@ -121,7 +121,8 @@ const app = await (async () => {
     const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
     makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug });
     const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
-    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate });
+    const shot = new URLSearchParams(document.location.search).has('shot');
+    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot });
 
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 
@@ -144,6 +145,7 @@ const app = await (async () => {
     }
 
     (async () => {
+        if (shot) return;
         const changed = await grabMoreDataIfNecessary('all');
         updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ])) : undefined, true);
     })();

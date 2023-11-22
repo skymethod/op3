@@ -4,9 +4,9 @@ import { Chart, distinct } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined, shot: boolean };
 
-export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate }: Opts) => {
+export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot }: Opts) => {
 
     const [ 
         episodePacingPrevious, 
@@ -32,7 +32,6 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         element<HTMLTemplateElement>('episode-pacing-legend-item'),
     ];
 
-    const shot = new URLSearchParams(document.location.search).has('shot');
     if (shot) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
@@ -81,12 +80,12 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
             episodeRelativeSummaries = Object.fromEntries(Object.entries(episodeHourlyDownloads).map(v => [ v[0], computeRelativeSummary(v[1]) ]));
             pages = Math.ceil(episodeIdsWithData.length / pageSize);
             maxPageIndex = pages - 1;
-            redrawChart();
         }
         episodePacingExportButton.style.visibility = final_ ? 'visible' : 'hidden';
         if (final) update();
     }
     updateEpisodeHourlyDownloads(episodeHourlyDownloads, false);
+    redrawChart();
 
     episodePacingPrevious.onclick = () => {
         if (pageIndex > 0) {

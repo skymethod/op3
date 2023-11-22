@@ -8670,7 +8670,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
     };
     return new xt(ctx, config);
 }
-const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate })=>{
+const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot })=>{
     const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingExportButton, episodePacingLegendItemTemplate] = [
         element('episode-pacing-previous'),
         element('episode-pacing-next'),
@@ -8683,7 +8683,6 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
         element('episode-pacing-export'),
         element('episode-pacing-legend-item')
     ];
-    const shot = new URLSearchParams(document.location.search).has('shot');
     if (shot) {
         episodePacingShotHeader.classList.remove('hidden');
         episodePacingShotHeader.innerHTML = showTitle ?? '(untitled)';
@@ -8737,12 +8736,12 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
                 ]));
             pages = Math.ceil(episodeIdsWithData.length / pageSize);
             maxPageIndex = pages - 1;
-            redrawChart();
         }
         episodePacingExportButton.style.visibility = final_ ? 'visible' : 'hidden';
         if (__final) update();
     }
     updateEpisodeHourlyDownloads(episodeHourlyDownloads, false);
+    redrawChart();
     episodePacingPrevious.onclick = ()=>{
         if (pageIndex > 0) {
             pageIndex--;
@@ -10344,12 +10343,14 @@ const app = await (async ()=>{
         showSlug,
         previewToken
     });
+    const shot = new URLSearchParams(document.location.search).has('shot');
     const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
         episodeHourlyDownloads,
         episodes,
         showTitle,
         showSlug,
-        mostRecentDate
+        mostRecentDate,
+        shot
     });
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
             month,
@@ -10414,6 +10415,7 @@ const app = await (async ()=>{
         headlineStats.update();
     }
     (async ()=>{
+        if (shot) return;
         const changed = await grabMoreDataIfNecessary('all');
         updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
                 v[0],
