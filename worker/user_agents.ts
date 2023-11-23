@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@dbc3c38bcd3f342bb1a1db3260157039cad389a1 (2023-11-10T03:31:49Z)
+// from user-agents-v2@1c67b1f6ad76204ef3e9c7cdfaa1b3aeb5584810 (2023-11-23T16:09:47Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -186,7 +186,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AhaRadio2\//.test(userAgent)) return { name: `AhaRadio`, type: 'app' };
     if (/^Airr(%20Beta)?\/|^Airr \(/.test(userAgent)) return { name: `Airr`, type: 'app' };
     if (/^Airsonic\//.test(userAgent)) return { name: `Airsonic`, type: 'app' };
-    if (/(^AlexaMediaPlayer\/[\dv]|^Echo\/|^AlexaService\/|^Alexa Mobile Voice\/)/.test(userAgent)) return { name: `Alexa-enabled device`, type: 'app' };
+    if (/^AlexaMediaPlayer\/[\dv]|^Echo\/|^AlexaService\/|^Alexa Mobile Voice\/|^Amazon;Echo/.test(userAgent)) return { name: `Alexa-enabled device`, type: 'app' };
     if (/^AlienBlue\//.test(userAgent)) return { name: `AlienBlue`, type: 'app' };
     if (/AllYouCanBooks/.test(userAgent)) return { name: `All You Can Books`, type: 'app' };
     if (/^AllHitMusicRadio\//.test(userAgent)) return { name: `AllHitMusicRadio`, type: 'app' };
@@ -213,6 +213,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS Askoyvaringen Hermes\//.test(userAgent)) return { name: `Askoyvaringen iOS app`, type: 'app' };
     if (/^Audacious/.test(userAgent)) return { name: `Audacious`, type: 'app' };
     if (/^Radio\.com\//.test(userAgent)) return { name: `Audacy`, type: 'app' };
+    if (/^com\.audials\//.test(userAgent)) return { name: `Audials`, type: 'app' };
     if (/(^com\.audible\.playersdk\.player|^Audible,|^Audible.*Darwin)/.test(userAgent)) return { name: `Audible`, type: 'app' };
     if (/^Audio\//.test(userAgent)) return { name: `Audio`, type: 'app' };
     if (/^Android_AudioNow/.test(userAgent)) return { name: `Audio Now`, type: 'app' };
@@ -480,12 +481,12 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
     if (/(^NPR%20One\/|^NPROneAndroid)/.test(userAgent)) return { name: `NPR One`, type: 'app' };
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
-    if (/nl\.nrc\.nrcapp|^NRC-Nieuws\//.test(userAgent)) return { name: `NRC`, type: 'app' };
+    if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
     if (/^Overcast\/|^Overcast.*Apple Watch/.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
     if (/^Palco MP3/.test(userAgent)) return { name: `Palco MP3`, type: 'app' };
-    if (/(^Pandora.+Android| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
+    if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
     if (/^Parler( Staging)?\//.test(userAgent)) return { name: `Parler`, type: 'app' };
     if (/^PeaCast\//.test(userAgent)) return { name: `PeaCast`, type: 'app' };
     if (/^Playapod/.test(userAgent)) return { name: `Playapod`, type: 'app' };
@@ -734,6 +735,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/:\/\/[^.\/]+\.podfriend\.com\//.test(referer)) return { name: `Podfriend`, type: 'referrer', category: 'app' };
     if (/:\/\/podgrabber\.com\//.test(referer)) return { name: `PodGrabber`, type: 'referrer', category: 'app' };
     if (/\/\/pod\.link\//.test(referer)) return { name: `PodLink`, type: 'referrer', category: 'app' };
+    if (/:\/\/podmust\.com\//.test(referer)) return { name: `Podmust`, type: 'referrer', category: 'app' };
     if (/podplay\.com/.test(referer)) return { name: `Podplay`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podtail\.com\//.test(referer)) return { name: `Podtail`, type: 'referrer' };
     if (/:\/\/podverse\.fm\//.test(referer)) return { name: `Podverse`, type: 'referrer', category: 'app' };

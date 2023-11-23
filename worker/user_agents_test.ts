@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@dbc3c38bcd3f342bb1a1db3260157039cad389a1 (2023-11-10T03:31:49Z)
+// from user-agents-v2@1c67b1f6ad76204ef3e9c7cdfaa1b3aeb5584810 (2023-11-23T16:09:47Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -204,6 +204,10 @@ const appTests = {
     'AlexaService/2.2.303087.0 (Linux;Android 9) ExoPlayerLib/2.8.4': { type: 'app', name: `Alexa-enabled device` },
     'Alexa Mobile Voice/2.2.2768.0 (Linux;Android 7.0) ExoPlayerLib/2.2.0': { type: 'app', name: `Alexa-enabled device` },
     'Echo/1.0(MRM)': { type: 'app', name: `Alexa-enabled device` },
+    'Amazon;Echo_Dot;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
+    'Amazon;Echo_Dot_with_clock;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
+    'Amazon;Echo_Show_5;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
+    'Amazon;Echo;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
     'AlienBlue/2.9.7 CFNetwork/808.2.16 Darwin/16.3.0': { type: 'app', name: `AlienBlue` },
     'AllYouCanBooks/510 CFNetwork/811.5.4 Darwin/16.7.0': { type: 'app', name: `All You Can Books` },
     'Mozilla/5.0 (Linux; Android 9; CLT-L29 Build/HUAWEICLT-L29; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/75.0.3770.101 Mobile Safari/537.36 AllYouCanBooksAppAndroid': { type: 'app', name: `All You Can Books` },
@@ -278,6 +282,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Askoyvaringen Hermes/90.0.0 _app_': { type: 'app', name: `Askoyvaringen iOS app` },
     'Audacious/3.10.1 neon/0.30.2': { type: 'app', name: `Audacious` },
     'Radio.com/12.2.0 (com.cbsradio.cbsradioplayer; build:1; iOS 14.6.0) Alamofire/4.8.1': { type: 'app', name: `Audacy` },
+    'com.audials/9.52.0-0+gb3764950b-1058878988 (Linux;Android 11) AndroidXMedia3/1.1.1': { type: 'app', name: `Audials` },
     'Audio/105 CFNetwork/548.1.4 Darwin/11.0.0': { type: 'app', name: `Audio` },
     'Android_AudioNow': { type: 'app', name: `Audio Now` },
     'AudioWave/1.5 (+https://audiowave.io/; iPhone 15.4)': { type: 'app', name: `AudioWave` },
@@ -663,6 +668,7 @@ const appTests = {
     'iPad (compatible; Tablet2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iPadOS 16.6': { type: 'app', name: `NRC` },
     'iPhone (compatible; Smartphone2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iOS 16.6': { type: 'app', name: `NRC` },
     'NRC-Nieuws/5.4.0 (com.twipemobile.nrc; build:540; Android:13; Sdk:33; Manufacturer:samsung; Model: SM-A528B) OkHttp/4.11.0': { type: 'app', name: `NRC` },
+    'SM-T970 (compatible; Tablet2.0) HandelsbladProduction, com.twipemobile.nrc 5.1.4 (511) / Android 33': { type: 'app', name: `NRC` },
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },
@@ -671,6 +677,7 @@ const appTests = {
     'Podcast Overhaul/4.1.1 iOS/16.1.1 +https://www.podcastoverhaul.com/': { type: 'app', name: `Overhaul` },
     'Palco MP3/3.13.18 (Linux;Android 11) ExoPlayerLib/2.11.0': { type: 'app', name: `Palco MP3` },
     'Pandora/2009.2 Android/7.1.1 gteslteatt (ExoPlayerLib1.5.14.1)': { type: 'app', name: `Pandora` },
+    'Pandora/2179 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `Pandora` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/2009.2': { type: 'app', name: `Pandora` },
     'Mozilla/5.0 (iPad; CPU OS 12_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/1908.1': { type: 'app', name: `Pandora` },
     'Parler Staging/542 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Parler` },
@@ -978,6 +985,10 @@ const deviceTests = {
     'PRDownloader': { type: 'device', name: `Android Phone` },
     'TURTLECAST/0.5.1': { type: 'device', name: `Android Phone` },
     'Amazon;Echo_Pop;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
+    'Amazon;Echo_Dot;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
+    'Amazon;Echo_Dot_with_clock;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
+    'Amazon;Echo_Show_5;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
+    'Amazon;Echo;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'device', name: `Amazon Smart Speaker` },
     'Bose;Bose_Home_Speaker_500;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
     'Bose;Bose_Home_Speaker_500': { type: 'device', name: `Other Smart Speaker` },
     'Bose;Bose_Soundbar_700;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
@@ -1066,6 +1077,7 @@ const referrerTests = {
     'https://www.podfriend.com/': { type: 'referrer', name: `Podfriend` },
     'https://podgrabber.com/': { type: 'referrer', name: `PodGrabber` },
     'https://pod.link/': { type: 'referrer', name: `PodLink` },
+    'https://podmust.com/': { type: 'referrer', name: `Podmust` },
     'https://www.podplay.com/': { type: 'referrer', name: `Podplay` },
     'https://podtail.com/': { type: 'referrer', name: `Podtail` },
     'https://podverse.fm/': { type: 'referrer', name: `Podverse` },
