@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@1c67b1f6ad76204ef3e9c7cdfaa1b3aeb5584810 (2023-11-23T16:09:47Z)
+// from user-agents-v2@0d971142c56e0708371d9434a1afef6beb8dea16 (2023-11-30T14:27:26Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -866,8 +866,11 @@ const appTests = {
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231105.002; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62251340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
+    'com.google.android.apps.youtube.music/62852240 (Linux; U; Android 11; pt_PT; SM-A705FN; Build/RP1A.200720.012; Cronet/120.0.6057.2)': { type: 'app', name: `YouTube Music` },
     'YouTubeMusic/20231020.1.1 CFNetwork/1474 Darwin/23.0.0': { type: 'app', name: `YouTube Music` },
     'YouTubeMusic/20230915.1.1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `YouTube Music` },
+    'YouTubeMusic/6.29.2 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `YouTube Music` },
+    'app.revanced.android.apps.youtube.music/62852240 (Linux; U; Android 11; pt_BR; Redmi Note 8 Pro; Build/RP1A.200720.011; Cronet/120.0.6057.2)': { type: 'app', name: `YouTube Music (ReVanced)` },
     'Zeno': { type: 'app', name: `Zeno` },
     'Zune/4.8': { type: 'app', name: `Zune` },
     'Mozilla/5.0 (Mobile; LYF/F271i/LYF_F271i-000-01-20-101019; Android; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5': { type: 'app', name: `KAIOS podcast app` },
