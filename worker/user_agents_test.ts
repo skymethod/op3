@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@0d971142c56e0708371d9434a1afef6beb8dea16 (2023-11-30T14:27:26Z)
+// from user-agents-v2@7bf875b6d94872945de7004b6caab65be576b37f (2023-12-05T17:23:40Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -709,6 +709,7 @@ const appTests = {
     'poddl - podcast downloader': { type: 'app', name: `poddl - podcast downloader` },
     'Podeo/4.2.3 (Linux;Android 12) ExoPlayerLib/2.11.7': { type: 'app', name: `Podeo` },
     'Podfriend/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) PodFriend/0.7.11 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36': { type: 'app', name: `Podfriend` },
+    'Podgrab - docker': { type: 'app', name: `Podgrab` },
     'Podhero%20Alpha/4373 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `Podhero` },
     'Swoot Agent 1.0': { type: 'app', name: `Podhero` },
     'Podimo/1.11.3 build 121/iOS 13.3': { type: 'app', name: `Podimo` },
