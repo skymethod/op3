@@ -139,6 +139,7 @@ export class CombinedRedirectLogController {
         const multiples = Object.fromEntries([
             [ DoNames.redirectLogForColo('AMS'), 6 ],
             [ DoNames.redirectLogForColo('ORD'), 2 ],
+            [ DoNames.redirectLogForColo('SEA'), 2 ],
         ]);
 
         for (const state of sourceStates) {
