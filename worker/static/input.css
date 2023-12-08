@@ -11,6 +11,12 @@
         @apply text-orange-500;
         @apply underline;
     }
+    a.svg:hover {
+        @apply outline;
+        @apply outline-1;
+        @apply outline-orange-500;
+        @apply outline-offset-8;
+    }
     .basic p {
         @apply mt-4
     }

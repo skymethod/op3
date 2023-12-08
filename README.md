@@ -3,7 +3,7 @@ OP3: The Open Podcast Prefix Project
 
 <img width="366" alt="image" src="https://user-images.githubusercontent.com/47259736/196559392-77f5f200-46bf-42f9-96a7-cb414b0b08b8.png">
 
-The Open Podcast Prefix Project (OP3) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
+The [Open Podcast Prefix Project (OP3)](https://op3.dev/) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
 
 # TL;DR
 Podcasters or podcast hosting companies can prepend
@@ -33,8 +33,6 @@ A free service for podcasters and podcast hosts to compute standard episode/show
 
 ## Commitment to **open development**
   - Anyone can get involved in the project [discussions](https://github.com/skymethod/op3/discussions)
-  - Currently, only a minimal set of fields are saved for every request
-    - Other data like rough geo-location is available, but should be first discussed with a wider community before saving
    
 ## Commitment to **auditable infrastructure**
   - Entire code base is open source, right here in this very GitHub repo
@@ -56,7 +54,8 @@ A free service for podcasters and podcast hosts to compute standard episode/show
   - Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships (see [below](#sponsors))
 
 # Roadmap
-The production [op3.dev](https://op3.dev) prefix service is ready to use, it's been tested with large shows and is safely storing and returning episode request logs. 
+The production [op3.dev](https://op3.dev) prefix service is ready to use, it's been running since September 2022, currently measuring
+over 1000 shows, large and small.
 Basic request and download-level data is available in the API, all other future features will build on top in a layered approach.
 
 Free public stats pages are available for every show using OP3 - see an [example](https://op3.dev/show/dc1852e4d1ee4bce9c4fb7f5d8be8908).
@@ -77,12 +76,12 @@ Free public stats pages are available for every show using OP3 - see an [example
  - 🔜 Build operational tools to support ongoing maintenance, data management, and abuse/fraud detection with minimal staffing needs
 
 # Sponsors
-Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships.
+Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships.  This is the only way OP3 can stay open and independent into the future.
 
-For initial development, there are two monthly sponsorship levels:
- - $500/mo [OP3 Pioneer Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) to help fund development and drive future features
+There are two monthly sponsorship levels:
+ - $500/mo [OP3 Gold Sponsorship](https://buy.stripe.com/aEU8z676n2fnfEQ148) to help fund development and drive future features
  - $100/mo [OP3 Sponsorship](https://buy.stripe.com/cN2eXueyP07f3W83ch) to help fund development
- - Sponsors will eventually be listed here on the project page
+ - These sponsors are listed on [the OP3 home page](https://op3.dev/#sponsors)
 
 For podcasters using OP3 or anyone else wanting to support this effort, consider our:
  - $10/mo [Early Supporter Sponsorship](https://buy.stripe.com/8wM6qYeyPg6d9gsdQW) to help offset monthly infrastructure costs
