@@ -1,6 +1,6 @@
 import { Callback, parseXml } from './xml_parser.ts';
 import { tryParsePubdate } from './pubdates.ts';
-import { tryParseUrl } from './check.ts';
+import { tryParseUrl, undefinedIfBlank } from './check.ts';
 
 export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
@@ -143,7 +143,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/title') feedTitle = text;
             if (xpath === '/rss/channel/link') feedLink = text;
             if (xpath === '/rss/channel/generator') feedGenerator = text;
-            if (xpath === '/rss/channel/podcast:guid' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) feedPodcastGuid = text;
+            if (xpath === '/rss/channel/podcast:guid' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) feedPodcastGuid = undefinedIfBlank(text);
             if (xpath === '/rss/channel/itunes:author' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesAuthor = text;
             if (xpath === '/rss/channel/itunes:type' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesType = text;
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
