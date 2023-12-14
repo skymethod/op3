@@ -76,7 +76,7 @@ Deno.test({
             // ensure saved row count
             const data = await storage.list();
             // console.log(data);
-            assertEquals(data.size, 8 /* index records: 8 - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */ + 1 /* url record (pending was sent) */);
+            assertEquals(data.size, 7 /* index records: 7 - Method (GETs not indexed) */ + 1 /* data record */ + 1 /* source info */ + 1 /* attnums */ + 1 /* url record (pending was sent) */);
 
             // ensure attnums
             const namesToNums = data.get('crl.attNums');

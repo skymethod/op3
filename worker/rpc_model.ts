@@ -188,7 +188,6 @@ export interface QueryRedirectLogsRequest {
     readonly urlStartsWith?: string;
     readonly userAgent?: string;
     readonly referer?: string;
-    readonly range?: string;
     readonly hashedIpAddress?: string;
     readonly rawIpAddress?: string; // only allow caller ip
     readonly ulid?: string;

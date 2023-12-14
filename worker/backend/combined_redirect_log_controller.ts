@@ -214,7 +214,7 @@ export class CombinedRedirectLogController {
                 return { results };
             }
             if (operationKind === 'delete') {
-                const allowedToDelete = [ IndexId.Uuid, IndexId.EdgeColo, IndexId.DoColo, IndexId.Source ];
+                const allowedToDelete = [ IndexId.Uuid, IndexId.EdgeColo, IndexId.DoColo, IndexId.Source, IndexId.Range ];
                 if (!allowedToDelete.includes(indexId)) throw new Error(`Not allowed to delete index ${indexId}`);
                 const keys = [...map.keys()];
                 const firstKey = keys.at(0);
@@ -576,7 +576,7 @@ export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string
     [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(computeServerUrl(v)).sha256()).hex() ],
     [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
     [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
-    [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ],
+    [ 'range', IndexId.Range, _ => undefined ], // disabled 2023-12-14  [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ]
     [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
     [ 'other.colo', IndexId.EdgeColo, _ => undefined ], // disabled 2023-02-12 [ 'other.colo', IndexId.EdgeColo, v => v ],
     [ 'doColo', IndexId.DoColo, _ => undefined ], // disabled 2023-02-12 [ 'doColo', IndexId.DoColo, v => v ],

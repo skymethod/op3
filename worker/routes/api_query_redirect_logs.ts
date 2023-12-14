@@ -90,8 +90,8 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
 
 function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
-    const { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, ulid, xpsId, method } = request;
-    const filters = { urlSha256, urlStartsWith, userAgent, referer, range, hashedIpAddress, rawIpAddress, ulid, xpsId, method };
+    const { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId, method } = request;
+    const filters = { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId, method };
     let filterName = '';
     let filterValue = '';
     for (const [ name, value ] of Object.entries(filters)) {
