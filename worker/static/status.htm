@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>${title}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="alternate" type="application/rss+xml" href="${origin}/status.rss" title="${title}">
+    <link rel="canonical" href="${origin}/status" />
+    ${styleTag}
+</head>
+
+<body class="flex flex-col bg-neutral-900 text-neutral-300">
+    ${nonProdHeader}
+    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
+        Status
+    </h1>
+    <div class="basic max-w-2xl mx-auto px-8">
+        Subscribe to OP3 status updates as an <a href="/status.rss">RSS feed</a>
+    </div>
+    <div class="basic max-w-2xl mx-auto px-8">
+        ${basicHtml}
+    </div>
+    <div class="basic max-w-2xl mx-auto px-8">
+        <h4 id="poduptime">Historical uptime</h4>
+    </div>
+    <div class="basic max-w-2xl mx-auto px-8 my-8">
+        See <a href="https://poduptime.com/op3/">PodUptime's OP3 page</a> for an independent measurement of OP3's service availability.
+    </div>
+    <div class="basic max-w-2xl mx-auto px-8">
+        <h4 id="poduptime">Colo Monitor</h4>
+    </div>
+    <div class="basic max-w-2xl mx-auto px-8 my-8">
+        ${coloMonitorBasicHtml}
+    </div>
+
+    <div class="max-w-xl mx-auto my-16">
+        <a href="/">Home</a>
+    </div>
+    ${cfAnalyticsSnippet}
+</body>
+
+</html>

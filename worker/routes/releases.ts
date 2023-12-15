@@ -1,17 +1,14 @@
-import { importText, encodeXml } from '../deps.ts';
-import { computeRfc822 } from '../timestamp.ts';
+import { importText } from '../deps.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
 import { computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
-import { computeMarkdownHtml, computeMarkdownText } from './markdown.ts';
 import { newMethodNotAllowedResponse, newRssResponse } from '../responses.ts';
+import { FeedItem, computeBasicHtml, computeRss, tryParseFeedRequest } from './feed.ts';
 const releasesHtm = await importText(import.meta.url, '../static/releases.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
 
 export function tryParseReleasesRequest(opts: { method: string, pathname: string, headers: Headers}): ReleasesRequest | undefined {
-    const { method, pathname, headers } = opts;
-    const m = /^\/releases(\.rss)?$/.exec(pathname);
-    return m ? { method, type: m[1] === '.rss' || (headers.get('accept') ?? '').includes('application/rss+xml') ? 'rss' : 'html' } : undefined;
+    return tryParseFeedRequest({ ...opts, expectedPath: 'releases' });
 }
 
 export function computeReleasesResponse({ method, type } : ReleasesRequest, { instance, origin, productionOrigin, cfAnalyticsToken }: { instance: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined }): Response {
@@ -19,15 +16,17 @@ export function computeReleasesResponse({ method, type } : ReleasesRequest, { in
 
     const titleSuffix = instance === 'prod' ? '' : ` (${instance})`;
     const title = `Releases · OP3${titleSuffix}: The Open Podcast Prefix Project`;
+    const description = `Latest releases from OP3, the Open Podcast Prefix Project`;
+    const items = RELEASES;
 
-    if (type === 'rss') return newRssResponse(computeReleasesRss({ title, origin }));
+    if (type === 'rss') return newRssResponse(computeRss({ items, title, description, origin, pathname: '/releases' }));
 
     const html = computeHtml(releasesHtm, {
         title,
         styleTag: `<style>\n${outputCss}\n</style>`,
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
-        basicHtml: computeBasicHtml({ origin }),
+        basicHtml: computeBasicHtml({ items, origin }),
         origin,
     });
 
@@ -43,18 +42,7 @@ export interface ReleasesRequest {
 
 //
 
-type BulletPoint = (opts: { origin: string }) => string;
-
-interface Release {
-    readonly id: string;
-    readonly time: string; // instant
-    readonly title: string;
-    readonly bulletPoints: readonly BulletPoint[];
-}
-
-//
-
-const RELEASES: Release[] = [
+const RELEASES: FeedItem[] = [
     {
         id: '2023-02-26',
         time: '2023-02-26T21:28:39.191Z',
@@ -125,41 +113,3 @@ const RELEASES: Release[] = [
         ]
     },
 ];
-
-function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
-    return `<ul>${bulletPoints.map(v => `<li>${computeMarkdownHtml(v({ origin }))}</li>\n`).join('')}</ul>`
-}
-
-function computeBulletPointsDescription(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
-    return bulletPoints.map(v => ` • ${computeMarkdownText(v({ origin }))}\n`).join('');
-}
-
-function computeBasicHtml({ origin }: { origin: string }): string {
-    return RELEASES.map(v => `
-        <h4 id="${v.id}">${encodeXml(v.title)}</h4>
-        ${computeBulletPointsHtml(v.bulletPoints, { origin })}
-    `).join('\n\n');
-}
-
-const computeReleasesRss = ({ title, origin }: { title: string, origin: string }) => `<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>${encodeXml(title)}</title>
-    <link>${origin}/releases</link>
-    <description>Latest releases from OP3, the Open Podcast Prefix Project</description>
-    <language>en-us</language>
-    <lastBuildDate>${computeRfc822(RELEASES[0].time)}</lastBuildDate>
-    <atom:link href="${origin}/releases.rss" rel="self" type="application/rss+xml" />
-${RELEASES.map(v => `
-    <item>
-      <title>${encodeXml(v.title)}</title>
-      <link>${origin}/releases#${v.id}</link>
-      <pubDate>${computeRfc822(v.time)}</pubDate>
-      <guid>${origin}/releases#${v.id}</guid>
-      <description>${encodeXml(computeBulletPointsDescription(v.bulletPoints, { origin }))}</description>
-      <content:encoded>${encodeXml(computeBulletPointsHtml(v.bulletPoints, { origin }))}</content:encoded>
-    </item>  
-`).join('')}
-  </channel>
-</rss>
-`

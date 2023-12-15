@@ -33,6 +33,7 @@ import { computeDemoShowResponse, computeShowOgImageResponse, computeShowRespons
 import { CloudflareConfiguration } from './cloudflare_configuration.ts';
 import { computeDownloadCalculationResponse } from './routes/download_calculation.ts';
 import { computeStatsResponse } from './routes/stats.ts';
+import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -249,6 +250,8 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
     const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+    { const r = tryParseStatusRequest({ method, pathname, headers }); if (r) return await computeStatusResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken, rpcClient }); }
+
     const background: Background = work => {
         context.waitUntil((async () => {
             try {

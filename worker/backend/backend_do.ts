@@ -251,6 +251,8 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.combinedRedirectLog) {
                         return newRpcResponse(await getOrLoadCombinedRedirectLogController().queryPackedRedirectLogs(obj));
+                    } else if (obj.kind === 'get-colo-status' && durableObjectName === DoNames.combinedRedirectLog) {
+                        return newRpcResponse(await getOrLoadCombinedRedirectLogController().getColoStatus(obj));
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

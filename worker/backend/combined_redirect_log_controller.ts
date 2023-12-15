@@ -1,6 +1,6 @@
 import { Bytes, chunk, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { checkMatches, isStringRecord } from '../check.ts';
-import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, ColoStatus, GetColoStatusRequest, GetColoStatusResponse, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
 import { AttNums } from './att_nums.ts';
 import { computeTimestamp, isValidTimestamp, timestampToEpochMillis, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -266,6 +266,28 @@ export class CombinedRedirectLogController {
         await this.ensureInit();
         const attNums = await this.getOrLoadAttNums();
         return computeRebuildIndexResponse(request, attNums, this.storage);
+    }
+
+    async getColoStatus(_request: Unkinded<GetColoStatusRequest>): Promise<GetColoStatusResponse> {
+        await this.ensureInit();
+        if (this.sourceStateCache.size === 0) {
+            const states = await loadSourceStates(this.storage);
+            this.updateSourceStateCache(states);
+        }
+        const status: Record<string, ColoStatus> = {};
+        for (const { doName, notificationTimestampId, haveTimestampId } of this.sourceStateCache.values()) {
+            if (typeof notificationTimestampId !== 'string') continue;
+            if (typeof haveTimestampId !== 'string') continue;
+            const m = /^redirect-log-([a-zA-Z0-9]+)$/.exec(doName);
+            if (!m) continue;
+            const notificationTime = timestampToEpochMillis(notificationTimestampId.substring(0, 15));
+            const haveTime = timestampToEpochMillis(haveTimestampId.substring(0, 15));
+            const behindSeconds = Math.round(Math.max(notificationTime - haveTime, 0) / 1000);
+            const colo = m[1];
+            status[colo] = { colo, behindSeconds };
+        }
+        return { kind: 'get-colo-status', status };
+
     }
 
     async getMetrics(): Promise<Response> {
