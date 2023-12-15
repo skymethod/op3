@@ -137,7 +137,7 @@ export class CombinedRedirectLogController {
         const attNums = await this.getOrLoadAttNums();
         
         const multiples = Object.fromEntries([
-            [ DoNames.redirectLogForColo('MIA'), 10 ],
+            [ DoNames.redirectLogForColo('MIA'), 14 ],
             [ DoNames.redirectLogForColo('AMS'), 6 ],
             [ DoNames.redirectLogForColo('ORD'), 2 ],
             [ DoNames.redirectLogForColo('SEA'), 2 ],
