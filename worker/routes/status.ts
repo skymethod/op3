@@ -63,21 +63,21 @@ const ITEMS: FeedItem[] = [
 
 async function computeColoMonitorBasicHtml(rpcClient: RpcClient): Promise<string> {
     const { status } = await rpcClient.getColoStatus({ }, DoNames.combinedRedirectLog );
-    const sorted = sortBy(Object.values(status), v => -v.behindSeconds);
+    const sorted = sortBy(Object.values(status), v => -v.behindSeconds).filter(v => v.behindSeconds > 30);
     const detail = [ `<ul>` ];
     for (const { colo, behindSeconds } of sorted) {
         detail.push(`<li>${colo}: ${formatSecondsBehind(behindSeconds)}</li>`)
     }
     detail.push(`</ul>`);
     const mostBehind = sorted.at(0);
-    return `<details><summary>${mostBehind ? (mostBehind.colo + ': ' + formatSecondsBehind(mostBehind.behindSeconds)) : '(no colos)'}</summary>${detail.join('')}</details>`;
+    return `<details><summary>${mostBehind ? `[Most behind] ${mostBehind.colo}: ${formatSecondsBehind(mostBehind.behindSeconds)}` : '[All colos up to date]'}</summary>${detail.join('')}</details>`;
 }
 
 function formatSecondsBehind(seconds: number): string {
     const minutes = seconds / 60;
-    if (minutes < 60) return minutes.toFixed(2) + 'minutes behind';
+    if (minutes < 60) return minutes.toFixed(2) + ' minutes behind';
     const hours = minutes / 60;
-    if (hours < 24) return hours.toFixed(2) + 'hours behind';
+    if (hours < 24) return hours.toFixed(2) + ' hours behind';
     const days = hours / 24;
     return days.toFixed(2) + 'days behind';
 }
