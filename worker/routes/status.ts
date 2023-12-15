@@ -64,13 +64,13 @@ const ITEMS: FeedItem[] = [
 async function computeColoMonitorBasicHtml(rpcClient: RpcClient): Promise<string> {
     const { status } = await rpcClient.getColoStatus({ }, DoNames.combinedRedirectLog );
     const sorted = sortBy(Object.values(status), v => -v.behindSeconds).filter(v => v.behindSeconds > 30);
+    if (sorted.length === 0) return '(no backlog, everything up to date)'
     const detail = [ `<ul>` ];
     for (const { colo, behindSeconds } of sorted) {
         detail.push(`<li>${colo}: ${formatSecondsBehind(behindSeconds)}</li>`)
     }
     detail.push(`</ul>`);
-    const mostBehind = sorted.at(0);
-    return `<details><summary>${mostBehind ? `[Most behind] ${mostBehind.colo}: ${formatSecondsBehind(mostBehind.behindSeconds)}` : '[All colos up to date]'}</summary>${detail.join('')}</details>`;
+    return detail.join('');
 }
 
 function formatSecondsBehind(seconds: number): string {
