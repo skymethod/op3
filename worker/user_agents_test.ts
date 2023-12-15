@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@9321927243371c597b9540e5d4b8b508e837f226 (2023-12-15T01:38:28Z)
+// from user-agents-v2@3f3a7e75270c5f7807de64e80013d3e0a1cf14bc (2023-12-15T16:07:05Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -663,6 +663,7 @@ const appTests = {
     'NPR%20One/234 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `NPR` },
     'NPROneAndroid': { type: 'app', name: `NPR` },
     'NPR/618 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `NPR` },
+    'Dalvik/2.1.0 (Linux; U; Android 13; SM-G991U Build/TP1A.220624.014) nprone_android/3.7.0/OSv:13': { type: 'app', name: `NPR` },
     'NRC Audio/2.0.0 (nl.nrc.audio; build:29; Android 12; Sdk:31; Manufacturer:samsung; Model: SM-G975F) OkHttp/4.9.3': { type: 'app', name: `NRC Audio` },
     'NRC%20Audio/1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `NRC Audio` },
     'NRC-Nieuws/10.3.1 (nl.nrc.nrcapp; build:210; iOS 16.6.0) Alamofire/10.3.1': { type: 'app', name: `NRC` },

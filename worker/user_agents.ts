@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@9321927243371c597b9540e5d4b8b508e837f226 (2023-12-15T01:38:28Z)
+// from user-agents-v2@3f3a7e75270c5f7807de64e80013d3e0a1cf14bc (2023-12-15T16:07:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -479,7 +479,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^myTuner Radio app\/|^myTuner%20Radio%20app\/|^mytuner_podcasts_androidplayer\/|^MyTuner-|^myTuner$|^myTuneriOS%20Free\//.test(userAgent)) return { name: `MyTuner`, type: 'app' };
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
-    if (/^NPR\/|^NPR%20One\/|^NPROneAndroid/.test(userAgent)) return { name: `NPR`, type: 'app' };
+    if (/^NPR\/|^NPR%20One\/|^NPROneAndroid|nprone_android\//.test(userAgent)) return { name: `NPR`, type: 'app' };
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
     if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
