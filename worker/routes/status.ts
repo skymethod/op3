@@ -79,5 +79,5 @@ function formatSecondsBehind(seconds: number): string {
     const hours = minutes / 60;
     if (hours < 24) return hours.toFixed(2) + ' hours behind';
     const days = hours / 24;
-    return days.toFixed(2) + 'days behind';
+    return days.toFixed(2) + ' days behind';
 }
