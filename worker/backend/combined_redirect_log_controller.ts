@@ -138,6 +138,7 @@ export class CombinedRedirectLogController {
         
         const multiples = Object.fromEntries([
             [ DoNames.redirectLogForColo('ATL'), 20 ],
+            [ DoNames.redirectLogForColo('IAD'), 20 ],
             [ DoNames.redirectLogForColo('AMS'), 4 ],
             [ DoNames.redirectLogForColo('ORD'), 2 ],
             [ DoNames.redirectLogForColo('SEA'), 2 ],

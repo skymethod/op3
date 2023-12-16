@@ -151,7 +151,8 @@ Deno.test({
     name: 'process -> multiples',
     fn: async () => {
         const storage = new InMemoryDurableObjectStorage();
-        const colos = [ 'AMS', 'ORD', 'DFW', 'ATL' ];
+        const expectedColoCalledTimes = { AMS: 4, ORD: 2, DFW: 1, ATL: 20, IAD: 20 };
+        const colos = Object.keys(expectedColoCalledTimes)
         for (const colo of colos) {
             const doName = DoNames.redirectLogForColo(colo);
             await storage.put(`crl.ss.${doName}`, { doName });
@@ -200,7 +201,7 @@ Deno.test({
         await controller.process();
 
         // ensure inner loop called the correct number of times
-        assertEquals(getNewRedirectLogsCallsByColo, { AMS: 4, ORD: 2, DFW: 1, ATL: 20 });
+        assertEquals(getNewRedirectLogsCallsByColo, expectedColoCalledTimes);
     }
 });
 
