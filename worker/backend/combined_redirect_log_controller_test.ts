@@ -16,6 +16,7 @@ import { isStringRecord } from '../check.ts';
 import { DoNames } from '../do_names.ts';
 import { IpAddressHashingFn } from './redirect_log_controller.ts';
 import { increment } from '../summaries.ts';
+import { MULTIPLES } from './combined_redirect_log_multiples.ts';
 
 Deno.test({
     name: 'process -> queryRedirectLogs -> index-and-record-storage',
@@ -151,7 +152,7 @@ Deno.test({
     name: 'process -> multiples',
     fn: async () => {
         const storage = new InMemoryDurableObjectStorage();
-        const expectedColoCalledTimes = { AMS: 4, ORD: 2, DFW: 1, ATL: 20, IAD: 20 };
+        const expectedColoCalledTimes = Object.fromEntries(Object.entries(MULTIPLES).map(v => [ v[0].substring('redirect-log-'.length), v[1] ]));
         const colos = Object.keys(expectedColoCalledTimes)
         for (const colo of colos) {
             const doName = DoNames.redirectLogForColo(colo);

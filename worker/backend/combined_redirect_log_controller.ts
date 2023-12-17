@@ -13,6 +13,7 @@ import { computeServerUrl } from '../client_params.ts';
 import { computeListOpts } from './storage.ts';
 import { DoNames } from '../do_names.ts';
 import { IpAddressHashingFn } from './redirect_log_controller.ts';
+import { MULTIPLES } from './combined_redirect_log_multiples.ts';
 
 export class CombinedRedirectLogController {
     static readonly processAlarmKind = 'CombinedRedirectLogController.processAlarmKind';
@@ -135,17 +136,9 @@ export class CombinedRedirectLogController {
         this.updateSourceStateCache(sourceStates);
 
         const attNums = await this.getOrLoadAttNums();
-        
-        const multiples = Object.fromEntries([
-            [ DoNames.redirectLogForColo('ATL'), 20 ],
-            [ DoNames.redirectLogForColo('IAD'), 20 ],
-            [ DoNames.redirectLogForColo('AMS'), 4 ],
-            [ DoNames.redirectLogForColo('ORD'), 2 ],
-            [ DoNames.redirectLogForColo('SEA'), 2 ],
-        ]);
 
         for (const state of sourceStates) {
-            const times = multiples[state.doName] ?? 1;
+            const times = MULTIPLES[state.doName] ?? 1;
             let currentState = state;
             for (let i = 0; i < times; i++) {
                 const newState = await processSource(currentState, rpcClient, attNums, storage, knownExistingUrls, knownExistingUrlsMax, urlNotificationsEnabled);
