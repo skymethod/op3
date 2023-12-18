@@ -20,16 +20,19 @@ export class R2ApiBlobs implements Blobs {
     }
 
     async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
-        const { keyPrefix, afterKey } = opts;
+        const { keyPrefix, afterKey, limit } = opts;
         const { bucket, origin, region, context } = this.opts;
         const prefix = keyPrefix ? `${this.opts.prefix}${keyPrefix}` : this.opts.prefix;
         const startAfter = afterKey ? `${this.opts.prefix}${afterKey}` : undefined;
         const keys: string[] = [];
         let continuationToken: string | undefined;
+        let maxKeys = limit;
         while (true) {
-            const { isTruncated, contents, continuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken }, context, 'r2-api-blobs-list');
+            if (maxKeys !== undefined && keys.length >= maxKeys) return { keys };
+            const { isTruncated, contents, continuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken, maxKeys }, context, 'r2-api-blobs-list');
             keys.push(...contents.map(v => v.key.substring(this.opts.prefix.length)));
             if (!isTruncated) return { keys };
+            if (maxKeys !== undefined) maxKeys -= contents.length;
             continuationToken = token;
         }
     }

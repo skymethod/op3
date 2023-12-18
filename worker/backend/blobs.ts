@@ -14,7 +14,7 @@ export interface Blobs {
     head(key: string): Promise<{ etag: string } | undefined>;
 }
 
-export type ListOpts = { keyPrefix?: string, afterKey?: string };
+export type ListOpts = { keyPrefix?: string, afterKey?: string, limit?: number };
 export type GetOpts = { ifMatch?: string };
 
 export interface ListBlobsResponse {
