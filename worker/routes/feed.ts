@@ -30,9 +30,9 @@ export const computeRss = ({ items, title, description, origin, pathname }: { it
 ${items.map(v => `
     <item>
       <title>${encodeXml(v.title)}</title>
-      <link>${origin}${pathname}#${v.id}</link>
+      <link>${origin}${pathname}#${checkId(v.id)}</link>
       <pubDate>${computeRfc822(v.time)}</pubDate>
-      <guid>${origin}${pathname}#${v.id}</guid>
+      <guid>${origin}${pathname}#${checkId(v.id)}</guid>
       <description>${encodeXml(computeBulletPointsDescription(v.bulletPoints, { origin }))}</description>
       <content:encoded>${encodeXml(computeBulletPointsHtml(v.bulletPoints, { origin }))}</content:encoded>
     </item>  
@@ -43,7 +43,7 @@ ${items.map(v => `
 
 export const computeBasicHtml = ({ items, origin }: { items: FeedItem[], origin: string }) =>
     items.map(v => `
-        <h4 id="${v.id}">${encodeXml(v.title)}</h4>
+        <h4 id="${checkId(v.id)}">${encodeXml(v.title)}</h4>
         ${computeBulletPointsHtml(v.bulletPoints, { origin })}
     `).join('\n\n');
 
@@ -55,4 +55,9 @@ function computeBulletPointsHtml(bulletPoints: readonly BulletPoint[], { origin 
 
 function computeBulletPointsDescription(bulletPoints: readonly BulletPoint[], { origin }: { origin: string }): string {
     return bulletPoints.map(v => ` • ${computeMarkdownText(v({ origin }))}\n`).join('');
+}
+
+function checkId(id: string): string {
+    if (/^[a-z0-9-]+$/.test(id)) return id;
+    throw new Error(`Invalid id: ${id}`);
 }

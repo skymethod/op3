@@ -14,7 +14,11 @@ export function computeMarkdownHtml(markdown: string): string {
         i = lastIndex;
     }
     parts.push(encodeXml(markdown.substring(i)));
-    return parts.join('').replaceAll(/`([a-z]+)`/g, `<code>$1</code>`);
+    return parts.join('')
+        .replaceAll(/`([a-z]+)`/g, `<code>$1</code>`)
+        .replaceAll(/\*\*([^*]+?)\*\*/g, `<b>$1</b>`)
+        .replaceAll(/_([^_]+?)_/g, `<i>$1</i>`)
+        ;
 }
 
 export function computeMarkdownText(markdown: string): string {
@@ -31,5 +35,8 @@ export function computeMarkdownText(markdown: string): string {
         i = lastIndex;
     }
     parts.push(markdown.substring(i));
-    return parts.join('').replaceAll(/`([a-z]+)`/g, `$1`);
+    return parts.join('')
+        .replaceAll(/`([a-z]+)`/g, `$1`)
+        // leave the md bold/italics in
+        ;
 }
