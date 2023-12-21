@@ -47,16 +47,17 @@ export interface StatusRequest {
 
 const ITEMS: FeedItem[] = [
     {
-        id: '2023-12-15-2023-12-18-update',
-        time: '2023-12-18T17:36:03.917Z',
-        title: '2023-12-15: Reprocessing from mid-October (2023-12-18 update)',
+        id: '2023-12-15-2023-12-21-finished',
+        time: '2023-12-21T16:42:19.061Z',
+        title: '2023-12-15: Reprocessing from mid-October (done 2023-12-21)',
         bulletPoints: [
             () => `We've just noticed that data from three large incoming colos (IAD, ATL, & MIA) have not been included in the processing pipeline for several weeks: IAD since 10/10, ATL since 10/14, MIA since 11/03.  Nothing has been lost, but we now have a potentially large amount of unexpected data to reprocess and recompute.`,
             ({ origin }) => `First, we'll need to process the 'hits' ([redirect logs](${origin}/api/docs#tag/redirect-logs)) coming in from each of the three colos.  We're starting with MIA, since it's the least backed up, then we'll process IAD and ATL. This is likely to take several days, as it competes with continuous live data coming in at the same time from all colos.  See the colo monitor below to track this process live. **(This is now complete)**`,
-            ({ origin }) => `Once all colos are up to date, we'll need to [recompute downloads](${origin}/download-calculation) for all shows based on the underlying hits, starting from 10/10 up to the present. This will probably take several hours.`,
-            () => `It's likely that download numbers currently shown for most shows are a bit lower than they should be, starting from the middle of October.  The numbers will be up to date and comprehensive again once this process completes.  No data has been lost, just delayed.`,
+            ({ origin }) => `Once all colos are up to date, we'll need to [recompute downloads](${origin}/download-calculation) for all shows based on the underlying hits, starting from 10/10 up to the present. This will probably take several hours. **(This is now complete)**`,
+            () => `It's likely that download numbers currently shown for most shows are a bit lower than they should be, starting from the middle of October.  The numbers will be up to date and comprehensive again once this process completes.  No data has been lost, just delayed. **(This is now complete)**`,
             ({ origin }) => `Sorry about the delay: OP3 will always report issues like this as soon as they come up since we are committed to transparency – not only in data and codebase, but also in operations and [costs](${origin}/costs).`,
-            () => `Subscribe to this page (RSS link above) to follow the updates as we catch up.`
+            () => `Subscribe to this page (RSS link above) to follow the updates as we catch up.`,
+            () => `[2023-12-21]: Finished - all shows have been fully reprocessed.`
         ]
     },
 ];
