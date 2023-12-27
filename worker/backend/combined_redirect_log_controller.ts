@@ -251,7 +251,7 @@ export class CombinedRedirectLogController {
                     }
                     const maxPartSize = 1024 * 1024 * partSizeMb;
                     while (partSize < maxPartSize) { // common part size (for all but the last part)
-                        const startOpts = backup.maxKey ? { startAfter: partMaxKey } : { start: `crl.r.${timestampStart}` };
+                        const startOpts = partMaxKey ? { startAfter: partMaxKey } : { start: `crl.r.${timestampStart}` };
                         const map = await this.storage.list({ ...startOpts, end: `crl.r.${timestampEnd}`, allowConcurrency: true, noCache: true, limit });
                         lists++;
                         if (map.size > 0) {
