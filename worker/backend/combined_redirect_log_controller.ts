@@ -272,12 +272,24 @@ export class CombinedRedirectLogController {
                     if (partSize > 0) {
                         let remainder: Uint8Array | undefined;
                         if (partSize > maxPartSize) {
-                            const keepSize = maxPartSize - partSize;
-                            const lastIndex = chunks.length - 1;
-                            const lastChunk = chunks[lastIndex];
-                            remainder = lastChunk.slice(keepSize);
-                            chunks[lastIndex] = lastChunk.slice(0, keepSize);
-                            partSize -= remainder.length;
+                            // take remainder from chunks at the end
+                            const remainderChunks: Uint8Array[] = [];
+                            while (partSize > maxPartSize) {
+                                const remainderSize = partSize - maxPartSize;
+                                const lastIndex = chunks.length - 1;
+                                const lastChunk = chunks[lastIndex];
+                                if (remainderSize >= lastChunk.length) {
+                                    remainderChunks.unshift(lastChunk);
+                                    chunks.pop();
+                                    partSize -= lastChunk.length;
+                                } else {
+                                    const keepSize = lastChunk.length - remainderSize;
+                                    remainderChunks.unshift(lastChunk.slice(keepSize));
+                                    chunks[lastIndex] = lastChunk.slice(0, keepSize);
+                                    partSize -= remainderSize;
+                                }
+                            }
+                            remainder = concat(remainderChunks);
                             done = false;
                         }
                         const partBytes = concat(chunks);
