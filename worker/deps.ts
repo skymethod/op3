@@ -16,3 +16,4 @@ export { TextLineStream } from 'https://deno.land/std@0.210.0/streams/text_line_
 export { zip } from 'https://deno.land/std@0.210.0/collections/zip.ts';
 export { ascend, descend } from 'https://deno.land/std@0.210.0/data_structures/comparators.ts';
 export { DelimiterStream } from 'https://deno.land/std@0.210.0/streams/delimiter_stream.ts';
+export { concat } from 'https://deno.land/std@0.210.0/bytes/concat.ts';
