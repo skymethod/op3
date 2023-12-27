@@ -116,9 +116,8 @@ export class RedirectLogController {
                 return { results: [ result ] };
             }
             if (operationKind === 'select' && subpath === '/state') {
-                const latestTimestampid = await queryLatestTimestampId(this.storage);
-                const latestStartAfterTimestampId = await this.getOrLoadLatestStartAfterTimestampId();
-                const state = { latestTimestampid, latestStartAfterTimestampId };
+                const [ latestTimestampId, latestStartAfterTimestampId ] = await Promise.all([ queryLatestTimestampId(this.storage), this.getOrLoadLatestStartAfterTimestampId() ]);
+                const state = { latestTimestampId, latestStartAfterTimestampId };
                 return { results: [ state ] };
             }
         }
