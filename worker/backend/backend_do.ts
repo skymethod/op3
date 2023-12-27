@@ -152,7 +152,8 @@ export class BackendDO {
                         } else if (operationKind === 'select' && targetPath === '/keys' && durableObjectName === DoNames.keyServer) {
                             return newRpcResponse({ kind: 'admin-data', results: await getOrLoadKeyController().listKeys() });
                         } else if (targetPath.startsWith('/crl/') && durableObjectName === DoNames.combinedRedirectLog) {
-                            const { results, message } = await getOrLoadCombinedRedirectLogController().adminExecuteDataQuery(obj);
+                            const backupBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'backup/' }) : undefined;
+                            const { results, message } = await getOrLoadCombinedRedirectLogController().adminExecuteDataQuery(obj, backupBlobs);
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } else if ((targetPath === '/api-keys' || targetPath.startsWith('/api-keys/')) && durableObjectName === DoNames.apiKeyServer) {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
