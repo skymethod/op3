@@ -29,7 +29,7 @@ export class R2ApiBlobs implements Blobs {
         let maxKeys = limit;
         while (true) {
             if (maxKeys !== undefined && keys.length >= maxKeys) return { keys };
-            const { isTruncated, contents, continuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken, maxKeys }, context, 'r2-api-blobs-list');
+            const { isTruncated, contents, nextContinuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken, maxKeys }, context, 'r2-api-blobs-list');
             keys.push(...contents.map(v => v.key.substring(this.opts.prefix.length)));
             if (!isTruncated) return { keys };
             if (maxKeys !== undefined) maxKeys -= contents.length;
