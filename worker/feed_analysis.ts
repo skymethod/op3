@@ -4,7 +4,7 @@ import { parsePubdate } from './pubdates.ts';
 
 export async function computeFeedAnalysis(feed: string, opts: { userAgent: string }): Promise<FeedAnalysis> {
     const { userAgent } = opts;
-    const res = await fetch(feed, { headers: { 'user-agent': userAgent }});
+    const res = await fetchAndHandleRedirects(feed, { headers: { 'user-agent': userAgent } });
     let items = 0;
     let itemsWithEnclosures = 0;
     let itemsWithOp3Enclosures = 0;
@@ -80,6 +80,29 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
         maxPubdate = pubdates.at(-1);
     }
     return { feed, status: res.status, items, itemsWithEnclosures, itemsWithOp3Enclosures, minPubdate, maxPubdate };
+}
+
+//
+
+async function fetchAndHandleRedirects(url: string, { headers }: { headers: Record<string, string> }): Promise<Response> {
+    const rt: Response[] = [];
+    const urls = new Set<string>();
+    const resToString = (res: Response) => [ res.url, res.status, [...res.headers].map(v => v.join(': ')).join(',') ].join(', ');
+    while (rt.length < 10) {
+        if (urls.has(url)) throw new Error(`Circular redirect: ${rt.map(resToString).join(', ')}`);
+        urls.add(url);
+        const res = await fetch(url, { headers, redirect: 'manual' });
+        rt.push(res);
+        if ([ 301, 302, 307, 308 ].includes(res.status)) {
+            const location = res.headers.get('location');
+            if (typeof location === 'string') {
+                url = new URL(location, new URL(url)).toString();
+                continue;
+            }
+        }
+        return rt.at(-1)!;
+    }
+    throw new Error(`Too many redirects: ${rt.map(resToString).join(', ')}`);
 }
 
 //
