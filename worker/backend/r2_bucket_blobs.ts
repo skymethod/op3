@@ -91,7 +91,7 @@ export class R2BucketBlobs implements Blobs {
         const { bucket, prefix, readonly } = this;
         if (readonly) throw new Error(`Bucket is readonly!`);
 
-        const upload = await bucket.createMultipartUpload(prefix + key);
+        const upload = await r2(() => bucket.createMultipartUpload(prefix + key));
         return new R2Multiput(upload);
     }
 
