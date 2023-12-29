@@ -9,9 +9,10 @@ type Opts = {
     parameters: Record<string, string>, 
     backupBlobs: Blobs | undefined, 
     isValidItem: (item: string) => boolean, 
-    prefix: string, computeHeaderLine: () => string, 
+    prefix: string,
+    computeHeaderLine?: () => string, 
     storage: DurableObjectStorage,
-    computeKeyRange: (item: string) => { startKeyInclusive: string, endKeyExclusive: string },
+    computeKeyRange: (item: string) => { startKeyInclusive: string | undefined, endKeyExclusive: string | undefined },
     computeRecordLine: (key: string, record: DurableObjectStorageValue) => string,
 };
 
@@ -58,7 +59,7 @@ export class Backups {
                 let lists = 0;
                 let done = false;
                 const encoder = new TextEncoder();
-                if (backup.partEtags.length === 0) {
+                if (backup.partEtags.length === 0 && computeHeaderLine) {
                     const chunk = encoder.encode(computeHeaderLine() + '\n');
                     chunks.push(chunk);
                     partSize += chunk.length;

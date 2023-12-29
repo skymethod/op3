@@ -11,6 +11,7 @@ import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } fro
 import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
+import { Backups } from './backups.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, computeHourlyShowColumns, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
@@ -29,6 +30,7 @@ export class ShowController {
     private readonly feedBlobs: Blobs;
     private readonly statsBlobs: Blobs;
     private readonly rpcClient: RpcClient;
+    private readonly backups = new Backups();
 
     constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
         this.storage = storage;
@@ -91,7 +93,7 @@ export class ShowController {
         await this.notifications.receiveExternalNotification({ notification, received });
     }
 
-    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
+    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>, backupBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
         const { notifications, storage, origin, feedBlobs } = this;
         const res = await notifications.adminExecuteDataQuery(req);
         if (res) return res;
@@ -395,6 +397,19 @@ export class ShowController {
                 return Promise.resolve({ etag: '' });
             } });
             return { results: [ { url, headers: [...headers].map(v => v.join(': ')), fetchInfo, blobs } ] };
+        }
+
+        if (targetPath === '/show/storage/backup') {
+            const { storage } = this;
+            const computeRecordLine = (key: string, record: DurableObjectStorageValue) => {
+                return JSON.stringify([ key, record ]);
+            }
+            const computeKeyRange = (_item: string) => {
+                return { startKeyInclusive: undefined, endKeyExclusive: undefined };
+            }
+            const isValidItem = (item: string) => /^storage$/.test(item);
+            const prefix = 'show-storage/1/';
+            return await this.backups.execute({ operationKind, parameters, backupBlobs, isValidItem, prefix, computeKeyRange, storage, computeRecordLine });
         }
 
         throw new Error(`Unsupported show-related query: ${JSON.stringify(req)}`);
