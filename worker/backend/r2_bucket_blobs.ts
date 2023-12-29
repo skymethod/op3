@@ -113,7 +113,7 @@ class R2Multiput implements Multiput {
     async putPart(body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<{ etag: string }> {
         const { upload, parts } = this;
         const partNum = parts.length + 1;
-        const part = await upload.uploadPart(partNum, body);
+        const part = (body instanceof ReadableStream) ? await upload.uploadPart(partNum, body) : await r2(() => upload.uploadPart(partNum, body));
         this.debug.push(`putPart(${JSON.stringify({ ...part, inputPartNum: partNum })})`);
         parts.push(part);
         const { etag } = part;
