@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isNotBlank, isValidHttpUrl, tryParseUrl } from '../check.ts';
+import { check, isNotBlank, isValidHttpUrl, tryParseUrl } from '../check.ts';
 import { isValidSha1Hex, isValidSha256Hex } from '../crypto.ts';
 import { Bytes } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
@@ -78,10 +78,6 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         check('xpsId', xpsId, isNotBlank);
         request = { ...request, xpsId };
     }
-    if (typeof method === 'string') {
-        checkMatches('method', method, /^(HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$/);
-        request = { ...request, method };
-    }
     if (typeof include === 'string' && admin) {
         request = { ...request, include };
     }
@@ -90,8 +86,8 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
 
 function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
-    const { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId, method } = request;
-    const filters = { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId, method };
+    const { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId } = request;
+    const filters = { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId };
     let filterName = '';
     let filterValue = '';
     for (const [ name, value ] of Object.entries(filters)) {

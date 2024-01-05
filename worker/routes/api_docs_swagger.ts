@@ -212,14 +212,6 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                             "example": `2C2A32DC-F9D1-4C21-A1D2-7EE48B4B8DEF`,
                             "required": false,
                         },
-                        {
-                            "name": "method",
-                            "in": "query",
-                            "description": "Filter by a specific non-GET method\n\nThe vast majority of logs are GET requests, this can target any outliers",
-                            "example": `POST`,
-                            "required": false,
-                            "format": "http method",
-                        },
                     ],
                     "responses": {
                         "200": {

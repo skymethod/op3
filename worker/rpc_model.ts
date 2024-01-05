@@ -194,7 +194,6 @@ export interface QueryRedirectLogsRequest {
     readonly rawIpAddress?: string; // only allow caller ip
     readonly ulid?: string;
     readonly xpsId?: string;
-    readonly method?: string;
 }
 
 export interface QueryDownloadsRequest {
