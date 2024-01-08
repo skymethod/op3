@@ -7,7 +7,7 @@ export interface ApiShowsResponse {
     readonly episodes?: readonly EpisodeInfo[];
 }
 
-export type EpisodeInfo = { readonly id: string, readonly title?: string, readonly pubdate?: string };
+export type EpisodeInfo = { readonly id: string, readonly title?: string, readonly pubdate?: string, readonly itemGuid?: string };
 
 export interface ApiShowStatsResponse {
     readonly showUuid: string;
@@ -17,6 +17,7 @@ export interface ApiShowStatsResponse {
     readonly episodeHourlyDownloads: Record<string, Record<string, number>>;
     readonly dailyFoundAudience: Record<string, number>;
     readonly monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>;
+    readonly episodeMinuteMaps?: Record<string, string[]>;
 }
 
 export interface ApiShowSummaryStatsResponse {
