@@ -31,7 +31,7 @@ Deno.test({
 Deno.test({
     name: 'ShowListenStats',
     fn: () => {
-        const stats: ShowListenStats = { showUuid: generateUuid(), episodeListenStats: Object.fromEntries([{ itemGuid: generateUuid(), minuteMaps: [] }].map(v => [ v.itemGuid, v ])) };
+        const stats: ShowListenStats = { showUuid: generateUuid(), episodeListenStats: Object.fromEntries([{ itemGuid: generateUuid(), appCounts: {}, minuteMaps: [] }].map(v => [ v.itemGuid, v ])) };
         assertEquals(isValidShowListenStats(stats), true);
     }
 });
