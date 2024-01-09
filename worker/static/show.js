@@ -8365,6 +8365,12 @@ function increment(summary, key, delta = 1) {
     const existing = summary[key];
     summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
 }
+function incrementAll(summary, keysAndDeltas) {
+    for (const [key, delta] of Object.entries(keysAndDeltas)){
+        increment(summary, key, delta);
+    }
+    return summary;
+}
 function addDays(date, days) {
     if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
     const rt = new Date(date);
@@ -10228,6 +10234,124 @@ function computeRegionName3(regionCountry) {
     })[region] ?? region;
     return region;
 }
+const makeListens = ({ episodeListens, episodes })=>{
+    const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensEpisode] = [
+        element('listens-section'),
+        element('listens-25'),
+        element('listens-50'),
+        element('listens-90'),
+        element('listens-count'),
+        element('listens-from-app'),
+        element('listens-based-on'),
+        element('listens-graph'),
+        element('listens-episode')
+    ];
+    if (!episodeListens) return;
+    listensSection.classList.remove('hidden');
+    let listens25Count = 0, listens50Count = 0, listens90Count = 0, listens = 0;
+    for (const minuteMap of Object.values(episodeListens).flatMap((v)=>v.minuteMaps)){
+        const listened = [
+            ...minuteMap
+        ].filter((v)=>v === '1').length;
+        const pct = listened / minuteMap.length;
+        if (pct >= .25) listens25Count++;
+        if (pct >= .50) listens50Count++;
+        if (pct >= .90) listens90Count++;
+        listens++;
+    }
+    listens25.textContent = `${Math.round(listens25Count / listens * 100)}%`;
+    listens50.textContent = `${Math.round(listens50Count / listens * 100)}%`;
+    listens90.textContent = `${Math.round(listens90Count / listens * 100)}%`;
+    const allAppCounts = Object.values(episodeListens).map((v)=>v.appCounts).reduce(incrementAll, {});
+    listensCount.textContent = Object.values(allAppCounts).reduce((a, b)=>a + b, 0).toString();
+    const apps = Object.keys(allAppCounts).length;
+    sortBy(Object.entries(allAppCounts), (v)=>-v[1]).forEach(([appName, count], i)=>{
+        if (i > 0) listensBasedOn.appendChild(document.createTextNode(i < apps - 1 ? ', ' : ', and '));
+        const item = listensFromAppTemplate.content.cloneNode(true);
+        const a = item.querySelector('a');
+        a.textContent = appName;
+        a.href = knownAppLinks[appName] ?? '#';
+        item.querySelector('span').textContent = `${count}`;
+        listensBasedOn.appendChild(item);
+    });
+    const minutes = {};
+    const episodeListensEntries = Object.entries(episodeListens);
+    for(let i = 0; i < episodeListensEntries.length; i++){
+        const [episodeGuid, { minuteMaps }] = episodeListensEntries[i];
+        if (i === 0 && episodeListensEntries[1] && episodeListensEntries[1][1].minuteMaps.length > minuteMaps.length) continue;
+        for (const minuteMap of minuteMaps){
+            [
+                ...minuteMap
+            ].forEach((v, i)=>increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
+        }
+        drawGraph(listensGraph, minutes, minuteMaps.length);
+        const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
+        listensEpisode.textContent = `‘${epName}’`;
+        break;
+    }
+};
+const knownAppLinks = {
+    'Fountain': 'https://www.fountain.fm/',
+    'Castamatic': 'https://castamatic.com/',
+    'Podverse': 'https://podverse.fm/',
+    'CurioCaster': 'https://curiocaster.com/',
+    'TrueFans': 'https://truefans.fm/',
+    'PodcastGuru': 'https://podcastguru.io/',
+    'Podfriend': 'https://www.podfriend.com/',
+    'Breez': 'https://breez.technology/'
+};
+function drawGraph(canvas, labelsAndValues, sessions) {
+    const ctx = canvas.getContext('2d');
+    const values = Object.values(labelsAndValues);
+    const maxValue = Math.min(Math.round(Math.max(...values) * 1.25), sessions);
+    const labels = Object.keys(labelsAndValues);
+    const data = {
+        labels,
+        datasets: [
+            {
+                data: values,
+                backgroundColor: 'rgba(75, 192, 192, 0.75)',
+                hoverBackgroundColor: 'rgba(75, 192, 192, 1)',
+                pointRadius: 0,
+                borderWidth: 0,
+                barPercentage: 1,
+                categoryPercentage: .95
+            }
+        ]
+    };
+    const config = {
+        type: 'bar',
+        data,
+        options: {
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    display: false,
+                    min: 0,
+                    max: maxValue
+                }
+            },
+            animation: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    displayColors: false,
+                    footerColor: 'rgba(154, 52, 18, 1)',
+                    callbacks: {
+                        title: (items)=>`Minute ${items[0].label}`,
+                        label: (item)=>`${item.parsed.y} of ${sessions} observed sessions (${Math.round(item.parsed.y / sessions * 100)}%)`
+                    }
+                }
+            }
+        }
+    };
+    const chart = new xt(ctx, config);
+    return chart;
+}
 const app = await (async ()=>{
     xt.register(Vt);
     xt.register(ic);
@@ -10310,7 +10434,7 @@ const app = await (async ()=>{
         return changed;
     };
     await grabMoreDataIfNecessary('first');
-    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
+    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
             v[0],
@@ -10351,6 +10475,11 @@ const app = await (async ()=>{
         showSlug,
         mostRecentDate,
         shot
+    });
+    makeListens({
+        episodeListens,
+        episodes,
+        debug
     });
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
             month,

@@ -1,5 +1,5 @@
 import { transform, stop } from 'https://deno.land/x/esbuild@v0.16.10/mod.js';
-import { readAll } from 'https://deno.land/std@0.201.0/streams/read_all.ts';
+import { toArrayBuffer } from 'https://deno.land/std@0.211.0/streams/to_array_buffer.ts';
 
 async function fileExists(filePath: string | URL): Promise<boolean> {
     try {
@@ -13,7 +13,7 @@ async function fileExists(filePath: string | URL): Promise<boolean> {
     }
 }
 
-const text = new TextDecoder().decode(await readAll(Deno.stdin));
+const text = new TextDecoder().decode(await toArrayBuffer(Deno.stdin.readable));
 const [ output ] = Deno.args;
 
 if (!fileExists(output)) throw new Error(`Output file must exist`);

@@ -12,4 +12,7 @@
         "build": "deno bundle show.ts | deno run -A build.ts ../worker/static/show.js",
         "build-watch": "deno bundle show.ts ../worker/static/show.js --watch",
     },
+    "fmt": {
+        "singleQuote": true,
+    }
 }

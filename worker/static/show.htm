@@ -86,7 +86,7 @@ const previewToken = '${previewToken}';
             </sl-card>
         </div>
 
-        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/download-calculation" target="_blank">How OP3 calculates Downloads →</a></div>
+        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/download-calculation" target="_blank">How OP3 calculates downloads →</a></div>
 
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
@@ -107,6 +107,27 @@ const previewToken = '${previewToken}';
             <sl-icon-button name="caret-right-fill" label="Newer downloads" title="Newer downloads" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
+
+        <!-- listen time -->
+        <span id="listens-section" class="hidden">
+            <div class="flex justify-center items-center gap-2 mt-16 mb-8">
+                <sl-icon name="graph-up"></sl-icon>
+                Listen time
+            </div>
+            <div class="flex justify-center mt-4">
+                <sl-card class="card-basic max-w-[28rem]">
+                    <p><span id="listens-25"  class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">25%</span> of an episode</p>
+                    <p><span id="listens-50"class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">half</span></p>
+                    <p><span id="listens-90" class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">90%</span></p>
+                    <template id="listens-from-app"><span>n</span> from <a href="#" class="text-neutral-600 app-name" target="_blank">app</a></template>
+                    <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">Based on <span id="listens-count">nn</span> observed playback sessions: </div>
+                </sl-card>
+            </div>
+            <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">How OP3 calculates client-side listen time →</a></div>
+            <canvas id="listens-graph" class="max-h-64 cursor-pointer"></canvas>
+            <div class="flex justify-center items-center mt-8 text-neutral-600">Minutes played from&nbsp;<span id="listens-episode"></span></div>
+
+        </span>
 
         <!-- episode pacing -->
         <div class="flex justify-center items-center gap-2 mt-16 mb-8">

@@ -18,6 +18,7 @@ import { makeTopAuRegions } from './top_au_regions.ts';
 import { makeTopCaRegions } from './top_ca_regions.ts';
 import { makeTopAsRegions } from './top_as_regions.ts';
 import { makeTopLatamRegions } from './top_latam_regions.ts';
+import { makeListens } from './listens.ts';
 
 // provided server-side
 declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
@@ -104,7 +105,7 @@ const app = await (async () => {
     }
     await grabMoreDataIfNecessary('first');
 
-    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads } = statsObj;
+    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
     const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...episodes.find(v => v.id === episodeId)! }));
@@ -124,6 +125,8 @@ const app = await (async () => {
     const shot = new URLSearchParams(document.location.search).has('shot');
     const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot });
 
+    makeListens({ episodeListens, episodes, debug });
+    
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 
     makeTopCountries({ showSlug, monthlyDimensionDownloads });
