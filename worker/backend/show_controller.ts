@@ -14,6 +14,7 @@ import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Backups } from './backups.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, computeHourlyShowColumns, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
+import { computeShowListenStatsKey, isValidShowListenStats } from './listens.ts';
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowPartitionsRecord, isShowRecord, isValidPartition, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowPartitionsRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
@@ -292,6 +293,36 @@ export class ShowController {
                     if (operationKind === 'delete') {
                         const result = await deleteShow(showUuid, storage);
                         return { results: [ result ] };
+                    }
+                }
+            }
+        }
+
+        {
+            const m = /^\/show\/shows\/(.+?)\/listens$/.exec(targetPath);
+            if (m) {
+                const { statsBlobs } = this;
+                const [ _, input ] = m;
+                const showUuid = input;
+                check('showUuid', showUuid, isValidUuid);
+                const key = computeShowListenStatsKey({ showUuid });
+                if (operationKind === 'select') {
+                    const result = await statsBlobs.get(key, 'json');
+                    const results = isValidShowListenStats(result) ? [ result ] : [];
+                    return { results };
+                }
+                if (operationKind === 'update') {
+                    const { payload } = parameters;
+                    if (typeof payload !== 'string' || !isValidShowListenStats(JSON.parse(payload))) throw new Error(`Missing or invalid 'payload' parameter`);
+                    const { etag } = await statsBlobs.put(key, payload);
+                    return { results: [ { etag } ] };
+                }
+                if (operationKind === 'delete') {
+                    if (await statsBlobs.has(key)) {
+                        await statsBlobs.delete(key);
+                        return { message: 'deleted' };
+                    } else {
+                        return { message: 'does not exist' };
                     }
                 }
             }

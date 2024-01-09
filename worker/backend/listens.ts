@@ -30,12 +30,14 @@ export function isValidPackedMinuteMap(obj: unknown): obj is string {
 export interface EpisodeListenStats {
     readonly itemGuid: string;
     readonly minuteMaps: string[];
+    readonly appCounts: Record<string, number>;
 }
 
 export function isValidEpisodeListenStats(obj: unknown): obj is EpisodeListenStats {
     return isStringRecord(obj)
         && typeof obj.itemGuid === 'string'
         && Array.isArray(obj.minuteMaps) && obj.minuteMaps.every(isValidPackedMinuteMap)
+        && isStringRecord(obj.appCounts)
         ;
 }
 
