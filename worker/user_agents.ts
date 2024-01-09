@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@3f3a7e75270c5f7807de64e80013d3e0a1cf14bc (2023-12-15T16:07:05Z)
+// from user-agents-v2@3e0f87ff81bab059760123ca3099fdbb6f726c3e (2024-01-09T00:57:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -286,6 +286,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Clementine /.test(userAgent)) return { name: `Clementine Music Player`, type: 'app' };
     if (/^Club\//.test(userAgent)) return { name: `Club`, type: 'app' };
     if (/^Commotion\//.test(userAgent)) return { name: `Commotion`, type: 'app' };
+    if (/^CoolerFM\//.test(userAgent)) return { name: `Cooler`, type: 'app' };
     if (/^Copied\//.test(userAgent)) return { name: `Copied`, type: 'app' };
     if (/^CoreDataPlayerSample\//.test(userAgent)) return { name: `CoreDataPlayerSample`, type: 'app' };
     if (/^Cosmicast\//.test(userAgent)) return { name: `Cosmicast`, type: 'app' };

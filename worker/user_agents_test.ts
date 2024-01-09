@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@3f3a7e75270c5f7807de64e80013d3e0a1cf14bc (2023-12-15T16:07:05Z)
+// from user-agents-v2@3e0f87ff81bab059760123ca3099fdbb6f726c3e (2024-01-09T00:57:05Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -368,6 +368,7 @@ const appTests = {
     'Client/16042 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Client` },
     'Club/126 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `Club` },
     'Commotion/3.0.79 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `Commotion` },
+    'CoolerFM/1.0 iPhone/15 +https://cooler.fm': { type: 'app', name: `Cooler` },
     'Copied/142 CFNetwork/760.2.6 Darwin/15.2.0 (x86_64)': { type: 'app', name: `Copied` },
     'CoreDataPlayerSample/1 CFNetwork/975.0.3 Darwin/17.7.0': { type: 'app', name: `CoreDataPlayerSample` },
     'Cosmicast/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Cosmicast` },
