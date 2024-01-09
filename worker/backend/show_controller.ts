@@ -273,32 +273,6 @@ export class ShowController {
         }
 
         {
-            const m = /^\/show\/shows\/(.+?)(\/episodes)?$/.exec(targetPath);
-            if (m) {
-                const [ _, input, episodes ] = m;
-                const showUuid = input;
-                check('showUuid', showUuid, isValidUuid);
-                if (episodes) {
-                    if (operationKind === 'select') {
-                        const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
-                        const results = [...map.values()].filter(isEpisodeRecord);
-                        return { results };
-                    }
-                } else {
-                    if (operationKind === 'select') {
-                        const result = await storage.get(computeShowKey(showUuid));
-                        const results = isShowRecord(result) ? [ result ] : [];
-                        return { results }
-                    }
-                    if (operationKind === 'delete') {
-                        const result = await deleteShow(showUuid, storage);
-                        return { results: [ result ] };
-                    }
-                }
-            }
-        }
-
-        {
             const m = /^\/show\/shows\/(.+?)\/listens$/.exec(targetPath);
             if (m) {
                 const { statsBlobs } = this;
@@ -323,6 +297,32 @@ export class ShowController {
                         return { message: 'deleted' };
                     } else {
                         return { message: 'does not exist' };
+                    }
+                }
+            }
+        }
+
+        {
+            const m = /^\/show\/shows\/(.+?)(\/episodes)?$/.exec(targetPath);
+            if (m) {
+                const [ _, input, episodes ] = m;
+                const showUuid = input;
+                check('showUuid', showUuid, isValidUuid);
+                if (episodes) {
+                    if (operationKind === 'select') {
+                        const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
+                        const results = [...map.values()].filter(isEpisodeRecord);
+                        return { results };
+                    }
+                } else {
+                    if (operationKind === 'select') {
+                        const result = await storage.get(computeShowKey(showUuid));
+                        const results = isShowRecord(result) ? [ result ] : [];
+                        return { results }
+                    }
+                    if (operationKind === 'delete') {
+                        const result = await deleteShow(showUuid, storage);
+                        return { results: [ result ] };
                     }
                 }
             }
