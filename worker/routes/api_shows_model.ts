@@ -17,7 +17,7 @@ export interface ApiShowStatsResponse {
     readonly episodeHourlyDownloads: Record<string, Record<string, number>>;
     readonly dailyFoundAudience: Record<string, number>;
     readonly monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>;
-    readonly episodeMinuteMaps?: Record<string, string[]>;
+    readonly episodeListens?: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }>;
 }
 
 export interface ApiShowSummaryStatsResponse {

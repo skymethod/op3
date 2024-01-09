@@ -124,7 +124,7 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     let episodeHourlyDownloads: Record<string, Record<string, number>> = {};
     let dailyFoundAudience: Record<string, number> = {};
     let monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> = {};
-    let episodeMinuteMaps: Record<string, string[]> | undefined;
+    let episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined;
 
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
@@ -148,9 +148,9 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     }
    
     if (isValidShowListenStats(listens)) {
-        episodeMinuteMaps = Object.fromEntries(Object.values(listens.episodeListenStats).map(v => [ v.itemGuid, v.minuteMaps ]));
+        episodeListens = Object.fromEntries(Object.values(listens.episodeListenStats).map(({ itemGuid, minuteMaps, appCounts }) => [ itemGuid, { minuteMaps, appCounts } ]));
     }
-    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeMinuteMaps }));
+    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeListens }));
 }
 
 export async function computeShowSummaryStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
