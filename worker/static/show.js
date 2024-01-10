@@ -10235,7 +10235,7 @@ function computeRegionName3(regionCountry) {
     return region;
 }
 const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
-    const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensGraphFooter, listensEpisode] = [
+    const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensGraphFooter, listensEpisode, listensGraphFooterPrevious, listensGraphFooterNext] = [
         element('listens-section'),
         element('listens-25'),
         element('listens-50'),
@@ -10245,7 +10245,9 @@ const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
         element('listens-based-on'),
         element('listens-graph'),
         element('listens-graph-footer'),
-        element('listens-episode')
+        element('listens-episode'),
+        element('listens-graph-footer-previous'),
+        element('listens-graph-footer-next')
     ];
     if (!episodeListens) return;
     listensSection.classList.remove('hidden');
@@ -10275,27 +10277,38 @@ const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
         item.querySelector('span').textContent = `${count}`;
         listensBasedOn.appendChild(item);
     });
-    const minutes = {};
-    const episodeListensEntries = Object.entries(episodeListens);
-    for(let i = 0; i < episodeListensEntries.length; i++){
-        const [episodeGuid, { minuteMaps }] = episodeListensEntries[i];
-        if (i === 0 && episodeListensEntries[1] && episodeListensEntries[1][1].minuteMaps.length > minuteMaps.length) continue;
+    const episodeListensEntries = Object.entries(episodeListens).filter((v)=>v[1].minuteMaps.length > 0 && v[1].minuteMaps[0].length >= 3);
+    if (episodeListensEntries.length === 0) return;
+    [
+        listensGraph,
+        listensGraphFooter
+    ].forEach((v)=>v.classList.remove('hidden'));
+    let index = episodeListensEntries[1] && episodeListensEntries[1][1].minuteMaps.length > episodeListensEntries[0][1].minuteMaps.length ? 1 : 0;
+    let chart;
+    const updateGraph = ()=>{
+        const [episodeGuid, { minuteMaps }] = episodeListensEntries[index];
+        if (chart) chart.destroy();
+        const minutes = {};
         for (const minuteMap of minuteMaps){
             [
                 ...minuteMap
             ].forEach((v, i)=>increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        if (minuteMaps.length > 0 && minuteMaps[0].length >= 10) {
-            [
-                listensGraph,
-                listensGraphFooter
-            ].forEach((v)=>v.classList.remove('hidden'));
-            drawGraph(listensGraph, minutes, minuteMaps.length);
-            const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
-            listensEpisode.textContent = `‘${epName}’`;
-        }
-        break;
-    }
+        chart = drawGraph(listensGraph, minutes, minuteMaps.length);
+        const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
+        listensEpisode.textContent = `‘${epName}’`;
+        listensGraphFooterPrevious.disabled = index === episodeListensEntries.length - 1;
+        listensGraphFooterNext.disabled = index === 0;
+    };
+    updateGraph();
+    listensGraphFooterPrevious.onclick = ()=>{
+        index = Math.min(index + 1, episodeListensEntries.length - 1);
+        updateGraph();
+    };
+    listensGraphFooterNext.onclick = ()=>{
+        index = Math.max(index - 1, 0);
+        updateGraph();
+    };
 };
 function drawGraph(canvas, labelsAndValues, sessions) {
     const ctx = canvas.getContext('2d');

@@ -1,4 +1,4 @@
-import { element } from './elements.ts';
+import { SlIconButton, element } from './elements.ts';
 import { increment, incrementAll } from '../worker/summaries.ts';
 import { Chart, TooltipItem, sortBy } from './deps.ts';
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
@@ -18,6 +18,8 @@ export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Op
         listensGraph,
         listensGraphFooter,
         listensEpisode,
+        listensGraphFooterPrevious,
+        listensGraphFooterNext,
     ] = [
         element('listens-section'),
         element('listens-25'),
@@ -29,6 +31,8 @@ export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Op
         element<HTMLCanvasElement>('listens-graph'),
         element('listens-graph-footer'),
         element('listens-episode'),
+        element<SlIconButton>('listens-graph-footer-previous'),
+        element<SlIconButton>('listens-graph-footer-next'),
     ];
 
     if (!episodeListens) return;
@@ -61,22 +65,39 @@ export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Op
         listensBasedOn.appendChild(item);
     });
     
-    const minutes: Record<string, number> = {};
-    const episodeListensEntries = Object.entries(episodeListens);
-    for (let i = 0; i < episodeListensEntries.length; i++) {
-        const [ episodeGuid, { minuteMaps } ] = episodeListensEntries[i];
-        if (i === 0 && episodeListensEntries[1] && episodeListensEntries[1][1].minuteMaps.length > minuteMaps.length) continue;
+    const episodeListensEntries = Object.entries(episodeListens).filter(v => v[1].minuteMaps.length > 0 && v[1].minuteMaps[0].length >= 3);
+    if (episodeListensEntries.length === 0) return;
+
+    [ listensGraph, listensGraphFooter ].forEach(v => v.classList.remove('hidden'));
+
+    let index = episodeListensEntries[1] && episodeListensEntries[1][1].minuteMaps.length > episodeListensEntries[0][1].minuteMaps.length ? 1 : 0;
+    let chart: Chart | undefined;
+
+    const updateGraph = () => {
+        const [ episodeGuid, { minuteMaps } ] = episodeListensEntries[index];
+        if (chart) chart.destroy();
+        const minutes: Record<string, number> = {};
         for (const minuteMap of minuteMaps) {
             [...minuteMap].forEach((v, i) => increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        if (minuteMaps.length > 0 && minuteMaps[0].length >= 10) {
-            [ listensGraph, listensGraphFooter ].forEach(v => v.classList.remove('hidden'));
-            drawGraph(listensGraph, minutes, minuteMaps.length);
-            const epName = episodes.find(v => v.itemGuid === episodeGuid)?.title ?? episodeGuid;
-            listensEpisode.textContent = `‘${epName}’`;
-        }
-        break;
+        chart = drawGraph(listensGraph, minutes, minuteMaps.length);
+        const epName = episodes.find(v => v.itemGuid === episodeGuid)?.title ?? episodeGuid;
+        listensEpisode.textContent = `‘${epName}’`;
+        listensGraphFooterPrevious.disabled = index === episodeListensEntries.length - 1;
+        listensGraphFooterNext.disabled = index === 0;
     }
+    updateGraph();
+
+    listensGraphFooterPrevious.onclick = () => {
+        index = Math.min(index + 1, episodeListensEntries.length - 1);
+        updateGraph();
+    };
+
+    listensGraphFooterNext.onclick = () => {
+        index = Math.max(index - 1, 0);
+        updateGraph();
+    };
+
 };
 
 //
