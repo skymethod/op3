@@ -105,7 +105,7 @@ const app = await (async () => {
     }
     await grabMoreDataIfNecessary('first');
 
-    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens } = statsObj;
+    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
     const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([ episodeId, firstHour ]) => ({ firstHour, ...episodes.find(v => v.id === episodeId)! }));
@@ -125,7 +125,7 @@ const app = await (async () => {
     const shot = new URLSearchParams(document.location.search).has('shot');
     const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot });
 
-    makeListens({ episodeListens, episodes, debug });
+    makeListens({ episodeListens, episodes, knownAppLinks, debug });
     
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 

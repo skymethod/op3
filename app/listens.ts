@@ -3,9 +3,9 @@ import { increment, incrementAll } from '../worker/summaries.ts';
 import { Chart, TooltipItem, sortBy } from './deps.ts';
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 
-type Opts = { episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined, episodes: readonly EpisodeInfo[], debug: boolean };
+type Opts = { episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined, episodes: readonly EpisodeInfo[], knownAppLinks: Record<string, string> | undefined, debug: boolean };
 
-export const makeListens = ({ episodeListens, episodes }: Opts) => {
+export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Opts) => {
 
     const [ 
         listensSection,
@@ -16,6 +16,7 @@ export const makeListens = ({ episodeListens, episodes }: Opts) => {
         listensFromAppTemplate,
         listensBasedOn,
         listensGraph,
+        listensGraphFooter,
         listensEpisode,
     ] = [
         element('listens-section'),
@@ -26,6 +27,7 @@ export const makeListens = ({ episodeListens, episodes }: Opts) => {
         element<HTMLTemplateElement>('listens-from-app'),
         element('listens-based-on'),
         element<HTMLCanvasElement>('listens-graph'),
+        element('listens-graph-footer'),
         element('listens-episode'),
     ];
 
@@ -67,26 +69,17 @@ export const makeListens = ({ episodeListens, episodes }: Opts) => {
         for (const minuteMap of minuteMaps) {
             [...minuteMap].forEach((v, i) => increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        drawGraph(listensGraph, minutes, minuteMaps.length);
-        const epName = episodes.find(v => v.itemGuid === episodeGuid)?.title ?? episodeGuid;
-        listensEpisode.textContent = `‘${epName}’`;
+        if (minuteMaps.length > 0 && minuteMaps[0].length >= 10) {
+            [ listensGraph, listensGraphFooter ].forEach(v => v.classList.remove('hidden'));
+            drawGraph(listensGraph, minutes, minuteMaps.length);
+            const epName = episodes.find(v => v.itemGuid === episodeGuid)?.title ?? episodeGuid;
+            listensEpisode.textContent = `‘${epName}’`;
+        }
         break;
     }
 };
 
 //
-
-const knownAppLinks: Record<string, string> = {
-    'Fountain': 'https://www.fountain.fm/',
-    'Castamatic': 'https://castamatic.com/',
-    'Podverse': 'https://podverse.fm/',
-    'CurioCaster': 'https://curiocaster.com/',
-    'TrueFans': 'https://truefans.fm/',
-    'PodcastGuru': 'https://podcastguru.io/',
-    'Podfriend': 'https://www.podfriend.com/',
-    'Breez': 'https://breez.technology/',
-}
-
 
 function drawGraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, sessions: number) {
     const ctx = canvas.getContext('2d')!;
@@ -135,7 +128,7 @@ function drawGraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, nu
                     callbacks: {
                         title: (items: TooltipItem<never>[]) => `Minute ${items[0].label}`,
                         // deno-lint-ignore no-explicit-any
-                        label: (item: any) => `${item.parsed.y} of ${sessions} observed sessions (${Math.round(item.parsed.y / sessions * 100)}%)`,
+                        label: (item: any) => `${item.parsed.y} of ${sessions} anonymized sessions (${Math.round(item.parsed.y / sessions * 100)}%)`,
                     }
                 },
             },

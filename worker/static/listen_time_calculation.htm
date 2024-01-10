@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Listen Time Calculation · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href="${origin}/listen-time-calculation" />
+    ${styleTag}
+</head>
+
+<body class="flex flex-col bg-neutral-900 text-neutral-300">
+    ${nonProdHeader}
+    <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
+        Listen Time Calculation
+    </h1>
+    <div class="basic max-w-2xl mx-auto px-8">
+        <p>OP3 primarily <a href="/download-calculation">computes "Downloads"</a>, which is the current industry-standard way of measuring a podcast's audience.</p>
+        <p>Downloads measure server-side requests, an upper-bound estimate of actual listener plays, but not an exact measurement.  Only the podcast player app knows which episodes a listener actually plays, and which segments of the audio they listen to.</p>
+        <p>If all player apps in the open podcast ecosystem shared anonymized client-side playback information with podcasters, it would provide a fuller picture of which parts of their shows are connecting or not with their listeners - above and beyond the relatively opaque metric of a download.</p>
+
+        <h2 id="how">How does OP3 calculate listen time?</h2>
+        <p>It turns out <a href="#apps">eight podcast apps</a> already provide a decent approximation of this client-side playback information via an existing mechanism: <a href="https://support.fountain.fm/article/50-how-to-support-podcasts-on-fountain#howsupport">enabling listeners to send small digital payments every minute</a>.</p>
+        <p>As a podcaster, you can take a look at the received data directly, or include services in the payment that can aggregate streaming payment statistics on your behalf.</p>
+        <p>If OP3 is included in this loop, it can now display this information in a special "Listen time" section in your OP3 show stats page. <a href="/show/fb3d03641442410e881acb0562ef27c6">Example →</a></p>
+        <p>While not all podcast apps support this, and not all listeners will choose to send these payments, it's better than no cross-app-comparable client-side data at all - and useful to analyze in addition to server-side downloads.</p>
+
+        <h2 id="enable">How do I enable listen time on my OP3 page?</h2>
+        <p>For podcasters that have already <a href="/setup">enabled OP3</a> for their podcast:</p>
+        <ul>
+            <li>Add the <code>podcast:valueRecipient</code> information from <a href="https://reflex.livewire.io/">reflex.livewire.io</a> to your podcast RSS feed (ignore the chapters part).</li>
+            <li>That's it! Reflex will automatically send OP3 anonymized, aggregate stats based on any incoming data observed, and display it on the show page.</li>
+            <li>Encourage your listeners to use one of the apps below to listen to your show, and encourage them to support your show with streaming payments.</li>
+        </ul>
+        <p id="apps" class="font-bold">Podcast apps</p>
+        <ul id="apps-list">
+        </ul>
+
+    </div>
+   
+    <div class="max-w-xl mx-auto my-16">
+        <a href="/">Home</a>
+    </div>
+    ${cfAnalyticsSnippet}
+</body>
+
+</html>

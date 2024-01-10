@@ -18,7 +18,6 @@ import { addMonthsToMonthString } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { ApiShowsResponse, ApiShowStatsResponse, ApiShowSummaryStatsResponse, EpisodeInfo } from './api_shows_model.ts';
 
-
 type LookupShowIdOpts = Omit<ShowsOpts, 'method' | 'origin'>;
 
 export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searchParams, rpcClient, roRpcClient, configuration, times = {} }: LookupShowIdOpts): Promise<{ showUuid: string, showUuidInput: string } | Response> {
@@ -125,6 +124,7 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     let dailyFoundAudience: Record<string, number> = {};
     let monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> = {};
     let episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined;
+    let knownAppLinks: Record<string, string> | undefined;
 
     if (isValidShowSummary(overall)) {
         episodeFirstHours = Object.fromEntries(Object.entries(overall.episodes).map(([ episodeId, value ]) => ([ episodeId, value.firstHour ])));
@@ -149,8 +149,9 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
    
     if (isValidShowListenStats(listens)) {
         episodeListens = Object.fromEntries(Object.values(listens.episodeListenStats).map(({ itemGuid, minuteMaps, appCounts }) => [ itemGuid, { minuteMaps, appCounts } ]));
+        knownAppLinks = KNOWN_APP_LINKS;
     }
-    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeListens }));
+    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks }));
 }
 
 export async function computeShowSummaryStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
@@ -366,3 +367,14 @@ const DEMO_SHOW_1_EPISODE_TITLES = [
     'The Beauty of the Hawaiian Islands',
     'The Charm of the Netherlands',
 ];
+
+export const KNOWN_APP_LINKS: Record<string, string> = {
+    'Fountain': 'https://www.fountain.fm/',
+    'Podverse': 'https://podverse.fm/',
+    'Castamatic': 'https://castamatic.com/',
+    'PodcastGuru': 'https://podcastguru.io/',
+    'CurioCaster': 'https://curiocaster.com/',
+    'TrueFans': 'https://truefans.fm/',
+    'Podfriend': 'https://www.podfriend.com/',
+    'Breez': 'https://breez.technology/',
+}

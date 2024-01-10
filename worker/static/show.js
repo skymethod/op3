@@ -10234,8 +10234,8 @@ function computeRegionName3(regionCountry) {
     })[region] ?? region;
     return region;
 }
-const makeListens = ({ episodeListens, episodes })=>{
-    const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensEpisode] = [
+const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
+    const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensGraphFooter, listensEpisode] = [
         element('listens-section'),
         element('listens-25'),
         element('listens-50'),
@@ -10244,6 +10244,7 @@ const makeListens = ({ episodeListens, episodes })=>{
         element('listens-from-app'),
         element('listens-based-on'),
         element('listens-graph'),
+        element('listens-graph-footer'),
         element('listens-episode')
     ];
     if (!episodeListens) return;
@@ -10284,21 +10285,17 @@ const makeListens = ({ episodeListens, episodes })=>{
                 ...minuteMap
             ].forEach((v, i)=>increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        drawGraph(listensGraph, minutes, minuteMaps.length);
-        const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
-        listensEpisode.textContent = `‘${epName}’`;
+        if (minuteMaps.length > 0 && minuteMaps[0].length >= 10) {
+            [
+                listensGraph,
+                listensGraphFooter
+            ].forEach((v)=>v.classList.remove('hidden'));
+            drawGraph(listensGraph, minutes, minuteMaps.length);
+            const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
+            listensEpisode.textContent = `‘${epName}’`;
+        }
         break;
     }
-};
-const knownAppLinks = {
-    'Fountain': 'https://www.fountain.fm/',
-    'Castamatic': 'https://castamatic.com/',
-    'Podverse': 'https://podverse.fm/',
-    'CurioCaster': 'https://curiocaster.com/',
-    'TrueFans': 'https://truefans.fm/',
-    'PodcastGuru': 'https://podcastguru.io/',
-    'Podfriend': 'https://www.podfriend.com/',
-    'Breez': 'https://breez.technology/'
 };
 function drawGraph(canvas, labelsAndValues, sessions) {
     const ctx = canvas.getContext('2d');
@@ -10343,7 +10340,7 @@ function drawGraph(canvas, labelsAndValues, sessions) {
                     footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
                         title: (items)=>`Minute ${items[0].label}`,
-                        label: (item)=>`${item.parsed.y} of ${sessions} observed sessions (${Math.round(item.parsed.y / sessions * 100)}%)`
+                        label: (item)=>`${item.parsed.y} of ${sessions} anonymized sessions (${Math.round(item.parsed.y / sessions * 100)}%)`
                     }
                 }
             }
@@ -10434,7 +10431,7 @@ const app = await (async ()=>{
         return changed;
     };
     await grabMoreDataIfNecessary('first');
-    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens } = statsObj;
+    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks } = statsObj;
     const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
     const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
             v[0],
@@ -10479,6 +10476,7 @@ const app = await (async ()=>{
     makeListens({
         episodeListens,
         episodes,
+        knownAppLinks,
         debug
     });
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[

@@ -34,6 +34,7 @@ import { CloudflareConfiguration } from './cloudflare_configuration.ts';
 import { computeDownloadCalculationResponse } from './routes/download_calculation.ts';
 import { computeStatsResponse } from './routes/stats.ts';
 import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
+import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -238,6 +239,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/download-calculation') return computeDownloadCalculationResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
+    if (method === 'GET' && pathname === '/listen-time-calculation') return computeListenTimeCalculationResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/demo') return computeDemoShowResponse({ origin });
     if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens });
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);

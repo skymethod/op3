@@ -23,6 +23,7 @@ export function computeSitemapXmlResponse(opts: { origin: string }): Response {
         '/costs',
         '/setup',
         '/download-calculation',
+        '/listen-time-calculation',
         '/status',
     ];
     const lines = [ 

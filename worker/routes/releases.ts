@@ -44,6 +44,15 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-01-10',
+        time: '2024-01-10T12:00:00.00Z',
+        title: '2024-01-10: New client-side listen time statistics section on show pages',
+        bulletPoints: [
+            () => `Podcasters can unlock a new "Listen time" section in their stats pages, aggregated from anonymized streaming payments already supported by eight existing podcast apps.`,
+            ({ origin }) => `Learn how to enable these stats on the new [OP3 Listen Time Calculation](${origin}/listen-time-calculation) page.`,
+        ]
+    },
+    {
         id: '2023-02-26',
         time: '2023-02-26T21:28:39.191Z',
         title: '2023-02-26: Show stats pages + new API calls for show downloads and other queries',

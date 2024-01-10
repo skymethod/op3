@@ -86,7 +86,7 @@ const previewToken = '${previewToken}';
             </sl-card>
         </div>
 
-        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/download-calculation" target="_blank">How OP3 calculates downloads →</a></div>
+        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600 text-sm md:text-base" href="/download-calculation" target="_blank">How OP3 calculates downloads →</a></div>
 
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
@@ -120,12 +120,12 @@ const previewToken = '${previewToken}';
                     <p><span id="listens-50"class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">half</span></p>
                     <p><span id="listens-90" class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">90%</span></p>
                     <template id="listens-from-app"><span>n</span> from <a href="#" class="text-neutral-600 app-name" target="_blank">app</a></template>
-                    <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">Based on <span id="listens-count">nn</span> observed playback sessions: </div>
+                    <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">Based on <span id="listens-count">nn</span> anonymized playback sessions: </div>
                 </sl-card>
             </div>
-            <div class="flex justify-center items-center mt-8"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">How OP3 calculates client-side listen time →</a></div>
-            <canvas id="listens-graph" class="max-h-64 cursor-pointer"></canvas>
-            <div class="flex justify-center items-center mt-8 text-neutral-600">Minutes played from&nbsp;<span id="listens-episode"></span></div>
+            <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">How OP3 calculates client-side listen time →</a></div>
+            <canvas id="listens-graph" class="max-h-64 cursor-pointer hidden"></canvas>
+            <div id="listens-graph-footer" class="flex justify-center items-center mt-8 text-neutral-600 hidden text-sm md:text-base">Minutes played from&nbsp;<span id="listens-episode"></span></div>
 
         </span>
 
