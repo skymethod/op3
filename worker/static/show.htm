@@ -124,7 +124,9 @@ const previewToken = '${previewToken}';
                 </sl-card>
             </div>
             <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">How OP3 calculates client-side listen time →</a></div>
-            <canvas id="listens-graph" class="max-h-64 cursor-pointer hidden mt-8"></canvas>
+            <div>
+                <canvas id="listens-graph" class="max-h-64 cursor-pointer hidden mt-8"></canvas>
+            </div>
             <div id="listens-graph-footer" class="flex justify-center items-center mt-8 text-neutral-600 hidden text-sm md:text-base">
                 <sl-icon-button name="caret-left-fill" label="Previous" id="listens-graph-footer-previous"></sl-icon-button>
                 Minutes played from&nbsp;<span id="listens-episode"></span>
