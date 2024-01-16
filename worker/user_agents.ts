@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@3e0f87ff81bab059760123ca3099fdbb6f726c3e (2024-01-09T00:57:05Z)
+// from user-agents-v2@aaf67397092047446cb7368ec79b218f39f85668 (2024-01-16T18:07:07Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -463,6 +463,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Menucast\//.test(userAgent)) return { name: `Menucast`, type: 'app' };
     if (/^Message\+\//.test(userAgent)) return { name: `Message+`, type: 'app' };
     if (/^Messenger\//.test(userAgent)) return { name: `Messenger`, type: 'app' };
+    if (/^Metacast\//.test(userAgent)) return { name: `Metacast`, type: 'app' };
     if (/^Outlook-Android\/|^Microsoft Office\/.*?Microsoft Outlook/.test(userAgent)) return { name: `Microsoft Outlook`, type: 'app' };
     if (/^microsoft;xbox_/.test(userAgent)) return { name: `Microsoft Xbox`, type: 'app' };
     if (/^Mimir(-macOS)?\//.test(userAgent)) return { name: `Mimir`, type: 'app' };

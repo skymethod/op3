@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@3e0f87ff81bab059760123ca3099fdbb6f726c3e (2024-01-09T00:57:05Z)
+// from user-agents-v2@aaf67397092047446cb7368ec79b218f39f85668 (2024-01-16T18:07:07Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -632,6 +632,7 @@ const appTests = {
     'Menucast/1.4 CFNetwork/720.1.1 Darwin/14.0.0 (x86_64)': { type: 'app', name: `Menucast` },
     'Message+/2.4.7 CFNetwork/811.5.4 Darwin/16.7.0 (x86_64)': { type: 'app', name: `Message+` },
     'Messenger/168725151 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Messenger` },
+    'Metacast/189 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `Metacast` },
     'Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.16130; Pro)': { type: 'app', name: `Microsoft Outlook` },
     'Outlook-Android/2.0': { type: 'app', name: `Microsoft Outlook` },
     'microsoft;xbox_one;1fc2d01aa9074dde950e8d3dc0eb1729;;tpapi;3.167.55': { type: 'app', name: `Microsoft Xbox` },
