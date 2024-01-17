@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@aaf67397092047446cb7368ec79b218f39f85668 (2024-01-16T18:07:07Z)
+// from user-agents-v2@72b592227cbb98edb234db3253d06329436a0f5b (2024-01-17T23:42:13Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -1102,6 +1102,8 @@ const referrerTests = {
     'https://classic.stitcher.com/': { type: 'referrer', name: `Stitcher` },
     'https://asdf.transistor.fm/': { type: 'referrer', name: `Transistor Web Player` },
     'https://share.transistor.fm/': { type: 'referrer', name: `Transistor Web Player` },
+    'https://truefans.fm/': { type: 'referrer', name: `TrueFans` },
+    'https://podfans.fm/': { type: 'referrer', name: `TrueFans` },
     'https://tunein.com/': { type: 'referrer', name: `TuneIn` },
     'https://podcasts.wixapps.net/': { type: 'referrer', name: `Wix` },
 };

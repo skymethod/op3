@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@aaf67397092047446cb7368ec79b218f39f85668 (2024-01-16T18:07:07Z)
+// from user-agents-v2@72b592227cbb98edb234db3253d06329436a0f5b (2024-01-17T23:42:13Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -750,6 +750,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/https:\/\/(open|api-partner)\.spotify\.com/.test(referer)) return { name: `Spotify`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(www|app|classic)\.stitcher\.com\//.test(referer)) return { name: `Stitcher`, type: 'referrer', category: 'app' };
     if (/:\/\/([^.\/]+\.)?transistor\.fm\//.test(referer)) return { name: `Transistor Web Player`, type: 'referrer', category: 'host' };
+    if (/:\/\/(pod|true)fans\.fm\//.test(referer)) return { name: `TrueFans`, type: 'referrer', category: 'app' };
     if (/^https:\/\/tunein\.com\//.test(referer)) return { name: `TuneIn`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podcasts\.wixapps\.net/.test(referer)) return { name: `Wix`, type: 'referrer', category: 'host' };
 }
