@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@72b592227cbb98edb234db3253d06329436a0f5b (2024-01-17T23:42:13Z)
+// from user-agents-v2@96e03deb49ec6974aed38271f2843ddc233e8837 (2024-01-19T20:37:58Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -721,6 +721,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/kajabi\.com\/?$/.test(referer)) return { name: `Kajabi`, type: 'referrer', category: 'host' };
     if (/^https:\/\/www\.linkedin\.com\//.test(referer)) return { name: `LinkedIn`, type: 'referrer', category: 'app' };
     if (/^https:\/\/www\.listennotes\.com\//.test(referer)) return { name: `Listen Notes`, type: 'referrer' };
+    if (/:\/\/lnbeats\.com\//.test(referer)) return { name: `LN Beats`, type: 'referrer', category: 'app' };
     if (/:\/\/luminarypodcasts\.com\//.test(referer)) return { name: `Luminary`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.megaphone\.fm\//.test(referer)) return { name: `Megaphone`, type: 'referrer', category: 'host' };
     if (/^https:\/\/www\.mixcloud\.com\//.test(referer)) return { name: `Mixcloud`, type: 'referrer', category: 'app' };

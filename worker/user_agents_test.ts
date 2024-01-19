@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@72b592227cbb98edb234db3253d06329436a0f5b (2024-01-17T23:42:13Z)
+// from user-agents-v2@96e03deb49ec6974aed38271f2843ddc233e8837 (2024-01-19T20:37:58Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -1052,6 +1052,7 @@ const referrerTests = {
     'https://creativityfound.mykajabi.com/': { type: 'referrer', name: `Kajabi` },
     'https://www.linkedin.com/': { type: 'referrer', name: `LinkedIn` },
     'https://www.listennotes.com/': { type: 'referrer', name: `Listen Notes` },
+    'https://lnbeats.com/': { type: 'referrer', name: `LN Beats` },
     'https://luminarypodcasts.com/': { type: 'referrer', name: `Luminary` },
     'https://playlist.megaphone.fm/': { type: 'referrer', name: `Megaphone` },
     'https://www.mixcloud.com/': { type: 'referrer', name: `Mixcloud` },
