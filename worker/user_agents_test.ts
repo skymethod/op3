@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@96e03deb49ec6974aed38271f2843ddc233e8837 (2024-01-19T20:37:58Z)
+// from user-agents-v2@c6bab110cb90793aac71e2bd0b3485006fb3a8f5 (2024-02-08T19:37:11Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -94,6 +94,7 @@ const botTests = {
     'Googlebot-Image/1.0': { type: 'bot', name: `Googlebot` },
     'Feedfetcher-Google; (+http://www.google.com/feedfetcher.html; 1 subscribers; feed-id=4653447469100830145)': { type: 'bot', name: `Googlebot` },
     'google-xrawler': { type: 'bot', name: `Googlebot` },
+    'Googlebot-News Audio': { type: 'bot', name: `Googlebot` },
     'Gumball.fm Analytics Prefix Checker': { type: 'bot', name: `Gumball` },
     'Headliner/1.0.0 +https://headliner.app': { type: 'bot', name: `Headliner` },
     'Mozilla/5.0 (compatible; HubSpot Crawler; +https://www.hubspot.com)': { type: 'bot', name: `HubSpot Crawler` },
@@ -633,6 +634,7 @@ const appTests = {
     'Message+/2.4.7 CFNetwork/811.5.4 Darwin/16.7.0 (x86_64)': { type: 'app', name: `Message+` },
     'Messenger/168725151 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Messenger` },
     'Metacast/189 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `Metacast` },
+    'Metacast': { type: 'app', name: `Metacast` },
     'Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.16130; Pro)': { type: 'app', name: `Microsoft Outlook` },
     'Outlook-Android/2.0': { type: 'app', name: `Microsoft Outlook` },
     'microsoft;xbox_one;1fc2d01aa9074dde950e8d3dc0eb1729;;tpapi;3.167.55': { type: 'app', name: `Microsoft Xbox` },
@@ -820,6 +822,7 @@ const appTests = {
     'The God Minute/8 CFNetwork/1125.2 Darwin/19.4.0': { type: 'app', name: `The God Minute` },
     'lamarr-iOS-2.20.3-116': { type: 'app', name: `The Economist` },
     'TheEconomist-Lamarr-ios-2.22.2-12002': { type: 'app', name: `The Economist` },
+    'TheEconomist-Lamarr-iOS-3.44.1-2': { type: 'app', name: `The Economist` },
     'lamarr-android-2.18.1-21810': { type: 'app', name: `The Economist` },
     'TheEconomist-Lamarr-android-2.22.2-12002': { type: 'app', name: `The Economist` },
     'ThePodcastApp/6.23.0 (iPhone; iOS 15.6.1; ) player (build 6272; +https://podcast.app/)': { type: 'app', name: `The Podcast App` },
@@ -879,6 +882,18 @@ const appTests = {
     'Zeno': { type: 'app', name: `Zeno` },
     'Zune/4.8': { type: 'app', name: `Zune` },
     'Mozilla/5.0 (Mobile; LYF/F271i/LYF_F271i-000-01-20-101019; Android; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5': { type: 'app', name: `KAIOS podcast app` },
+    'talkSPORT/x.x.x.xxx.xxx (Linux; Android x) ExoPlayerLib/x.xx.x': { type: 'app', name: `talkSPORT app` },
+    'talkSPORT/xxxxxxxxxxx CFNetwork/1126 Darwin/19.5.0': { type: 'app', name: `talkSPORT app` },
+    'talkSport/45.2.1./iOS 17.2.1/iPhone iPhone': { type: 'app', name: `talkSPORT app` },
+    'Times%20Radio/x.x.x.xxx.xxx (Linux; Android x) ExoPlayerLib/x.xx.x': { type: 'app', name: `Times Radio app` },
+    'Times%20Radio/xxxxxxxxxxx CFNetwork/1126 Darwin/19.5.0': { type: 'app', name: `Times Radio app` },
+    'Times%20Radio/45.2.0.22025 / (Linux; Android 13) ExoPlayerLib/2.17.1 / samsung (SM-A145R)': { type: 'app', name: `Times Radio app` },
+    'Virgin%20Radio/x.x.x.xxx.xxx (Linux; Android x) ExoPlayerLib/x.xx.x': { type: 'app', name: `Virgin Radio app` },
+    'Virgin%20Radio/xxxxxxxxxxx CFNetwork/1126 Darwin/19.5.0': { type: 'app', name: `Virgin Radio app` },
+    'Virgin%20Radio/45.2.0.22026 / (Linux; Android 14) ExoPlayerLib/2.17.1 / samsung (SM-G996B)': { type: 'app', name: `Virgin Radio app` },
+    'Global Player/119.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Global Player/119.0 (iPad; CPU iPad OS 17_2 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Global Player/78.0.0 Android 14/samsung SM-S911B': { type: 'app', name: `Global Player` },
 };
 
 const libraryTests = {
@@ -929,6 +944,7 @@ const libraryTests = {
     'python-urllib3/1.26.7': { type: 'library', name: `urllib (python)` },
     'yourApplicationName/2.21.9 (Linux;Android 11) ExoPlayerLib/2.14.0': { type: 'library', name: `ExoPlayer (Android)` },
     'ExoPlayerLib/2.14.0 (Linux; Android 12) ExoPlayerLib/2.14.0': { type: 'library', name: `ExoPlayer (Android)` },
+    'ESP32 HTTP Client/1.0': { type: 'library', name: `ESP32 HTTP Client` },
 };
 
 const browserTests = {
