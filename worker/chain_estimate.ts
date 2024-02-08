@@ -172,9 +172,9 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://r.zen.ai/r/a.com/path/to/episode.mp3
     // http redirects to self https, suffix protocol supported, but not used! always https
-    m = /^https?:\/\/r\.zen\.ai\/r\/(https?:\/\/)?(.*?)$/.exec(url);
+    m = /^https?:\/\/r\.(zen\.ai|zencastr\.com)\/r\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, _suffixProtocol, suffix ] = m;
+        const [ _, __, _suffixProtocol, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'zencastr', url }, ...computeChainEstimate(targetUrl) ];
     }

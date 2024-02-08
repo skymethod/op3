@@ -377,6 +377,12 @@ Deno.test({
             { kind: 'prefix', prefix: 'cohost', url: 'https://cohst.app/pdcst/123ABC/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://r.zencastr.com/r/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'zencastr', url: 'https://r.zencastr.com/r/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+        
     }
 });
 
