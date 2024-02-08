@@ -1,7 +1,7 @@
 {
     "lock": false,
     "tasks": {
-        "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/d663de2d73fa10b4ea1d1f57d7a01f75a4e09478/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
+        "serve": "deno run --unstable -A https://raw.githubusercontent.com/skymethod/denoflare/75ac0717ec34f1ed500c3605ef068394646a7486/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
         "tailwind": "npx tailwindcss --content ./worker/static/home.htm,./worker/static/terms.htm,./worker/static/privacy.htm,./worker/static/header.htm,./worker/static/releases.htm,./worker/static/status.htm,./worker/static/404.htm,./worker/static/costs.htm,./worker/routes/costs.ts,./worker/static/api_keys.htm,./worker/static/setup.htm,./worker/static/show.htm,./worker/static/download_calculation.htm,./worker/static/listen_time_calculation.htm,./worker/static/stats.htm -i ./worker/static/input.css -o ./worker/static/output.css --watch"
     },
     "fmt": {
