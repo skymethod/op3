@@ -1,0 +1,12 @@
+{
+    "downloads_in_last_n_days": {
+        "string": "downloads in last %d days",
+        "character_limit": 30
+    },
+    "headline_box_download_graph_info": {
+        "string": "Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."
+    },
+    "headline_box_download_definition": {
+        "string": "In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent."
+    }
+}

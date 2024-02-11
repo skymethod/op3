@@ -1059,7 +1059,7 @@ async function fetchMediaUrlsIfNecessary({ knownMediaUrls, items, storage, userA
         remaining--;
         if (fetched >= 10) break;
     }
-    await storage.put(upserts);
+    if (Object.keys(upserts).length > 0) await storage.put(upserts);
     return { fetched, remaining };
 }
 
