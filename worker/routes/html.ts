@@ -1,5 +1,5 @@
 import { importText } from '../deps.ts';
-import { computeStringArgs, replacePlaceholders } from './strings.ts';
+import { processTemplate } from './strings.ts';
 
 const outputCss = await importText(import.meta.url, '../static/output.css');
 const shoelaceCommonHtm = await importText(import.meta.url, '../static/shoelace_common.htm');
@@ -21,19 +21,7 @@ export function computeHtml(template: string, variables: Record<string, string |
         return value ? g2 : '';
     });
 
-    return template.replace(/(\/\*)?\${((\w+)|s:(\w+)((:\w+=\w+)*):"(.*?)")}(\*\/({})?)?/g, (_, _1, variableExpression, variableName, stringName, stringArgs, _6, stringValue) => {
-        if (variableName !== undefined) {
-            const value = variables[variableName];
-            if (value === undefined) throw new Error(`Undefined variable: ${variableName}`);
-            if (typeof value === 'boolean') return `${value}`;
-            return value;
-        } else if (stringName !== undefined && stringValue !== undefined) {
-            const { nameValuePairs } = computeStringArgs(stringArgs);
-            return replacePlaceholders(stringValue, nameValuePairs);
-        } else {
-            throw new Error(`Unsupported variable expression: ${variableExpression}`);
-        }
-    });
+    return processTemplate(template, variables).replaced;
 }
 
 export function removeHeader(html: string) {

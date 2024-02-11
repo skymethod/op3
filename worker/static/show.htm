@@ -35,12 +35,12 @@ const previewToken = '${previewToken}';
         <div class="flex flex-wrap gap-8 flex-row items-center justify-center">
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="seven-day-downloads">xxx</div>
-                <div class="text-sm">${s:downloads_in_last_n_days:charlimit=30:days=7:"downloads in last %d days"}</div>
-                <div class="text-sm opacity-50 mt-[.1rem]">as of <span id="seven-day-downloads-asof">xxx</span></div>
+                <div class="text-sm">${s:downloads_in_last_n_days:charlimit=30:days=7:'downloads in last %d days'}</div>
+                <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:charlimit=10:'as of'} <span id="seven-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:headline_box_download_graph_info:days=7:"Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."}<br><br>${s:headline_box_download_definition:"In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent."}</div>
+                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=7:'Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value.'}<br><br>${s:download_definition_info:'In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.'}</div>
                         <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
@@ -48,12 +48,12 @@ const previewToken = '${previewToken}';
 
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="thirty-day-downloads">xxx</div>
-                <div class="text-sm">downloads in last 30 days</div>
-                <div class="text-sm opacity-50 mt-[.1rem]">as of <span id="thirty-day-downloads-asof">xxx</span></div>
+                <div class="text-sm">${s:downloads_in_last_n_days:days=30:'downloads in last %d days'}</div>
+                <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:''} <span id="thirty-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Total number of downloads for this podcast in the last 30 days, and a graph showing the recent history of this value.<br><br>In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.</div>
+                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=30:''}<br><br>${s:download_definition_info:''}</div>
                         <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
@@ -61,12 +61,12 @@ const previewToken = '${previewToken}';
 
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="downloads-count">xxx</div>
-                <div class="text-sm">downloads</div>
+                <div class="text-sm">${s:downloads:'downloads'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Downloads for this podcast in a given month.</div>
+                        <div class="text-xs" slot="content">${s:monthly_downloads_info:'Downloads for this podcast in a given month.'}</div>
                         <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
@@ -74,37 +74,37 @@ const previewToken = '${previewToken}';
 
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="audience-count">xxx</div>
-                <div class="text-sm">unique audience</div>
+                <div class="text-sm">${s:unique_audience:'unique audience'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">Unique listeners (IP hash) for this podcast in a given month.<br><br>OP3 rotates listener IP hashes every month for privacy reasons.</div>
+                        <div class="text-xs" slot="content">${s:audience_info:'Unique listeners (IP hash) for this podcast in a given month.'}<br><br>${s:audience_definition_info:'OP3 rotates listener IP hashes every month for privacy reasons.'}</div>
                         <sl-icon name="info-circle" label="Info" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
         </div>
 
-        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600 text-sm md:text-base" href="/download-calculation" target="_blank">How OP3 calculates downloads →</a></div>
+        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600 text-sm md:text-base" href="/download-calculation" target="_blank">${s:how_op3_calculates_downloads:'How OP3 calculates downloads'} →</a></div>
 
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
-            <sl-icon-button name="caret-left-fill" label="Older downloads" title="Older downloads" id="downloads-graph-previous"></sl-icon-button>
-            <span id="downloads-graph-granularity" class="whitespace-nowrap">Hourly Downloads</span>
+            <sl-icon-button name="caret-left-fill" label="${s:older_downloads:'Older downloads'}" title="${s:older_downloads:''}" id="downloads-graph-previous"></sl-icon-button>
+            <span id="downloads-graph-granularity" class="whitespace-nowrap">${s:hourly_downloads:'Hourly Downloads'}</span>
             <sl-dropdown class="flex justify-center">
                 <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
                 <sl-menu id="downloads-graph-options">
-                    <sl-menu-item value="daily" checked type="checkbox">Daily</sl-menu-item>
+                    <sl-menu-item value="daily" checked type="checkbox">${s:daily:'Daily'}</sl-menu-item>
                     <!-- <sl-menu-item value="twelve-hourly">12-Hourly</sl-menu-item> -->
                     <!-- <sl-menu-item value="six-hourly">6-Hourly</sl-menu-item> -->
-                    <sl-menu-item value="hourly" type="checkbox">Hourly</sl-menu-item>
+                    <sl-menu-item value="hourly" type="checkbox">${s:hourly:'Hourly'}</sl-menu-item>
                     <sl-divider></sl-divider>
-                    <sl-menu-item checked value="episode-markers" type="checkbox">Episode markers</sl-menu-item>
+                    <sl-menu-item checked value="episode-markers" type="checkbox">${s:episode_markers:'Episode markers'}</sl-menu-item>
                 </sl-menu>
             </sl-dropdown>
             <span id="downloads-graph-range" class="whitespace-nowrap">October 20 - December 20</span>
-            <sl-icon-button name="caret-right-fill" label="Newer downloads" title="Newer downloads" id="downloads-graph-next"></sl-icon-button>
+            <sl-icon-button name="caret-right-fill" label="${s:newer_downloads:'Newer downloads'}" title="${s:newer_downloads:''}" id="downloads-graph-next"></sl-icon-button>
         </div>
         <canvas id="downloads-graph" class="max-h-64 my-8 cursor-pointer"></canvas>
 

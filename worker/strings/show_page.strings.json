@@ -1,12 +1,52 @@
 {
-    "downloads_in_last_n_days": {
-        "string": "downloads in last %d days",
-        "character_limit": 30
-    },
-    "headline_box_download_graph_info": {
-        "string": "Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."
-    },
-    "headline_box_download_definition": {
-        "string": "In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent."
-    }
+  "downloads_in_last_n_days": {
+    "string": "downloads in last %d days",
+    "character_limit": 30
+  },
+  "as_of": {
+    "string": "as of",
+    "character_limit": 10
+  },
+  "download_sparkline_info": {
+    "string": "Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."
+  },
+  "download_definition_info": {
+    "string": "In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent."
+  },
+  "downloads": {
+    "string": "downloads"
+  },
+  "monthly_downloads_info": {
+    "string": "Downloads for this podcast in a given month."
+  },
+  "unique_audience": {
+    "string": "unique audience"
+  },
+  "audience_info": {
+    "string": "Unique listeners (IP hash) for this podcast in a given month."
+  },
+  "audience_definition_info": {
+    "string": "OP3 rotates listener IP hashes every month for privacy reasons."
+  },
+  "how_op3_calculates_downloads": {
+    "string": "How OP3 calculates downloads"
+  },
+  "older_downloads": {
+    "string": "Older downloads"
+  },
+  "hourly_downloads": {
+    "string": "Hourly Downloads"
+  },
+  "daily": {
+    "string": "Daily"
+  },
+  "hourly": {
+    "string": "Hourly"
+  },
+  "episode_markers": {
+    "string": "Episode markers"
+  },
+  "newer_downloads": {
+    "string": "Newer downloads"
+  }
 }
