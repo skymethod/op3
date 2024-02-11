@@ -48,5 +48,119 @@
   },
   "newer_downloads": {
     "string": "Newer downloads"
+  },
+  "listen_time": {
+    "string": "Listen time"
+  },
+  "of_listeners_listen_to": {
+    "string": "of listeners listen to at least"
+  },
+  "of_an_episode": {
+    "string": "of an episode"
+  },
+  "half": {
+    "string": "half"
+  },
+  "from": {
+    "string": "from"
+  },
+  "based_on": {
+    "string": "Based on"
+  },
+  "anonymized_playback_sessions": {
+    "string": "anonymized playback sessions"
+  },
+  "how_op3_calculates_listen_time": {
+    "string": "How OP3 calculates client-side listen time"
+  },
+  "previous": {
+    "string": "Previous"
+  },
+  "minutes_played_from": {
+    "string": "Minutes played from"
+  },
+  "next": {
+    "string": "Next"
+  },
+  "episode_pacing": {
+    "string": "Episode pacing"
+  },
+  "3_day": {
+    "string": "3-day"
+  },
+  "7_day": {
+    "string": "7-day"
+  },
+  "30_day": {
+    "string": "30-day"
+  },
+  "newer_episodes": {
+    "string": "Newer episodes"
+  },
+  "older_episodes": {
+    "string": "Older episodes"
+  },
+  "export": {
+    "string": "Export"
+  },
+  "top_countries": {
+    "string": "Top countries"
+  },
+  "top_us_metros": {
+    "string": "Top U.S. metros"
+  },
+  "top_canadian_regions": {
+    "string": "Top Canadian regions"
+  },
+  "top_latin_american_regions": {
+    "string": "Top Latin American regions"
+  },
+  "top_eu_regions": {
+    "string": "Top E.U. regions"
+  },
+  "top_asian_regions": {
+    "string": "Top Asian regions"
+  },
+  "top_australasian_regions": {
+    "string": "Top Australasian regions"
+  },
+  "top_apps": {
+    "string": "Top apps"
+  },
+  "top_devices": {
+    "string": "Top devices"
+  },
+  "top_device_types": {
+    "string": "Top device types"
+  },
+  "top_browsers_and_referrers": {
+    "string": "Top browsers & referrers"
+  },
+  "export_download_details": {
+    "string": "Export download details"
+  },
+  "cancel": {
+    "string": "Cancel"
+  },
+  "older": {
+    "string": "Older"
+  },
+  "include_bots": {
+    "string": "Include bots"
+  },
+  "last_updated": {
+    "string": "Last updated"
+  },
+  "dates_and_times_are_in": {
+    "string": "Dates and times are in"
+  },
+  "utc_stands_for": {
+    "string": "UTC stands for Coordinated Universal Time."
+  },
+  "utc_is_a_standardized_time_reference": {
+    "string": "It is a standardized time reference that is not affected by daylight saving time."
+  },
+  "utc": {
+    "string": "UTC"
   }
 }

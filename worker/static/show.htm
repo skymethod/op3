@@ -112,25 +112,25 @@ const previewToken = '${previewToken}';
         <span id="listens-section" class="hidden">
             <div class="flex justify-center items-center gap-2 mt-16 mb-8">
                 <sl-icon name="graph-up"></sl-icon>
-                Listen time
+                ${s:listen_time:'Listen time'}
             </div>
             <div class="flex justify-center mt-4">
                 <sl-card class="card-basic max-w-[28rem]">
-                    <p><span id="listens-25"  class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">25%</span> of an episode</p>
-                    <p><span id="listens-50"class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">half</span></p>
-                    <p><span id="listens-90" class="font-bold">xx%</span> of listeners listen to at least <span class="font-bold">90%</span></p>
-                    <template id="listens-from-app"><span>n</span> from <a href="#" class="text-neutral-600 app-name" target="_blank">app</a></template>
-                    <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">Based on <span id="listens-count">nn</span> anonymized playback sessions: </div>
+                    <p><span id="listens-25" class="font-bold">xx%</span> ${s:of_listeners_listen_to:'of listeners listen to at least'} <span class="font-bold">25%</span> ${s:of_an_episode:'of an episode'}</p>
+                    <p><span id="listens-50" class="font-bold">xx%</span> ${s:of_listeners_listen_to:''} <span class="font-bold">${s:half:'half'}</span></p>
+                    <p><span id="listens-90" class="font-bold">xx%</span> ${s:of_listeners_listen_to:''} <span class="font-bold">90%</span></p>
+                    <template id="listens-from-app"><span>n</span> ${s:from:'from'} <a href="#" class="text-neutral-600 app-name" target="_blank">app</a></template>
+                    <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">${s:based_on:'Based on'} <span id="listens-count">nn</span> ${s:anonymized_playback_sessions:'anonymized playback sessions'}: </div>
                 </sl-card>
             </div>
-            <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">How OP3 calculates client-side listen time →</a></div>
+            <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">${s:how_op3_calculates_listen_time:'How OP3 calculates client-side listen time'} →</a></div>
             <div>
                 <canvas id="listens-graph" class="max-h-64 cursor-pointer hidden mt-8"></canvas>
             </div>
             <div id="listens-graph-footer" class="flex justify-center items-center mt-8 text-neutral-600 hidden text-sm md:text-base">
-                <sl-icon-button name="caret-left-fill" label="Previous" id="listens-graph-footer-previous"></sl-icon-button>
-                Minutes played from&nbsp;<span id="listens-episode"></span>
-                <sl-icon-button name="caret-right-fill" label="Next" id="listens-graph-footer-next"></sl-icon-button>
+                <sl-icon-button name="caret-left-fill" label="${s:previous:'Previous'}" id="listens-graph-footer-previous"></sl-icon-button>
+                ${s:minutes_played_from:'Minutes played from'}&nbsp;<span id="listens-episode"></span>
+                <sl-icon-button name="caret-right-fill" label="${s:next:'Next'}" id="listens-graph-footer-next"></sl-icon-button>
             </div>
 
         </span>
@@ -138,7 +138,7 @@ const previewToken = '${previewToken}';
         <!-- episode pacing -->
         <div class="flex justify-center items-center gap-2 mt-16 mb-8">
             <sl-icon name="graph-up"></sl-icon>
-            Episode pacing
+            ${s:episode_pacing:'Episode pacing'}
         </div>
         <div id="episode-pacing-container">
             <div id="episode-pacing-shot-header" class="flex justify-center hidden text-3xl font-semibold pt-16 pb-16">Show name</div>
@@ -151,19 +151,19 @@ const previewToken = '${previewToken}';
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr_0_0_0_auto] md:grid-cols-[3rem_1fr_auto_auto_auto_auto] gap-x-2 cursor-pointer text-xs md:text-sm">
                 <dt></dt>
                 <dd></dd>
-                <div class="text-right text-xs opacity-50 mr-2 mb-1 invisible md:visible">3-day</div>
-                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">7-day</div>
-                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">30-day</div>
-                <div class="text-right text-xs opacity-50 mr-2">downloads</div>
+                <div class="text-right text-xs opacity-50 mr-2 mb-1 invisible md:visible">${s:3_day:'3-day'}</div>
+                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">${s:7_day:'7-day'}</div>
+                <div class="text-right text-xs opacity-50 mr-2 invisible md:visible">${s:30_day:'30-day'}</div>
+                <div class="text-right text-xs opacity-50 mr-2">${s:downloads:''}</div>
 
                 <div id="episode-pacing-nav" class="flex items-center justify-center gap-2 mt-4 mb-8 col-span-6">
-                    <sl-icon-button class="invisible" name="download" ></sl-icon-button>
+                    <sl-icon-button class="invisible" name="download"></sl-icon-button>
                     <div class="grow"></div>
-                    <sl-icon-button name="caret-left-fill" label="Newer episodes" title="Newer episodes" id="episode-pacing-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:newer_episodes:'Newer episodes'}" title="${s:newer_episodes:''}" id="episode-pacing-previous"></sl-icon-button>
                     <span id="episode-pacing-nav-caption">Page 1 of n</span>
-                    <sl-icon-button name="caret-right-fill" label="Older episodes" title="Older episodes" id="episode-pacing-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="${s:older_episodes:'Older episodes'}" title="${s:older_episodes:''}" id="episode-pacing-next"></sl-icon-button>
                     <div class="grow"></div>
-                    <sl-icon-button id="episode-pacing-export" name="download" label="Export" title="Export" class="invisible"></sl-icon-button>
+                    <sl-icon-button id="episode-pacing-export" name="download" label="${s:export:'Export'}" title="${s:export:''}" class="invisible"></sl-icon-button>
                 </div>
             </dl>
             <template id="episode-pacing-legend-item">
@@ -182,14 +182,14 @@ const previewToken = '${previewToken}';
             <!-- top countries -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top countries</div>
-                    <sl-icon-button id="top-countries-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_countries:'Top countries'}</div>
+                    <sl-icon-button id="top-countries-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-countries-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-countries-month-previous"></sl-icon-button>
                     <span id="top-countries-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-countries-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="${s:next:''}" id="top-countries-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-countries" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -203,20 +203,20 @@ const previewToken = '${previewToken}';
             <!-- top metros -->
             <sl-card id="top-metros-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top U.S. metros</div>
-                    <sl-icon-button id="top-metros-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_us_metros:'Top U.S. metros'}</div>
+                    <sl-icon-button id="top-metros-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-metros-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-metros-month-previous"></sl-icon-button>
                     <span id="top-metros-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-metros-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-metros-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-metros" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
                 <template id="top-metros-row">
                     <span class="leading-relaxed"></span>
-                    <dt class="leading-relaxed truncate max-w-[12rem]">Country</dt>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">Metro</dt>
                     <dd class="font-mono text-right leading-relaxed">50.00</dd>
                 </template>
             </sl-card>
@@ -224,14 +224,14 @@ const previewToken = '${previewToken}';
             <!-- top ca regions -->
             <sl-card id="top-ca-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Canadian regions</div>
-                    <sl-icon-button id="top-ca-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_canadian_regions:'Top Canadian regions'}</div>
+                    <sl-icon-button id="top-ca-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-ca-regions-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-ca-regions-month-previous"></sl-icon-button>
                     <span id="top-ca-regions-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-ca-regions-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-ca-regions-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-ca-regions" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -245,14 +245,14 @@ const previewToken = '${previewToken}';
             <!-- top latam regions -->
             <sl-card id="top-latam-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Latin American regions</div>
-                    <sl-icon-button id="top-latam-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_latin_american_regions:'Top Latin American regions'}</div>
+                    <sl-icon-button id="top-latam-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-latam-regions-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-latam-regions-month-previous"></sl-icon-button>
                     <span id="top-latam-regions-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-latam-regions-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-latam-regions-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-latam-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -266,14 +266,14 @@ const previewToken = '${previewToken}';
             <!-- top eu regions -->
             <sl-card id="top-eu-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top E.U. regions</div>
-                    <sl-icon-button id="top-eu-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_eu_regions:'Top E.U. regions'}</div>
+                    <sl-icon-button id="top-eu-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-eu-regions-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-eu-regions-month-previous"></sl-icon-button>
                     <span id="top-eu-regions-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-eu-regions-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-eu-regions-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-eu-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -287,14 +287,14 @@ const previewToken = '${previewToken}';
             <!-- top as regions -->
             <sl-card id="top-as-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Asian regions</div>
-                    <sl-icon-button id="top-as-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_asian_regions:'Top Asian regions'}</div>
+                    <sl-icon-button id="top-as-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-as-regions-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-as-regions-month-previous"></sl-icon-button>
                     <span id="top-as-regions-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-as-regions-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-as-regions-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-as-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -308,14 +308,14 @@ const previewToken = '${previewToken}';
             <!-- top au regions -->
             <sl-card id="top-au-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>Top Australasian regions</div>
-                    <sl-icon-button id="top-au-regions-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_australasian_regions:'Top Australasian regions'}</div>
+                    <sl-icon-button id="top-au-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-au-regions-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-au-regions-month-previous"></sl-icon-button>
                     <span id="top-au-regions-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-au-regions-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-au-regions-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-au-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -329,14 +329,14 @@ const previewToken = '${previewToken}';
             <!-- top apps -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top apps</div>
-                    <sl-icon-button id="top-apps-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_apps:'Top apps'}</div>
+                    <sl-icon-button id="top-apps-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-apps-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-apps-month-previous"></sl-icon-button>
                     <span id="top-apps-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-apps-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-apps-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-apps" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -350,14 +350,14 @@ const previewToken = '${previewToken}';
             <!-- top devices -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top devices</div>
-                    <sl-icon-button id="top-devices-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_devices:'Top devices'}</div>
+                    <sl-icon-button id="top-devices-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-devices-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-devices-month-previous"></sl-icon-button>
                     <span id="top-devices-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-devices-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-devices-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-devices" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -371,14 +371,14 @@ const previewToken = '${previewToken}';
             <!-- top device types -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top device types</div>
-                    <sl-icon-button id="top-device-types-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_device_types:'Top device types'}</div>
+                    <sl-icon-button id="top-device-types-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-device-types-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-device-types-month-previous"></sl-icon-button>
                     <span id="top-device-types-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-device-types-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-device-types-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-device-types" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -392,14 +392,14 @@ const previewToken = '${previewToken}';
             <!-- top browser downloads -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
-                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>Top browsers & referrers</div>
-                    <sl-icon-button id="top-browser-downloads-export" name="download" label="Export" title="Export"></sl-icon-button>
+                    <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_browsers_and_referrers:'Top browsers & referrers'}</div>
+                    <sl-icon-button id="top-browser-downloads-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
-                    <sl-icon-button name="caret-left-fill" label="Previous" id="top-browser-downloads-month-previous"></sl-icon-button>
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-browser-downloads-month-previous"></sl-icon-button>
                     <span id="top-browser-downloads-month" class="whitespace-nowrap">October 2022</span>
-                    <sl-icon-button name="caret-right-fill" label="Next" id="top-browser-downloads-month-next"></sl-icon-button>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-browser-downloads-month-next"></sl-icon-button>
                 </div>
             
                 <dl id="top-browser-downloads" class="grid grid-cols-[0_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
@@ -413,20 +413,20 @@ const previewToken = '${previewToken}';
             <!-- export downloads -->
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between">
-                    <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><sl-icon name="download" id="export-icon"></sl-icon><div id="export-title" class="ml-2">Export download details</div></div>
-                    <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="Cancel"></sl-icon-button>
+                    <div class="flex items-center"><sl-spinner id="export-spinner" class="hidden" style="--track-width: 0.1rem;"></sl-spinner><sl-icon name="download" id="export-icon"></sl-icon><div id="export-title" class="ml-2">${s:export_download_details:'Export download details'}</div></div>
+                    <sl-icon-button id="export-cancel" class="invisible" name="x-lg" label="${s:cancel:'Cancel'}"></sl-icon-button>
                 </div>
                 <sl-button-group>
                     <sl-button id="export-month-0" outline>Mmm YYYY</sl-button>
                     <sl-button id="export-month-1" outline>Mmm YYYY</sl-button>
                     <sl-dropdown id="export-dropdown">
-                        <sl-button id="export-older" slot="trigger" caret outline>Older</sl-button>
+                        <sl-button id="export-older" slot="trigger" caret outline>${s:older:'Older'}</sl-button>
                         <sl-menu>
                             <sl-menu-item id="export-month-2">Mmm YYYY</sl-menu-item>
                         </sl-menu>
                     </sl-dropdown>
                 </sl-button-group>
-                <sl-switch id="export-bots" class="block mt-4">Include bots</sl-switch>
+                <sl-switch id="export-bots" class="block mt-4">${s:include_bots:'Include bots'}</sl-switch>
             </sl-card>
         </div>
 
@@ -434,14 +434,14 @@ const previewToken = '${previewToken}';
 
     <footer class="wait sticky bottom-0 bg-neutral-800 border-t border-neutral-700">
         <div class="grid grid-cols-2 md:grid-cols-3 text-xs md:text-sm p-2 whitespace-nowrap text-neutral-400">
-            <div class="text-left">Last updated: <span id="footer-last-updated-date">Dec 9</span><span class="hidden md:inline"> (<sl-relative-time id="footer-last-updated-ago" class="inline-block" sync></sl-relative-time>)</span></div>
-            <div class="text-right md:text-center">Dates and times are in
+            <div class="text-left">${s:last_updated:'Last updated'}: <span id="footer-last-updated-date">Dec 9</span><span class="hidden md:inline"> (<sl-relative-time id="footer-last-updated-ago" class="inline-block" sync></sl-relative-time>)</span></div>
+            <div class="text-right md:text-center">${s:dates_and_times_are_in:'Dates and times are in'}
                 <sl-tooltip style="--sl-tooltip-arrow-size: 0; --max-width: 1000px" hoist>
-                    <div class="text-xs" slot="content">UTC stands for Coordinated Universal Time.<br><br>It is a standardized time reference that is not affected by daylight saving time.</div>
-                    <span class="cursor-pointer underline decoration-1 decoration-dotted underline-offset-4">UTC</span>
+                    <div class="text-xs" slot="content">${s:utc_stands_for:'UTC stands for Coordinated Universal Time.'}<br><br>${s:utc_is_a_standardized_time_reference:'It is a standardized time reference that is not affected by daylight saving time.'}</div>
+                    <span class="cursor-pointer underline decoration-1 decoration-dotted underline-offset-4">${s:utc:'UTC'}</span>
                 </sl-tooltip>
             </div>
-            <div class="hidden md:block text-right" id="footer-timezone"><span id="footer-current-timezone-name">US Central</span> is <span id="footer-current-timezone-offset">six hours behind</span> UTC</div>
+            <div class="hidden md:block text-right" id="footer-timezone"><span id="footer-current-timezone-name">US Central</span> is <span id="footer-current-timezone-offset">six hours behind</span> ${s:utc:''}</div>
         </div>
     </footer>
 
