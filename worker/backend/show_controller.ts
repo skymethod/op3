@@ -243,21 +243,21 @@ export class ShowController {
                     return { results: [ result ] };
                 } else if (operationKind === 'update') {
                     if (!isFeedRecord(result)) return { message: `Feed record not found` };
-                    const { action, disable = '', force = '' } = parameters;
+                    const { action, disable = '', force = '', 'refetch-media-urls': refetchMediaUrls } = parameters;
                     if (action === 'update-feed' || action === 'update-feed-and-index-items') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
                         const { message, updated, fetchStatus } = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
                         if (action === 'update-feed-and-index-items' && updated && fetchStatus === 200) {
                             const forceResave = force.includes('resave');
-                            const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave, origin });
+                            const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave, origin, refetchMediaUrls });
                             return { message: [message, indexItemsMessage ].join(', ') };
                         } else {
                             return { message };
                         }
                     } else if (action === 'index-items') {
                         const forceResave = force.includes('resave');
-                        const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave, origin });
+                        const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave, origin, refetchMediaUrls });
                         return { message };
                     } else if (action == 'set-show-uuid') {
                         const { 'show-uuid': showUuid = generateUuid() } = parameters;
@@ -819,8 +819,8 @@ async function findShowRecord(showUuid: string, storage: DurableObjectStorage): 
     return record;
 }
 
-async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean, origin: string }): Promise<string> {
-    const { storage, blobs, forceResave = false, origin } = opts;
+async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, blobs: Blobs, forceResave?: boolean, origin: string, refetchMediaUrls: string | undefined }): Promise<string> {
+    const { storage, blobs, forceResave = false, origin, refetchMediaUrls } = opts;
     let feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl, showUuid } = feedRecord;
 
@@ -889,8 +889,9 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         const loaded = Object.keys(knownMediaUrls).length;
         if (loaded > 0) rt.push(`Loaded ${loaded} media urls`);
         const userAgent = computeUserAgent({ origin });
-        const { fetched, remaining } = await fetchMediaUrlsIfNecessary({ knownMediaUrls, items: Object.values(itemsByTrimmedGuid), storage, feedRecordId, userAgent });
+        const { fetched, remaining, carriedOver } = await fetchMediaUrlsIfNecessary({ knownMediaUrls, items: Object.values(itemsByTrimmedGuid), storage, feedRecordId, userAgent, refetch: refetchMediaUrls });
         if (fetched > 0) rt.push(`Fetched ${fetched} media urls`);
+        if (carriedOver > 0) rt.push(`${carriedOver} carried over`);
         if (remaining > 0) rt.push(`${remaining} media urls remaining`);
         knownRedirectUrls = Object.fromEntries(Object.entries(knownMediaUrls).map(v => [ v[0], v[1].redirectUrls ?? [] ]));
     }
@@ -1022,45 +1023,55 @@ async function ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, 
     if (index2Writes > 0) rt.push(`${index2Writes} ep-by-pubdate index writes`);
 }
 
-function needsAnotherFetch(record: MediaUrlIndexRecord): boolean {
+function needsAnotherFetch(record: MediaUrlIndexRecord, refetch: string | undefined): boolean {
+    if (refetch && (record.refetch === undefined || refetch > record.refetch)) return true;
     if (record.redirectUrls && record.redirectUrls.some(hasOp3Reference)) return false;
     const age = Date.now() - new Date(record.updateInstant).getTime();
     return age > 1000 * 60 * 60 * 24;
 }
 
-async function computeNewMediaUrlIndexRecord(url: string, userAgent: string): Promise<MediaUrlIndexRecord> {
+async function computeNewMediaUrlIndexRecord(url: string, userAgent: string, refetch: string | undefined): Promise<MediaUrlIndexRecord> {
     try {
         const { redirectUrls, responseHeaders } = await fetchOp3RedirectUrls(url, { userAgent });
         const responseInstant = new Date().toISOString();
-        return { url, updateInstant: responseInstant, responseInstant, redirectUrls, responseHeaders };
+        return { url, updateInstant: responseInstant, responseInstant, redirectUrls, responseHeaders, refetch };
     } catch (e) {
         const error = `${e.stack || e}`;
-        return { url, updateInstant:  new Date().toISOString(), error };
+        return { url, updateInstant: new Date().toISOString(), error, refetch };
     }
 }
 
-async function fetchMediaUrlsIfNecessary({ knownMediaUrls, items, storage, userAgent, feedRecordId }: { knownMediaUrls: Record<string, MediaUrlIndexRecord>, items: Item[], storage: DurableObjectStorage, userAgent: string, feedRecordId: string }): Promise<{ fetched: number, remaining: number }> {
+async function fetchMediaUrlsIfNecessary({ knownMediaUrls, items, storage, userAgent, feedRecordId, refetch }: { knownMediaUrls: Record<string, MediaUrlIndexRecord>, items: Item[], storage: DurableObjectStorage, userAgent: string, feedRecordId: string, refetch: string | undefined }): Promise<{ fetched: number, remaining: number, carriedOver: number }> {
     const mediaUrls = distinct(items.flatMap(v => [...(v.enclosures ?? []).map(w => w.url).filter(isString), ...(v.alternateEnclosures ?? []).flatMap(w => (w.sources ?? []).map(x => x.uri).filter(isString))]));
     const toFetch: string[] = [];
     for (const mediaUrl of mediaUrls) {
         if (hasOp3Reference(mediaUrl)) continue; // no need to actually fetch if it's in the explicit url
         const known = knownMediaUrls[mediaUrl];
-        if (!known || needsAnotherFetch(known)) {
+        if (!known || needsAnotherFetch(known, refetch)) {
             toFetch.push(mediaUrl);
         }
     }
     let fetched = 0;
     let remaining = toFetch.length;
+    let carriedOver = 0;
     const upserts: Record<string, MediaUrlIndexRecord> = {};
     for (const url of toFetch) {
-        const upsert = await computeNewMediaUrlIndexRecord(url, userAgent);
+        let upsert = await computeNewMediaUrlIndexRecord(url, userAgent, refetch);
+        if (refetch) {
+            const known = knownMediaUrls[url];
+            if (known && known.redirectUrls && known.redirectUrls.length > 0) {
+                // if refetching, carry over previously-found relevant urls
+                upsert = { ...upsert, redirectUrls: [ ...known.redirectUrls, ...(upsert.redirectUrls ?? []) ] };
+                carriedOver++;
+            }
+        }
         upserts[computeFeedMediaUrlsIndexKey({ feedRecordId, url })] = upsert;
         fetched++;
         remaining--;
         if (fetched >= 10) break;
     }
     if (Object.keys(upserts).length > 0) await storage.put(upserts);
-    return { fetched, remaining };
+    return { fetched, remaining, carriedOver };
 }
 
 function computeRelevantUrls(item: Item, knownRedirects?: Record<string, string[]>): Record<string, string> {

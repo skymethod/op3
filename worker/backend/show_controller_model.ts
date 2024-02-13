@@ -251,6 +251,7 @@ export interface MediaUrlIndexRecord {
     readonly responseInstant?: string;
     readonly responseHeaders?: [string, string][];
     readonly redirectUrls?: string[]; // may not be comprehensive, filtered to op3 references only
+    readonly refetch?: string;
 }
 
 export function isMediaUrlIndexRecord(obj: unknown): obj is MediaUrlIndexRecord {
@@ -261,6 +262,7 @@ export function isMediaUrlIndexRecord(obj: unknown): obj is MediaUrlIndexRecord 
         && (obj.responseInstant === undefined || typeof obj.responseInstant === 'string')
         && (obj.responseHeaders === undefined || Array.isArray(obj.responseHeaders) && obj.responseHeaders.every(v => Array.isArray(v) && v.length === 2 && v.every(w => typeof w === 'string')))
         && (obj.redirectUrls === undefined || Array.isArray(obj.redirectUrls) && obj.redirectUrls.every(v => typeof v === 'string'))
+        && (obj.refetch === undefined || typeof obj.refetch === 'string')
         ;
 }
 
