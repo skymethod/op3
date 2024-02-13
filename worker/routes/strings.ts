@@ -25,7 +25,17 @@ export function computeStringArgs(args: unknown): { character_limit?: number, na
     return { character_limit, nameValuePairs };
 } 
 
-export type StructuredValue = { string: string, character_limit?: number };
+// https://help.transifex.com/en/articles/6220899-structured-json
+export type StructuredValue = {
+    /** Translatable string (Required). */
+    string: string,
+    /** Maximum number of characters the translation can have (Optional) */
+    character_limit?: number,
+    /** Small segment of text used to differentiate from entries with the same string value (Optional). */
+    context?: string,
+    /** Small description to give context to translators about how the string should be translated (Optional) */
+    developer_comment?: string,
+};
 export type StructuredJsonStrings = Record<string, StructuredValue>;
 
 export function processTemplate(template: string, variables: Record<string, string | boolean> | undefined): { replaced: string, strings: StructuredJsonStrings } {

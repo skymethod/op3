@@ -1,11 +1,11 @@
 {
   "downloads_in_last_n_days": {
     "string": "downloads in last %d days",
-    "character_limit": 30
+    "developer_comment": "Try to limit the translated string to 30 characters."
   },
   "as_of": {
     "string": "as of",
-    "character_limit": 10
+    "developer_comment": "Try to limit the translated string to 10 characters."
   },
   "download_sparkline_info": {
     "string": "Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."
