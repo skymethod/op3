@@ -1080,10 +1080,9 @@ function computeRelevantUrls(item: Item, knownRedirects?: Record<string, string[
         if (url && hasOp3Reference(url)) {
             rt[path] = url;
         } else if (url && knownRedirects) {
-            const redirect = (knownRedirects[url] ?? []).find(hasOp3Reference);
-            if (redirect) {
-                rt[`${path}.redirect`] = redirect;
-            }
+            (knownRedirects[url] ?? []).filter(hasOp3Reference).forEach((redirect, i) => {
+                rt[`${path}.redirect${i === 0 ? '' : `.${i + 1}`}`] = redirect;
+            });
         }
     };
     if (item.enclosures) {
