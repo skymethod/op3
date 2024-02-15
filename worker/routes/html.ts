@@ -1,5 +1,5 @@
 import { importText } from '../deps.ts';
-import { processTemplate } from './strings.ts';
+import { TranslatedStrings, processTemplate } from './strings.ts';
 
 const outputCss = await importText(import.meta.url, '../static/output.css');
 const shoelaceCommonHtm = await importText(import.meta.url, '../static/shoelace_common.htm');
@@ -12,7 +12,7 @@ export function computeShoelaceCommon(...components: string[]): string {
     return computeHtml(shoelaceCommonHtm, { components: components.map(v => `'${v}'`).join(', ') });
 }
 
-export function computeHtml(template: string, variables: Record<string, string | boolean>) {
+export function computeHtml(template: string, variables: Record<string, string | boolean>, translatedStrings?: TranslatedStrings, lang?: string) {
 
     template = template.replace(/\${if (\w+)}(.*?)\${endif}/gs, (_, g1, g2) => {
         const value = variables[g1];
@@ -21,7 +21,7 @@ export function computeHtml(template: string, variables: Record<string, string |
         return value ? g2 : '';
     });
 
-    return processTemplate(template, variables).replaced;
+    return processTemplate(template, variables, translatedStrings, lang).replaced;
 }
 
 export function removeHeader(html: string) {

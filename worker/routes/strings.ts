@@ -38,7 +38,7 @@ export type StructuredValue = {
 };
 export type StructuredJsonStrings = Record<string, StructuredValue>;
 
-export function processTemplate(template: string, variables: Record<string, string | boolean> | undefined): { replaced: string, strings: StructuredJsonStrings } {
+export function processTemplate(template: string, variables: Record<string, string | boolean> | undefined, translatedStrings: TranslatedStrings | undefined, lang: string | undefined): { replaced: string, strings: StructuredJsonStrings } {
     const entries: [ string, StructuredValue ][] = [];
     const replaced = template.replace(/(\/\*)?\${((\w+)|s:(\w+)((:\w+=\w+)*):'(.*?)')}(\*\/({})?)?/g, (_, _1, variableExpression, variableName, stringName, stringArgs, _6, stringValue) => {
         if (variableName !== undefined) {
@@ -53,10 +53,12 @@ export function processTemplate(template: string, variables: Record<string, stri
             if (existing) {
                 if (typeof character_limit === 'number' && character_limit !== existing[1].character_limit) throw new Error(`Cannot redefine charlimit: ${variableExpression}`);
                 if (stringValue !== '' && stringValue !== existing[1].string) throw new Error(`Cannot redefine string: ${variableExpression}`);
-                return replacePlaceholders(existing[1].string, nameValuePairs);
+                const translated = replaceWithTranslation(stringName, existing[1].string, translatedStrings, lang);
+                return replacePlaceholders(translated, nameValuePairs);
             } else {
                 entries.push([ stringName, { string: stringValue, character_limit } ]);
-                return replacePlaceholders(stringValue, nameValuePairs);
+                const translated = replaceWithTranslation(stringName, stringValue, translatedStrings, lang);
+                return replacePlaceholders(translated, nameValuePairs);
             }
         } else {
             throw new Error(`Unsupported variable expression: ${variableExpression}`);
@@ -64,4 +66,12 @@ export function processTemplate(template: string, variables: Record<string, stri
     });
     const strings = Object.fromEntries(entries);
     return { replaced, strings };
+}
+
+export type TranslatedStrings = Record<string /* stringName/key */, Record<string /* lang */, string /* translated value */>>;
+
+export function replaceWithTranslation(stringName: string, stringValue: string, translatedStrings: TranslatedStrings | undefined, lang: string | undefined) {
+    if (lang === undefined || translatedStrings === undefined) return stringValue;
+    const translations = translatedStrings[stringName]; if (translations === undefined) return stringValue;
+    return translations[lang] ?? stringValue;
 }

@@ -11,9 +11,12 @@ import { compute404Response } from './404.ts';
 import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
+import { TranslatedStrings } from './strings.ts';
 
 const showHtm = await importText(import.meta.url, '../static/show.htm');
 const showJs = await importText(import.meta.url, '../static/show.js');
+const showPageTranslationsJson = await importText(import.meta.url, '../strings/show_page.translations.json');
+let showPageTranslations: TranslatedStrings | undefined;
 
 export type ShowRequest = { id: string, type: 'show-uuid' | 'podcast-guid' };
 
@@ -91,6 +94,9 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const initialData = JSON.stringify({ showObj, statsObj, times });
     const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
 
+    if (!showPageTranslations) showPageTranslations = JSON.parse(showPageTranslationsJson) as TranslatedStrings;
+    const lang = searchParams.get('lang') ?? undefined;
+
     const html = computeHtml(showHtm, {
         showUuid,
         showTitle,
@@ -104,7 +110,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         origin,
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
-    });
+    }, showPageTranslations, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
 }

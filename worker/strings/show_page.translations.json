@@ -1,0 +1,164 @@
+{
+  "downloads_in_last_n_days": {
+    "fr": "téléchargements au cours des %d derniers jours"
+  },
+  "as_of": {
+    "fr": "à partir de"
+  },
+  "download_sparkline_info": {
+    "fr": "Nombre total de téléchargements pour ce podcast au cours des %d derniers jours, et courbe de l'évolution."
+  },
+  "download_definition_info": {
+    "fr": "En OP3, un téléchargement est une requête GET unique par adresse IP dans une période de 24 heures (jour UTC), sans les bots."
+  },
+  "downloads": {
+    "fr": "téléchargements"
+  },
+  "monthly_downloads_info": {
+    "fr": "Téléchargements pour ce podcast au cours d'un mois donné."
+  },
+  "unique_audience": {
+    "fr": "auditeurices uniques"
+  },
+  "audience_info": {
+    "fr": "Auditeurs uniques (filtre par IP) pour ce podcast au cours d'un mois donné."
+  },
+  "audience_definition_info": {
+    "fr": "OP3 change le chiffrement IP des auditeurices tous les mois pour des raisons de confidentialité."
+  },
+  "how_op3_calculates_downloads": {
+    "fr": "Comment OP3 calcule les téléchargements"
+  },
+  "older_downloads": {
+    "fr": "Anciens téléchargements"
+  },
+  "hourly_downloads": {
+    "fr": "Téléchargements par heure"
+  },
+  "daily": {
+    "fr": "Par jour"
+  },
+  "hourly": {
+    "fr": "Par heure"
+  },
+  "episode_markers": {
+    "fr": "Indicateur d'épisode"
+  },
+  "newer_downloads": {
+    "fr": "Nouveaux téléchargements"
+  },
+  "listen_time": {
+    "fr": "Temps d'écoute"
+  },
+  "of_listeners_listen_to": {
+    "fr": "des auditeurices écoutent au moins"
+  },
+  "of_an_episode": {
+    "fr": "d'un épisode"
+  },
+  "half": {
+    "fr": "la moitié"
+  },
+  "from": {
+    "fr": "de"
+  },
+  "based_on": {
+    "fr": "Basé sur"
+  },
+  "anonymized_playback_sessions": {
+    "fr": "des sessions de lecture anonymisées"
+  },
+  "how_op3_calculates_listen_time": {
+    "fr": "Comment OP3 calcule le temps d'écoute côté auditeurice."
+  },
+  "previous": {
+    "fr": "Précédent"
+  },
+  "minutes_played_from": {
+    "fr": "Minutes écoutées à partir de"
+  },
+  "next": {
+    "fr": "Suivant"
+  },
+  "episode_pacing": {
+    "fr": "Evolution des épisodes"
+  },
+  "3_day": {
+    "fr": "3 jours"
+  },
+  "7_day": {
+    "fr": "7 jours"
+  },
+  "30_day": {
+    "fr": "30 jours"
+  },
+  "newer_episodes": {
+    "fr": "Nouveaux épisodes"
+  },
+  "older_episodes": {
+    "fr": "Anciens épisodes"
+  },
+  "export": {
+    "fr": "Exporter"
+  },
+  "top_countries": {
+    "fr": "Top pays"
+  },
+  "top_us_metros": {
+    "fr": "Top régions des USA"
+  },
+  "top_canadian_regions": {
+    "fr": "Top régions du Canada"
+  },
+  "top_latin_american_regions": {
+    "fr": "Top régions d'Amérique latine"
+  },
+  "top_eu_regions": {
+    "fr": "Top régions de l'UE"
+  },
+  "top_asian_regions": {
+    "fr": "Top régions d'Asie"
+  },
+  "top_australasian_regions": {
+    "fr": "Top régions d'Australasie"
+  },
+  "top_apps": {
+    "fr": "Top applications"
+  },
+  "top_devices": {
+    "fr": "Top appareils"
+  },
+  "top_device_types": {
+    "fr": "Top types d'appareils"
+  },
+  "top_browsers_and_referrers": {
+    "fr": "Top navigateurs et sources"
+  },
+  "export_download_details": {
+    "fr": "Exporter les données en détail"
+  },
+  "cancel": {
+    "fr": "Annuler"
+  },
+  "older": {
+    "fr": "Plus ancien"
+  },
+  "include_bots": {
+    "fr": "Inclure les bots"
+  },
+  "last_updated": {
+    "fr": "Dernière mise à jour"
+  },
+  "dates_and_times_are_in": {
+    "fr": "Les dates et les heures sont en"
+  },
+  "utc_stands_for": {
+    "fr": "UTC signifie Coordinated Universal Time (temps universel coordonné)."
+  },
+  "utc_is_a_standardized_time_reference": {
+    "fr": "Il s'agit d'une échelle de temps normalisée qui n'est pas affectée par l'heure d'été."
+  },
+  "utc": {
+    "fr": "UTC"
+  }
+}
