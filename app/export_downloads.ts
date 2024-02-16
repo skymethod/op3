@@ -2,9 +2,9 @@ import { addMonthsToMonthString } from '../worker/timestamp.ts';
 import { element, SlButton, SlDropdown, SlSwitch } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { readonly showUuid: string, readonly showSlug: string, readonly previewToken: string, readonly strings: Record<string, string> };
+type Opts = { readonly showUuid: string, readonly showSlug: string, readonly previewToken: string, readonly strings: Record<string, string>, readonly lang: string | undefined };
 
-export const makeExportDownloads = ({ showUuid, showSlug, previewToken, strings }: Opts) => {
+export const makeExportDownloads = ({ showUuid, showSlug, previewToken, strings, lang }: Opts) => {
 
     const [ exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch ] = [ 
         element('export-spinner'),
@@ -20,7 +20,8 @@ export const makeExportDownloads = ({ showUuid, showSlug, previewToken, strings 
     let progress: number | undefined;
 
     const currentMonth = new Date().toISOString().substring(0, 7);
-    const f = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    const locale = lang ?? 'en-US';
+    const f = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric', timeZone: 'UTC' });
     const disables: { disabled: boolean }[] = [ exportOlderButton, exportBotsSwitch ];
     for (const monthNum of [ 0, 1, 2 ]) {
         const button = element<SlButton>(`export-month-${monthNum}`);

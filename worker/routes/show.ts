@@ -94,7 +94,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     if (!showPageTranslations) showPageTranslations = JSON.parse(showPageTranslationsJson) as TranslatedStrings;
     const lang = searchParams.get('lang') ?? undefined;
 
-    const initialData = JSON.stringify({ showObj, statsObj, times, showPageTranslations });
+    const initialData = JSON.stringify({ showObj, statsObj, times, showPageTranslations, lang });
     const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
 
     const html = computeHtml(showHtm, {

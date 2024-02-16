@@ -44,7 +44,7 @@ const app = await (async () => {
 
     console.log(initialData);
 
-    const { showObj, statsObj, times } = initialData;
+    const { showObj, statsObj, times, lang } = initialData;
     const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
 
@@ -120,28 +120,28 @@ const app = await (async () => {
         debugDiv.style.display = 'none';
     }
 
-    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience, strings });
-    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug, strings });
-    const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken, strings });
+    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience, strings, lang });
+    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug, strings, lang });
+    const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken, strings, lang });
     const shot = new URLSearchParams(document.location.search).has('shot');
-    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings });
+    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings, lang });
 
     makeListens({ episodeListens, episodes, knownAppLinks, debug, strings });
     
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 
-    makeTopCountries({ showSlug, monthlyDimensionDownloads, strings });
-    makeTopApps({ showSlug, monthlyDimensionDownloads, strings });
-    makeTopDevices({ showSlug, monthlyDimensionDownloads, strings });
-    makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads, strings });
-    makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopMetros({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
-    makeFooter({ mostRecentDate, strings });
+    makeTopCountries({ showSlug, monthlyDimensionDownloads, strings, lang });
+    makeTopApps({ showSlug, monthlyDimensionDownloads, strings, lang });
+    makeTopDevices({ showSlug, monthlyDimensionDownloads, strings, lang });
+    makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads, strings, lang });
+    makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopMetros({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+    makeFooter({ mostRecentDate, strings, lang });
 
     function update() {
         exportDownloads.update();

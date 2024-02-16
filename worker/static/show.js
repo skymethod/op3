@@ -8422,8 +8422,8 @@ function element(id) {
 function removeAllChildren(node) {
     while(node.firstChild)node.removeChild(node.firstChild);
 }
-function computeMonthName(month, { includeYear } = {}) {
-    return (includeYear ? monthNameAndYearFormat : monthNameFormat).format(new Date(`${month}-01T00:00:00.000Z`));
+function computeMonthName(month, lang, { includeYear } = {}) {
+    return (includeYear ? getMonthNameAndYearFormat(lang) : getMonthNameFormat(lang)).format(new Date(`${month}-01T00:00:00.000Z`));
 }
 function download(content, { type, filename }) {
     const parts = typeof content === 'string' ? [
@@ -8440,16 +8440,75 @@ function download(content, { type, filename }) {
     anchor.click();
     URL.revokeObjectURL(blobUrl);
 }
-const monthNameFormat = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    timeZone: 'UTC'
-});
-const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC'
-});
-const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings: strings1 })=>{
+function getOrCache(map, key, valueFn) {
+    let rt = map.get(key);
+    if (!rt) {
+        rt = valueFn();
+        map.set(key, rt);
+    }
+    return rt;
+}
+const monthNameFormatsByLocale = new Map();
+function getMonthNameFormat(lang) {
+    return getOrCacheByLocale(monthNameFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            month: 'long',
+            timeZone: 'UTC'
+        }));
+}
+const monthNameAndYearFormatsByLocale = new Map();
+function getMonthNameAndYearFormat(lang) {
+    return getOrCacheByLocale(monthNameAndYearFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'UTC'
+        }));
+}
+const numberFormatsByLocale = new Map();
+function getNumberFormat(lang) {
+    return getOrCacheByLocale(numberFormatsByLocale, lang, (locale)=>new Intl.NumberFormat(locale));
+}
+const dayFormatsByLocale = new Map();
+function getDayFormat(lang) {
+    return getOrCacheByLocale(dayFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            weekday: 'short',
+            month: 'long',
+            day: 'numeric',
+            timeZone: 'UTC'
+        }));
+}
+const shorterDayFormatsByLocale = new Map();
+function getShorterDayFormat(lang) {
+    return getOrCacheByLocale(shorterDayFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            timeZone: 'UTC'
+        }));
+}
+const dayAndHourFormatsByLocale = new Map();
+function getDayAndHourFormat(lang) {
+    return getOrCacheByLocale(dayAndHourFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            weekday: 'short',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            hour12: true,
+            timeZone: 'UTC'
+        }));
+}
+const timeOnlyFormatsByLocale = new Map();
+function getTimeOnlyFormat(lang) {
+    return getOrCacheByLocale(timeOnlyFormatsByLocale, lang, (locale)=>new Intl.DateTimeFormat(locale, {
+            hour: 'numeric',
+            hour12: true,
+            timeZone: 'UTC'
+        }));
+}
+function getOrCacheByLocale(map, lang, valueFn) {
+    const locale = lang ?? 'en-US';
+    return getOrCache(map, locale, ()=>valueFn(locale));
+}
+const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings: strings1, lang })=>{
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
         element('downloads-graph'),
         element('downloads-graph-previous'),
@@ -8514,7 +8573,7 @@ const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads,
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings1, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings1, lang, showEpisodeMarkers ? episodes : undefined);
     }
     function update() {
         downloadsGraphGranularitySpan.textContent = ({
@@ -8533,7 +8592,7 @@ const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads,
             }
         }
         downloadsGraphPreviousButton.disabled = rangeStartHourIndex === 0;
-        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
+        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex], lang)} – ${computeRangeDisplay(hours[rangeEndHourIndex], lang)}`;
         downloadsGraphNextButton.disabled = hours.length === 0 || rangeEndHourIndex === hours.length - 1;
     }
     update();
@@ -8550,33 +8609,8 @@ function isGranularity(obj) {
         'daily'
     ].includes(obj);
 }
-const shorterDayFormat = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC'
-});
-const dayFormat = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC'
-});
-const dayAndHourFormat = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    hour12: true,
-    timeZone: 'UTC'
-});
-const timeOnlyFormat = new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    hour12: true,
-    timeZone: 'UTC'
-});
-function computeRangeDisplay(hour) {
-    return `${computeMonthName(hour.substring(0, 7))} ${parseInt(hour.substring(8, 10))}`;
+function computeRangeDisplay(hour, lang) {
+    return `${computeMonthName(hour.substring(0, 7), lang)} ${parseInt(hour.substring(8, 10))}`;
 }
 function computeKeyForGranularity(hour, granularity) {
     const [_, date, hh] = checkMatches('hour', hour, /^(.*)T(\d{2})$/);
@@ -8611,11 +8645,12 @@ function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episod
     }
     return rt;
 }
-function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, granularity, debug, strings1, episodes) {
+function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, granularity, debug, strings1, lang, episodes) {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
     const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
-    const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
+    const dateFormat = granularity === 'daily' ? getDayFormat(lang) : getDayAndHourFormat(lang);
+    const locale = lang ?? 'en-US';
     const ctx = canvas.getContext('2d');
     const data = {
         labels: downloadLabels,
@@ -8640,6 +8675,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
                 intersect: false,
                 mode: 'index'
             },
+            locale,
             plugins: {
                 legend: {
                     display: false
@@ -8663,7 +8699,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
                         callback: function(value) {
                             const label = this.getLabelForValue(value);
                             const d = new Date(label);
-                            const format = d.getUTCHours() === 0 ? shorterDayFormat : timeOnlyFormat;
+                            const format = d.getUTCHours() === 0 ? getShorterDayFormat(lang) : getTimeOnlyFormat(lang);
                             return format.format(d);
                         }
                     }
@@ -8691,7 +8727,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
     };
     return new xt(ctx, config);
 }
-const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings: strings1 })=>{
+const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings: strings1, lang })=>{
     const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingExportButton, episodePacingLegendItemTemplate] = [
         element('episode-pacing-previous'),
         element('episode-pacing-next'),
@@ -8742,8 +8778,8 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
                 v.id,
                 v
             ]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1);
-        initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1, lang);
+        initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries, lang);
         currentChart = chart;
     }
     function updateEpisodeHourlyDownloads(episodeHourlyDownloads, __final) {
@@ -8831,12 +8867,11 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
     };
 };
 const ZWSP = '\u200b';
-const withCommas1 = new Intl.NumberFormat('en-US');
-function bindDownloads(item, selector, downloads) {
+function bindDownloads(item, lang, selector, downloads) {
     const downloadsN = item.querySelector(selector);
-    downloadsN.textContent = downloads ? withCommas1.format(downloads) : '—';
+    downloadsN.textContent = downloads ? getNumberFormat(lang).format(downloads) : '—';
 }
-function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, episodeRelativeSummaries) {
+function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, episodeRelativeSummaries, lang) {
     const summaries = Object.values(episodeRelativeSummaries);
     const items = chart.options.plugins.legend.labels.generateLabels(chart);
     const legendSelections = {};
@@ -8856,10 +8891,10 @@ function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendE
         dt.style.backgroundColor = fillStyle;
         const dd = item.querySelector('dd');
         dd.textContent = text;
-        bindDownloads(item, '.downloads-3', summary.downloads3);
-        bindDownloads(item, '.downloads-7', summary.downloads7);
-        bindDownloads(item, '.downloads-30', summary.downloads30);
-        bindDownloads(item, '.downloads-all', summary.downloadsAll);
+        bindDownloads(item, lang, '.downloads-3', summary.downloads3);
+        bindDownloads(item, lang, '.downloads-7', summary.downloads7);
+        bindDownloads(item, lang, '.downloads-30', summary.downloads30);
+        bindDownloads(item, lang, '.downloads-all', summary.downloadsAll);
         legendSelections[datasetIndex] = false;
         const updateItem = ()=>{
             dt.style.opacity = legendSelections[datasetIndex] ? '1' : '0.9';
@@ -8903,7 +8938,7 @@ function computeRelativeSummary(hourlyDownloads) {
         downloads30
     };
 }
-function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1) {
+function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1, lang) {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
@@ -8921,6 +8956,7 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
         '#ff7c43',
         '#ffa600'
     ].reverse();
+    const locale = lang ?? 'en-US';
     return new xt(ctx, {
         type: 'line',
         data: {
@@ -8957,6 +8993,7 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
                     }
                 }
             },
+            locale,
             scales: {
                 x: {
                     ticks: {
@@ -8983,7 +9020,7 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
         }
     });
 }
-const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1, strings: strings1 })=>{
+const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1, strings: strings1, lang })=>{
     const [exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
         element('export-spinner'),
         element('export-icon'),
@@ -8996,7 +9033,8 @@ const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1, 
     let exporting;
     let progress;
     const currentMonth = new Date().toISOString().substring(0, 7);
-    const f = new Intl.DateTimeFormat('en-US', {
+    const locale = lang ?? 'en-US';
+    const f = new Intl.DateTimeFormat(locale, {
         month: 'short',
         year: 'numeric',
         timeZone: 'UTC'
@@ -9110,7 +9148,7 @@ async function downloadDownloads(e, showUuid, showSlug, month, previewToken1, in
         filename: `${showSlug}-downloads-${month}${includeBots ? `-including-bots` : ''}.tsv`
     });
 }
-const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strings1 })=>{
+const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strings1, lang })=>{
     const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
@@ -9125,10 +9163,10 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strin
         element('audience-period'),
         element('audience-minigraph')
     ];
-    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
-    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings1);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings1);
+    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings1, lang);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings1, lang);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
     function update() {}
@@ -9137,9 +9175,9 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strin
         update
     };
 };
-const withCommas2 = new Intl.NumberFormat('en-US');
-function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanvas) {
-    const asofFormat = new Intl.DateTimeFormat('en-US', {
+function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanvas, lang) {
+    const locale = lang ?? 'en-US';
+    const asofFormat = new Intl.DateTimeFormat(locale, {
         weekday: 'short',
         month: 'long',
         day: 'numeric',
@@ -9147,19 +9185,19 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
     });
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
     if (Object.keys(nDayDownloads).length === 0) {
-        valueDiv.textContent = withCommas2.format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
+        valueDiv.textContent = getNumberFormat(lang).format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
         asofSpan.textContent = Object.keys(hourlyDownloads).length === 0 ? '' : asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
         return;
     }
     const init = ()=>{
-        valueDiv.textContent = withCommas2.format(Object.values(nDayDownloads).at(-1));
+        valueDiv.textContent = getNumberFormat(lang).format(Object.values(nDayDownloads).at(-1));
         asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(nDayDownloads).at(-1).substring(0, 10)}T00:00:00.000Z`));
     };
     init();
     drawSparkline(sparklineCanvas, nDayDownloads, {
         onHover: (v)=>{
             if (v) {
-                valueDiv.textContent = withCommas2.format(Math.round(v.value));
+                valueDiv.textContent = getNumberFormat(lang).format(Math.round(v.value));
                 asofSpan.textContent = asofFormat.format(new Date(`${v.label.substring(0, 10)}T00:00:00.000Z`));
             } else {
                 init();
@@ -9277,7 +9315,7 @@ function computeMonthlyCounts(dateBasedCounts) {
     }
     return monthlyCounts;
 }
-function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1) {
+function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1, lang) {
     const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2) ?? [
         '',
         0
@@ -9291,11 +9329,11 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1)
     const onHoverMonth = (hoverMonth)=>{
         const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
-        countDiv.textContent = withCommas2.format(value);
+        countDiv.textContent = getNumberFormat(lang).format(value);
         periodDiv.textContent = `${replacePlaceholders(strings1.in_month, [
             [
                 'month',
-                computeMonthName(month)
+                computeMonthName(month, lang)
             ]
         ])}${month === thisMonth ? ` (${strings1.so_far})` : ''}`;
     };
@@ -9399,7 +9437,7 @@ function drawMinigraph(canvas, labelsAndValues, { onHover } = {}) {
         };
     }
 }
-const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings: strings1 })=>{
+const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings: strings1, lang })=>{
     const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
         element(exportId),
         element(previousId),
@@ -9437,7 +9475,7 @@ const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, lis
     let first = true;
     const updateTableForMonth = ()=>{
         const month = months[monthIndex];
-        monthDiv.textContent = computeMonthName(month, {
+        monthDiv.textContent = computeMonthName(month, lang, {
             includeYear: true
         });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
@@ -9601,7 +9639,7 @@ const regionNamesInEnglish = new Intl.DisplayNames([
 ], {
     type: 'region'
 });
-const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
+const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'countryCode');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -9621,7 +9659,8 @@ const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: string
         computeEmoji,
         computeName: computeCountryName,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeAppDownloads(dimensionDownloads) {
@@ -9638,7 +9677,7 @@ function computeAppDownloads(dimensionDownloads) {
     }
     return rt;
 }
-const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
+const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             computeAppDownloads(v)
@@ -9657,10 +9696,11 @@ const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })
             'app'
         ],
         computeName: (key)=>key,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
-const makeTopDevices = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
+const makeTopDevices = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             v['deviceName'] ?? {}
@@ -9679,10 +9719,11 @@ const makeTopDevices = ({ showSlug, monthlyDimensionDownloads, strings: strings1
             'device'
         ],
         computeName: (key)=>key,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
-const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
+const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             v['deviceType'] ?? {}
@@ -9702,7 +9743,8 @@ const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads, strings: stri
         ],
         computeEmoji,
         computeName: computeDeviceTypeName,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeDeviceTypeName(deviceType) {
@@ -9717,7 +9759,7 @@ function computeEmoji(deviceType) {
         watch: '⌚️'
     })[deviceType] ?? '❔';
 }
-const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             computeBrowserDownloads(v)
@@ -9737,7 +9779,8 @@ const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, download
             'browserOrReferrer'
         ],
         computeName: (key)=>key,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeBrowserDownloads(dimensionDownloads) {
@@ -10074,7 +10117,7 @@ const METROS = {
     '993': `Yellowknife, NT`,
     '996': `Whitehorse, YT`
 };
-const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'metroCode');
     const { computeUrl } = regionCountryFunctions('US');
     return makeTopBox({
@@ -10095,22 +10138,29 @@ const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth,
         ],
         computeName: computeMetroName,
         computeUrl: (v)=>computeUrl(computeMetroName(v)),
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
-const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10), strings: strings1 })=>{
+const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10), strings: strings1, lang })=>{
     const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneDiv] = [
         element('footer-last-updated-date'),
         element('footer-last-updated-ago'),
         element('footer-timezone')
     ];
-    lastUpdatedDateSpan.textContent = shorterDayFormat1.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
+    const locale = lang ?? 'en-US';
+    const shorterDayFormat = new Intl.DateTimeFormat(locale, {
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC'
+    });
+    lastUpdatedDateSpan.textContent = shorterDayFormat.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
     try {
-        const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const currentTimezone = Intl.DateTimeFormat(locale).resolvedOptions().timeZone;
         const offsetMinutes = new Date().getTimezoneOffset();
         const offsetHours = pluralize(Math.abs(offsetMinutes) / 60, strings1, 'one_hour', 'multiple_hours');
         timezoneDiv.textContent = offsetMinutes === 0 ? replacePlaceholders(strings1.tz_is_equal_to_utc, [
@@ -10159,12 +10209,7 @@ const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10)
         update
     };
 };
-const shorterDayFormat1 = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC'
-});
-const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'euRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10185,7 +10230,8 @@ const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         computeEmoji,
         computeName: computeRegionName,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeRegionName(regionCountry) {
@@ -10195,7 +10241,7 @@ function computeRegionName(regionCountry) {
     })[region] ?? region;
     return region;
 }
-const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'auRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10216,14 +10262,15 @@ const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         computeEmoji,
         computeName: computeRegionName1,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeRegionName1(regionCountry) {
     const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
-const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'caRegion');
     const { computeUrl } = regionCountryFunctions('CA');
     return makeTopBox({
@@ -10243,10 +10290,11 @@ const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         ],
         computeName: (v)=>v,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
-const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'asRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10267,14 +10315,15 @@ const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         computeEmoji,
         computeName: computeRegionName2,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeRegionName2(regionCountry) {
     const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
-const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
+const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'latamRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10295,7 +10344,8 @@ const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPer
         computeEmoji,
         computeName: computeRegionName3,
         computeUrl,
-        strings: strings1
+        strings: strings1,
+        lang
     });
 };
 function computeRegionName3(regionCountry) {
@@ -10461,7 +10511,7 @@ const app = await (async ()=>{
         element('debug')
     ];
     console.log(initialData);
-    const { showObj, statsObj, times } = initialData;
+    const { showObj, statsObj, times, lang } = initialData;
     const { showUuid, episodes = [], title: showTitle } = showObj;
     if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
     const grabMoreDataIfNecessary = async (page)=>{
@@ -10549,20 +10599,23 @@ const app = await (async ()=>{
     const headlineStats = makeHeadlineStats({
         hourlyDownloads,
         dailyFoundAudience,
-        strings
+        strings,
+        lang
     });
     makeDownloadsGraph({
         hourlyDownloads,
         episodes: episodesWithFirstHours,
         episodeHourlyDownloads,
         debug,
-        strings
+        strings,
+        lang
     });
     const exportDownloads = makeExportDownloads({
         showUuid,
         showSlug,
         previewToken,
-        strings
+        strings,
+        lang
     });
     const shot = new URLSearchParams(document.location.search).has('shot');
     const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
@@ -10572,7 +10625,8 @@ const app = await (async ()=>{
         showSlug,
         mostRecentDate,
         shot,
-        strings
+        strings,
+        lang
     });
     makeListens({
         episodeListens,
@@ -10588,68 +10642,80 @@ const app = await (async ()=>{
     makeTopCountries({
         showSlug,
         monthlyDimensionDownloads,
-        strings
+        strings,
+        lang
     });
     makeTopApps({
         showSlug,
         monthlyDimensionDownloads,
-        strings
+        strings,
+        lang
     });
     makeTopDevices({
         showSlug,
         monthlyDimensionDownloads,
-        strings
+        strings,
+        lang
     });
     makeTopDeviceTypes({
         showSlug,
         monthlyDimensionDownloads,
-        strings
+        strings,
+        lang
     });
     makeTopBrowserDownloads({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopMetros({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopCaRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopEuRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopAuRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopAsRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeTopLatamRegions({
         showSlug,
         monthlyDimensionDownloads,
         downloadsPerMonth,
-        strings
+        strings,
+        lang
     });
     makeFooter({
         mostRecentDate,
-        strings
+        strings,
+        lang
     });
     function update() {
         exportDownloads.update();

@@ -19,9 +19,10 @@ type Opts = {
     computeName: (key: string) => string,
     computeUrl?: (key: string) => string,
     strings: Record<string, string>,
+    lang: string | undefined,
 };
 
-export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings }: Opts) => {
+export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings, lang }: Opts) => {
 
     const [
         exportButton,
@@ -60,7 +61,7 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
     let first = true;
     const updateTableForMonth = () => {
         const month = months[monthIndex];
-        monthDiv.textContent = computeMonthName(month, { includeYear: true });
+        monthDiv.textContent = computeMonthName(month, lang, { includeYear: true });
         const monthDownloads = Object.values(monthlyDownloads)[monthIndex] ?? {};
         const totalDownloads = downloadsPerMonth ? downloadsPerMonth[month] : Object.values(monthDownloads).reduce((a, b) => a + b, 0);
         const pct = Object.values(monthDownloads).reduce((a, b) => a + b, 0) / totalDownloads;

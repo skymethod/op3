@@ -2,9 +2,9 @@ import { makeTopBox } from './top_box.ts';
 import { checkMatches } from '../worker/check.ts';
 import { increment } from '../worker/summaries.ts';
 
-type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number>, strings: Record<string, string> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number>, strings: Record<string, string>, lang: string | undefined };
 
-export const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings }: Opts) => {
+export const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang }: Opts) => {
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, computeBrowserDownloads(v)]));
 
     return makeTopBox({
@@ -21,6 +21,7 @@ export const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, d
         tsvHeaderNames: [ 'browserOrReferrer' ],
         computeName: key => key,
         strings,
+        lang,
     });
 };
 

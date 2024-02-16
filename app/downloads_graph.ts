@@ -5,13 +5,13 @@ import { addDays } from '../worker/timestamp.ts';
 import { replacePlaceholders, pluralize } from './deps.ts';
 import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
-import { computeMonthName } from './util.ts';
+import { getDayAndHourFormat, getDayFormat, getShorterDayFormat, getTimeOnlyFormat, computeMonthName } from './util.ts';
 
 type EpisodeInfoAndFirstHour = EpisodeInfo & { firstHour: string };
 
-type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], episodeHourlyDownloads: Record<string, Record<string, number>>, debug: boolean, strings: Record<string, string> };
+type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], episodeHourlyDownloads: Record<string, Record<string, number>>, debug: boolean, strings: Record<string, string>, lang: string | undefined };
 
-export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings }: Opts) => {
+export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings, lang }: Opts) => {
 
     const [ 
         downloadsGraphCanvas,
@@ -91,7 +91,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDow
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings, lang, showEpisodeMarkers ? episodes : undefined);
     }
 
     function update() {
@@ -113,7 +113,7 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDow
         }
 
         downloadsGraphPreviousButton.disabled = rangeStartHourIndex === 0;
-        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex])} – ${computeRangeDisplay(hours[rangeEndHourIndex])}`;
+        downloadsGraphRangeSpan.textContent = hours.length === 0 ? '' : `${computeRangeDisplay(hours[rangeStartHourIndex], lang)} – ${computeRangeDisplay(hours[rangeEndHourIndex], lang)}`;
         downloadsGraphNextButton.disabled = hours.length === 0 || rangeEndHourIndex === (hours.length - 1);
     }
 
@@ -133,13 +133,8 @@ function isGranularity(obj: string): obj is Granularity {
 
 //
 
-const shorterDayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
-const dayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
-const dayAndHourFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', hour: 'numeric', hour12: true, timeZone: 'UTC' });
-const timeOnlyFormat = new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: true, timeZone: 'UTC' });
-
-function computeRangeDisplay(hour: string): string {
-    return `${computeMonthName(hour.substring(0, 7))} ${parseInt(hour.substring(8, 10))}`;
+function computeRangeDisplay(hour: string, lang: string | undefined): string {
+    return `${computeMonthName(hour.substring(0, 7), lang)} ${parseInt(hour.substring(8, 10))}`;
 }
 
 function computeKeyForGranularity(hour: string, granularity: Granularity): string {
@@ -178,12 +173,13 @@ function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], download
     return rt;
 }
 
-function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, episodeHourlyDownloads: Record<string, Record<string, number>>, granularity: Granularity, debug: boolean, strings: Record<string, string>, episodes?: EpisodeInfoAndFirstHour[]): Chart {
+function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, episodeHourlyDownloads: Record<string, Record<string, number>>, granularity: Granularity, debug: boolean, strings: Record<string, string>, lang: string | undefined, episodes?: EpisodeInfoAndFirstHour[]): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
     const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
 
-    const dateFormat = granularity === 'daily' ? dayFormat : dayAndHourFormat;
+    const dateFormat = granularity === 'daily' ? getDayFormat(lang) : getDayAndHourFormat(lang);
+    const locale = lang ?? 'en-US';
 
     const ctx = canvas.getContext('2d')!;
     const data = {
@@ -210,6 +206,7 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                 intersect: false,
                 mode: 'index',
             },
+            locale,
             plugins: {
                 legend: {
                     display: false,
@@ -236,7 +233,7 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                         callback: function(this: any, value: number) {
                             const label = this.getLabelForValue(value);
                             const d = new Date(label);
-                            const format = d.getUTCHours() === 0 ? shorterDayFormat : timeOnlyFormat;
+                            const format = d.getUTCHours() === 0 ? getShorterDayFormat(lang) : getTimeOnlyFormat(lang);
                             return format.format(d);
                         }
                     }

@@ -1,4 +1,67 @@
 {
+  "export_download_details": {
+    "fr": "Exporter les données en détail"
+  },
+  "daily_downloads": {
+    "fr": "Téléchargements quotidiens"
+  },
+  "twelve_hourly_downloads": {
+    "fr": "Téléchargements en 12 heures"
+  },
+  "six_hourly_downloads": {
+    "fr": "Téléchargements en 6 heures"
+  },
+  "hourly_downloads": {
+    "fr": "Téléchargements par heure"
+  },
+  "in_month": {
+    "fr": "en %s"
+  },
+  "so_far": {
+    "fr": "jusqu'à présent"
+  },
+  "day_n": {
+    "fr": "Jour %d"
+  },
+  "hour_n": {
+    "fr": "Heure %d"
+  },
+  "minute_n": {
+    "fr": "Minute %d"
+  },
+  "page_x_of_n": {
+    "fr": "Page %d sur %d"
+  },
+  "x_of_n_anonymized_sessions": {
+    "fr": "%d des %d sessions anonymisées"
+  },
+  "published_episode": {
+    "fr": "Publié : %s"
+  },
+  "one_download": {
+    "fr": "%d téléchargement"
+  },
+  "multiple_downloads": {
+    "fr": "%d téléchargements"
+  },
+  "one_hour": {
+    "fr": "%d heure"
+  },
+  "multiple_hours": {
+    "fr": "%d heures"
+  },
+  "utc": {
+    "fr": "UTC"
+  },
+  "tz_is_equal_to_utc": {
+    "fr": "%s est égal à %s"
+  },
+  "tz_is_behind_utc": {
+    "fr": "%s est %s derrière %s"
+  },
+  "tz_is_ahead_of_utc": {
+    "fr": "%s est %s devant %s"
+  },
   "downloads_in_last_n_days": {
     "fr": "téléchargements au cours des %d derniers jours"
   },
@@ -30,10 +93,7 @@
     "fr": "Comment OP3 calcule les téléchargements"
   },
   "older_downloads": {
-    "fr": "Anciens téléchargements"
-  },
-  "hourly_downloads": {
-    "fr": "Téléchargements par heure"
+    "fr": "Téléchargements plus anciens"
   },
   "daily": {
     "fr": "Par jour"
@@ -45,7 +105,7 @@
     "fr": "Indicateur d'épisode"
   },
   "newer_downloads": {
-    "fr": "Nouveaux téléchargements"
+    "fr": "Téléchargements plus récents"
   },
   "listen_time": {
     "fr": "Temps d'écoute"
@@ -93,10 +153,10 @@
     "fr": "30 jours"
   },
   "newer_episodes": {
-    "fr": "Nouveaux épisodes"
+    "fr": "Épisodes plus récents"
   },
   "older_episodes": {
-    "fr": "Anciens épisodes"
+    "fr": "Épisodes plus anciens"
   },
   "export": {
     "fr": "Exporter"
@@ -134,9 +194,6 @@
   "top_browsers_and_referrers": {
     "fr": "Top navigateurs et sources"
   },
-  "export_download_details": {
-    "fr": "Exporter les données en détail"
-  },
   "cancel": {
     "fr": "Annuler"
   },
@@ -157,8 +214,5 @@
   },
   "utc_is_a_standardized_time_reference": {
     "fr": "Il s'agit d'une échelle de temps normalisée qui n'est pas affectée par l'heure d'été."
-  },
-  "utc": {
-    "fr": "UTC"
   }
 }

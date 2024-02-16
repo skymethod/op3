@@ -1,11 +1,11 @@
 import { Chart, replacePlaceholders } from './deps.ts';
 import { element } from './elements.ts';
 import { increment } from '../worker/summaries.ts';
-import { computeMonthName } from './util.ts';
+import { computeMonthName, getNumberFormat } from './util.ts';
 
-type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number>, strings: Record<string, string> };
+type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number>, strings: Record<string, string>, lang: string | undefined };
 
-export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings }: Opts) => {
+export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings, lang }: Opts) => {
 
     const [ 
         sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
@@ -27,11 +27,11 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
         element<HTMLCanvasElement>('audience-minigraph'),
     ];
 
-    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
-    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
+    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
 
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings, lang);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings, lang);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
 
@@ -46,26 +46,25 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
 
 //
 
-const withCommas = new Intl.NumberFormat('en-US');
-
-function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, valueDiv: HTMLElement, asofSpan: HTMLElement, sparklineCanvas: HTMLCanvasElement) {
-    const asofFormat = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
+function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, valueDiv: HTMLElement, asofSpan: HTMLElement, sparklineCanvas: HTMLCanvasElement, lang: string | undefined) {
+    const locale = lang ?? 'en-US';
+    const asofFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
 
     if (Object.keys(nDayDownloads).length === 0) {
-        valueDiv.textContent = withCommas.format(Object.values(hourlyDownloads).reduce((a, b) => a + b, 0));
+        valueDiv.textContent = getNumberFormat(lang).format(Object.values(hourlyDownloads).reduce((a, b) => a + b, 0));
         asofSpan.textContent = Object.keys(hourlyDownloads).length === 0 ? '' : asofFormat.format(new Date(`${Object.keys(hourlyDownloads).at(-1)!.substring(0, 10)}T00:00:00.000Z`));
         return;
     }
     const init = () => {
-        valueDiv.textContent = withCommas.format(Object.values(nDayDownloads).at(-1)!);
+        valueDiv.textContent = getNumberFormat(lang).format(Object.values(nDayDownloads).at(-1)!);
         asofSpan.textContent = asofFormat.format(new Date(`${Object.keys(nDayDownloads).at(-1)!.substring(0, 10)}T00:00:00.000Z`));
     };
     init();
     drawSparkline(sparklineCanvas, nDayDownloads, { onHover: v => {
         if (v) {
-            valueDiv.textContent = withCommas.format(Math.round(v.value));
+            valueDiv.textContent = getNumberFormat(lang).format(Math.round(v.value));
             asofSpan.textContent = asofFormat.format(new Date(`${v.label.substring(0, 10)}T00:00:00.000Z`));
         } else {
             init();
@@ -191,7 +190,7 @@ function computeMonthlyCounts(dateBasedCounts: Record<string, number>): Record<s
 type HoverMonthHandler = (hoverMonth?: string) => void;
 type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler: HoverMonthHandler) => void };
 
-function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement, strings: Record<string, string>): MonthlyBox {
+function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement, strings: Record<string, string>, lang: string | undefined): MonthlyBox {
     const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2) ?? [ '', 0 ];
     const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1) ?? [ '', 0 ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
@@ -200,8 +199,8 @@ function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLEle
     const onHoverMonth: HoverMonthHandler = hoverMonth => {
         const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
-        countDiv.textContent = withCommas.format(value);
-        periodDiv.textContent = `${replacePlaceholders(strings.in_month, [ [ 'month', computeMonthName(month) ] ])}${month === thisMonth ? ` (${strings.so_far})` : ''}`;
+        countDiv.textContent = getNumberFormat(lang).format(value);
+        periodDiv.textContent = `${replacePlaceholders(strings.in_month, [ [ 'month', computeMonthName(month, lang) ] ])}${month === thisMonth ? ` (${strings.so_far})` : ''}`;
     }
     if (initialMonth !== '') onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, { onHover: v => {

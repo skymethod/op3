@@ -2,11 +2,11 @@ import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { addDaysToDateString } from '../worker/timestamp.ts';
 import { Chart, distinct, replacePlaceholders } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
-import { download } from './util.ts';
+import { getNumberFormat, download } from './util.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined, shot: boolean, strings: Record<string, string> };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined, shot: boolean, strings: Record<string, string>, lang: string | undefined };
 
-export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings }: Opts) => {
+export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings, lang }: Opts) => {
 
     const [ 
         episodePacingPrevious, 
@@ -66,8 +66,8 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         const pageEpisodeRelativeSummaries = Object.fromEntries(pageEpisodeIds.map(v => [ v, episodeRelativeSummaries[v] ]));
         const suggestedMax = Math.max(...Object.values(pageEpisodeRelativeSummaries).map(v => Math.max(...Object.values(v.cumulative))));
         const episodeInfos = Object.fromEntries(episodes.map(v => [v.id, v]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings);
-        initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings, lang);
+        initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries, lang);
         
         currentChart = chart;
     }
@@ -142,14 +142,12 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
 
 const ZWSP = '\u200b';
 
-const withCommas = new Intl.NumberFormat('en-US');
-
-function bindDownloads(item: HTMLElement, selector: string, downloads?: number) {
+function bindDownloads(item: HTMLElement, lang: string | undefined, selector: string, downloads?: number) {
     const downloadsN = item.querySelector(selector)!;
-    downloadsN.textContent = downloads ? withCommas.format(downloads) : '—';
+    downloadsN.textContent = downloads ? getNumberFormat(lang).format(downloads) : '—';
 }
 
-function initLegend(chart: Chart, episodePacingLegendItemTemplate: HTMLTemplateElement, episodePacingLegendElement: HTMLElement, episodePacingNav: HTMLElement, episodeRelativeSummaries: Record<string, RelativeSummary>) {
+function initLegend(chart: Chart, episodePacingLegendItemTemplate: HTMLTemplateElement, episodePacingLegendElement: HTMLElement, episodePacingNav: HTMLElement, episodeRelativeSummaries: Record<string, RelativeSummary>, lang: string | undefined) {
     const summaries = Object.values(episodeRelativeSummaries);
     // deno-lint-ignore no-explicit-any
     const items = (chart as any).options.plugins.legend.labels.generateLabels(chart);
@@ -174,10 +172,10 @@ function initLegend(chart: Chart, episodePacingLegendItemTemplate: HTMLTemplateE
         dt.style.backgroundColor = fillStyle;
         const dd = item.querySelector('dd')!;
         dd.textContent = text;
-        bindDownloads(item, '.downloads-3', summary.downloads3);
-        bindDownloads(item, '.downloads-7', summary.downloads7);
-        bindDownloads(item, '.downloads-30', summary.downloads30);
-        bindDownloads(item, '.downloads-all', summary.downloadsAll);
+        bindDownloads(item, lang, '.downloads-3', summary.downloads3);
+        bindDownloads(item, lang, '.downloads-7', summary.downloads7);
+        bindDownloads(item, lang, '.downloads-30', summary.downloads30);
+        bindDownloads(item, lang, '.downloads-all', summary.downloadsAll);
         legendSelections[datasetIndex] = false;
         const updateItem = () => {
             dt.style.opacity = legendSelections[datasetIndex] ? '1' : '0.9';
@@ -219,7 +217,7 @@ function computeRelativeSummary(hourlyDownloads: Record<string, number>): Relati
     return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
 }
 
-function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean, strings: Record<string, string>): Chart {
+function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean, strings: Record<string, string>, lang: string | undefined): Chart {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap(v => Object.keys(v.cumulative)).sort());
 
     const parseHourLabel = (label: string) => {
@@ -240,6 +238,8 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
         '#ff7c43',
         '#ffa600',
     ].reverse();
+
+    const locale = lang ?? 'en-US';
 
     return new Chart(ctx, {
         type: 'line',
@@ -275,6 +275,7 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
                     }
                 }
             },
+            locale,
             scales: {
                 x: {
                     ticks: {
