@@ -2,9 +2,9 @@ import { addMonthsToMonthString } from '../worker/timestamp.ts';
 import { element, SlButton, SlDropdown, SlSwitch } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { readonly showUuid: string, readonly showSlug: string, readonly previewToken: string };
+type Opts = { readonly showUuid: string, readonly showSlug: string, readonly previewToken: string, readonly strings: Record<string, string> };
 
-export const makeExportDownloads = ({ showUuid, showSlug, previewToken }: Opts) => {
+export const makeExportDownloads = ({ showUuid, showSlug, previewToken, strings }: Opts) => {
 
     const [ exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch ] = [ 
         element('export-spinner'),
@@ -64,7 +64,7 @@ export const makeExportDownloads = ({ showUuid, showSlug, previewToken }: Opts) 
             exportSpinner.classList.add('hidden');
             exportIcon.classList.remove('hidden');
             exportCancelButton.classList.add('invisible');
-            exportTitleDiv.textContent = 'Export download details';
+            exportTitleDiv.textContent = strings.export_download_details;
         }
         disables.forEach(v => v.disabled = !!exporting);
     }

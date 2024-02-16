@@ -21,8 +21,9 @@ import { makeTopLatamRegions } from './top_latam_regions.ts';
 import { makeListens } from './listens.ts';
 
 // provided server-side
-declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number> };
+declare const initialData: { showObj: ApiShowsResponse, statsObj: ApiShowStatsResponse, times: Record<string, number>, lang?: string };
 declare const previewToken: string;
+declare const strings: Record<string, string>;
 
 const app = await (async () => {
 
@@ -119,28 +120,28 @@ const app = await (async () => {
         debugDiv.style.display = 'none';
     }
 
-    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience });
-    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug });
-    const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken });
+    const headlineStats = makeHeadlineStats({ hourlyDownloads, dailyFoundAudience, strings });
+    makeDownloadsGraph({ hourlyDownloads, episodes: episodesWithFirstHours, episodeHourlyDownloads, debug, strings });
+    const exportDownloads = makeExportDownloads({ showUuid, showSlug, previewToken, strings });
     const shot = new URLSearchParams(document.location.search).has('shot');
-    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot });
+    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings });
 
-    makeListens({ episodeListens, episodes, knownAppLinks, debug });
+    makeListens({ episodeListens, episodes, knownAppLinks, debug, strings });
     
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([ month, v ]) => ([ month, Object.values(v['countryCode'] ?? {}).reduce((a, b) => a + b, 0) ])));
 
-    makeTopCountries({ showSlug, monthlyDimensionDownloads });
-    makeTopApps({ showSlug, monthlyDimensionDownloads });
-    makeTopDevices({ showSlug, monthlyDimensionDownloads });
-    makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads });
-    makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopMetros({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth });
-    makeFooter({ mostRecentDate });
+    makeTopCountries({ showSlug, monthlyDimensionDownloads, strings });
+    makeTopApps({ showSlug, monthlyDimensionDownloads, strings });
+    makeTopDevices({ showSlug, monthlyDimensionDownloads, strings });
+    makeTopDeviceTypes({ showSlug, monthlyDimensionDownloads, strings });
+    makeTopBrowserDownloads({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopMetros({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopCaRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopEuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings });
+    makeFooter({ mostRecentDate, strings });
 
     function update() {
         exportDownloads.update();

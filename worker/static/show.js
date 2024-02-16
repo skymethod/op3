@@ -8347,6 +8347,25 @@ function sortBy(array, selector, options) {
     }
     return indexes;
 }
+function replacePlaceholders(str, nameValuePairs) {
+    const nvps = Array.isArray(nameValuePairs) ? nameValuePairs : [
+        [
+            'arg',
+            nameValuePairs
+        ]
+    ];
+    let i = 0;
+    return str.replace(/%[dDsS]/g, (sub)=>{
+        const nvp = nvps[i];
+        i++;
+        if (nvp === undefined) return sub;
+        return nvp[1].toString();
+    });
+}
+function pluralize(n, strings1, singleKey, pluralKey, format) {
+    return replacePlaceholders(strings1[n === 1 ? singleKey : pluralKey], (format ?? withCommas).format(n));
+}
+const withCommas = new Intl.NumberFormat('en-US');
 function checkMatches(name1, value, pattern) {
     const m = pattern.exec(value);
     if (!m) throw new Error(`Bad ${name1}: ${value}`);
@@ -8421,9 +8440,6 @@ function download(content, { type, filename }) {
     anchor.click();
     URL.revokeObjectURL(blobUrl);
 }
-function pluralize(n, unit, format) {
-    return `${(format ?? withCommas).format(n)} ${unit}${n !== 1 ? 's' : ''}`;
-}
 const monthNameFormat = new Intl.DateTimeFormat('en-US', {
     month: 'long',
     timeZone: 'UTC'
@@ -8433,8 +8449,7 @@ const monthNameAndYearFormat = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     timeZone: 'UTC'
 });
-const withCommas = new Intl.NumberFormat('en-US');
-const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug })=>{
+const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings: strings1 })=>{
     const [downloadsGraphCanvas, downloadsGraphPreviousButton, downloadsGraphGranularitySpan, downloadsGraphOptionsMenu, downloadsGraphRangeSpan, downloadsGraphNextButton] = [
         element('downloads-graph'),
         element('downloads-graph-previous'),
@@ -8499,15 +8514,15 @@ const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads,
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings1, showEpisodeMarkers ? episodes : undefined);
     }
     function update() {
         downloadsGraphGranularitySpan.textContent = ({
-            'hourly': 'Hourly',
-            'six-hourly': '6-hourly',
-            'twelve-hourly': '12-hourly',
-            'daily': 'Daily'
-        })[granularity] + ' Downloads';
+            'hourly': strings1.hourly_downloads,
+            'six-hourly': strings1.six_hourly_downloads,
+            'twelve-hourly': strings1.twelve_hourly_downloads,
+            'daily': strings1.daily_downloads
+        })[granularity];
         const items = downloadsGraphOptionsMenu.querySelectorAll('sl-menu-item');
         for (const item of items){
             const { value } = item;
@@ -8596,7 +8611,7 @@ function computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episod
     }
     return rt;
 }
-function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, granularity, debug, episodes) {
+function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, granularity, debug, strings1, episodes) {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
     const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
@@ -8634,10 +8649,10 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
                     footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
                         title: (items)=>dateFormat.format(new Date(items[0].label)),
-                        label: (item)=>pluralize(item.parsed.y, 'download'),
+                        label: (item)=>pluralize(item.parsed.y, strings1, 'one_download', 'multiple_downloads'),
                         footer: (items)=>{
                             const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
-                            return records.length === 0 ? undefined : records.map((v)=>`Published: ${v.title}${debug ? ` f:${v.firstHour} p:${v.pubdate}` : ''}`).join('\n');
+                            return records.length === 0 ? undefined : records.map((v)=>`${replacePlaceholders(strings1.published_episode, v.title ?? '')}${debug ? ` f:${v.firstHour} p:${v.pubdate}` : ''}`).join('\n');
                         }
                     }
                 }
@@ -8676,7 +8691,7 @@ function drawDownloadsChart(canvas, hourlyDownloads, episodeHourlyDownloads, gra
     };
     return new xt(ctx, config);
 }
-const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot })=>{
+const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings: strings1 })=>{
     const [episodePacingPrevious, episodePacingNext, episodePacingShotHeader, episodePacingCanvas, episodePacingShotFooter, episodePacingLegendElement, episodePacingNav, episodePacingNavCaption, episodePacingExportButton, episodePacingLegendItemTemplate] = [
         element('episode-pacing-previous'),
         element('episode-pacing-next'),
@@ -8727,7 +8742,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
                 v.id,
                 v
             ]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         currentChart = chart;
     }
@@ -8798,7 +8813,16 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;
         episodePacingNext.disabled = !final_ || pageIndex === maxPageIndex;
-        episodePacingNavCaption.textContent = `Page ${pageIndex + 1} of ${pages}`;
+        episodePacingNavCaption.textContent = replacePlaceholders(strings1.page_x_of_n, [
+            [
+                'page',
+                pageIndex + 1
+            ],
+            [
+                'pages',
+                pages
+            ]
+        ]);
     }
     update();
     return {
@@ -8806,6 +8830,7 @@ const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSl
         updateEpisodeHourlyDownloads
     };
 };
+const ZWSP = '\u200b';
 const withCommas1 = new Intl.NumberFormat('en-US');
 function bindDownloads(item, selector, downloads) {
     const downloadsN = item.querySelector(selector);
@@ -8878,11 +8903,12 @@ function computeRelativeSummary(hourlyDownloads) {
         downloads30
     };
 }
-function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot) {
+function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1) {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
     const parseHourLabel = (label)=>{
         const hour = parseInt(label.substring(1));
-        return hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : `Hour ${hour}`;
+        if (hour % 24 === 0) return replacePlaceholders(strings1.day_n, Math.floor(hour / 24));
+        return replacePlaceholders(strings1.hour_n, Math.floor(hour));
     };
     const ctx = canvas.getContext('2d');
     const colors = [
@@ -8937,13 +8963,13 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
                         autoSkip: false,
                         callback: function(value) {
                             const hour = value + 1;
-                            const label = hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : '';
+                            const label = hour % 24 === 0 ? ZWSP + replacePlaceholders(strings1.day_n, Math.floor(hour / 24)) : '';
                             if (label !== '' && this.width < 700 && hour !== 24 && hour / 24 % 5 !== 0) return '';
                             return label;
                         }
                     },
                     grid: {
-                        color: (ctx)=>ctx.tick.label.startsWith('Day') ? 'rgba(255, 255, 255, 0.1)' : undefined
+                        color: (ctx)=>ctx.tick.label.startsWith(ZWSP) ? 'rgba(255, 255, 255, 0.1)' : undefined
                     }
                 },
                 y: {
@@ -8957,7 +8983,7 @@ function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episode
         }
     });
 }
-const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1 })=>{
+const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1, strings: strings1 })=>{
     const [exportSpinner, exportIcon, exportTitleDiv, exportCancelButton, exportDropdown, exportOlderButton, exportBotsSwitch] = [
         element('export-spinner'),
         element('export-icon'),
@@ -9031,7 +9057,7 @@ const makeExportDownloads = ({ showUuid, showSlug, previewToken: previewToken1 }
             exportSpinner.classList.add('hidden');
             exportIcon.classList.remove('hidden');
             exportCancelButton.classList.add('invisible');
-            exportTitleDiv.textContent = 'Export download details';
+            exportTitleDiv.textContent = strings1.export_download_details;
         }
         disables.forEach((v)=>v.disabled = !!exporting);
     }
@@ -9084,7 +9110,7 @@ async function downloadDownloads(e, showUuid, showSlug, month, previewToken1, in
         filename: `${showSlug}-downloads-${month}${includeBots ? `-including-bots` : ''}.tsv`
     });
 }
-const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience })=>{
+const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strings1 })=>{
     const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
@@ -9101,8 +9127,8 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience })=>{
     ];
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings1);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings1);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
     function update() {}
@@ -9251,7 +9277,7 @@ function computeMonthlyCounts(dateBasedCounts) {
     }
     return monthlyCounts;
 }
-function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
+function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1) {
     const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2) ?? [
         '',
         0
@@ -9266,7 +9292,12 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph) {
         const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
         countDiv.textContent = withCommas2.format(value);
-        periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
+        periodDiv.textContent = `${replacePlaceholders(strings1.in_month, [
+            [
+                'month',
+                computeMonthName(month)
+            ]
+        ])}${month === thisMonth ? ` (${strings1.so_far})` : ''}`;
     };
     if (initialMonth !== '') onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, {
@@ -9368,7 +9399,7 @@ function drawMinigraph(canvas, labelsAndValues, { onHover } = {}) {
         };
     }
 }
-const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl })=>{
+const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings: strings1 })=>{
     const [exportButton, previousButton, monthDiv, nextButton, list, rowTemplate] = [
         element(exportId),
         element(previousId),
@@ -9451,7 +9482,7 @@ const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, lis
             }
             const dd = item.querySelector('dd');
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
-            dd.title = pluralize(downloads, 'download');
+            dd.title = pluralize(downloads, strings1, 'one_download', 'multiple_downloads');
             list.appendChild(item);
         }
         previousButton.disabled = monthIndex === 0;
@@ -9570,7 +9601,7 @@ const regionNamesInEnglish = new Intl.DisplayNames([
 ], {
     type: 'region'
 });
-const makeTopCountries = ({ showSlug, monthlyDimensionDownloads })=>{
+const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'countryCode');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -9589,7 +9620,8 @@ const makeTopCountries = ({ showSlug, monthlyDimensionDownloads })=>{
         ],
         computeEmoji,
         computeName: computeCountryName,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
 function computeAppDownloads(dimensionDownloads) {
@@ -9606,7 +9638,7 @@ function computeAppDownloads(dimensionDownloads) {
     }
     return rt;
 }
-const makeTopApps = ({ showSlug, monthlyDimensionDownloads })=>{
+const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             computeAppDownloads(v)
@@ -9624,10 +9656,11 @@ const makeTopApps = ({ showSlug, monthlyDimensionDownloads })=>{
         tsvHeaderNames: [
             'app'
         ],
-        computeName: (key)=>key
+        computeName: (key)=>key,
+        strings: strings1
     });
 };
-const makeTopDevices = ({ showSlug, monthlyDimensionDownloads })=>{
+const makeTopDevices = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             v['deviceName'] ?? {}
@@ -9645,10 +9678,11 @@ const makeTopDevices = ({ showSlug, monthlyDimensionDownloads })=>{
         tsvHeaderNames: [
             'device'
         ],
-        computeName: (key)=>key
+        computeName: (key)=>key,
+        strings: strings1
     });
 };
-const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads })=>{
+const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads, strings: strings1 })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             v['deviceType'] ?? {}
@@ -9667,7 +9701,8 @@ const makeTopDeviceTypes = ({ showSlug, monthlyDimensionDownloads })=>{
             'deviceType'
         ],
         computeEmoji,
-        computeName: computeDeviceTypeName
+        computeName: computeDeviceTypeName,
+        strings: strings1
     });
 };
 function computeDeviceTypeName(deviceType) {
@@ -9682,7 +9717,7 @@ function computeEmoji(deviceType) {
         watch: '⌚️'
     })[deviceType] ?? '❔';
 }
-const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
             computeBrowserDownloads(v)
@@ -9701,7 +9736,8 @@ const makeTopBrowserDownloads = ({ showSlug, monthlyDimensionDownloads, download
         tsvHeaderNames: [
             'browserOrReferrer'
         ],
-        computeName: (key)=>key
+        computeName: (key)=>key,
+        strings: strings1
     });
 };
 function computeBrowserDownloads(dimensionDownloads) {
@@ -10038,7 +10074,7 @@ const METROS = {
     '993': `Yellowknife, NT`,
     '996': `Whitehorse, YT`
 };
-const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'metroCode');
     const { computeUrl } = regionCountryFunctions('US');
     return makeTopBox({
@@ -10058,30 +10094,64 @@ const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth 
             'metroName'
         ],
         computeName: computeMetroName,
-        computeUrl: (v)=>computeUrl(computeMetroName(v))
+        computeUrl: (v)=>computeUrl(computeMetroName(v)),
+        strings: strings1
     });
 };
 function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
-const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10) })=>{
-    const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneSpan, currentTimezoneNameSpan, currentTimezoneOffsetSpan] = [
+const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10), strings: strings1 })=>{
+    const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneDiv] = [
         element('footer-last-updated-date'),
         element('footer-last-updated-ago'),
-        element('footer-timezone'),
-        element('footer-current-timezone-name'),
-        element('footer-current-timezone-offset')
+        element('footer-timezone')
     ];
     lastUpdatedDateSpan.textContent = shorterDayFormat1.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
     try {
-        currentTimezoneNameSpan.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const offsetMinutes = new Date().getTimezoneOffset();
-        const offsetHours = pluralize(Math.abs(offsetMinutes) / 60, 'hour');
-        currentTimezoneOffsetSpan.textContent = offsetMinutes === 0 ? 'equal to' : offsetMinutes > 0 ? `${offsetHours} behind` : `${offsetHours} ahead of`;
+        const offsetHours = pluralize(Math.abs(offsetMinutes) / 60, strings1, 'one_hour', 'multiple_hours');
+        timezoneDiv.textContent = offsetMinutes === 0 ? replacePlaceholders(strings1.tz_is_equal_to_utc, [
+            [
+                'currentTimezone',
+                currentTimezone
+            ],
+            [
+                'utc',
+                strings1.utc
+            ]
+        ]) : offsetMinutes > 0 ? replacePlaceholders(strings1.tz_is_behind_utc, [
+            [
+                'currentTimezone',
+                currentTimezone
+            ],
+            [
+                'offsetHours',
+                offsetHours
+            ],
+            [
+                'utc',
+                strings1.utc
+            ]
+        ]) : replacePlaceholders(strings1.tz_is_ahead_of_utc, [
+            [
+                'currentTimezone',
+                currentTimezone
+            ],
+            [
+                'offsetHours',
+                offsetHours
+            ],
+            [
+                'utc',
+                strings1.utc
+            ]
+        ]);
     } catch (e) {
         console.warn(`Error displaying current time zone: ${e.stack || e}`);
-        timezoneSpan.style.visibility = 'hidden';
+        timezoneDiv.style.visibility = 'hidden';
     }
     function update() {}
     update();
@@ -10094,7 +10164,7 @@ const shorterDayFormat1 = new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     timeZone: 'UTC'
 });
-const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'euRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10114,7 +10184,8 @@ const makeTopEuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         ],
         computeEmoji,
         computeName: computeRegionName,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
 function computeRegionName(regionCountry) {
@@ -10124,7 +10195,7 @@ function computeRegionName(regionCountry) {
     })[region] ?? region;
     return region;
 }
-const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'auRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10144,14 +10215,15 @@ const makeTopAuRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         ],
         computeEmoji,
         computeName: computeRegionName1,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
 function computeRegionName1(regionCountry) {
     const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
-const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'caRegion');
     const { computeUrl } = regionCountryFunctions('CA');
     return makeTopBox({
@@ -10170,10 +10242,11 @@ const makeTopCaRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
             'caRegion'
         ],
         computeName: (v)=>v,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
-const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'asRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10193,14 +10266,15 @@ const makeTopAsRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMon
         ],
         computeEmoji,
         computeName: computeRegionName2,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
 function computeRegionName2(regionCountry) {
     const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
-const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth })=>{
+const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1 })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'latamRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
     return makeTopBox({
@@ -10220,7 +10294,8 @@ const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPer
         ],
         computeEmoji,
         computeName: computeRegionName3,
-        computeUrl
+        computeUrl,
+        strings: strings1
     });
 };
 function computeRegionName3(regionCountry) {
@@ -10234,7 +10309,7 @@ function computeRegionName3(regionCountry) {
     })[region] ?? region;
     return region;
 }
-const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
+const makeListens = ({ episodeListens, episodes, knownAppLinks = {}, strings: strings1 })=>{
     const [listensSection, listens25, listens50, listens90, listensCount, listensFromAppTemplate, listensBasedOn, listensGraph, listensGraphFooter, listensEpisode, listensGraphFooterPrevious, listensGraphFooterNext] = [
         element('listens-section'),
         element('listens-25'),
@@ -10294,7 +10369,7 @@ const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
                 ...minuteMap
             ].forEach((v, i)=>increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        chart = drawGraph(listensGraph, minutes, minuteMaps.length);
+        chart = drawGraph(listensGraph, minutes, minuteMaps.length, strings1);
         const epName = episodes.find((v)=>v.itemGuid === episodeGuid)?.title ?? episodeGuid;
         listensEpisode.textContent = `‘${epName}’`;
         listensGraphFooterPrevious.disabled = index === episodeListensEntries.length - 1;
@@ -10310,7 +10385,7 @@ const makeListens = ({ episodeListens, episodes, knownAppLinks = {} })=>{
         updateGraph();
     };
 };
-function drawGraph(canvas, labelsAndValues, sessions) {
+function drawGraph(canvas, labelsAndValues, sessions, strings1) {
     const ctx = canvas.getContext('2d');
     const values = Object.values(labelsAndValues);
     const maxValue = Math.min(Math.round(Math.max(...values) * 1.25), sessions);
@@ -10352,8 +10427,17 @@ function drawGraph(canvas, labelsAndValues, sessions) {
                     displayColors: false,
                     footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
-                        title: (items)=>`Minute ${items[0].label}`,
-                        label: (item)=>`${item.parsed.y} of ${sessions} anonymized sessions (${Math.round(item.parsed.y / sessions * 100)}%)`
+                        title: (items)=>replacePlaceholders(strings1.minute_n, items[0].label),
+                        label: (item)=>`${replacePlaceholders(strings1.x_of_n_anonymized_sessions, [
+                                [
+                                    'x',
+                                    item.parsed.y
+                                ],
+                                [
+                                    'sessions',
+                                    sessions
+                                ]
+                            ])} (${Math.round(item.parsed.y / sessions * 100)}%)`
                     }
                 }
             }
@@ -10464,18 +10548,21 @@ const app = await (async ()=>{
     }
     const headlineStats = makeHeadlineStats({
         hourlyDownloads,
-        dailyFoundAudience
+        dailyFoundAudience,
+        strings
     });
     makeDownloadsGraph({
         hourlyDownloads,
         episodes: episodesWithFirstHours,
         episodeHourlyDownloads,
-        debug
+        debug,
+        strings
     });
     const exportDownloads = makeExportDownloads({
         showUuid,
         showSlug,
-        previewToken
+        previewToken,
+        strings
     });
     const shot = new URLSearchParams(document.location.search).has('shot');
     const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
@@ -10484,13 +10571,15 @@ const app = await (async ()=>{
         showTitle,
         showSlug,
         mostRecentDate,
-        shot
+        shot,
+        strings
     });
     makeListens({
         episodeListens,
         episodes,
         knownAppLinks,
-        debug
+        debug,
+        strings
     });
     const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
             month,
@@ -10498,57 +10587,69 @@ const app = await (async ()=>{
         ]));
     makeTopCountries({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        strings
     });
     makeTopApps({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        strings
     });
     makeTopDevices({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        strings
     });
     makeTopDeviceTypes({
         showSlug,
-        monthlyDimensionDownloads
+        monthlyDimensionDownloads,
+        strings
     });
     makeTopBrowserDownloads({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopMetros({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopCaRegions({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopEuRegions({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopAuRegions({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopAsRegions({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeTopLatamRegions({
         showSlug,
         monthlyDimensionDownloads,
-        downloadsPerMonth
+        downloadsPerMonth,
+        strings
     });
     makeFooter({
-        mostRecentDate
+        mostRecentDate,
+        strings
     });
     function update() {
         exportDownloads.update();

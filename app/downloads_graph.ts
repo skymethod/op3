@@ -2,15 +2,16 @@ import { checkMatches } from '../worker/check.ts';
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { increment } from '../worker/summaries.ts';
 import { addDays } from '../worker/timestamp.ts';
+import { replacePlaceholders, pluralize } from './deps.ts';
 import { Chart, TooltipItem } from './deps.ts';
 import { element, SlIconButton, SlMenuItem } from './elements.ts';
-import { computeMonthName, pluralize } from './util.ts';
+import { computeMonthName } from './util.ts';
 
 type EpisodeInfoAndFirstHour = EpisodeInfo & { firstHour: string };
 
-type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], episodeHourlyDownloads: Record<string, Record<string, number>>, debug: boolean };
+type Opts = { hourlyDownloads: Record<string, number>, episodes: EpisodeInfoAndFirstHour[], episodeHourlyDownloads: Record<string, Record<string, number>>, debug: boolean, strings: Record<string, string> };
 
-export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug }: Opts) => {
+export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDownloads, debug, strings }: Opts) => {
 
     const [ 
         downloadsGraphCanvas,
@@ -90,16 +91,16 @@ export const makeDownloadsGraph = ({ hourlyDownloads, episodes, episodeHourlyDow
     function redrawChart() {
         if (chart) chart.destroy();
         const hourlyDownloadsToChart = Object.fromEntries(Object.entries(hourlyDownloads).slice(rangeStartHourIndex, rangeEndHourIndex + 1));
-        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, showEpisodeMarkers ? episodes : undefined);
+        chart = drawDownloadsChart(downloadsGraphCanvas, hourlyDownloadsToChart, episodeHourlyDownloads, granularity, debug, strings, showEpisodeMarkers ? episodes : undefined);
     }
 
     function update() {
         downloadsGraphGranularitySpan.textContent = { 
-            'hourly': 'Hourly',
-            'six-hourly': '6-hourly',
-            'twelve-hourly': '12-hourly',
-            'daily': 'Daily',
-        }[granularity] + ' Downloads';
+            'hourly': strings.hourly_downloads,
+            'six-hourly': strings.six_hourly_downloads,
+            'twelve-hourly': strings.twelve_hourly_downloads,
+            'daily': strings.daily_downloads,
+        }[granularity];
 
         const items = downloadsGraphOptionsMenu.querySelectorAll('sl-menu-item') as NodeListOf<SlMenuItem>;
         for (const item of items) {
@@ -177,7 +178,7 @@ function computeEpisodeMarkerIndex(episodes: EpisodeInfoAndFirstHour[], download
     return rt;
 }
 
-function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, episodeHourlyDownloads: Record<string, Record<string, number>>, granularity: Granularity, debug: boolean, episodes?: EpisodeInfoAndFirstHour[]): Chart {
+function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<string, number>, episodeHourlyDownloads: Record<string, Record<string, number>>, granularity: Granularity, debug: boolean, strings: Record<string, string>, episodes?: EpisodeInfoAndFirstHour[]): Chart {
     const downloads = computeDownloads(hourlyDownloads, granularity);
     const downloadLabels = Object.keys(downloads);
     const episodeMarkerIndex = episodes ? computeEpisodeMarkerIndex(episodes, downloadLabels, granularity, episodeHourlyDownloads) : undefined;
@@ -219,11 +220,11 @@ function drawDownloadsChart(canvas: HTMLCanvasElement, hourlyDownloads: Record<s
                     callbacks: {
                         title: (items: TooltipItem<never>[]) => dateFormat.format(new Date(items[0].label)),
                         // deno-lint-ignore no-explicit-any
-                        label: (item: any) => pluralize(item.parsed.y, 'download'),
+                        label: (item: any) => pluralize(item.parsed.y, strings, 'one_download', 'multiple_downloads'),
                         // deno-lint-ignore no-explicit-any
                         footer: (items: any[]) => {
                             const records = episodeMarkerIndex?.get(items[0].parsed.x) ?? [];
-                            return records.length === 0 ? undefined : records.map(v => `Published: ${v.title}${debug ? ` f:${v.firstHour} p:${v.pubdate}` : ''}`).join('\n');
+                            return records.length === 0 ? undefined : records.map(v => `${replacePlaceholders(strings.published_episode, v.title ?? '')}${debug ? ` f:${v.firstHour} p:${v.pubdate}` : ''}`).join('\n');
                         }
                     }
                 }

@@ -1,12 +1,12 @@
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
 import { addDaysToDateString } from '../worker/timestamp.ts';
-import { Chart, distinct } from './deps.ts';
+import { Chart, distinct, replacePlaceholders } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
 import { download } from './util.ts';
 
-type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined, shot: boolean };
+type Opts = { episodeHourlyDownloads: Record<string, Record<string, number>>, episodes: readonly EpisodeInfo[], showTitle: string | undefined, showSlug: string, mostRecentDate: string | undefined, shot: boolean, strings: Record<string, string> };
 
-export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot }: Opts) => {
+export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle, showSlug, mostRecentDate, shot, strings }: Opts) => {
 
     const [ 
         episodePacingPrevious, 
@@ -66,7 +66,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
         const pageEpisodeRelativeSummaries = Object.fromEntries(pageEpisodeIds.map(v => [ v, episodeRelativeSummaries[v] ]));
         const suggestedMax = Math.max(...Object.values(pageEpisodeRelativeSummaries).map(v => Math.max(...Object.values(v.cumulative))));
         const episodeInfos = Object.fromEntries(episodes.map(v => [v.id, v]));
-        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot);
+        const chart = drawPacingChart(episodePacingCanvas, pageEpisodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings);
         initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendElement, episodePacingNav, pageEpisodeRelativeSummaries);
         
         currentChart = chart;
@@ -130,7 +130,7 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
     function update() {
         episodePacingPrevious.disabled = pageIndex === 0;
         episodePacingNext.disabled = !final_ || pageIndex === maxPageIndex;
-        episodePacingNavCaption.textContent = `Page ${pageIndex + 1} of ${pages}`;
+        episodePacingNavCaption.textContent = replacePlaceholders(strings.page_x_of_n, [ [ 'page', pageIndex + 1 ], [ 'pages', pages ] ]);
     }
 
     update();
@@ -139,6 +139,8 @@ export const makeEpisodePacing = ({ episodeHourlyDownloads, episodes, showTitle,
 };
 
 //
+
+const ZWSP = '\u200b';
 
 const withCommas = new Intl.NumberFormat('en-US');
 
@@ -217,12 +219,13 @@ function computeRelativeSummary(hourlyDownloads: Record<string, number>): Relati
     return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
 }
 
-function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean): Chart {
+function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean, strings: Record<string, string>): Chart {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap(v => Object.keys(v.cumulative)).sort());
 
     const parseHourLabel = (label: string) => {
         const hour = parseInt(label.substring(1));
-        return hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : `Hour ${hour}`;
+        if (hour % 24 === 0) return replacePlaceholders(strings.day_n, Math.floor(hour / 24));
+        return replacePlaceholders(strings.hour_n, Math.floor(hour));
     }
 
     const ctx = canvas.getContext('2d')!;
@@ -278,13 +281,13 @@ function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Re
                         autoSkip: false,
                         callback: function(this, value) {
                             const hour = (value as number) + 1;
-                            const label = hour % 24 === 0 ? `Day ${Math.floor(hour / 24)}` : '';
+                            const label = hour % 24 === 0 ? ZWSP + replacePlaceholders(strings.day_n, Math.floor(hour / 24)) : '';
                             if (label !== '' && this.width < 700 && hour !== 24 && (hour / 24) % 5 !== 0) return '';
                             return label;
                         }
                     },
                     grid: {
-                        color: ctx => (ctx.tick.label as string).startsWith('Day') ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                        color: ctx => (ctx.tick.label as string).startsWith(ZWSP) ? 'rgba(255, 255, 255, 0.1)' : undefined,
                     }
                 },
                 y: {

@@ -1,6 +1,6 @@
-import { sortBy } from './deps.ts';
+import { sortBy, pluralize } from './deps.ts';
 import { element, removeAllChildren, SlIconButton } from './elements.ts';
-import { computeMonthName, download, pluralize } from './util.ts';
+import { computeMonthName, download } from './util.ts';
 
 type Opts = {
     type: string,
@@ -18,10 +18,10 @@ type Opts = {
     computeEmoji?: (key: string) => string,
     computeName: (key: string) => string,
     computeUrl?: (key: string) => string,
-
+    strings: Record<string, string>,
 };
 
-export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl }: Opts) => {
+export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, nextId, listId, templateId, cardId, monthlyDownloads, downloadsPerMonth, tsvHeaderNames, computeEmoji, computeName, computeUrl, strings }: Opts) => {
 
     const [
         exportButton,
@@ -104,7 +104,7 @@ export const makeTopBox = ({ type, showSlug, exportId, previousId, monthId, next
 
             const dd = item.querySelector('dd')!;
             dd.textContent = (downloads / totalDownloads * 100).toFixed(2).toString() + '%';
-            dd.title = pluralize(downloads, 'download');
+            dd.title = pluralize(downloads, strings, 'one_download', 'multiple_downloads');
 
             list.appendChild(item);
         }

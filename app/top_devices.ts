@@ -1,8 +1,8 @@
 import { makeTopBox } from './top_box.ts';
 
-type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, strings: Record<string, string> };
 
-export const makeTopDevices = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
+export const makeTopDevices = ({ showSlug, monthlyDimensionDownloads, strings }: Opts) => {
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, v['deviceName'] ?? {} ]));
 
     return makeTopBox({
@@ -17,5 +17,6 @@ export const makeTopDevices = ({ showSlug, monthlyDimensionDownloads }: Opts) =>
         monthlyDownloads,
         tsvHeaderNames: [ 'device' ],
         computeName: key => key,
+        strings,
     });
 };

@@ -1,9 +1,9 @@
 import { makeTopBox } from './top_box.ts';
 import { computeAppDownloads } from '../worker/routes/api_shows_shared.ts';
 
-type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, strings: Record<string, string> };
 
-export const makeTopApps = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
+export const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings }: Opts) => {
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v]) => [n, computeAppDownloads(v)]));
 
     return makeTopBox({
@@ -18,5 +18,6 @@ export const makeTopApps = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
         monthlyDownloads,
         tsvHeaderNames: [ 'app' ],
         computeName: key => key,
+        strings,
     });
 };

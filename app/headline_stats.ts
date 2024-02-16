@@ -1,11 +1,11 @@
-import { Chart } from './deps.ts';
+import { Chart, replacePlaceholders } from './deps.ts';
 import { element } from './elements.ts';
 import { increment } from '../worker/summaries.ts';
 import { computeMonthName } from './util.ts';
 
-type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number> };
+type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Record<string, number>, strings: Record<string, string> };
 
-export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts) => {
+export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings }: Opts) => {
 
     const [ 
         sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
@@ -30,8 +30,8 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience }: Opts)
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas);
 
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
 
@@ -191,7 +191,7 @@ function computeMonthlyCounts(dateBasedCounts: Record<string, number>): Record<s
 type HoverMonthHandler = (hoverMonth?: string) => void;
 type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler: HoverMonthHandler) => void };
 
-function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement): MonthlyBox {
+function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement, strings: Record<string, string>): MonthlyBox {
     const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2) ?? [ '', 0 ];
     const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1) ?? [ '', 0 ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
@@ -201,7 +201,7 @@ function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLEle
         const month = hoverMonth ?? initialMonth;
         const value = monthlyCounts[month];
         countDiv.textContent = withCommas.format(value);
-        periodDiv.textContent = `in ${computeMonthName(month)}${month === thisMonth ? ' (so far)' : ''}`;
+        periodDiv.textContent = `${replacePlaceholders(strings.in_month, [ [ 'month', computeMonthName(month) ] ])}${month === thisMonth ? ` (${strings.so_far})` : ''}`;
     }
     if (initialMonth !== '') onHoverMonth(initialMonth);
     drawMinigraph(minigraph, monthlyCounts, { onHover: v => {

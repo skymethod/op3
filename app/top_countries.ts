@@ -1,8 +1,8 @@
 import { computeCountryName, computeMonthlyDownloads, makeTopBox, regionCountryFunctions } from './top_box.ts';
 
-type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, strings: Record<string, string> };
 
-export const makeTopCountries = ({ showSlug, monthlyDimensionDownloads }: Opts) => {
+export const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings }: Opts) => {
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'countryCode');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
 
@@ -20,5 +20,6 @@ export const makeTopCountries = ({ showSlug, monthlyDimensionDownloads }: Opts) 
         computeEmoji,
         computeName: computeCountryName,
         computeUrl,
+        strings,
     });
 };

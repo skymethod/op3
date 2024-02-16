@@ -2,10 +2,11 @@ import { SlIconButton, element } from './elements.ts';
 import { increment, incrementAll } from '../worker/summaries.ts';
 import { Chart, TooltipItem, sortBy } from './deps.ts';
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
+import { replacePlaceholders } from '../worker/routes/strings.ts';
 
-type Opts = { episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined, episodes: readonly EpisodeInfo[], knownAppLinks: Record<string, string> | undefined, debug: boolean };
+type Opts = { episodeListens: Record<string, { minuteMaps: string[], appCounts: Record<string, number> }> | undefined, episodes: readonly EpisodeInfo[], knownAppLinks: Record<string, string> | undefined, debug: boolean, strings: Record<string, string> };
 
-export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Opts) => {
+export const makeListens = ({ episodeListens, episodes, knownAppLinks = {}, strings }: Opts) => {
 
     const [ 
         listensSection,
@@ -80,7 +81,7 @@ export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Op
         for (const minuteMap of minuteMaps) {
             [...minuteMap].forEach((v, i) => increment(minutes, (i + 1).toString(), v === '1' ? 1 : 0));
         }
-        chart = drawGraph(listensGraph, minutes, minuteMaps.length);
+        chart = drawGraph(listensGraph, minutes, minuteMaps.length, strings);
         const epName = episodes.find(v => v.itemGuid === episodeGuid)?.title ?? episodeGuid;
         listensEpisode.textContent = `‘${epName}’`;
         listensGraphFooterPrevious.disabled = index === episodeListensEntries.length - 1;
@@ -102,7 +103,7 @@ export const makeListens = ({ episodeListens, episodes, knownAppLinks = {} }: Op
 
 //
 
-function drawGraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, sessions: number) {
+function drawGraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, number>, sessions: number, strings: Record<string, string>) {
     const ctx = canvas.getContext('2d')!;
 
     const values = Object.values(labelsAndValues);
@@ -147,9 +148,9 @@ function drawGraph(canvas: HTMLCanvasElement, labelsAndValues: Record<string, nu
                     displayColors: false,
                     footerColor: 'rgba(154, 52, 18, 1)',
                     callbacks: {
-                        title: (items: TooltipItem<never>[]) => `Minute ${items[0].label}`,
+                        title: (items: TooltipItem<never>[]) => replacePlaceholders(strings.minute_n, items[0].label),
                         // deno-lint-ignore no-explicit-any
-                        label: (item: any) => `${item.parsed.y} of ${sessions} anonymized sessions (${Math.round(item.parsed.y / sessions * 100)}%)`,
+                        label: (item: any) => `${replacePlaceholders(strings.x_of_n_anonymized_sessions, [ [ 'x', item.parsed.y ],  [ 'sessions', sessions ] ])} (${Math.round(item.parsed.y / sessions * 100)}%)`,
                     }
                 },
             },

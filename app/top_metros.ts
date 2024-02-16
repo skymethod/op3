@@ -1,9 +1,9 @@
 import { METROS } from './metros.ts';
 import { computeMonthlyDownloads, makeTopBox, regionCountryFunctions } from './top_box.ts';
 
-type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number> };
+type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, downloadsPerMonth: Record<string, number>, strings: Record<string, string> };
 
-export const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth }: Opts) => {
+export const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings }: Opts) => {
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'metroCode');
     const { computeUrl } = regionCountryFunctions('US');
     
@@ -22,6 +22,7 @@ export const makeTopMetros = ({ showSlug, monthlyDimensionDownloads, downloadsPe
         tsvHeaderNames: [ 'metroCode', 'metroName' ],
         computeName: computeMetroName,
         computeUrl: v => computeUrl(computeMetroName(v)),
+        strings,
     });
 };
 

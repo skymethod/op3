@@ -1,4 +1,67 @@
 {
+  "export_download_details": {
+    "string": "Export download details"
+  },
+  "daily_downloads": {
+    "string": "Daily Downloads"
+  },
+  "twelve_hourly_downloads": {
+    "string": "12-hourly Downloads"
+  },
+  "six_hourly_downloads": {
+    "string": "6-hourly Downloads"
+  },
+  "hourly_downloads": {
+    "string": "Hourly Downloads"
+  },
+  "in_month": {
+    "string": "in %s"
+  },
+  "so_far": {
+    "string": "so far"
+  },
+  "day_n": {
+    "string": "Day %d"
+  },
+  "hour_n": {
+    "string": "Hour %d"
+  },
+  "minute_n": {
+    "string": "Minute %d"
+  },
+  "page_x_of_n": {
+    "string": "Page %d of %d"
+  },
+  "x_of_n_anonymized_sessions": {
+    "string": "%d of %d anonymized sessions"
+  },
+  "published_episode": {
+    "string": "Published: %s"
+  },
+  "one_download": {
+    "string": "%d download"
+  },
+  "multiple_downloads": {
+    "string": "%d downloads"
+  },
+  "one_hour": {
+    "string": "%d hour"
+  },
+  "multiple_hours": {
+    "string": "%d hours"
+  },
+  "utc": {
+    "string": "UTC"
+  },
+  "tz_is_equal_to_utc": {
+    "string": "%s is equal to %s"
+  },
+  "tz_is_behind_utc": {
+    "string": "%s is %s behind %s"
+  },
+  "tz_is_ahead_of_utc": {
+    "string": "%s is %s ahead of %s"
+  },
   "downloads_in_last_n_days": {
     "string": "downloads in last %d days",
     "developer_comment": "Try to limit the translated string to 30 characters."
@@ -33,9 +96,6 @@
   },
   "older_downloads": {
     "string": "Older downloads"
-  },
-  "hourly_downloads": {
-    "string": "Hourly Downloads"
   },
   "daily": {
     "string": "Daily"
@@ -136,9 +196,6 @@
   "top_browsers_and_referrers": {
     "string": "Top browsers & referrers"
   },
-  "export_download_details": {
-    "string": "Export download details"
-  },
   "cancel": {
     "string": "Cancel"
   },
@@ -159,8 +216,5 @@
   },
   "utc_is_a_standardized_time_reference": {
     "string": "It is a standardized time reference that is not affected by daylight saving time."
-  },
-  "utc": {
-    "string": "UTC"
   }
 }

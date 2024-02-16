@@ -91,11 +91,11 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const { title } = showObj;
     const showTitle = title ?? '(untitled)';
 
-    const initialData = JSON.stringify({ showObj, statsObj, times });
-    const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
-
     if (!showPageTranslations) showPageTranslations = JSON.parse(showPageTranslationsJson) as TranslatedStrings;
     const lang = searchParams.get('lang') ?? undefined;
+
+    const initialData = JSON.stringify({ showObj, statsObj, times, showPageTranslations });
+    const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
 
     const html = computeHtml(showHtm, {
         showUuid,
@@ -110,6 +110,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         origin,
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
+        lang: lang ?? '',
     }, showPageTranslations, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });

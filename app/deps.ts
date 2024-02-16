@@ -3,3 +3,5 @@ export { Chart, CategoryScale, LinearScale, LineController, PointElement, LineEl
 export type { TooltipItem } from 'https://esm.sh/stable/chart.js@4.1.1';
 export { distinct } from 'https://deno.land/std@0.211.0/collections/distinct.ts';
 export { sortBy } from 'https://deno.land/std@0.211.0/collections/sort_by.ts';
+export { replacePlaceholders, pluralize } from '../worker/routes/strings.ts';
+

@@ -1,11 +1,12 @@
 
-export function replacePlaceholders(str: string, nameValuePairs: [string, string][]): string {
+export function replacePlaceholders(str: string, nameValuePairs: string | number | [string, string | number][]): string {
+    const nvps = Array.isArray(nameValuePairs) ? nameValuePairs : [ [ 'arg', nameValuePairs ] ];
     let i = 0;
-    return str.replace(/%d/g, () => {
-        const nvp = nameValuePairs[i];
-        if (nvp === undefined) throw new Error(`replacePlaceholders: Bad input: ${str}, ${nameValuePairs.map(v => v.join('=')).join(',')}`);
+    return str.replace(/%[dDsS]/g, (sub) => {
+        const nvp = nvps[i];
         i++;
-        return nvp[1];
+        if (nvp === undefined) return sub; // soft fail in case we are deferring replacement to js
+        return nvp[1].toString();
     });
 }
 
@@ -71,7 +72,17 @@ export function processTemplate(template: string, variables: Record<string, stri
 export type TranslatedStrings = Record<string /* stringName/key */, Record<string /* lang */, string /* translated value */>>;
 
 export function replaceWithTranslation(stringName: string, stringValue: string, translatedStrings: TranslatedStrings | undefined, lang: string | undefined) {
-    if (lang === undefined || translatedStrings === undefined) return stringValue;
+    if (lang === undefined) return stringValue;
+    if (lang === 'up') return stringValue.toUpperCase();
+    if (translatedStrings === undefined) return stringValue;
     const translations = translatedStrings[stringName]; if (translations === undefined) return stringValue;
     return translations[lang] ?? stringValue;
 }
+
+export function pluralize(n: number, strings: Record<string, string>, singleKey: string, pluralKey: string, format?: Intl.NumberFormat): string {
+    return replacePlaceholders(strings[n === 1 ? singleKey : pluralKey], (format ?? withCommas).format(n));
+}
+
+//
+
+const withCommas = new Intl.NumberFormat('en-US');
