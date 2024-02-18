@@ -86,6 +86,7 @@ const strings = {
                 <div class="text-[2.5rem] leading-none mb-2" id="downloads-count">xxx</div>
                 <div class="text-sm">${s:downloads:'downloads'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
+                <div id="downloads-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
@@ -99,6 +100,7 @@ const strings = {
                 <div class="text-[2.5rem] leading-none mb-2" id="audience-count">xxx</div>
                 <div class="text-sm">${s:unique_audience:'unique audience'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
+                <div id="audience-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">

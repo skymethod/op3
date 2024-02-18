@@ -10,8 +10,8 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
     const [ 
         sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
         thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, 
-        downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph,
-        audienceCountDiv, audiencePeriodDiv, audienceMinigraph,
+        downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph,
+        audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph,
     ] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
@@ -21,17 +21,19 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
         element<HTMLCanvasElement>('thirty-day-downloads-sparkline'),
         element('downloads-count'),
         element('downloads-period'),
+        element('downloads-spacer-line'),
         element<HTMLCanvasElement>('downloads-minigraph'),
         element('audience-count'),
         element('audience-period'),
+        element('audience-spacer-line'),
         element<HTMLCanvasElement>('audience-minigraph'),
     ];
 
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
 
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings, lang);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings, lang);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, strings, lang);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph, strings, lang);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
 
@@ -190,10 +192,12 @@ function computeMonthlyCounts(dateBasedCounts: Record<string, number>): Record<s
 type HoverMonthHandler = (hoverMonth?: string) => void;
 type MonthlyBox = { onHoverMonth: HoverMonthHandler, addHoverListener: (handler: HoverMonthHandler) => void };
 
-function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, minigraph: HTMLCanvasElement, strings: Record<string, string>, lang: string | undefined): MonthlyBox {
+function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLElement, periodDiv: HTMLElement, spacerLine: HTMLElement, minigraph: HTMLCanvasElement, strings: Record<string, string>, lang: string | undefined): MonthlyBox {
     const [ lastMonth, lastMonthCount ] = Object.entries(monthlyCounts).at(-2) ?? [ '', 0 ];
     const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1) ?? [ '', 0 ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
+
+    if (lang === 'fr') spacerLine.classList.remove('hidden');
 
     const hoverListeners: HoverMonthHandler[] = [];
     const onHoverMonth: HoverMonthHandler = hoverMonth => {

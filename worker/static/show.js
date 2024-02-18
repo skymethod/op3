@@ -9149,7 +9149,7 @@ async function downloadDownloads(e, showUuid, showSlug, month, previewToken1, in
     });
 }
 const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strings1, lang })=>{
-    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceMinigraph] = [
+    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph] = [
         element('seven-day-downloads'),
         element('seven-day-downloads-asof'),
         element('seven-day-downloads-sparkline'),
@@ -9158,15 +9158,17 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strin
         element('thirty-day-downloads-sparkline'),
         element('downloads-count'),
         element('downloads-period'),
+        element('downloads-spacer-line'),
         element('downloads-minigraph'),
         element('audience-count'),
         element('audience-period'),
+        element('audience-spacer-line'),
         element('audience-minigraph')
     ];
     initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
     initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
-    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsMinigraph, strings1, lang);
-    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceMinigraph, strings1, lang);
+    const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, strings1, lang);
+    const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph, strings1, lang);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
     monthlyAudienceBox.addHoverListener(monthlyDownloadsBox.onHoverMonth);
     function update() {}
@@ -9315,7 +9317,7 @@ function computeMonthlyCounts(dateBasedCounts) {
     }
     return monthlyCounts;
 }
-function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1, lang) {
+function initMonthlyBox(monthlyCounts, countDiv, periodDiv, spacerLine, minigraph, strings1, lang) {
     const [lastMonth, lastMonthCount] = Object.entries(monthlyCounts).at(-2) ?? [
         '',
         0
@@ -9325,6 +9327,7 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, minigraph, strings1,
         0
     ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
+    if (lang === 'fr') spacerLine.classList.remove('hidden');
     const hoverListeners = [];
     const onHoverMonth = (hoverMonth)=>{
         const month = hoverMonth ?? initialMonth;
