@@ -10149,9 +10149,10 @@ function computeMetroName(metroCode) {
     return METROS[metroCode] ?? `Metro ${metroCode}`;
 }
 const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10), strings: strings1, lang })=>{
-    const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneDiv] = [
+    const [lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, languageMenu, timezoneDiv] = [
         element('footer-last-updated-date'),
         element('footer-last-updated-ago'),
+        element('footer-language-menu'),
         element('footer-timezone')
     ];
     const locale = lang ?? 'en-US';
@@ -10162,6 +10163,13 @@ const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10)
     });
     lastUpdatedDateSpan.textContent = shorterDayFormat.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
+    languageMenu.addEventListener('sl-select', (event)=>{
+        const newLang = event.detail.item.value;
+        if (newLang === (lang ?? 'en')) return;
+        const u = new URL(document.location.href);
+        u.searchParams.set('lang', newLang);
+        document.location.href = u.toString();
+    });
     try {
         const currentTimezone = Intl.DateTimeFormat(locale).resolvedOptions().timeZone;
         const offsetMinutes = new Date().getTimezoneOffset();

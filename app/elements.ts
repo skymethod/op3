@@ -38,3 +38,7 @@ export interface SlIconButton extends HTMLElement {
 export interface SlRelativeTime extends HTMLElement {
     date: string | Date;
 }
+
+export interface SlSelectEvent extends Event {
+    detail: { item: SlMenuItem };
+}

@@ -111,6 +111,9 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
         lang: lang ?? '',
+        langLabelCurrent: langs[lang ?? 'en'],
+        langLabelEn: langs['en'],
+        langLabelFr: langs['fr'],
     }, showPageTranslations, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
@@ -189,6 +192,11 @@ export function computeDemoShowResponse({ origin }: { origin: string }): Respons
 }
 
 //
+
+const langs: Record<string, string> = {
+    en: 'English (US)',
+    fr: 'Français',
+};
 
 async function headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }: { showUuid: string, searchParams: URLSearchParams, assetBlobs: Blobs | undefined, roAssetBlobs: Blobs | undefined }): Promise<{ etag: string } | undefined> {
     const targetAssetBlobs = searchParams.has('ro') ? roAssetBlobs : assetBlobs;

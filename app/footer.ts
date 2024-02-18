@@ -1,14 +1,15 @@
 import { addDaysToDateString } from '../worker/timestamp.ts';
-import { element, SlRelativeTime } from './elements.ts';
+import { element, SlRelativeTime, SlSelectEvent } from './elements.ts';
 import { pluralize, replacePlaceholders } from './deps.ts';
 
 type Opts = { mostRecentDate: string | undefined, strings: Record<string, string>, lang: string | undefined };
 
 export const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10), strings, lang }: Opts) => {
 
-    const [ lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, timezoneDiv ] = [ 
+    const [ lastUpdatedDateSpan, lastUpdatedAgoRelativeTime, languageMenu, timezoneDiv ] = [ 
         element('footer-last-updated-date'),
         element<SlRelativeTime>('footer-last-updated-ago'),
+        element('footer-language-menu'),
         element('footer-timezone'),
     ];
 
@@ -16,6 +17,14 @@ export const makeFooter = ({ mostRecentDate = new Date().toISOString().substring
     const shorterDayFormat = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric', timeZone: 'UTC' });
     lastUpdatedDateSpan.textContent = shorterDayFormat.format(new Date(`${mostRecentDate}T00:00:00.000Z`));
     lastUpdatedAgoRelativeTime.date = `${addDaysToDateString(mostRecentDate, 1)}T00:00:00.000Z`;
+
+    languageMenu.addEventListener('sl-select', event => {
+        const newLang = (event as SlSelectEvent).detail.item.value;
+        if (newLang === (lang ?? 'en')) return;
+        const u = new URL(document.location.href);
+        u.searchParams.set('lang', newLang);
+        document.location.href = u.toString();
+    });
 
     try {
         const currentTimezone = Intl.DateTimeFormat(locale).resolvedOptions().timeZone;

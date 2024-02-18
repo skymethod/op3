@@ -460,13 +460,23 @@ const strings = {
     <footer class="wait sticky bottom-0 bg-neutral-800 border-t border-neutral-700">
         <div class="grid grid-cols-2 md:grid-cols-3 text-xs md:text-sm p-2 whitespace-nowrap text-neutral-400">
             <div class="text-left">${s:last_updated:'Last updated'}: <span id="footer-last-updated-date">Dec 9</span><span class="hidden md:inline"> (<sl-relative-time id="footer-last-updated-ago" class="inline-block" lang="${lang}" sync></sl-relative-time>)</span></div>
-            <div class="text-right md:text-center">${s:dates_and_times_are_in:'Dates and times are in'}
+            <div class="text-right md:text-center">
+                <sl-dropdown>
+                    <div slot="trigger" class="flex items-center cursor-pointer"><sl-icon slot="prefix" name="globe"></sl-icon>&nbsp;<span class="underline decoration-1 decoration-dotted underline-offset-4">${langLabelCurrent}</span></div>
+                    <sl-menu id="footer-language-menu" class="text-left">
+                        <sl-menu-item value="en">${langLabelEn}</sl-menu-item>
+                        <sl-menu-item value="fr">${langLabelFr}</sl-menu-item>
+                    </sl-menu>
+                </sl-dropdown>
+            </div>
+            <div class="hidden md:block text-right">${s:dates_and_times_are_in:'Dates and times are in'}
                 <sl-tooltip style="--sl-tooltip-arrow-size: 0; --max-width: 1000px" hoist>
-                    <div class="text-xs" slot="content">${s:utc_stands_for:'UTC stands for Coordinated Universal Time.'}<br><br>${s:utc_is_a_standardized_time_reference:'It is a standardized time reference that is not affected by daylight saving time.'}</div>
+                    <div class="text-xs" slot="content">${s:utc_stands_for:'UTC stands for Coordinated Universal Time.'}<br><br>
+                        ${s:utc_is_a_standardized_time_reference:'It is a standardized time reference that is not affected by daylight saving time.'}<br><br>
+                        <span id="footer-timezone">${s:tz_is_equal_to_utc:''}</span></div>
                     <span class="cursor-pointer underline decoration-1 decoration-dotted underline-offset-4">${s:utc:''}</span>
                 </sl-tooltip>
             </div>
-            <div class="hidden md:block text-right" id="footer-timezone">${s:tz_is_equal_to_utc:''}</div>
         </div>
     </footer>
 
