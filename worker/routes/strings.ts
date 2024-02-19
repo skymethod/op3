@@ -127,7 +127,8 @@ export class Translations {
     compute({ searchParams, acceptLanguage }: { searchParams: URLSearchParams, acceptLanguage: string | undefined }): { lang: string | undefined, contentLanguage: string, translatedStrings: TranslatedStrings } {
         if (!this.translatedStrings) this.translatedStrings = JSON.parse(this.translatedStringsJson) as TranslatedStrings;
         const translatedStrings = this.translatedStrings;
-        const lang = Object.keys(translatedStrings).length > 0 ? computePreferredSupportedLanguage({ langParam: searchParams.get('lang') ?? undefined, acceptLanguage }) : undefined;
+        const langParam = searchParams.get('lang') ?? undefined;
+        const lang = Object.keys(translatedStrings).length > 0 || langParam === 'up' ? computePreferredSupportedLanguage({ langParam, acceptLanguage }) : undefined;
         const contentLanguage = lang ?? 'en';
         return { lang, contentLanguage, translatedStrings };
     }

@@ -1,0 +1,77 @@
+{
+  "paragraph_1": {
+    "string": "The Open Podcast Prefix Project (OP3) is a free and <a href=\"https://github.com/skymethod/op3\">open-source</a> podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a> committed to open data and listener privacy."
+  },
+  "box_1_line_1": {
+    "string": "It's easy: no signup or login required"
+  },
+  "box_1_line_2": {
+    "string": "Podcasters or podcast hosting companies can prepend"
+  },
+  "box_1_line_3": {
+    "string": "to podcast episode urls in their feed to participate and start measuring downloads."
+  },
+  "box_1_line_4": {
+    "string": "(No need to remove existing prefixes, there can be more than one)"
+  },
+  "box_1_line_5": {
+    "string": "For more instructions, check your feed using our <a href=\"/setup\">setup page →</a>"
+  },
+  "paragraph_2": {
+    "string": "Once you start using this prefix, you are opening up your show's listener numbers to the world, <i>without compromising your listeners' privacy</i>.  App developers and companies can start building products and services for you using this open data, without you having to manage a custom integration."
+  },
+  "stats_box_paragraph_1": {
+    "string": "Every show measured by OP3 automatically receives a free, public stats page with industry-standard podcast download metrics, detailed breakdowns, even spreadsheet data exports <em>with full history</em>."
+  },
+  "stats_box_demo_link_label": {
+    "string": "Example public stats page →"
+  },
+  "paragraph_3": {
+    "string": "This service is a departure from all other analytics services, it's an open and auditable machine.  The entire codebase available to audit on <a href=\"https://github.com/skymethod/op3\">GitHub</a>, as are associated deployment actions. OP3 executes on a single cloud platform, no mixing data with external third-party IP address databases!"
+  },
+  "privacy_policy_line": {
+    "string": "See our <em>readable</em> <a href=\"/privacy\">privacy policy</a> for more details."
+  },
+  "paragraph_4": {
+    "string": "OP3 runs on a global CDN with edge nodes in over 300 cites in over 120 countries, it is one of the fastest (if not the fastest) podcast redirect service.  Keep an eye on our <a href=\"https://poduptime.com/op3/\">independently-measured uptime</a>."
+  },
+  "paragraph_5": {
+    "string": "We've been running smoothly since Sept 2022, now measuring over %d million podcast downloads every month across more than %d shows. Our data is available to the public via the <a href=\"/api/docs\">OP3 API</a>."
+  },
+  "paragraph_6": {
+    "string": "OP3 is an independent project by <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, relying solely on sponsors that share our vision to help cover our <a href=\"/costs\">costs</a> - we wouldn't exist without them."
+  },
+  "sponsor_us_link_label": {
+    "string": "Sponsor us!"
+  },
+  "learn_more_line": {
+    "string": "Learn more about our future plans on the <a href=\"https://github.com/skymethod/op3#op3\">GitHub readme →"
+  },
+  "privacy_policy_link_label": {
+    "string": "Privacy Policy"
+  },
+  "terms_of_service_link_label": {
+    "string": "Terms of Service"
+  },
+  "costs_link_label": {
+    "string": "Costs"
+  },
+  "releases_link_label": {
+    "string": "Releases"
+  },
+  "status_link_label": {
+    "string": "Status"
+  },
+  "email_link_label": {
+    "string": "Email"
+  },
+  "sponsor_link_label": {
+    "string": "Sponsor"
+  },
+  "version": {
+    "string": "Version"
+  },
+  "deployed": {
+    "string": "Deployed"
+  }
+}
