@@ -115,6 +115,24 @@ export const supportedLanguageLabels: Record<string, string> = {
 
 export const supportedLanguages = Object.keys(supportedLanguageLabels);
 
+export class Translations {
+    private readonly translatedStringsJson: string;
+    
+    private translatedStrings?: TranslatedStrings;
+
+    constructor(translatedStringsJson: string) {
+        this.translatedStringsJson = translatedStringsJson;
+    }
+
+    compute({ searchParams, acceptLanguage }: { searchParams: URLSearchParams, acceptLanguage: string | undefined }): { lang: string | undefined, contentLanguage: string, translatedStrings: TranslatedStrings } {
+        if (!this.translatedStrings) this.translatedStrings = JSON.parse(this.translatedStringsJson) as TranslatedStrings;
+        const translatedStrings = this.translatedStrings;
+        const lang = Object.keys(translatedStrings).length > 0 ? computePreferredSupportedLanguage({ langParam: searchParams.get('lang') ?? undefined, acceptLanguage }) : undefined;
+        const contentLanguage = lang ?? 'en';
+        return { lang, contentLanguage, translatedStrings };
+    }
+}
+
 //
 
 const withCommas = new Intl.NumberFormat('en-US');

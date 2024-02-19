@@ -11,12 +11,12 @@ import { compute404Response } from './404.ts';
 import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
-import { TranslatedStrings, supportedLanguageLabels, computePreferredSupportedLanguage } from './strings.ts';
+import { Translations, supportedLanguageLabels } from './strings.ts';
 
 const showHtm = await importText(import.meta.url, '../static/show.htm');
 const showJs = await importText(import.meta.url, '../static/show.js');
 const showPageTranslationsJson = await importText(import.meta.url, '../strings/show_page.translations.json');
-let showPageTranslations: TranslatedStrings | undefined;
+const translations = new Translations(showPageTranslationsJson);
 
 export type ShowRequest = { id: string, type: 'show-uuid' | 'podcast-guid', acceptLanguage: string | undefined };
 
@@ -91,9 +91,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const { title } = showObj;
     const showTitle = title ?? '(untitled)';
 
-    if (!showPageTranslations) showPageTranslations = JSON.parse(showPageTranslationsJson) as TranslatedStrings;
-    const lang = computePreferredSupportedLanguage({ langParam: searchParams.get('lang') ?? undefined, acceptLanguage });
-    const contentLanguage = lang ?? 'en';
+    const { lang, contentLanguage, translatedStrings: showPageTranslations } = translations.compute({ searchParams, acceptLanguage });
 
     const initialData = JSON.stringify({ showObj, statsObj, times, showPageTranslations, lang });
     const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
@@ -111,7 +109,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         origin,
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
-        lang: lang ?? '',
+        contentLanguage,
         langLabelCurrent: supportedLanguageLabels[lang ?? 'en'],
         langLabelEn: supportedLanguageLabels['en'],
         langLabelFr: supportedLanguageLabels['fr'],
