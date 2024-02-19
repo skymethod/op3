@@ -853,10 +853,6 @@ a.svg:hover {
   width: 100%;
 }
 
-.w-\[32rem\] {
-  width: 32rem;
-}
-
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -869,20 +865,12 @@ a.svg:hover {
   max-width: 12rem;
 }
 
-.max-w-xl {
-  max-width: 36rem;
-}
-
-.max-w-\[16rem\] {
-  max-width: 16rem;
-}
-
-.max-w-\[32rem\] {
-  max-width: 32rem;
-}
-
 .max-w-\[28rem\] {
   max-width: 28rem;
+}
+
+.max-w-xl {
+  max-width: 36rem;
 }
 
 .grow {
@@ -1213,10 +1201,6 @@ a.svg:hover {
 
 .leading-relaxed {
   line-height: 1.625;
-}
-
-.leading-normal {
-  line-height: 1.5;
 }
 
 .text-green-600 {
