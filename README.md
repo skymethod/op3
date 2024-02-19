@@ -75,6 +75,9 @@ Free public stats pages are available for every show using OP3 - see an [example
  - 🔜 Build useful data exports to Google Sheets, Zapier, etc
  - 🔜 Build operational tools to support ongoing maintenance, data management, and abuse/fraud detection with minimal staffing needs
 
+## Translation
+🌎 Help us translate OP3 into as many languages as possible! See our [translation instructions](https://github.com/skymethod/op3/blob/master/translation.md) for more details.
+
 # Sponsors
 Anyone interested in supporting the project can sponsor development and operational costs by purchasing sponsorships.  This is the only way OP3 can stay open and independent into the future.
 
