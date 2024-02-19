@@ -89,7 +89,7 @@ export function computePreferredSupportedLanguage({ langParam, acceptLanguage }:
     // fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
     type QualityValue = { value: string, q: number };
     const qualityValues: QualityValue[] = [];
-    if (langParam) qualityValues.push({ value: langParam, q: 2 });
+    if (langParam) qualityValues.push({ value: langParam.toLowerCase(), q: 2 });
     if (acceptLanguage) {
         qualityValues.push(...acceptLanguage.split(',').map(v => v.toLowerCase().trim()).filter(v => v.length > 0).map(v => { 
             const m = /^([a-zA-Z0-9-_]+)(;q=([0-9.]+))?$/.exec(v);
@@ -102,6 +102,7 @@ export function computePreferredSupportedLanguage({ langParam, acceptLanguage }:
     qualityValues.sort((a, b) => b.q - a.q);
     for (const { value } of qualityValues) {
         const lang = value.split('-').at(0) ?? value;
+        if (lang === 'up') return lang; // for testing
         if (supportedLanguages.includes(lang)) return lang;
     }
     return undefined;

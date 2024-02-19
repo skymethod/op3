@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="${lang}">
 
 <head>
-    <title>Download Calculation · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <title>${s:download_calculation:'Download Calculation'} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/download-calculation" />
@@ -12,38 +12,38 @@
 <body class="flex flex-col bg-neutral-900 text-neutral-300">
     ${nonProdHeader}
     <h1 class="max-w-xl mx-auto text-3xl font-semibold mt-16 mb-8">
-        Download Calculation
+        ${s:download_calculation:''}
     </h1>
     <div class="basic max-w-2xl mx-auto px-8">
-        <p>"Downloads" are currently the industry-standard way of measuring a podcast's audience, they are visible evidence on the server-side (hosting companies and analytics prefixes) without the need for any coordination or special APIs from every podcast player app.</p>
-        <p>Of course, many podcast apps auto-download episodes, so a Download does not necessarily equal a Listen. <a href="https://podnews.net/article/understanding-podcast-statistics">Learn more about podcast stats.</a></p>
-        <p>Over time, podcast hosting companies and advertising standards entities such as the <a href="https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau">IAB</a> have developed <a href="https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf">best practices</a> about turning raw server logs into unique listener requests.</p>
-        <p>As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-auditable-infrastructure">commitment to auditable infrastructure</a>, our download calculation is described below, with links to any relevant codepaths.</p>
+        <p>${s:paragraph_1:'"Downloads" are currently the industry-standard way of measuring a podcast's audience, they are visible evidence on the server-side (hosting companies and analytics prefixes) without the need for any coordination or special APIs from every podcast player app.'}</p>
+        <p>${s:paragraph_2:'Of course, many podcast apps auto-download episodes, so a Download does not necessarily equal a Listen. <a href="https://podnews.net/article/understanding-podcast-statistics">Learn more about podcast stats.</a>'}</p>
+        <p>${s:paragraph_3:'Over time, podcast hosting companies and advertising standards entities such as the <a href="https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau">IAB</a> have developed <a href="https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf">best practices</a> about turning raw server logs into unique listener requests.'}</p>
+        <p>${s:paragraph_4:'As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-auditable-infrastructure">commitment to auditable infrastructure</a>, our download calculation is described below, with links to any relevant codepaths.'}</p>
 
-        <h2 id="how">How does OP3 calculate Downloads?</h2>
-        <p>OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href="/setup">add our prefix</a> to podcast episodes in their feed.</p>
-        <p>All incoming requests are quickly redirected to their destination with a <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16">302</a> and logged, but not all requests become Downloads:
+        <h2 id="how">${s:how_heading:'How does OP3 calculate Downloads?'}</h2>
+        <p>${s:how_paragraph_1:'OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href="/setup">add our prefix</a> to podcast episodes in their feed.'}</p>
+        <p>${s:how_paragraph_2:'All incoming requests are quickly redirected to their destination with a <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16">302</a> and logged, but not all requests become Downloads:'}
             <ul>
-                <li>First, we ignore all <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46">non-GET</a> requests.</li>
-                <li>We ignore all range requests that don't ask for <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49">more than two bytes</a>, <em>except</em> <b>bytes=0-1</b> requests <em>(see <a href="https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes">A Tale of Two Bytes</a> for rationale)</em>.</li>
-                <li><a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63">Duplicate</a> <a href="https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163">requests</a> in the same UTC day (24 hours) based on the secure IP address hash + User-Agent + Referer for the same normalized episode url are ignored.</li>
-                <li>Using the User-Agent header and <a href="https://github.com/opawg/user-agents-v2">user-agents-v2</a>, we ignore:
+                <li>${s:list_item_1:'First, we ignore all <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46">non-GET</a> requests.'}</li>
+                <li>${s:list_item_2:'We ignore all range requests that don't ask for <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49">more than two bytes</a>, <em>except</em> <b>bytes=0-1</b> requests <em>(see <a href="https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes">A Tale of Two Bytes</a> for rationale)</em>.'}</li>
+                <li>${s:list_item_3:'<a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63">Duplicate</a> <a href="https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163">requests</a> in the same UTC day (24 hours) based on the secure IP address hash + User-Agent + Referer for the same normalized episode url are ignored.'}</li>
+                <li>${s:list_item_4:'Using the User-Agent header and <a href="https://github.com/opawg/user-agents-v2">user-agents-v2</a>, we ignore:'}
                     <ul>
-                        <li>Requests with <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7">no User-Agent header</a></li>
-                        <li>A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4">'bot'</a></li>
-                        <li>A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5">'library' with a category of 'bot'</a></li>
-                        <li>An <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6">unknown user agent including the text 'bot', 'crawler', or 'spider'</a></li>
-                        <li>One other <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9">uncommon case</a> found in the wild (using OP3 data)</li>
+                        <li>${s:ignore_list_item_1:'Requests with <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7">no User-Agent header</a>'}</li>
+                        <li>${s:ignore_list_item_2:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4">'bot'</a>'}</li>
+                        <li>${s:ignore_list_item_3:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5">'library' with a category of 'bot'</a>'}</li>
+                        <li>${s:ignore_list_item_4:'An <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6">unknown user agent including the text 'bot', 'crawler', or 'spider'</a>'}</li>
+                        <li>${s:ignore_list_item_5:'One other <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9">uncommon case</a> found in the wild (using OP3 data)'}</li>
                     </ul>
                 </li>
             </ul>
-            <p>Downloads are associated to a podcast by matching the normalized url (removing tracking prefixes and client-added params) to an enclosure or alternate enclosure found in a public podcast feed.</p>
+            <p>${s:how_paragraph_3:'Downloads are associated to a podcast by matching the normalized url (removing tracking prefixes and client-added params) to an enclosure or alternate enclosure found in a public podcast feed.'}</p>
         </p>
 
     </div>
    
     <div class="max-w-xl mx-auto my-16">
-        <a href="/">Home</a>
+        <a href="/">${s:home_link_label:'Home'}</a>
     </div>
     ${cfAnalyticsSnippet}
 </body>
