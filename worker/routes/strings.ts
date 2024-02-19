@@ -1,4 +1,3 @@
-
 export function replacePlaceholders(str: string, nameValuePairs: string | number | [string, string | number][]): string {
     const nvps = Array.isArray(nameValuePairs) ? nameValuePairs : [ [ 'arg', nameValuePairs ] ];
     let i = 0;
@@ -82,6 +81,38 @@ export function replaceWithTranslation(stringName: string, stringValue: string, 
 export function pluralize(n: number, strings: Record<string, string>, singleKey: string, pluralKey: string, format?: Intl.NumberFormat): string {
     return replacePlaceholders(strings[n === 1 ? singleKey : pluralKey], (format ?? withCommas).format(n));
 }
+
+export function computePreferredSupportedLanguage({ langParam, acceptLanguage }: { langParam?: string, acceptLanguage?: string }): string | undefined {
+    // *
+    // de-DE
+    // fr
+    // fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+    type QualityValue = { value: string, q: number };
+    const qualityValues: QualityValue[] = [];
+    if (langParam) qualityValues.push({ value: langParam, q: 2 });
+    if (acceptLanguage) {
+        qualityValues.push(...acceptLanguage.split(',').map(v => v.toLowerCase().trim()).filter(v => v.length > 0).map(v => { 
+            const m = /^([a-zA-Z0-9-_]+)(;q=([0-9.]+))?$/.exec(v);
+            if (!m) return undefined;
+            const [ _, value, _2, qStr ] = m;
+            return { value, q: qStr === undefined ? 1 : parseFloat(qStr) };
+        }).filter(v => v !== undefined) as QualityValue[]);
+    }
+    if (qualityValues.length === 0) return undefined;
+    qualityValues.sort((a, b) => b.q - a.q);
+    for (const { value } of qualityValues) {
+        const lang = value.split('-').at(0) ?? value;
+        if (supportedLanguages.includes(lang)) return lang;
+    }
+    return undefined;
+}
+
+export const supportedLanguageLabels: Record<string, string> = {
+    en: 'English (US)',
+    fr: 'Français',
+};
+
+export const supportedLanguages = Object.keys(supportedLanguageLabels);
 
 //
 

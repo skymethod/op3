@@ -8365,6 +8365,11 @@ function replacePlaceholders(str, nameValuePairs) {
 function pluralize(n, strings1, singleKey, pluralKey, format) {
     return replacePlaceholders(strings1[n === 1 ? singleKey : pluralKey], (format ?? withCommas).format(n));
 }
+const supportedLanguageLabels = {
+    en: 'English (US)',
+    fr: 'Français'
+};
+Object.keys(supportedLanguageLabels);
 const withCommas = new Intl.NumberFormat('en-US');
 function checkMatches(name1, value, pattern) {
     const m = pattern.exec(value);

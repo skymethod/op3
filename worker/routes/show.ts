@@ -11,21 +11,21 @@ import { compute404Response } from './404.ts';
 import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
-import { TranslatedStrings } from './strings.ts';
+import { TranslatedStrings, supportedLanguageLabels, computePreferredSupportedLanguage } from './strings.ts';
 
 const showHtm = await importText(import.meta.url, '../static/show.htm');
 const showJs = await importText(import.meta.url, '../static/show.js');
 const showPageTranslationsJson = await importText(import.meta.url, '../strings/show_page.translations.json');
 let showPageTranslations: TranslatedStrings | undefined;
 
-export type ShowRequest = { id: string, type: 'show-uuid' | 'podcast-guid' };
+export type ShowRequest = { id: string, type: 'show-uuid' | 'podcast-guid', acceptLanguage: string | undefined };
 
-export function tryParseShowRequest({ method, pathname }: { method: string, pathname: string }): ShowRequest | undefined {
+export function tryParseShowRequest({ method, pathname, acceptLanguage }: { method: string, pathname: string, acceptLanguage: string | undefined }): ShowRequest | undefined {
     const m = /^\/show\/([0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(pathname);
     if (!m) return undefined;
     const id = m[1].toLowerCase();
     const type = id.includes('-') ? 'podcast-guid' : 'show-uuid';
-    return method === 'GET' && m ? { id, type } : undefined;
+    return method === 'GET' && m ? { id, type, acceptLanguage } : undefined;
 }
 
 type Opts = {
@@ -48,7 +48,7 @@ type Opts = {
 
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
     const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
-    const { id, type } = req;
+    const { id, type, acceptLanguage } = req;
 
     const times: Record<string, number> = {};
 
@@ -92,7 +92,8 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     const showTitle = title ?? '(untitled)';
 
     if (!showPageTranslations) showPageTranslations = JSON.parse(showPageTranslationsJson) as TranslatedStrings;
-    const lang = searchParams.get('lang') ?? undefined;
+    const lang = computePreferredSupportedLanguage({ langParam: searchParams.get('lang') ?? undefined, acceptLanguage });
+    const contentLanguage = lang ?? 'en';
 
     const initialData = JSON.stringify({ showObj, statsObj, times, showPageTranslations, lang });
     const showTitleWithSuffix = `${showTitle} · OP3${instance === 'prod' ? '' : ` (${instance})`}: The Open Podcast Prefix Project`;
@@ -111,12 +112,12 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         showJs,
         previewToken: [...previewTokens].at(0) ?? '',
         lang: lang ?? '',
-        langLabelCurrent: langs[lang ?? 'en'],
-        langLabelEn: langs['en'],
-        langLabelFr: langs['fr'],
+        langLabelCurrent: supportedLanguageLabels[lang ?? 'en'],
+        langLabelEn: supportedLanguageLabels['en'],
+        langLabelFr: supportedLanguageLabels['fr'],
     }, showPageTranslations, lang);
 
-    return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });
+    return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'content-language': contentLanguage } });
 }
 
 type LoadDataOpts = {
@@ -192,11 +193,6 @@ export function computeDemoShowResponse({ origin }: { origin: string }): Respons
 }
 
 //
-
-const langs: Record<string, string> = {
-    en: 'English (US)',
-    fr: 'Français',
-};
 
 async function headOgImage({ showUuid, searchParams, assetBlobs, roAssetBlobs }: { showUuid: string, searchParams: URLSearchParams, assetBlobs: Blobs | undefined, roAssetBlobs: Blobs | undefined }): Promise<{ etag: string } | undefined> {
     const targetAssetBlobs = searchParams.has('ro') ? roAssetBlobs : assetBlobs;

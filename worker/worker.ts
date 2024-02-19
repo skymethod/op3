@@ -229,6 +229,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     const { origin, hostname, pathname, searchParams, protocol } = new URL(request.url);
     const { method, headers } = request;
     const acceptsHtml = /html/i.test(headers.get('accept') ?? '');
+    const acceptLanguage = headers.get('accept-language') ?? undefined;
     const adminTokens = parseStringSet(env.adminTokens);
     const previewTokens = parseStringSet(env.previewTokens);
     const productionOrigin = productionDomain ? `https://${productionDomain}` : origin;
@@ -269,7 +270,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
 
     const roRpcClient = roRpcClientParams ? ReadonlyRemoteDataRpcClient.ofParams(roRpcClientParams) : undefined;
     const { blobs: assetBlobs, roBlobs: roAssetBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'assets/' });
-    { const r = tryParseShowRequest({ method, pathname }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
+    { const r = tryParseShowRequest({ method, pathname, acceptLanguage }); if (r && configuration) return computeShowResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
     { const r = tryParseShowOgImageRequest({ method, pathname }); if (r && configuration) return computeShowOgImageResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
     const { blobs: miscBlobs, roBlobs: roMiscBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'misc/' });
     const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs });
