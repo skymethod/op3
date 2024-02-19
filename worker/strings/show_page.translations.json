@@ -3,7 +3,7 @@
     "fr": "Exporter les données en détail"
   },
   "daily_downloads": {
-    "fr": "Téléchargements quotidiens"
+    "fr": "Téléchargements par jour"
   },
   "twelve_hourly_downloads": {
     "fr": "Téléchargements en 12 heures"
@@ -78,13 +78,13 @@
     "fr": "téléchargements"
   },
   "monthly_downloads_info": {
-    "fr": "Téléchargements pour ce podcast au cours d'un mois donné."
+    "fr": "Téléchargements pour ce podcast au cours du mois indiqué."
   },
   "unique_audience": {
     "fr": "auditeurices uniques"
   },
   "audience_info": {
-    "fr": "Auditeurs uniques (filtre par IP) pour ce podcast au cours d'un mois donné."
+    "fr": "Auditeurices uniques (filtre par IP) pour ce podcast au cours du mois indiqué."
   },
   "audience_definition_info": {
     "fr": "OP3 change le chiffrement IP des auditeurices tous les mois pour des raisons de confidentialité."
