@@ -1,0 +1,134 @@
+{
+  "setup_page_title": {
+    "string": "Setup"
+  },
+  "search_prompt_message": {
+    "string": "Find your podcast, we'll check your setup"
+  },
+  "search_finding_message": {
+    "string": "Finding podcasts..."
+  },
+  "search_failed_message": {
+    "string": "Search failed"
+  },
+  "analyze_started_message": {
+    "string": "Analyzing podcast..."
+  },
+  "analyze_finished_message": {
+    "string": "Finished analyzing podcast"
+  },
+  "analyze_failed_message": {
+    "string": "Podcast analysis failed"
+  },
+  "analyze_failed_default_error_message": {
+    "string": "Failed"
+  },
+  "feed_summary_analyzing": {
+    "string": "Analyzing..."
+  },
+  "zero_episodes": {
+    "string": "No episodes"
+  },
+  "one_episode": {
+    "string": "One episode"
+  },
+  "multiple_episodes": {
+    "string": "%d episodes"
+  },
+  "less_than_24_hrs_ago": {
+    "string": "less than 24 hrs ago"
+  },
+  "latest_as_prefix_to_relative_time": {
+    "string": "latest"
+  },
+  "found_zero_podcasts": {
+    "string": "Found no podcasts"
+  },
+  "found_one_podcast": {
+    "string": "Found one episode"
+  },
+  "found_multiple_podcasts": {
+    "string": "Found %d podcasts"
+  },
+  "heading": {
+    "string": "Check your OP3 setup"
+  },
+  "search_placeholder": {
+    "string": "Podcast name or rss feed url"
+  },
+  "rss_feed_suffix": {
+    "string": "rss feed"
+  },
+  "prefix_not_found_warning": {
+    "string": "OP3 prefix not found"
+  },
+  "prefix_found_on_all_episodes": {
+    "string": "OP3 prefix found on all episodes"
+  },
+  "prefix_found_on_some_episodes": {
+    "string": "OP3 prefix found on <span id=\"fp-found-episodes-span\">n episodes</span>"
+  },
+  "prefix_found_on_some_episodes_prompt": {
+    "string": "Did you want to add it to every episode?"
+  },
+  "podcast_guid": {
+    "string": "Podcast Guid"
+  },
+  "stats_page_line_1": {
+    "string": "Want to see this podcast's show stats page?"
+  },
+  "stats_page_line_2": {
+    "string": "Once OP3 has observed a few days of downloads, it will be available <a id=\"show-page-link\" href=\"#\">here</a>"
+  },
+  "instructions_heading": {
+    "string": "Instructions"
+  },
+  "instructions_box_line_1": {
+    "string": "OP3 works like any other podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend"
+  },
+  "instructions_box_line_2": {
+    "string": "to podcast episode urls in their feed to participate and start measuring downloads."
+  },
+  "instructions_box_line_3": {
+    "string": "(No need to remove existing prefixes, there can be more than one)"
+  },
+  "instructions_box_line_4": {
+    "string": "Some podcast hosting companies (like <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, and some (like <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> and <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) make it as easy as checking a box!"
+  },
+  "instructions_box_line_5": {
+    "string": "If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support."
+  },
+  "examples_heading": {
+    "string": "Examples"
+  },
+  "typical_prefix_summary": {
+    "string": "Typical prefix"
+  },
+  "examples_from": {
+    "string": "From"
+  },
+  "examples_to": {
+    "string": "To"
+  },
+  "target_http_enclosure_summary": {
+    "string": "Target HTTP enclosure"
+  },
+  "target_http_enclosure_instructions": {
+    "string": "Including the full protocol after the prefix is only necessary when the target is <code>http</code>."
+  },
+  "optional_prefix_arguments_summary": {
+    "string": "Optional prefix arguments"
+  },
+  "optional_prefix_arguments_line_1": {
+    "string": "Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>."
+  },
+  "optional_prefix_arguments_line_2": {
+    "string": "OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">Podcast GUID</a>."
+  },
+  "optional_prefix_arguments_line_3": {
+    "string": "While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above."
+  },
+  "home_link_label": {
+    "string": "Home"
+  }
+}

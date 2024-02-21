@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="sl-theme-dark">
+<html class="sl-theme-dark" lang="${contentLanguage}">
 
 <head>
-    <title>Setup · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
+    <title>${s:setup_page_title:'Setup'} · OP3${titleSuffix}: The Open Podcast Prefix Project</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/setup" />
@@ -12,6 +12,25 @@
     <script type="module">
 const previewToken = '${previewToken}';
 let sessionToken = '${sessionToken}';
+const lang = '${contentLanguage}';
+const strings = {
+    search_prompt_message: "${s:search_prompt_message:'Find your podcast, we'll check your setup'}",
+    search_finding_message: "${s:search_finding_message:'Finding podcasts...'}",
+    search_failed_message: "${s:search_failed_message:'Search failed'}",
+    analyze_started_message: "${s:analyze_started_message:'Analyzing podcast...'}",
+    analyze_finished_message: "${s:analyze_finished_message:'Finished analyzing podcast'}",
+    analyze_failed_message: "${s:analyze_failed_message:'Podcast analysis failed'}",
+    analyze_failed_default_error_message: "${s:analyze_failed_default_error_message:'Failed'}",
+    feed_summary_analyzing: "${s:feed_summary_analyzing:'Analyzing...'}",
+    zero_episodes: "${s:zero_episodes:'No episodes'}",
+    one_episode: "${s:one_episode:'One episode'}",
+    multiple_episodes: "${s:multiple_episodes:'%d episodes'}",
+    less_than_24_hrs_ago: "${s:less_than_24_hrs_ago:'less than 24 hrs ago'}",
+    latest_as_prefix_to_relative_time: "${s:latest_as_prefix_to_relative_time:'latest'}",
+    found_zero_podcasts: "${s:found_zero_podcasts:'Found no podcasts'}",
+    found_one_podcast: "${s:found_one_podcast:'Found one episode'}",
+    found_multiple_podcasts: "${s:found_multiple_podcasts:'Found %d podcasts'}",
+};
 /*${setupJs}*/
     </script>
 </head>
@@ -19,16 +38,16 @@ let sessionToken = '${sessionToken}';
 <body class="bg-neutral-900 text-neutral-300 flex flex-col">
     ${nonProdHeader}
 
-    <h4 id="setup" class="mt-16 mx-auto text-3xl font-semibold">Check your OP3 setup</h4>
+    <h4 id="setup" class="mt-16 mx-auto text-3xl font-semibold">${s:heading:'Check your OP3 setup'}</h4>
 
     <form id="form" class="wait mx-auto w-[22rem] md:w-[32rem] mt-8" onsubmit="return false;">
-        <sl-input id="search-input" class="" placeholder="Podcast name or rss feed url" type="text" size="medium" clearable autofocus enterkeyhint="search" spellcheck="false" autocorrect="off">
+        <sl-input id="search-input" class="" placeholder="${s:search_placeholder:'Podcast name or rss feed url'}" type="text" size="medium" clearable autofocus enterkeyhint="search" spellcheck="false" autocorrect="off">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
-        <div class="flex ml-4 mt-4 items-center"><sl-spinner id="status-spinner" class="invisible"></sl-spinner><span id="status-message" class="truncate w-[20rem] md:w-[30rem] ml-4 opacity-50 text-sm">Find your podcast</span></div>
+        <div class="flex ml-4 mt-4 items-center"><sl-spinner id="status-spinner" class="invisible"></sl-spinner><span id="status-message" class="truncate w-[20rem] md:w-[30rem] ml-4 opacity-50 text-sm"></span></div>
         <div id="search-results-container">
             <template id="search-result-template">
-                <sl-button class="mt-4 w-[22rem] md:w-[32rem]" variant="default" size="large" outline>
+                <sl-button class="mt-4 w-[22rem] md:w-[32rem]" variant="default" size="large" outline lang="">
                     <div class="flex items-center">
                         <img class="bg-neutral-800 row-artwork"><figure class="bg-neutral-800 row-artwork"><sl-icon name="headphones"></sl-icon></figure><span class="ml-4 w-[18rem] md:w-[28rem] truncate text-left"></span>
                     </div>
@@ -46,67 +65,66 @@ let sessionToken = '${sessionToken}';
                     <img id="fp-img" class="mr-4 bg-neutral-900 panel-artwork" src="#">
                     <figure id="fp-img-placeholder" class="mr-4 bg-neutral-900 panel-artwork flex items-center justify-center text-xl opacity-50"><sl-icon name="headphones"></sl-icon></figure>
                     <div>
-                        <div id="fp-title-div" class="opacity-75">Show name</div>
-                        <div id="fp-author-div" class="opacity-50">Author</div>
-                        <a id="fp-feed-anchor" href="#" target="_blank"><span id="fp-feed-host-span">example.com</span> rss feed →</a>
+                        <div id="fp-title-div" class="opacity-75" lang="">Show name</div>
+                        <div id="fp-author-div" class="opacity-50" lang="">Author</div>
+                        <a id="fp-feed-anchor" href="#" target="_blank"><span id="fp-feed-host-span">example.com</span> ${s:rss_feed_suffix:'rss feed'} →</a>
                     </div>
                 </div>
-                <div id="fp-summary-div" class="mt-4 opacity-50">n episodes, latest 3 minutes ago</div>
-                <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">OP3 prefix not found</span></div>
-                <div id="fp-found-all-div" class="flex items-center text-green-600 md:text-lg mt-4"><sl-icon name="check-square"></sl-icon><span class="ml-2">OP3 prefix found on all episodes</span></div>
-                <div id="fp-found-some-div" class="flex items-center text-neutral-300 md:text-lg mt-4"><sl-icon name="info-square"></sl-icon><span class="ml-2">OP3 prefix found on <span id="fp-found-episodes-span">n episodes</span></div>
+                <div id="fp-summary-div" class="mt-4 opacity-50"></div>
+                <div id="fp-found-none-div" class="flex items-center text-orange-600 md:text-lg mt-4"><sl-icon name="exclamation-octagon"></sl-icon><span class="ml-2">${s:prefix_not_found_warning:'OP3 prefix not found'}</span></div>
+                <div id="fp-found-all-div" class="flex items-center text-green-600 md:text-lg mt-4"><sl-icon name="check-square"></sl-icon><span class="ml-2">${s:prefix_found_on_all_episodes:'OP3 prefix found on all episodes'}</span></div>
+                <div id="fp-found-some-div" class="flex items-center text-neutral-300 md:text-lg mt-4"><sl-icon name="info-square"></sl-icon><span class="ml-2">${s:prefix_found_on_some_episodes:'OP3 prefix found on <span id="fp-found-episodes-span">n episodes</span>'}</div>
                 <ul id="fp-suggestions-list" class="list-disc list-inside mt-4 opacity-50">
-                    <li>Did you want to add it to every episode?</li>
+                    <li>${s:prefix_found_on_some_episodes_prompt:'Did you want to add it to every episode?'}</li>
                 </ul>
             </div>
-            <div class="px-4 py-2 opacity-50">Podcast Guid: <span id="fp-podcast-guid">unknown</span></div>
+            <div class="px-4 py-2 opacity-50">${s:podcast_guid:'Podcast Guid'}: <span id="fp-podcast-guid">unknown</span></div>
         </div>
     </form>
 
     <sl-alert id="show-page-preview" variant="primary" open class="mt-8 mx-auto max-w-2xl px-4 hidden">
         <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Want to see this podcast's show stats page?</strong><br />
-        Once OP3 has observed a few days of downloads, it will be available <a id="show-page-link" href="#">here</a>.
+        <strong>${s:stats_page_line_1:'Want to see this podcast's show stats page?'}</strong><br />
+        ${s:stats_page_line_2:'Once OP3 has observed a few days of downloads, it will be available <a id="show-page-link" href="#">here</a>'}.
     </sl-alert>
 
-    <h4 id="instructions" class="mt-16 mx-auto text-3xl font-semibold">Instructions</h4>
+    <h4 id="instructions" class="mt-16 mx-auto text-3xl font-semibold">${s:instructions_heading:'Instructions'}</h4>
 
     <div class="mt-8 mx-auto max-w-2xl px-4">
-        <p>OP3 works like any other podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend</p>
+        <p>${s:instructions_box_line_1:'OP3 works like any other podcast <a href="https://soundsprofitable.com/update/prefix-analytics">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend'}</p>
         <div class="font-mono p-4 inline-block font-bold text-center w-full">${origin}/e/</div>
-        <p>to podcast episode urls in their feed to participate and start measuring downloads.<br>
-        (No need to remove existing prefixes, there can be more than one)<br><br>
-        Some podcast hosting companies (like <a href="http://support.megaphone.fm/en/articles/2845162-custom-prefixes">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, 
-        and some (like <a href="https://transistor.fm/changelog/open-prefix/">Transistor</a> and <a href="https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/">Castopod</a>) make it as easy as checking a box!<br><br>
-        If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.</p>
+        <p>${s:instructions_box_line_2:'to podcast episode urls in their feed to participate and start measuring downloads.'}<br>
+        ${s:instructions_box_line_3:'(No need to remove existing prefixes, there can be more than one)'}<br><br>
+        ${s:instructions_box_line_4:'Some podcast hosting companies (like <a href="http://support.megaphone.fm/en/articles/2845162-custom-prefixes">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, and some (like <a href="https://transistor.fm/changelog/open-prefix/">Transistor</a> and <a href="https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/">Castopod</a>) make it as easy as checking a box!'}<br><br>
+        ${s:instructions_box_line_5:'If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.'}</p>
     </div>
 
-    <h4 id="examples" class="mt-16 mx-auto text-3xl font-semibold">Examples</h4>
+    <h4 id="examples" class="mt-16 mx-auto text-3xl font-semibold">${s:examples_heading:'Examples'}</h4>
 
     <div id="details-container" class="wait mt-8 mx-auto w-[22rem] md:w-[40rem] text-sm">
-        <sl-details class="w-full" summary="Typical prefix" open>
+        <sl-details class="w-full" summary="${s:typical_prefix_summary:'Typical prefix'}" open>
             <div class="grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_from:'From'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_to:'To'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
       
-        <sl-details class="w-full" summary="Target HTTP enclosure">
-            Including the full protocol after the prefix is only necessary when the target is <code>http</code>.
+        <sl-details class="w-full" summary="${s:target_http_enclosure_summary:'Target HTTP enclosure'}">
+            ${s:target_http_enclosure_instructions:'Including the full protocol after the prefix is only necessary when the target is <code>http</code>.'}
             <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">http</span>://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/http://</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_from:'From'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">http</span>://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_to:'To'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e/http://</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
       
-        <sl-details class="w-full" summary="Optional prefix arguments">
-            Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>.<br><br>
+        <sl-details class="w-full" summary="${s:optional_prefix_arguments_summary:'Optional prefix arguments'}">
+            ${s:optional_prefix_arguments_line_1:'Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>.'}<br><br>
 
-            OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid">Podcast GUID</a>.
-            While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above.
+            ${s:optional_prefix_arguments_line_2:'OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid">Podcast GUID</a>.'}
+            ${s:optional_prefix_arguments_line_3:'While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above.'}
             <div class="mt-8 grid grid-cols-[min-content_1fr] gap-4">
-                <div>From</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
-                <div>To</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e,pg=<span id="example-guid">00000000-0000-0000-0000-000000000000</span>/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_from:'From'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="https://cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
+                <div>${s:examples_to:'To'}</div><code class="text-neutral-500 break-all">&lt;enclosure url="<span class="text-orange-800">${origin}/e,pg=<span id="example-guid">00000000-0000-0000-0000-000000000000</span>/</span>cdn.example.com/uploads/podcast/episode-54.mp3" length="692947" type="audio/mpeg" /&gt;</code>
             </div>
         </sl-details>
     </div>
@@ -117,7 +135,7 @@ let sessionToken = '${sessionToken}';
         });
     </script>
     <div class="max-w-xl mx-auto my-16">
-        <a href="/">Home</a>
+        <a href="/">${s:home_link_label:'Home'}</a>
     </div>
     ${cfAnalyticsSnippet}
 </body>

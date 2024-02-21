@@ -1,5 +1,5 @@
 import { assertEquals } from '../tests/deps.ts';
-import { computePreferredSupportedLanguage } from './strings.ts';
+import { computePreferredSupportedLanguage, toUppercaseExceptMarkup } from './strings.ts';
 
 Deno.test({
     name: 'computePreferredSupportedLanguage',
@@ -26,5 +26,20 @@ Deno.test({
 
         assertEquals(computePreferredSupportedLanguage({ langParam: 'en', acceptLanguage: 'fr-FR' }), 'en');
         assertEquals(computePreferredSupportedLanguage({ langParam: 'de', acceptLanguage: 'fr-FR' }), 'fr');
+    }
+});
+
+Deno.test({
+    name: 'toUppercaseExceptMarkup',
+    fn: () => {
+        const inputToExpected = {
+            '': '',
+            ' ': ' ',
+            '<a>foo</a>': '<a>FOO</a>',
+            'foo': 'FOO',
+        }
+        for (const [ input, expected ] of Object.entries(inputToExpected)) {
+            assertEquals(toUppercaseExceptMarkup(input), expected);
+        }
     }
 });

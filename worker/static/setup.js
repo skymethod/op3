@@ -16,9 +16,9 @@ function computeFeedHost(url) {
 }
 
 function computeRelativeTime(from) {
-    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
+    const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'always' });
     const ageMillis = Date.now() - from;
-    if (ageMillis < 1000 * 60 * 60 * 24) return 'less than 24 hrs ago';
+    if (ageMillis < 1000 * 60 * 60 * 24) return strings.less_than_24_hrs_ago;
     const ageDays = ageMillis / 1000 / 60 / 60 / 24;
     if (ageDays < 31) {
         return rtf.format(-Math.round(ageDays), 'day');
@@ -30,19 +30,19 @@ function computeRelativeTime(from) {
 
 }
 
-function computeQuantityText(quantity, unit) {
-    const qty = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][Math.max(0, quantity)] ?? quantity.toString();
-    return `${qty} ${unit}${quantity === 1 ? '' : 's'}`;
+function computeQuantityText(quantity, zero, one, multiple) {
+    return quantity === 0 ? strings[zero]
+        : quantity === 1 ? strings[one]
+        : strings[multiple].replace(/%d/gi, quantity.toString());
 }
 
 function computeFeedSummary(analysis) {
     // n episodes, latest 3 minutes ago
     const { itemsWithEnclosures, maxPubdate } = analysis;
-    let rt = computeQuantityText(itemsWithEnclosures, 'episode');
-    rt = rt.substring(0, 1).toUpperCase() + rt.substring(1);
+    let rt = computeQuantityText(itemsWithEnclosures, 'zero_episodes', 'one_episode', 'multiple_episodes');
     if (typeof maxPubdate === 'string') {
         const suffix = computeRelativeTime(new Date(maxPubdate).getTime());
-        rt += `, ${itemsWithEnclosures > 1 ? 'latest ' : ''}${suffix}`;
+        rt += `, ${itemsWithEnclosures > 1 ? `${strings.latest_as_prefix_to_relative_time} ` : ''}${suffix}`;
     }
     return rt;
 }
@@ -65,7 +65,7 @@ scheduleUpdateSessionToken();
 
 const app = (() => {
 
-    let status = { message: `Find your podcast, we'll check your setup`};
+    let status = { message: strings.search_prompt_message};
     let searchTimeout = 0;
     let searchResults = [];
     let searchResultsPageIndex = 0;
@@ -131,7 +131,7 @@ const app = (() => {
             }
             console.log('search: ' + q);
             await makeApiCall({ 
-                beforeMessage: 'Finding podcasts...',
+                beforeMessage: strings.search_finding_message,
                 pathname: '/api/1/feeds/search',
                 body: { q, sessionToken },
                 callback: obj => {
@@ -143,8 +143,8 @@ const app = (() => {
                     feedAnalysis = undefined;
                     feedAnalysisError = undefined;
                 },
-                afterMessage: obj => `Found ${computeQuantityText(obj.feeds.length, 'podcast')}`,
-                errorMessage: 'Search failed',
+                afterMessage: obj => computeQuantityText(obj.feeds.length, 'found_zero_podcasts', 'found_one_podcast', 'found_multiple_podcasts'),
+                errorMessage: strings.search_failed_message,
                 errorCallback: () => {
                     reset();
                 }
@@ -161,7 +161,7 @@ const app = (() => {
    
     async function analyzeFeed() {
         await makeApiCall({ 
-            beforeMessage: 'Analyzing podcast...',
+            beforeMessage: strings.analyze_started_message,
             pathname: '/api/1/feeds/analyze',
             body: { feed: feed.url, id: feed.id, sessionToken },
             callback: obj => {
@@ -170,10 +170,10 @@ const app = (() => {
                 feedAnalysis = obj;
                 updateApp();
             },
-            afterMessage: `Finished analyzing podcast`,
-            errorMessage: 'Podcast analysis failed',
+            afterMessage: strings.analyze_finished_message,
+            errorMessage: strings.analyze_failed_message,
             errorCallback: obj => {
-                feedAnalysisError = obj.error ?? 'Failed';
+                feedAnalysisError = obj.error ?? strings.analyze_failed_default_error_message;
             }
         });
     }
@@ -246,7 +246,7 @@ const app = (() => {
             fpAuthorDiv.textContent = (feed && feed.author) ?? '';
             fpFeedAnchor.href = (feed && feed.url) ?? '#';
             fpFeedHostSpan.textContent = computeFeedHost(feed && feed.url);
-            fpSummaryDiv.textContent = feedAnalysisError ? feedAnalysisError : !feed ? '' : !feedAnalysis ? 'Analyzing...' : computeFeedSummary(feedAnalysis);
+            fpSummaryDiv.textContent = feedAnalysisError ? feedAnalysisError : !feed ? '' : !feedAnalysis ? strings.feed_summary_analyzing : computeFeedSummary(feedAnalysis);
             fpFoundNoneDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures === 0 ? 'flex' : 'none';
             fpFoundAllDiv.style.display = feed && feedAnalysis && feedAnalysis.itemsWithEnclosures > 0 && feedAnalysis.itemsWithOp3Enclosures === feedAnalysis.itemsWithEnclosures ? 'flex' : 'none';
             const hasSome = feed && feedAnalysis && feedAnalysis.itemsWithOp3Enclosures > 0 && feedAnalysis.itemsWithOp3Enclosures !== feedAnalysis.itemsWithEnclosures;
@@ -258,7 +258,7 @@ const app = (() => {
             } else {
                 fpFoundNoneDiv.style.visibility = 'visible';
             }
-            fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeQuantityText(feedAnalysis.itemsWithOp3Enclosures, 'episode')) ?? '';
+            fpFoundEpisodesSpan.textContent = (feed && feedAnalysis && computeQuantityText(feedAnalysis.itemsWithOp3Enclosures, 'zero_episodes', 'one_episode', 'multiple_episodes')) ?? '';
             fpSuggestionsList.style.display = hasSome ? 'block' : 'none';
             exampleGuidSpan.textContent = feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : '00000000-0000-0000-0000-000000000000';
             fpPodcastGuidSpan.textContent = feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : 'unknown';

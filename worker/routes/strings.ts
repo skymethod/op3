@@ -72,10 +72,24 @@ export type TranslatedStrings = Record<string /* stringName/key */, Record<strin
 
 export function replaceWithTranslation(stringName: string, stringValue: string, translatedStrings: TranslatedStrings | undefined, lang: string | undefined) {
     if (lang === undefined) return stringValue;
-    if (lang === 'up') return stringValue.toUpperCase();
+    if (lang === 'up') return toUppercaseExceptMarkup(stringValue);
     if (translatedStrings === undefined) return stringValue;
     const translations = translatedStrings[stringName]; if (translations === undefined) return stringValue;
     return translations[lang] ?? stringValue;
+}
+
+export function toUppercaseExceptMarkup(input: string): string {
+    const rt: string[] = [];
+    const regex = /<[^>]+?>/g;
+    let m;
+    let i = 0;
+    while ((m = regex.exec(input)) !== null) {
+        rt.push(input.substring(i, m.index).toUpperCase());
+        rt.push(m[0]);
+        i = regex.lastIndex;
+    }
+    rt.push(input.substring(i).toUpperCase());
+    return rt.join('');
 }
 
 export function pluralize(n: number, strings: Record<string, string>, singleKey: string, pluralKey: string, format?: Intl.NumberFormat): string {
