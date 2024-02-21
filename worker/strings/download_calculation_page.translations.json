@@ -1,3 +1,59 @@
 {
-  
+  "download_calculation": {
+    "fr": "Calcul des téléchargements"
+  },
+  "paragraph_1": {
+    "fr": "Les \"téléchargements\" sont actuellement la méthode standard de l'industrie pour mesurer l'audience d'un podcast. Ces accès aux fichiers sont visibles côté serveur (hébergeur via un préfixe d'URL) sans nécessiter d'API spéciale de la part de chaque application de lecteur de podcasts."
+  },
+  "paragraph_2": {
+    "fr": "Bien sûr, de nombreuses applications de podcast téléchargent automatiquement les épisodes, donc un téléchargement ne correspond pas nécessairement à une écoute. <a href=\"https://podnews.net/article/understanding-podcast-statistics\">En savoir plus sur les statistiques de podcast.</a>"
+  },
+  "paragraph_3": {
+    "fr": "Au fil du temps, les sociétés d'hébergement de podcasts et les organismes de normalisation de la publicité tels que l'<a href=\"https://fr.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> ont développé des <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">meilleures pratiques</a> pour transformer les historiques d'accès au serveur en demandes d'auditeurs uniques."
+  },
+  "paragraph_4": {
+    "fr": "Dans le cadre de l'engagement d'OP3 envers une infrastructure vérifiable, notre calcul de téléchargement est décrit ci-dessous, avec des liens vers les ressources explicatives."
+  },
+  "how_heading": {
+    "fr": "Comment OP3 calcule-t-il les téléchargements ?"
+  },
+  "how_paragraph_1": {
+    "fr": "OP3 voit les requêtes HTTP entrantes pour les fichiers médias des épisodes de podcast dès que les podcasteurs ajoutent notre préfixe à leurs épisodes dans leur flux."
+  },
+  "how_paragraph_2": {
+    "fr": "Toutes les demandes entrantes sont rapidement redirigées vers leur destination avec un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> et enregistrées, mais tous les accès ne sont pas considérés comme des téléchargements:"
+  },
+  "list_item_1": {
+    "fr": "D'abord, nous ignorons toutes les demandes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46\">non-GET</a>."
+  },
+  "list_item_2": {
+    "fr": "Nous ignorons toutes les demandes de plage qui ne demandent pas <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49\">plus de deux octets</a>, <em>sauf</em> les demandes <b>bytes=0-1</b> <em>(voir <a href=\"https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes\">A Tale of Two Bytes</a> pour la justification)</em>."
+  },
+  "list_item_3": {
+    "fr": "<a href=\"https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163\">Les demandes</a> <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63\">en double</a> au cours du même jour UTC (24 heures), basées sur l'adresse IP sécurisée + User-Agent + Referer pour la même url d'épisode, sont ignorées."
+  },
+  "list_item_4": {
+    "fr": "En utilisant l'en-tête User-Agent et <a href=\"https://github.com/opawg/user-agents-v2\">user-agents-v2</a>, nous ignorons :"
+  },
+  "ignore_list_item_1": {
+    "fr": "Les demandes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7\">sans en-tête User-Agent</a>."
+  },
+  "ignore_list_item_2": {
+    "fr": "Un User-Agent connu de type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4\">'bot'</a>"
+  },
+  "ignore_list_item_3": {
+    "fr": "Un User-Agent connu de type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5\">'librarie' avec une catégorie de 'bot'</a>"
+  },
+  "ignore_list_item_4": {
+    "fr": "Un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6\">User-Agent inconnu incluant le texte 'bot', 'crawler' ou 'spider'</a>"
+  },
+  "ignore_list_item_5": {
+    "fr": "Un autre <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9\">cas particulier</a> trouvé dans la nature (à partir des données de l'OP3)"
+  },
+  "how_paragraph_3": {
+    "fr": "Les téléchargements sont associés à un podcast en faisant correspondre l'URL nettoyée (en supprimant les préfixes de suivi et les paramètres ajoutés par le client) à un fichier joint ou une version alternative trouvée dans un flux de podcast public."
+  },
+  "home_link_label": {
+    "fr": "Accueil"
+  }
 }
