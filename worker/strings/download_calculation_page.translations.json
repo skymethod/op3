@@ -12,13 +12,13 @@
     "fr": "Au fil du temps, les sociétés d'hébergement de podcasts et les organismes de normalisation de la publicité tels que l'<a href=\"https://fr.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> ont développé des <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">meilleures pratiques</a> pour transformer les historiques d'accès au serveur en demandes d'auditeurs uniques."
   },
   "paragraph_4": {
-    "fr": "Dans le cadre de l'engagement d'OP3 envers une infrastructure vérifiable, notre calcul de téléchargement est décrit ci-dessous, avec des liens vers les ressources explicatives."
+    "fr": "Dans le cadre de <a href=\"https://github.com/skymethod/op3#commitment-to-auditable-infrastructure\">l'engagement d'OP3 envers une infrastructure vérifiable</a>, notre calcul de téléchargement est décrit ci-dessous, avec des liens vers les ressources explicatives."
   },
   "how_heading": {
     "fr": "Comment OP3 calcule-t-il les téléchargements ?"
   },
   "how_paragraph_1": {
-    "fr": "OP3 voit les requêtes HTTP entrantes pour les fichiers médias des épisodes de podcast dès que les podcasteurs ajoutent notre préfixe à leurs épisodes dans leur flux."
+    "fr": "OP3 voit les requêtes HTTP entrantes pour les fichiers médias des épisodes de podcast dès que les podcasteurs <a href=\"/setup\" class=\"localized\">ajoutent notre préfixe</a> à leurs épisodes dans leur flux."
   },
   "how_paragraph_2": {
     "fr": "Toutes les demandes entrantes sont rapidement redirigées vers leur destination avec un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> et enregistrées, mais tous les accès ne sont pas considérés comme des téléchargements:"

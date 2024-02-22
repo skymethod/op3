@@ -18,7 +18,7 @@
     "string": "How does OP3 calculate Downloads?"
   },
   "how_paragraph_1": {
-    "string": "OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href=\"/setup\">add our prefix</a> to podcast episodes in their feed."
+    "string": "OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href=\"/setup\" class=\"localized\">add our prefix</a> to podcast episodes in their feed."
   },
   "how_paragraph_2": {
     "string": "All incoming requests are quickly redirected to their destination with a <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> and logged, but not all requests become Downloads:"

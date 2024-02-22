@@ -15,7 +15,7 @@
     "string": "(No need to remove existing prefixes, there can be more than one)"
   },
   "box_1_line_5": {
-    "string": "For more instructions, check your feed using our <a href=\"/setup\">setup page →</a>"
+    "string": "For more instructions, check your feed using our <a href=\"/setup\" class=\"localized\">setup page →</a>"
   },
   "paragraph_2": {
     "string": "Once you start using this prefix, you are opening up your show's listener numbers to the world, <i>without compromising your listeners' privacy</i>.  App developers and companies can start building products and services for you using this open data, without you having to manage a custom integration."
