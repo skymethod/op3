@@ -44,6 +44,16 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-02-22',
+        time: '2024-02-22T16:20:00.00Z',
+        title: '2024-02-22: Translations',
+        bulletPoints: [
+            () => `Volunteers can now help us translate the OP3 show stats pages and the home/setup pages into other languages.`,
+            () => `Many thanks to [BadGeek](https://www.badgeek.fr/) for generously providing a French translation.`,
+            () => `Translators can use an easy online editor, see the [OP3 Translation](https://github.com/skymethod/op3/blob/master/translation.md) page to get started.`,
+        ]
+    },
+    {
         id: '2024-01-10',
         time: '2024-01-10T12:00:00.00Z',
         title: '2024-01-10: New client-side listen time statistics section on show pages',
