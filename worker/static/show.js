@@ -10733,6 +10733,15 @@ const app = await (async ()=>{
         strings,
         lang
     });
+    const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
+    if (langParam) {
+        const localized = document.querySelectorAll('a.localized');
+        for (const a of localized){
+            const u = new URL(a.href);
+            u.searchParams.set('lang', langParam);
+            a.href = u.toString();
+        }
+    }
     function update() {
         exportDownloads.update();
         headlineStats.update();

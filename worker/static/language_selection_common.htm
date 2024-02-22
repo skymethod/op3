@@ -1,0 +1,30 @@
+${shoelaceCommon}
+    <script type="module">
+        const contentLanguage = '${contentLanguage}';
+        const dropdown = document.getElementById('language-selection');
+        dropdown.addEventListener('sl-select', event => {
+            const newLang = event.detail.item.value;
+            if (newLang === contentLanguage) return;
+            const u = new URL(document.location.href);
+            u.searchParams.set('lang', newLang);
+            document.location.href = u.toString();
+        });
+        const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
+        if (langParam) {
+            const localized = document.querySelectorAll('a.localized');
+            for (const a of localized) {
+                const u = new URL(a.href);
+                u.searchParams.set('lang', langParam);
+                a.href = u.toString();
+            }
+        }
+    </script>
+    <div class="max-w-2xl mx-auto mt-8 text-center px-8 wait sl-theme-dark mb-16">
+        <sl-dropdown id="language-selection">
+            <div slot="trigger" class="flex items-center cursor-pointer"><sl-icon slot="prefix" name="globe"></sl-icon>&nbsp;<span class="underline decoration-1 decoration-dotted underline-offset-4">${langLabelCurrent}</span></div>
+            <sl-menu class="text-left">
+                <sl-menu-item value="en">${langLabelEn}</sl-menu-item>
+                <sl-menu-item value="fr">${langLabelFr}</sl-menu-item>
+            </sl-menu>
+        </sl-dropdown>
+    </div>

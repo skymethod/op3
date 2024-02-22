@@ -1,5 +1,5 @@
 import { importText } from '../deps.ts';
-import { computeCloudflareAnalyticsSnippet, computeHtml } from './html.ts';
+import { computeCloudflareAnalyticsSnippet, computeHtml, computeLanguageSelection } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 import { Translations } from './strings.ts';
 
@@ -22,6 +22,7 @@ export function computeDownloadCalculationResponse(opts: { instance: string, ori
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         contentLanguage,
+        languageSelection: computeLanguageSelection(contentLanguage),
     }, translatedStrings, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'content-language': contentLanguage } });

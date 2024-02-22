@@ -180,12 +180,13 @@ export function computeOgImageKey({ showUuid }: { showUuid: string}): string {
     return `show/${showUuid}/og.png`;
 }
 
-export function computeDemoShowResponse({ origin }: { origin: string }): Response {
+export function computeDemoShowResponse({ origin, searchParams }: { origin: string, searchParams: URLSearchParams }): Response {
+    const lang = searchParams.get('lang') ?? undefined;
     return new Response(undefined, {
         status: 302,
         headers: {
             'cache-control': 'private, no-cache',
-            'location': `${origin}/show/${DEMO_SHOW_1}`,
+            'location': `${origin}/show/${DEMO_SHOW_1}${lang ? `?lang=${lang}` : ''}`,
         }
     });
 }

@@ -134,9 +134,10 @@ const strings = {
             [...container.querySelectorAll('sl-details')].map(details => (details.open = event.target === details));
         });
     </script>
-    <div class="max-w-xl mx-auto my-16">
-        <a href="/">${s:home_link_label:'Home'}</a>
+    <div class="max-w-xl mx-auto mt-16">
+        <a href="/" class="localized">${s:home_link_label:'Home'}</a>
     </div>
+    ${languageSelection}
     ${cfAnalyticsSnippet}
 </body>
 

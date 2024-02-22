@@ -21,7 +21,7 @@
         <p>${s:paragraph_4:'As part of OP3's <a href="https://github.com/skymethod/op3#commitment-to-auditable-infrastructure">commitment to auditable infrastructure</a>, our download calculation is described below, with links to any relevant codepaths.'}</p>
 
         <h2 id="how">${s:how_heading:'How does OP3 calculate Downloads?'}</h2>
-        <p>${s:how_paragraph_1:'OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href="/setup">add our prefix</a> to podcast episodes in their feed.'}</p>
+        <p>${s:how_paragraph_1:'OP3 sees incoming HTTP requests for podcast episode media files as soon as podcasters <a href="/setup" class="localized">add our prefix</a> to podcast episodes in their feed.'}</p>
         <p>${s:how_paragraph_2:'All incoming requests are quickly redirected to their destination with a <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16">302</a> and logged, but not all requests become Downloads:'}
             <ul>
                 <li>${s:list_item_1:'First, we ignore all <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46">non-GET</a> requests.'}</li>
@@ -42,9 +42,10 @@
 
     </div>
    
-    <div class="max-w-xl mx-auto my-16">
-        <a href="/">${s:home_link_label:'Home'}</a>
+    <div class="max-w-xl mx-auto mt-16">
+        <a href="/" class="localized">${s:home_link_label:'Home'}</a>
     </div>
+    ${languageSelection}
     ${cfAnalyticsSnippet}
 </body>
 

@@ -241,7 +241,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/download-calculation') return computeDownloadCalculationResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken, acceptLanguage, searchParams });
     if (method === 'GET' && pathname === '/listen-time-calculation') return computeListenTimeCalculationResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });
-    if (method === 'GET' && pathname === '/demo') return computeDemoShowResponse({ origin });
+    if (method === 'GET' && pathname === '/demo') return computeDemoShowResponse({ origin, searchParams });
     if (method === 'GET' && pathname === '/setup') return computeSetupResponse({ instance, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, acceptLanguage, searchParams });
     if (method === 'GET' && pathname === '/info.json') return computeInfoResponse(env);
     if (method === 'GET' && pathname === '/api' && acceptsHtml) return new Response('', { status: 302, headers: { location: '/api/docs' } });

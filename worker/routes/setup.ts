@@ -1,6 +1,6 @@
 import { importText } from '../deps.ts';
 import { computeSessionToken } from '../session_token.ts';
-import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
+import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag, computeLanguageSelection } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 import { Translations } from './strings.ts';
 
@@ -26,7 +26,8 @@ export async function computeSetupResponse(opts: { instance: string, origin: str
         setupJs,
         previewToken: [...previewTokens].at(0) ?? '',
         sessionToken,
-        contentLanguage
+        contentLanguage,
+        languageSelection: computeLanguageSelection(contentLanguage),
     }, translatedStrings, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'content-language': contentLanguage } });

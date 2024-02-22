@@ -15,7 +15,7 @@
     "fr": "(Pas besoin de supprimer les préfixes existants, il peut y en avoir plus d'un)"
   },
   "box_1_line_5": {
-    "fr": "Pour plus d'informations, consultez votre flux en utilisant notre page de <a href=\"/setup\">configuration →</a>"
+    "fr": "Pour plus d'informations, consultez votre flux en utilisant notre page de <a href=\"/setup\" class=\"localized\">configuration →</a>"
   },
   "paragraph_2": {
     "fr": "Une fois que vous commencez à utiliser ce préfixe, vous permettez la captation d'audience de votre émission au monde entier, <i>sans compromettre la vie privée de vos auditeurs</i>. Les développeurs d'applications et les entreprises peuvent commencer à créer des produits et des services pour vous en utilisant ces données ouvertes, sans que vous ayez à gérer une intégration personnalisée."

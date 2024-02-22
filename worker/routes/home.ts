@@ -1,5 +1,5 @@
 import { importText } from '../deps.ts';
-import { computeCloudflareAnalyticsSnippet, computeHtml } from './html.ts';
+import { computeCloudflareAnalyticsSnippet, computeHtml, computeLanguageSelection } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 import { Translations } from './strings.ts';
 
@@ -23,6 +23,7 @@ export function computeHomeResponse(opts: { instance: string, origin: string, pr
         deploySha,
         deployTime,
         contentLanguage,
+        languageSelection: computeLanguageSelection(contentLanguage),
     }, translatedStrings, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'content-language': contentLanguage } });

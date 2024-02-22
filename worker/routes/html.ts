@@ -1,8 +1,9 @@
 import { importText } from '../deps.ts';
-import { TranslatedStrings, processTemplate } from './strings.ts';
+import { TranslatedStrings, processTemplate, supportedLanguageLabels } from './strings.ts';
 
 const outputCss = await importText(import.meta.url, '../static/output.css');
 const shoelaceCommonHtm = await importText(import.meta.url, '../static/shoelace_common.htm');
+const languageSelectionCommonHtm = await importText(import.meta.url, '../static/language_selection_common.htm');
 
 export function computeStyleTag(): string {
     return `<style>\n${outputCss}\n    </style>`;
@@ -10,6 +11,17 @@ export function computeStyleTag(): string {
 
 export function computeShoelaceCommon(...components: string[]): string {
     return computeHtml(shoelaceCommonHtm, { components: components.map(v => `'${v}'`).join(', ') });
+}
+
+export function computeLanguageSelection(contentLanguage: string): string {
+    const shoelaceCommon = computeShoelaceCommon('sl-dropdown', 'sl-menu', 'sl-menu-item', 'sl-icon');
+    return computeHtml(languageSelectionCommonHtm, {
+        langLabelCurrent: supportedLanguageLabels[contentLanguage],
+        langLabelEn: supportedLanguageLabels['en'],
+        langLabelFr: supportedLanguageLabels['fr'],
+        shoelaceCommon,
+        contentLanguage,
+    });
 }
 
 export function computeHtml(template: string, variables: Record<string, string | boolean>, translatedStrings?: TranslatedStrings, lang?: string) {
