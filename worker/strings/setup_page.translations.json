@@ -1,3 +1,134 @@
 {
-
+  "setup_page_title": {
+    "fr": "Configuration"
+  },
+  "search_prompt_message": {
+    "fr": "Trouvez votre podcast, nous vérifierons votre configuration"
+  },
+  "search_finding_message": {
+    "fr": "Recherche des podcasts..."
+  },
+  "search_failed_message": {
+    "fr": "La recherche a échoué"
+  },
+  "analyze_started_message": {
+    "fr": "Analyse du podcast..."
+  },
+  "analyze_finished_message": {
+    "fr": "Analyse du podcast terminée"
+  },
+  "analyze_failed_message": {
+    "fr": "L'analyse du podcast a échoué"
+  },
+  "analyze_failed_default_error_message": {
+    "fr": "Échec"
+  },
+  "feed_summary_analyzing": {
+    "fr": "Analyse en cours..."
+  },
+  "zero_episodes": {
+    "fr": "Aucun épisode"
+  },
+  "one_episode": {
+    "fr": "Un épisode"
+  },
+  "multiple_episodes": {
+    "fr": "%d épisodes"
+  },
+  "less_than_24_hrs_ago": {
+    "fr": "il y a moins de 24 heures"
+  },
+  "latest_as_prefix_to_relative_time": {
+    "fr": "dernier"
+  },
+  "found_zero_podcasts": {
+    "fr": "Aucun podcast trouvé"
+  },
+  "found_one_podcast": {
+    "fr": "Un épisode trouvé"
+  },
+  "found_multiple_podcasts": {
+    "fr": "%d podcasts trouvés"
+  },
+  "heading": {
+    "fr": "Vérifiez votre configuration OP3"
+  },
+  "search_placeholder": {
+    "fr": "Nom du podcast ou URL du flux RSS"
+  },
+  "rss_feed_suffix": {
+    "fr": "flux RSS"
+  },
+  "prefix_not_found_warning": {
+    "fr": "Préfixe OP3 non détecté"
+  },
+  "prefix_found_on_all_episodes": {
+    "fr": "Préfixe OP3 détecté sur tous les épisodes"
+  },
+  "prefix_found_on_some_episodes": {
+    "fr": "Préfixe OP3 détecté sur <span id=\"fp-found-episodes-span\">n épisodes</span>"
+  },
+  "prefix_found_on_some_episodes_prompt": {
+    "fr": "Vouliez-vous l'ajouter à chaque épisode ?"
+  },
+  "podcast_guid": {
+    "fr": "Podcast Guid"
+  },
+  "stats_page_line_1": {
+    "fr": "Voulez-vous voir les statistiques de ce podcast ?"
+  },
+  "stats_page_line_2": {
+    "fr": "Une fois que OP3 aura scruté quelques jours de téléchargements, ce sera disponible <a id=\"show-page-link\" href=\"#\">ici</a>"
+  },
+  "instructions_heading": {
+    "fr": "Instructions"
+  },
+  "instructions_box_line_1": {
+    "fr": "OP3 fonctionne comme n'importe quel autre <a href=\"https://soundsprofitable.com/update/prefix-analytics\">service d'analyse de podcast avec préfixe</a>, mais de manière plus simple ! <b>Aucune connexion ou inscription</b> n'est nécessaire. Les podcasteurices ou les hébergeurs de podcasts peuvent préfixer"
+  },
+  "instructions_box_line_2": {
+    "fr": "le lien vers l'épisode pour commencer à mesurer les téléchargements."
+  },
+  "instructions_box_line_3": {
+    "fr": "(Pas besoin de supprimer les préfixes existants, ils peuvent être cumulés)"
+  },
+  "instructions_box_line_4": {
+    "fr": "Certains hébergeurs de podcasts (comme <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) vous permettent d'ajouter un préfixe personnalisé dans l'espace configuration de votre podcast, et d'autres (comme <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> et <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) le rendent aussi simple que cocher une case !"
+  },
+  "instructions_box_line_5": {
+    "fr": "Si votre hébergeur de podcasts n'a pas prévu de champ dans votre espace de configuration pour activer un préfixe personnalisé, la plupart l'ajouteront si vous envoyez un e-mail au support."
+  },
+  "examples_heading": {
+    "fr": "Exemples"
+  },
+  "typical_prefix_summary": {
+    "fr": "Préfixe standard"
+  },
+  "examples_from": {
+    "fr": "Avant"
+  },
+  "examples_to": {
+    "fr": "Après"
+  },
+  "target_http_enclosure_summary": {
+    "fr": "Lien non sécurisé en HTTP"
+  },
+  "target_http_enclosure_instructions": {
+    "fr": "Inclure le lien complet après le préfixe n'est nécessaire que lorsque le lien initial est en <code>http</code>."
+  },
+  "optional_prefix_arguments_summary": {
+    "fr": "Paramètres facultatifs du préfixe"
+  },
+  "optional_prefix_arguments_line_1": {
+    "fr": "Vous pouvez passer des paramètres facultatifs au préfixe sous forme de paires <code>nom=valeur</code> séparées par des virgules entre le <code>e</code> et le <code>/</code>."
+  },
+  "optional_prefix_arguments_line_2": {
+    "fr": "OP3 prend actuellement en charge un seul paramètre optionnel nommé <code>pg</code>, vous permettant de spécifier l'identifiant <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">GUID de votre podcast</a>."
+  },
+  "optional_prefix_arguments_line_3": {
+    "fr": "Bien que facultatif, cela nous aide à attribuer plus rapidement l'URL de l'épisode à un podcast, et accélère donc la récupération de vos statistiques. Vous pouvez rechercher votre identifiant de podcast en utilisant le formulaire ci-dessus."
+  },
+  "home_link_label": {
+    "fr": "Accueil"
+  }
 }
