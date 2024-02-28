@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@af426a2766018bc6727bcf45d982433c7fa6cc74 (2024-02-28T17:54:03Z)
+// from user-agents-v2@a910e4b3f7c85c34fead67ca74829c2c69bae074 (2024-02-28T21:36:38Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -726,6 +726,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/^https\:\/\/make\.headliner\.app\//.test(referer)) return { name: `Headliner`, type: 'referrer', category: 'app' };
     if (/^https:\/\/www\.iheart\.com\//.test(referer)) return { name: `iHeartRadio`, type: 'referrer', category: 'app' };
     if (/:\/\/www\.inoreader\.com\//.test(referer)) return { name: `Inoreader`, type: 'referrer', category: 'app' };
+    if (/:\/\/www\.ivoox\.com\//.test(referer)) return { name: `iVoox`, type: 'referrer', category: 'app' };
     if (/:\/\/www\.jam\.ai\//.test(referer)) return { name: `Jam`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.justcast\.com\//.test(referer)) return { name: `JustCast`, type: 'referrer', category: 'host' };
     if (/kajabi\.com\/?$/.test(referer)) return { name: `Kajabi`, type: 'referrer', category: 'host' };
@@ -752,10 +753,11 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/\/\/pod\.link\//.test(referer)) return { name: `PodLink`, type: 'referrer', category: 'app' };
     if (/:\/\/podmust\.com\//.test(referer)) return { name: `Podmust`, type: 'referrer', category: 'app' };
     if (/podplay\.com/.test(referer)) return { name: `Podplay`, type: 'referrer', category: 'app' };
-    if (/^https:\/\/podtail\.com\//.test(referer)) return { name: `Podtail`, type: 'referrer' };
+    if (/^https:\/\/podtail\.com\//.test(referer)) return { name: `Podtail`, type: 'referrer', category: 'app' };
     if (/:\/\/podverse\.fm\//.test(referer)) return { name: `Podverse`, type: 'referrer', category: 'app' };
     if (/:\/\/podvine\.com\//.test(referer)) return { name: `Podvine`, type: 'referrer', category: 'host' };
     if (/^https:\/\/podyssey\.fm\//.test(referer)) return { name: `Podyssey`, type: 'referrer', category: 'app' };
+    if (/:\/\/www\.radioline\.co\//.test(referer)) return { name: `Radioline`, type: 'referrer', category: 'app' };
     if (/:\/\/(embed\.)?radiopublic\.com\//.test(referer)) return { name: `RadioPublic`, type: 'referrer', category: 'app' };
     if (/:\/\/player\.simplecast\.com\//.test(referer)) return { name: `Simplecast`, type: 'referrer', category: 'host' };
     if (/https:\/\/(open|api-partner)\.spotify\.com/.test(referer)) return { name: `Spotify`, type: 'referrer', category: 'app' };

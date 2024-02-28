@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@af426a2766018bc6727bcf45d982433c7fa6cc74 (2024-02-28T17:54:03Z)
+// from user-agents-v2@a910e4b3f7c85c34fead67ca74829c2c69bae074 (2024-02-28T21:36:38Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -1069,6 +1069,7 @@ const referrerTests = {
     'https://make.headliner.app/': { type: 'referrer', name: `Headliner` },
     'https://www.iheart.com/': { type: 'referrer', name: `iHeartRadio` },
     'https://www.inoreader.com/': { type: 'referrer', name: `Inoreader` },
+    'https://www.ivoox.com/': { type: 'referrer', name: `iVoox` },
     'https://www.jam.ai/': { type: 'referrer', name: `Jam` },
     'https://widget.justcast.com/': { type: 'referrer', name: `JustCast` },
     'https://melisa-liberman.mykajabi.com/': { type: 'referrer', name: `Kajabi` },
@@ -1115,6 +1116,7 @@ const referrerTests = {
     'https://podverse.fm/': { type: 'referrer', name: `Podverse` },
     'https://podverse.fm/livestreams': { type: 'referrer', name: `Podverse` },
     'https://podvine.com/': { type: 'referrer', name: `Podvine` },
+    'https://www.radioline.co/': { type: 'referrer', name: `Radioline` },
     'https://radiopublic.com/': { type: 'referrer', name: `RadioPublic` },
     'https://embed.radiopublic.com/': { type: 'referrer', name: `RadioPublic` },
     'https://player.simplecast.com/': { type: 'referrer', name: `Simplecast` },
