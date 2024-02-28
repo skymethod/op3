@@ -1026,6 +1026,10 @@ a.svg:hover {
   white-space: pre;
 }
 
+.text-nowrap {
+  text-wrap: nowrap;
+}
+
 .break-all {
   word-break: break-all;
 }

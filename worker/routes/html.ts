@@ -18,6 +18,7 @@ export function computeLanguageSelection(contentLanguage: string): string {
     return computeHtml(languageSelectionCommonHtm, {
         langLabelCurrent: supportedLanguageLabels[contentLanguage],
         langLabelEn: supportedLanguageLabels['en'],
+        langLabelEs: supportedLanguageLabels['es'],
         langLabelFr: supportedLanguageLabels['fr'],
         langLabelNl: supportedLanguageLabels['nl'],
         shoelaceCommon,

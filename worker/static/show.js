@@ -8367,6 +8367,7 @@ function pluralize(n, strings1, singleKey, pluralKey, format) {
 }
 const supportedLanguageLabels = {
     en: 'English (US)',
+    es: 'Español',
     fr: 'Français',
     nl: 'Nederlands'
 };

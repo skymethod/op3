@@ -1,78 +1,97 @@
 {
   "download_calculation": {
     "fr": "Calcul des téléchargements",
-    "nl": "Berekening downloaden"
+    "nl": "Berekening downloaden",
+    "es": "Cálculo de Descargas"
   },
   "paragraph_1": {
     "fr": "Les \"téléchargements\" sont actuellement la méthode standard de l'industrie pour mesurer l'audience d'un podcast. Ces accès aux fichiers sont visibles côté serveur (hébergeur via un préfixe d'URL) sans nécessiter d'API spéciale de la part de chaque application de lecteur de podcasts.",
-    "nl": "De \"downloads\" zijn momenteel de standaardmethode in de industrie om het publiek van een podcast te meten. Deze toegangen tot de bestanden zijn zichtbaar aan de serverkant (hostingprovider via een URL-prefix) zonder dat er speciale API's nodig zijn van elke podcastspeler-app."
+    "nl": "De \"downloads\" zijn momenteel de standaardmethode in de industrie om het publiek van een podcast te meten. Deze toegangen tot de bestanden zijn zichtbaar aan de serverkant (hostingprovider via een URL-prefix) zonder dat er speciale API's nodig zijn van elke podcastspeler-app.",
+    "es": "Las \"Descargas\" son actualmente la forma estándar de la industria para medir la audiencia de un podcast, son la evidencia visible en el lado del servidor (compañías de alojamiento y prefijos analíticos) sin necesidad de coordinación o APIs especiales de cada aplicación de reproducción de podcast."
   },
   "paragraph_2": {
     "fr": "Bien sûr, de nombreuses applications de podcast téléchargent automatiquement les épisodes, donc un téléchargement ne correspond pas nécessairement à une écoute. <a href=\"https://podnews.net/article/understanding-podcast-statistics\">En savoir plus sur les statistiques de podcast.</a>",
-    "nl": "Natuurlijk downloaden veel podcast-apps afleveringen automatisch, dus een download staat niet per se gelijk aan een luisterbeurt.  <a href=\"https://podnews.net/article/understanding-podcast-statistics\">Meer informatie over podcaststatistieken</a>."
+    "nl": "Natuurlijk downloaden veel podcast-apps afleveringen automatisch, dus een download staat niet per se gelijk aan een luisterbeurt.  <a href=\"https://podnews.net/article/understanding-podcast-statistics\">Meer informatie over podcaststatistieken</a>.",
+    "es": "Por supuesto, muchas aplicaciones de podcast descargan automáticamente episodios, por lo que una Descarga no necesariamente equivale a una Escucha. <a href=\"https://podnews.net/article/understanding-podcast-statistics\">Aprende más sobre las estadísticas de los podcasts.</a>"
   },
   "paragraph_3": {
     "fr": "Au fil du temps, les sociétés d'hébergement de podcasts et les organismes de normalisation de la publicité tels que l'<a href=\"https://fr.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> ont développé des <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">meilleures pratiques</a> pour transformer les historiques d'accès au serveur en demandes d'auditeurs uniques.",
-    "nl": "In de loop van de tijd hebben podcasthostingbedrijven en instanties voor advertentiestandaarden zoals de <a href=\"https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">best practices</a> ontwikkeld voor het omzetten van ruwe serverlogs naar unieke luisterverzoeken."
+    "nl": "In de loop van de tijd hebben podcasthostingbedrijven en instanties voor advertentiestandaarden zoals de <a href=\"https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">best practices</a> ontwikkeld voor het omzetten van ruwe serverlogs naar unieke luisterverzoeken.",
+    "es": "Con el tiempo, las compañías de alojamiento de podcasts y las entidades de estándares publicitarios como el <a href=\"https://en.wikipedia.org/wiki/Interactive_Advertising_Bureau\">IAB</a> han desarrollado <a href=\"https://iabtechlab.com/wp-content/uploads/2021/03/PodcastMeasurement_v2.1.pdf\">mejores prácticas</a> sobre cómo convertir los registros de servidores en solicitudes únicas de oyentes ."
   },
   "paragraph_4": {
     "fr": "Dans le cadre de <a href=\"https://github.com/skymethod/op3#commitment-to-auditable-infrastructure\">l'engagement d'OP3 envers une infrastructure vérifiable</a>, notre calcul de téléchargement est décrit ci-dessous, avec des liens vers les ressources explicatives.",
-    "nl": "Als onderdeel van <a href=\"https://github.com/skymethod/op3#commitment-to-auditable-infrastructure\">de toewijding van OP3 aan controleerbare infrastructuur</a>, wordt onze downloadberekening hieronder beschreven, met links naar verklarende bronnen"
+    "nl": "Als onderdeel van <a href=\"https://github.com/skymethod/op3#commitment-to-auditable-infrastructure\">de toewijding van OP3 aan controleerbare infrastructuur</a>, wordt onze downloadberekening hieronder beschreven, met links naar verklarende bronnen",
+    "es": "Como parte del <a href=\"https://github.com/skymethod/op3#commitment-to-auditable-infrastructure\">compromiso de OP3 con una infraestructura auditada</a>, se describe a continuación nuestro método de cálculo de descargas, con enlaces a cualquier código relevante."
   },
   "how_heading": {
     "fr": "Comment OP3 calcule-t-il les téléchargements ?",
-    "nl": "Hoe berekent OP3 downloads?"
+    "nl": "Hoe berekent OP3 downloads?",
+    "es": "¿Cómo calcula OP3 las descargas?"
   },
   "how_paragraph_1": {
     "fr": "OP3 voit les requêtes HTTP entrantes pour les fichiers médias des épisodes de podcast dès que les podcasteurs <a href=\"/setup\" class=\"localized\">ajoutent notre préfixe</a> à leurs épisodes dans leur flux.",
-    "nl": "OP3 ziet inkomende HTTP-verzoeken voor mediabestanden van podcastafleveringen zodra podcasters <a href=\"/setup\" class=\"localized\">onze prefix aan</a> podcastafleveringen toevoegen in hun feed."
+    "nl": "OP3 ziet inkomende HTTP-verzoeken voor mediabestanden van podcastafleveringen zodra podcasters <a href=\"/setup\" class=\"localized\">onze prefix aan</a> podcastafleveringen toevoegen in hun feed.",
+    "es": "OP3 ve las solicitudes HTTP entrantes para los archivos multimedia de los episodios de podcast tan pronto como los podcasters <a href=\"/setup\" class=\"localized\">agregan nuestro prefijo</a> a los episodios de su feed."
   },
   "how_paragraph_2": {
     "fr": "Toutes les demandes entrantes sont rapidement redirigées vers leur destination avec un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> et enregistrées, mais tous les accès ne sont pas considérés comme des téléchargements:",
-    "nl": "Alle inkomende verzoeken worden snel doorgestuurd naar hun bestemming met een <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> en gelogd, maar niet alle toegangen worden beschouwd als downloads:"
+    "nl": "Alle inkomende verzoeken worden snel doorgestuurd naar hun bestemming met een <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> en gelogd, maar niet alle toegangen worden beschouwd als downloads:",
+    "es": "Todas las solicitudes entrantes se redirigen rápidamente a su destino con un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/routes/redirect_episode.ts#L16\">302</a> y se registran, pero no todas las solicitudes se convierten en Descargas:"
   },
   "list_item_1": {
     "fr": "D'abord, nous ignorons toutes les demandes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46\">non-GET</a>.",
-    "nl": "Eerst negeren we alle <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46\">no-GET</a>-verzoeken."
+    "nl": "Eerst negeren we alle <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46\">no-GET</a>-verzoeken.",
+    "es": "Primero, ignoramos todas las solicitudes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L46\">non-GET</a>."
   },
   "list_item_2": {
     "fr": "Nous ignorons toutes les demandes de plage qui ne demandent pas <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49\">plus de deux octets</a>, <em>sauf</em> les demandes <b>bytes=0-1</b> <em>(voir <a href=\"https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes\">A Tale of Two Bytes</a> pour la justification)</em>.",
-    "nl": "We negeren alle bereikverzoeken die niet om <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49\">meer dan twee bytes</a> vragen, <em>behalve</em> verzoeken voor <b>bytes=0-1</b> <em>(zie <a href=\"https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes\">A Tale of Two Bytes</a> voor de rechtvaardiging)</em>."
+    "nl": "We negeren alle bereikverzoeken die niet om <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49\">meer dan twee bytes</a> vragen, <em>behalve</em> verzoeken voor <b>bytes=0-1</b> <em>(zie <a href=\"https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes\">A Tale of Two Bytes</a> voor de rechtvaardiging)</em>.",
+    "es": "Ignoramos todas las solicitudes de rango que no pidan <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L49\">más de dos bytes</a>, <em>excepto</em> las solicitudes de <b>bytes=0-1</b> <em>(ver <a href=\"https://livewire.io/a-tale-of-two-bytes-prefix-vs-host-based-analytics/#should-prefixes-ignore-requests-for-the-first-two-bytes\">A Tale of Two Bytes</a> para más información)</em>."
   },
   "list_item_3": {
     "fr": "<a href=\"https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163\">Les demandes</a> <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63\">en double</a> au cours du même jour UTC (24 heures), basées sur l'adresse IP sécurisée + User-Agent + Referer pour la même url d'épisode, sont ignorées.",
-    "nl": "<a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63\">Dubbele</a> <a href=\"https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163\">verzoeken</a> op dezelfde UTC-dag (24 uur) op basis van de beveiligde IP-adres-hash + User-Agent + Referer voor dezelfde genormaliseerde afleverings-URL worden genegeerd."
+    "nl": "<a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63\">Dubbele</a> <a href=\"https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163\">verzoeken</a> op dezelfde UTC-dag (24 uur) op basis van de beveiligde IP-adres-hash + User-Agent + Referer voor dezelfde genormaliseerde afleverings-URL worden genegeerd.",
+    "es": "Se ignoran las <a href=\"https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163\">solicitudes</a> <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63\">duplicadas</a> en el mismo día UTC (24 horas) basadas en el hash de dirección IP segura + User-Agent + \"Referer\" para la misma URL de episodio normalizada."
   },
   "list_item_4": {
     "fr": "En utilisant l'en-tête User-Agent et <a href=\"https://github.com/opawg/user-agents-v2\">user-agents-v2</a>, nous ignorons :",
-    "nl": "Gebruikmakend van de User-Agent header en <a href=\"https://github.com/opawg/user-agents-v2\">user-agents-v2</a>, negeren we:"
+    "nl": "Gebruikmakend van de User-Agent header en <a href=\"https://github.com/opawg/user-agents-v2\">user-agents-v2</a>, negeren we:",
+    "es": "Usando la cabecera User-Agent y <a href=\"https://github.com/opawg/user-agents-v2\">user-agents-v2</a>, ignoramos:"
   },
   "ignore_list_item_1": {
     "fr": "Les demandes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7\">sans en-tête User-Agent</a>.",
-    "nl": "Verzoeken <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7\">zonder User-Agent</a> header"
+    "nl": "Verzoeken <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7\">zonder User-Agent</a> header",
+    "es": "Solicitudes <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7\">sin encabezado User-Agent</a>"
   },
   "ignore_list_item_2": {
     "fr": "Un User-Agent connu de type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4\">'bot'</a>",
-    "nl": "Een bekende gebruikersagent van het type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4\">'bot'</a>"
+    "nl": "Een bekende gebruikersagent van het type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4\">'bot'</a>",
+    "es": "Un agente de usuario conocido de tipo <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4\">\"bot\"</a>"
   },
   "ignore_list_item_3": {
     "fr": "Un User-Agent connu de type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5\">'librarie' avec une catégorie de 'bot'</a>",
-    "nl": "Een bekende gebruikersagent van het type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5\">'library' met een categorie 'bot'</a>"
+    "nl": "Een bekende gebruikersagent van het type <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5\">'library' met een categorie 'bot'</a>",
+    "es": "Un agente de usuario conocido de tipo <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5\">'biblioteca' con una categoría de 'bot'</a>"
   },
   "ignore_list_item_4": {
     "fr": "Un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6\">User-Agent inconnu incluant le texte 'bot', 'crawler' ou 'spider'</a>",
-    "nl": "Een <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6\">onbekende gebruikersagent met daarin de tekst 'bot', 'crawler' of 'spider'</a>"
+    "nl": "Een <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6\">onbekende gebruikersagent met daarin de tekst 'bot', 'crawler' of 'spider'</a>",
+    "es": "Un <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6\">agente de usuario desconocido que incluye el texto 'bot', 'crawler' o 'spider'</a>"
   },
   "ignore_list_item_5": {
     "fr": "Un autre <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9\">cas particulier</a> trouvé dans la nature (à partir des données de l'OP3)",
-    "nl": "Nog een andere <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9\">ongewone situatie</a> die in het wild is aangetroffen (gebaseerd op OP3-gegevens)"
+    "nl": "Nog een andere <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9\">ongewone situatie</a> die in het wild is aangetroffen (gebaseerd op OP3-gegevens)",
+    "es": "Otro <a href=\"https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9\">caso infrecuente</a> hallado (con datos del OP3)"
   },
   "how_paragraph_3": {
     "fr": "Les téléchargements sont associés à un podcast en faisant correspondre l'URL nettoyée (en supprimant les préfixes de suivi et les paramètres ajoutés par le client) à un fichier joint ou une version alternative trouvée dans un flux de podcast public.",
-    "nl": "De downloads worden gekoppeld aan een podcast door de genormaliseerde URL (waarbij tracking-prefixen en door de client toegevoegde parameters worden verwijderd) te matchen met een bijlage of alternatieve bijlage die wordt gevonden in een openbare podcastfeed."
+    "nl": "De downloads worden gekoppeld aan een podcast door de genormaliseerde URL (waarbij tracking-prefixen en door de client toegevoegde parameters worden verwijderd) te matchen met een bijlage of alternatieve bijlage die wordt gevonden in een openbare podcastfeed.",
+    "es": "Las descargas se asocian a un podcast haciendo coincidir la URL normalizada (eliminando los prefijos de seguimiento y los parámetros añadidos por el cliente) con un \"enclosure\" o \"enclosure alternativo\" encontrado en un feed público."
   },
   "home_link_label": {
     "fr": "Accueil",
-    "nl": "Startpagina"
+    "nl": "Startpagina",
+    "es": "Inicio"
   }
 }
