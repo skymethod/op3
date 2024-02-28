@@ -44,6 +44,15 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-02-28b',
+        time: '2024-02-28T22:13:00.00Z',
+        title: '2024-02-28: Spanish translation',
+        bulletPoints: [
+            () => `New Spanish translation!`,
+            () => `It's free and easy to help us translate into other languages, see the [OP3 Translation](https://github.com/skymethod/op3/blob/master/translation.md) page to get started.`,
+        ]
+    },
+    {
         id: '2024-02-28',
         time: '2024-02-28T17:12:00.00Z',
         title: '2024-02-28: Dutch translation',
