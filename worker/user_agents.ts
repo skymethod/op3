@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@c6bab110cb90793aac71e2bd0b3485006fb3a8f5 (2024-02-08T19:37:11Z)
+// from user-agents-v2@96e1bb4f0cebf565e0d4a50f56d54b663dd34361 (2024-02-28T17:51:31Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -82,6 +82,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Archive-It;|web\.archive\.org/.test(userAgent)) return { name: `Internet Archive`, type: 'bot' };
     if (/^Jaunt\//.test(userAgent)) return { name: `Jaunt`, type: 'bot' };
     if (/INA dlweb/.test(userAgent)) return { name: `l'Institut national de l'audiovisuel`, type: 'bot' };
+    if (/LAC_IAHarvester\//.test(userAgent)) return { name: `Library and Archives Canada`, type: 'bot' };
     if (/^Libsyn4/.test(userAgent)) return { name: `Libsyn`, type: 'bot' };
     if (/^libwww-perl| libwww-perl/.test(userAgent)) return { name: `libwww-perl`, type: 'bot' };
     if (/LivelapBot/.test(userAgent)) return { name: `Livelap Crawler`, type: 'bot' };
@@ -213,7 +214,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS Askoyvaringen Hermes\//.test(userAgent)) return { name: `Askoyvaringen iOS app`, type: 'app' };
     if (/^Audacious/.test(userAgent)) return { name: `Audacious`, type: 'app' };
     if (/^Radio\.com\//.test(userAgent)) return { name: `Audacy`, type: 'app' };
-    if (/^com\.audials\//.test(userAgent)) return { name: `Audials`, type: 'app' };
+    if (/^com\.audials(\.paid)?\//.test(userAgent)) return { name: `Audials`, type: 'app' };
     if (/(^com\.audible\.playersdk\.player|^Audible,|^Audible.*Darwin)/.test(userAgent)) return { name: `Audible`, type: 'app' };
     if (/^Audio\//.test(userAgent)) return { name: `Audio`, type: 'app' };
     if (/^Android_AudioNow/.test(userAgent)) return { name: `Audio Now`, type: 'app' };
@@ -532,6 +533,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
+    if (/^pypodder$/.test(userAgent)) return { name: `Pypodder`, type: 'app' };
     if (/^Podcast Provider.*?Radio Downloader/.test(userAgent)) return { name: `Radio Downloader`, type: 'app' };
     if (/^(radio\.[a-z]{2,3}|GetPodcast)[ \/]\d/.test(userAgent)) return { name: `radio.de`, type: 'app' };
     if (/^Radioline%202\/|^Radioline$/.test(userAgent)) return { name: `Radioline`, type: 'app' };
@@ -569,6 +571,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Stitcher\/|^Stitcher Demo\/|^AlexaMediaPlayer\/Stitcher/.test(userAgent)) return { name: `Stitcher`, type: 'app' };
     if (/^Stoler(%20| )Report\//.test(userAgent)) return { name: `Stoler Report`, type: 'app' };
     if (/^Storiyoh\//.test(userAgent)) return { name: `Storiyoh`, type: 'app' };
+    if (/^Storybutton\//.test(userAgent)) return { name: `Storybutton`, type: 'app' };
     if (/^StoryShots\//.test(userAgent)) return { name: `StoryShots`, type: 'app' };
     if (/iOS Strilen Hermes\//.test(userAgent)) return { name: `Strilen iOS app`, type: 'app' };
     if (/^Subcast/.test(userAgent)) return { name: `Subcast`, type: 'app' };
@@ -626,6 +629,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
     if (/^AHC\/\d+\.\d+/.test(userAgent)) return { name: `Async Http Client (java)`, type: 'library', category: 'bot' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
+    if (/^Bun\/\d/.test(userAgent)) return { name: `Bun`, type: 'library', category: 'bot' };
     if (/^CarrierWave\//.test(userAgent)) return { name: `CarrierWave (ruby)`, type: 'library', category: 'bot' };
     if (/github\.com\/gocolly/.test(userAgent)) return { name: `Colly`, type: 'library', category: 'bot' };
     if (/^Dalvik[\/ ]/.test(userAgent)) return { name: `Dalvik`, type: 'library' };
@@ -691,7 +695,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/ServeStream|Android|android|HTC|ExoPlayer|^AntennaPod\/|^GSA\/.*\.arm(64)?$|^sp-agent|^PRDownloader$|^(Turtlecast|TURTLECAST)\//.test(userAgent)) return { name: `Android Phone`, type: 'device', category: 'mobile' };
     if (/Windows|windows|WMPlayer|Winamp|Win32|Win64|NSPlayer|MediaMonkey|NSPlayer|PC/.test(userAgent)) return { name: `Windows Computer`, type: 'device', category: 'computer' };
     if (/Alexa|^Echo\/|^Amazon;Echo/.test(userAgent)) return { name: `Amazon Smart Speaker`, type: 'device', category: 'smart_speaker' };
-    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON|^Denon;DENON-DWHS/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
+    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON|^Denon;DENON-DWHS|^Storybutton\//.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
     if (/Lavf\/|desktop|Linux|linux|VLC|^okhttp\/|CastBox\//.test(userAgent)) return { name: `Other Computer`, type: 'device', category: 'computer' };
     if (/tablet|Tablet/.test(userAgent)) return { name: `Other Tablet`, type: 'device', category: 'mobile' };
     if (/watch|Watch/.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };

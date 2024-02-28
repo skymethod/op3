@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@c6bab110cb90793aac71e2bd0b3485006fb3a8f5 (2024-02-08T19:37:11Z)
+// from user-agents-v2@96e1bb4f0cebf565e0d4a50f56d54b663dd34361 (2024-02-28T17:51:31Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -101,6 +101,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; special_archiver; Archive-It; http://archive-it.org/files/site-owners-special.html)': { type: 'bot', name: `Internet Archive` },
     'ia_archiver-web.archive.org': { type: 'bot', name: `Internet Archive` },
     'Jaunt/1.5': { type: 'bot', name: `Jaunt` },
+    'Mozilla/5.0 (compatible; LAC_IAHarvester/3.3.0; +https://library-archives.canada.ca/eng/services/government-canada/web-social-media-preservation-program/Pages/web-archive.aspx)': { type: 'bot', name: `Library and Archives Canada` },
     'Libsyn4-Download': { type: 'bot', name: `Libsyn` },
     'LWP::Simple/6.34 libwww-perl/6.34': { type: 'bot', name: `libwww-perl` },
     'ltx71 - (http://ltx71.com/)': { type: 'bot', name: `LTX71` },
@@ -284,6 +285,7 @@ const appTests = {
     'Audacious/3.10.1 neon/0.30.2': { type: 'app', name: `Audacious` },
     'Radio.com/12.2.0 (com.cbsradio.cbsradioplayer; build:1; iOS 14.6.0) Alamofire/4.8.1': { type: 'app', name: `Audacy` },
     'com.audials/9.52.0-0+gb3764950b-1058878988 (Linux;Android 11) AndroidXMedia3/1.1.1': { type: 'app', name: `Audials` },
+    'com.audials.paid/9.54.2-0+gd5b7eebd0-1117772855 (Linux;Android 14) AndroidXMedia3/1.2.0': { type: 'app', name: `Audials` },
     'Audio/105 CFNetwork/548.1.4 Darwin/11.0.0': { type: 'app', name: `Audio` },
     'Android_AudioNow': { type: 'app', name: `Audio Now` },
     'AudioWave/1.5 (+https://audiowave.io/; iPhone 15.4)': { type: 'app', name: `AudioWave` },
@@ -746,6 +748,7 @@ const appTests = {
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
+    'pypodder': { type: 'app', name: `Pypodder` },
     'Podcast Provider 0.34-9e9009e7 for Radio Downloader 0.34-9e9009e7': { type: 'app', name: `Radio Downloader` },
     'radio.fr 5.6.22 (iPhone; iPhone OS 16.4; fr_FR)': { type: 'app', name: `radio.de` },
     'radio.de 5.6.22 (iPad; iPhone OS 16.4; de_DE)': { type: 'app', name: `radio.de` },
@@ -808,6 +811,7 @@ const appTests = {
     'Stitcher/28420 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `Stitcher` },
     'Stoler%20Report/1.4 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Stoler Report` },
     'Stoler Report/1.4 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Stoler Report` },
+    'Storybutton/1.0': { type: 'app', name: `Storybutton` },
     'StoryShots/1.9.72 (Linux;Android 9) ExoPlayerLib/2.11.4': { type: 'app', name: `StoryShots` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Strilen Hermes/90.0.0 _app_': { type: 'app', name: `Strilen iOS app` },
     'Substack/1457 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Substack` },
@@ -909,6 +913,7 @@ const libraryTests = {
     'AHC/2.1': { type: 'library', name: `Async Http Client (java)` },
     'AHC/2.0': { type: 'library', name: `Async Http Client (java)` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
+    'Bun/1.0.7': { type: 'library', name: `Bun` },
     'CarrierWave/2.2.4': { type: 'library', name: `CarrierWave (ruby)` },
     'colly - https://github.com/gocolly/colly': { type: 'library', name: `Colly` },
     'Dalvik/2.1.0 (Linux; U; Android 9; SM-N950U Build/PPR1.180610.011)': { type: 'library', name: `Dalvik` },
@@ -1018,6 +1023,7 @@ const deviceTests = {
     'Bose;Bose_Soundbar_700;1d2cf25b1643474983fae381b00cea3c;;tpapi;3.198.103': { type: 'device', name: `Other Smart Speaker` },
     'HEOS;DENON-DWA_40-200;3c043256d0a14590ab901fdc062e55c7;;tpapi;3.202.330': { type: 'device', name: `Other Smart Speaker` },
     'Denon;DENON-DWHS_60-150;8f2c0cd9c29f44b39c868f9c7055662c;;tpapi;3.202.330': { type: 'device', name: `Other Smart Speaker` },
+    'Storybutton/1.0': { type: 'device', name: `Other Smart Speaker` },
     'Mozilla/5.0 (Mobile; Nokia_8110_4G; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5.1 PodKast': { type: 'device', name: `Other Mobile Device` },
     'Zune/4.8': { type: 'device', name: `Other Mobile Device` },
     'PodcastGuru 2.0.2-beta3': { type: 'device', name: `Other Mobile Device` },
