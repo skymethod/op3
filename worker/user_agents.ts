@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@96e1bb4f0cebf565e0d4a50f56d54b663dd34361 (2024-02-28T17:51:31Z)
+// from user-agents-v2@af426a2766018bc6727bcf45d982433c7fa6cc74 (2024-02-28T17:54:03Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -130,6 +130,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ HeadlessChrome\/\d/.test(userAgent)) return { name: `Puppeteer`, type: 'bot' };
     if (/python-requests/.test(userAgent)) return { name: `python-requests`, type: 'bot' };
     if (/qiniu.*spider/.test(userAgent)) return { name: `Qiniu spider`, type: 'bot' };
+    if (/^Radioline Stream Monitoring/.test(userAgent)) return { name: `Radioline Stream Monitoring`, type: 'bot' };
     if (/RedCircle/.test(userAgent)) return { name: `RedCircle`, type: 'bot' };
     if (/ RidderBot\//.test(userAgent)) return { name: `Ridder Bot`, type: 'bot' };
     if (/^RSStT/.test(userAgent)) return { name: `RSS to Telegram`, type: 'bot' };

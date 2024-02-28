@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@96e1bb4f0cebf565e0d4a50f56d54b663dd34361 (2024-02-28T17:51:31Z)
+// from user-agents-v2@af426a2766018bc6727bcf45d982433c7fa6cc74 (2024-02-28T17:54:03Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -145,6 +145,7 @@ const botTests = {
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/105.0.5173.0 Safari/537.36': { type: 'bot', name: `Puppeteer` },
     'z0-qiniu-imgstg-spider-1.0': { type: 'bot', name: `Qiniu spider` },
+    'Radioline Stream Monitoring (tech@radioline.co)': { type: 'bot', name: `Radioline Stream Monitoring` },
     'RedCircle': { type: 'bot', name: `RedCircle` },
     'Mozilla/5.0 (compatible; RidderBot/1.0; bot@ridder.co)': { type: 'bot', name: `Ridder Bot` },
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
