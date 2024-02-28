@@ -1,77 +1,102 @@
 {
   "paragraph_1": {
-    "fr": "Le projet Open Podcast Prefix (OP3) est un <a href=\"https://soundsprofitable.com/update/prefix-analytics\">service d'analyse de préfixe</a> de podcast <a href=\"https://github.com/skymethod/op3\">open-source</a> et gratuit, engagé envers les données ouvertes et la confidentialité des auditeurs."
+    "fr": "Le projet Open Podcast Prefix (OP3) est un <a href=\"https://soundsprofitable.com/update/prefix-analytics\">service d'analyse de préfixe</a> de podcast <a href=\"https://github.com/skymethod/op3\">open-source</a> et gratuit, engagé envers les données ouvertes et la confidentialité des auditeurs.",
+    "nl": "Het Open Podcast Prefix Project (OP3) is een gratis en <a href=\"https://github.com/skymethod/op3\">open-source</a> dienst voor <a href=\"https://soundsprofitable.com/update/prefix-analytics\">podcast-prefixanalyse</a> die zich inzet voor open data en de privacy van luisteraars."
   },
   "box_1_line_1": {
-    "fr": "C'est facile : aucune inscription ni connexion n'est requise"
+    "fr": "C'est facile : aucune inscription ni connexion n'est requise",
+    "nl": "Het is zo makkelijk: geen aanmelding of inloggen vereist."
   },
   "box_1_line_2": {
-    "fr": "Les podcasteurices ou les hébergeurs de podcasts peuvent ajouter un préfixe d'URL"
+    "fr": "Les podcasteurices ou les hébergeurs de podcasts peuvent ajouter un préfixe d'URL",
+    "nl": "Podcasters of podcasthosts kunnen een URL-voorvoegsel toevoegen"
   },
   "box_1_line_3": {
-    "fr": "au lien vers l'épisode pour commencer à mesurer les téléchargements."
+    "fr": "au lien vers l'épisode pour commencer à mesurer les téléchargements.",
+    "nl": "naar podcastaflevering url's in hun feed om deel te nemen en downloads te gaan meten."
   },
   "box_1_line_4": {
-    "fr": "(Pas besoin de supprimer les préfixes existants, il peut y en avoir plus d'un)"
+    "fr": "(Pas besoin de supprimer les préfixes existants, il peut y en avoir plus d'un)",
+    "nl": "(Geen noodzaak om bestaande voorvoegsels te verwijderen, er kunnen er meer dan één zijn)"
   },
   "box_1_line_5": {
-    "fr": "Pour plus d'informations, consultez votre flux en utilisant notre page de <a href=\"/setup\" class=\"localized\">configuration →</a>"
+    "fr": "Pour plus d'informations, consultez votre flux en utilisant notre page de <a href=\"/setup\" class=\"localized\">configuration →</a>",
+    "nl": "Voor meer instructies, controleer uw feed met behulp van onze <a href=\"/setup\" class=\"localized\">installatiepagina →</a>"
   },
   "paragraph_2": {
-    "fr": "Une fois que vous commencez à utiliser ce préfixe, vous permettez la captation d'audience de votre émission au monde entier, <i>sans compromettre la vie privée de vos auditeurs</i>. Les développeurs d'applications et les entreprises peuvent commencer à créer des produits et des services pour vous en utilisant ces données ouvertes, sans que vous ayez à gérer une intégration personnalisée."
+    "fr": "Une fois que vous commencez à utiliser ce préfixe, vous permettez la captation d'audience de votre émission au monde entier, <i>sans compromettre la vie privée de vos auditeurs</i>. Les développeurs d'applications et les entreprises peuvent commencer à créer des produits et des services pour vous en utilisant ces données ouvertes, sans que vous ayez à gérer une intégration personnalisée.",
+    "nl": "Zodra u deze voorvoegsel begint te gebruiken, opent u de luistercijfers van uw show voor de wereld, <i>zonder de privacy van uw luisteraars in gevaar te brengen</i>. App-ontwikkelaars en bedrijven kunnen beginnen met het bouwen van producten en diensten voor u met behulp van deze open data, zonder dat u een aangepaste integratie hoeft te beheren."
   },
   "stats_box_paragraph_1": {
-    "fr": "Chaque émission mesurée par OP3 reçoit automatiquement une page de statistiques gratuite et publique avec des métriques de téléchargements de podcast standard de l'industrie, en détails, et même l'export des données sous forme d'une feuille de calculs<em>avec un historique complet</em>."
+    "fr": "Chaque émission mesurée par OP3 reçoit automatiquement une page de statistiques gratuite et publique avec des métriques de téléchargements de podcast standard de l'industrie, en détails, et même l'export des données sous forme d'une feuille de calculs<em>avec un historique complet</em>.",
+    "nl": "Elke show die gemeten wordt door OP3 ontvangt automatisch een gratis, openbare statistiekenpagina met podcast-downloadstatistieken die voldoen aan de industriestandaard, gedetailleerde analyses, zelfs export van gegevens naar spreadsheets <em>met volledige geschiedenis</em>."
   },
   "stats_box_demo_link_label": {
-    "fr": "Exemple d'une page de statistiques publique →"
+    "fr": "Exemple d'une page de statistiques publique →",
+    "nl": "Voorbeeld van een openbare statistiekenpagina →"
   },
   "paragraph_3": {
-    "fr": "Ce service est différent de tous les autres services d'analyse, car ouvert (open source) et vérifiable. L'ensemble du code source est disponible pour vérification sur <a href=\"https://github.com/skymethod/op3\">GitHub</a>, tout comme les actions de déploiement associées. OP3 s'exécute sur une seule plateforme cloud, sans mélanger les données avec des bases de données d'adresses IP tierces externes !"
+    "fr": "Ce service est différent de tous les autres services d'analyse, car ouvert (open source) et vérifiable. L'ensemble du code source est disponible pour vérification sur <a href=\"https://github.com/skymethod/op3\">GitHub</a>, tout comme les actions de déploiement associées. OP3 s'exécute sur une seule plateforme cloud, sans mélanger les données avec des bases de données d'adresses IP tierces externes !",
+    "nl": "Deze service onderscheidt zich van alle andere analyseservices doordat hij open - open source - en verifieerbaar is. De volledige codebase is beschikbaar voor audit op <a href=\"https://github.com/skymethod/op3\">GitHub</a>, evenals de bijbehorende implementatieacties. OP3 wordt uitgevoerd op een enkel cloudplatform, waarbij geen gegevens worden gemengd met externe IP-adresdatabases van derden!"
   },
   "privacy_policy_line": {
-    "fr": "Pour plus de détails, consultez notre <a href=\"/privacy\">politique de confidentialité</a>."
+    "fr": "Pour plus de détails, consultez notre <a href=\"/privacy\">politique de confidentialité</a>.",
+    "nl": "Bekijk onze <em>leesbare</em> <a href=\"/privacy\">privacyverklaring</a> voor meer details."
   },
   "paragraph_4": {
-    "fr": "OP3 fonctionne sur un CDN mondial avec des connexions dans plus de 300 villes réparties dans plus de 120 pays. C'est l'un des services de redirection de podcast les plus rapides (si ce n'est le plus rapide). Gardez un œil sur notre <a href=\"https://poduptime.com/op3/\">temps de disponibilité mesuré de manière indépendante</a>."
+    "fr": "OP3 fonctionne sur un CDN mondial avec des connexions dans plus de 300 villes réparties dans plus de 120 pays. C'est l'un des services de redirection de podcast les plus rapides (si ce n'est le plus rapide). Gardez un œil sur notre <a href=\"https://poduptime.com/op3/\">temps de disponibilité mesuré de manière indépendante</a>.",
+    "nl": "OP3 draait op een wereldwijd CDN met edge nodes in meer dan 300 steden in meer dan 120 landen. Het is een van de snelste (zo niet dé snelste) podcast-omleidingsdiensten. Houd onze <a href=\"https://poduptime.com/op3/\">onafhankelijk gemeten uptime</a> in de gaten."
   },
   "paragraph_5": {
-    "fr": "Nous fonctionnons sans problème depuis septembre 2022, mesurant maintenant plus de %d millions de téléchargements de podcasts chaque mois sur plus de %d émissions. Nos données sont disponibles au public via l'<a href=\"/api/docs\">API OP3</a>."
+    "fr": "Nous fonctionnons sans problème depuis septembre 2022, mesurant maintenant plus de %d millions de téléchargements de podcasts chaque mois sur plus de %d émissions. Nos données sont disponibles au public via l'<a href=\"/api/docs\">API OP3</a>.",
+    "nl": "Sinds september 2022 draaien we soepel en meten we nu meer dan %d miljoen podcastdownloads per maand over meer dan %d shows. Onze gegevens zijn beschikbaar voor het publiek via de <a href=\"/api/docs\">OP3 API</a>."
   },
   "paragraph_6": {
-    "fr": "OP3 est un projet indépendant de <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, reposant uniquement sur des sponsors qui partagent notre vision pour aider à couvrir nos <a href=\"/costs\">coûts</a> - nous n'existerions pas sans eux."
+    "fr": "OP3 est un projet indépendant de <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, reposant uniquement sur des sponsors qui partagent notre vision pour aider à couvrir nos <a href=\"/costs\">coûts</a> - nous n'existerions pas sans eux.",
+    "nl": "OP3 is een onafhankelijk project van <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a> en vertrouwt uitsluitend op sponsors die onze visie delen om onze <a href=\"/costs\">kosten</a> te dekken - we zouden niet bestaan zonder hen."
   },
   "sponsor_us_link_label": {
-    "fr": "Devenez sponsor !"
+    "fr": "Devenez sponsor !",
+    "nl": "Sponsor ons!"
   },
   "learn_more_line": {
-    "fr": "En savoir plus sur nos projets futurs sur le <a href=\"https://github.com/skymethod/op3#op3\">GitHub →"
+    "fr": "En savoir plus sur nos projets futurs sur le <a href=\"https://github.com/skymethod/op3#op3\">GitHub →",
+    "nl": "Lees meer over onze toekomstplannen op de <a href=\"https://github.com/skymethod/op3#op3\">GitHub readme →"
   },
   "privacy_policy_link_label": {
-    "fr": "Politique de confidentialité"
+    "fr": "Politique de confidentialité",
+    "nl": "Privacybeleid"
   },
   "terms_of_service_link_label": {
-    "fr": "C.G.U."
+    "fr": "C.G.U.",
+    "nl": "Algemene voorwaarden"
   },
   "costs_link_label": {
-    "fr": "Coûts"
+    "fr": "Coûts",
+    "nl": "Kosten"
   },
   "releases_link_label": {
-    "fr": "Versions"
+    "fr": "Versions",
+    "nl": "Versies"
   },
   "status_link_label": {
-    "fr": "Statut"
+    "fr": "Statut",
+    "nl": "Status"
   },
   "email_link_label": {
-    "fr": "E-mail"
+    "fr": "E-mail",
+    "nl": "E-mail"
   },
   "sponsor_link_label": {
-    "fr": "Sponsor"
+    "fr": "Sponsor",
+    "nl": "Sponsor"
   },
   "version": {
-    "fr": "Version"
+    "fr": "Version",
+    "nl": "Versie"
   },
   "deployed": {
-    "fr": "Déploiement"
+    "fr": "Déploiement",
+    "nl": "Geïmplementeerd"
   }
 }

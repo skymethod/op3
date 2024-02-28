@@ -8,12 +8,13 @@ type Opts = { hourlyDownloads: Record<string, number>, dailyFoundAudience: Recor
 export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings, lang }: Opts) => {
 
     const [ 
-        sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
+        sevenDayDownloadsDiv, sevenDaySpacerLine, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, 
         thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, 
         downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph,
         audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph,
     ] = [
         element('seven-day-downloads'),
+        element('seven-day-spacer-line'),
         element('seven-day-downloads-asof'),
         element<HTMLCanvasElement>('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
@@ -29,8 +30,8 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
         element<HTMLCanvasElement>('audience-minigraph'),
     ];
 
-    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
-    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDaySpacerLine,  sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, undefined, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
 
     const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, strings, lang);
     const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph, strings, lang);
@@ -48,9 +49,11 @@ export const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings
 
 //
 
-function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, valueDiv: HTMLElement, asofSpan: HTMLElement, sparklineCanvas: HTMLCanvasElement, lang: string | undefined) {
+function initDownloadsBox(n: number, hourlyDownloads: Record<string, number>, valueDiv: HTMLElement, spacerLine: HTMLElement | undefined,  asofSpan: HTMLElement, sparklineCanvas: HTMLCanvasElement, lang: string | undefined) {
     const locale = lang ?? 'en-US';
     const asofFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+    if (spacerLine && lang === 'nl') spacerLine.classList.remove('hidden');
 
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
 
@@ -197,7 +200,7 @@ function initMonthlyBox(monthlyCounts: Record<string, number>, countDiv: HTMLEle
     const [ thisMonth, thisMonthCount ] = Object.entries(monthlyCounts).at(-1) ?? [ '', 0 ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
 
-    if (lang === 'fr') spacerLine.classList.remove('hidden');
+    if (lang === 'fr' || lang === 'nl') spacerLine.classList.remove('hidden');
 
     const hoverListeners: HoverMonthHandler[] = [];
     const onHoverMonth: HoverMonthHandler = hoverMonth => {

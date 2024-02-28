@@ -113,6 +113,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         langLabelCurrent: supportedLanguageLabels[lang ?? 'en'],
         langLabelEn: supportedLanguageLabels['en'],
         langLabelFr: supportedLanguageLabels['fr'],
+        langLabelNl: supportedLanguageLabels['nl'],
     }, showPageTranslations, lang);
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'content-language': contentLanguage } });

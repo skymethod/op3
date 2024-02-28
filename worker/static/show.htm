@@ -59,6 +59,7 @@ const strings = {
             <sl-card class="card-basic w-[16rem]">
                 <div class="text-[2.5rem] leading-none mb-2" id="seven-day-downloads">xxx</div>
                 <div class="text-sm">${s:downloads_in_last_n_days:charlimit=30:days=7:'downloads in last %d days'}</div>
+                <div id="seven-day-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:charlimit=10:'as of'} <span id="seven-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
                     <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
@@ -466,6 +467,7 @@ const strings = {
                     <sl-menu id="footer-language-menu" class="text-left">
                         <sl-menu-item value="en">${langLabelEn}</sl-menu-item>
                         <sl-menu-item value="fr">${langLabelFr}</sl-menu-item>
+                        <sl-menu-item value="nl">${langLabelNl}</sl-menu-item>
                     </sl-menu>
                 </sl-dropdown>
             </div>

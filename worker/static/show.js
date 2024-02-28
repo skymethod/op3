@@ -8367,7 +8367,8 @@ function pluralize(n, strings1, singleKey, pluralKey, format) {
 }
 const supportedLanguageLabels = {
     en: 'English (US)',
-    fr: 'Français'
+    fr: 'Français',
+    nl: 'Nederlands'
 };
 Object.keys(supportedLanguageLabels);
 const withCommas = new Intl.NumberFormat('en-US');
@@ -9154,8 +9155,9 @@ async function downloadDownloads(e, showUuid, showSlug, month, previewToken1, in
     });
 }
 const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strings1, lang })=>{
-    const [sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph] = [
+    const [sevenDayDownloadsDiv, sevenDaySpacerLine, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph] = [
         element('seven-day-downloads'),
+        element('seven-day-spacer-line'),
         element('seven-day-downloads-asof'),
         element('seven-day-downloads-sparkline'),
         element('thirty-day-downloads'),
@@ -9170,8 +9172,8 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strin
         element('audience-spacer-line'),
         element('audience-minigraph')
     ];
-    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
-    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(7, hourlyDownloads, sevenDayDownloadsDiv, sevenDaySpacerLine, sevenDayDownloadsAsofSpan, sevenDayDownloadsSparklineCanvas, lang);
+    initDownloadsBox(30, hourlyDownloads, thirtyDayDownloadsDiv, undefined, thirtyDayDownloadsAsofSpan, thirtyDayDownloadsSparklineCanvas, lang);
     const monthlyDownloadsBox = initMonthlyBox(computeMonthlyCounts(hourlyDownloads), downloadsCountDiv, downloadsPeriodDiv, downloadsSpacerLine, downloadsMinigraph, strings1, lang);
     const monthlyAudienceBox = initMonthlyBox(computeMonthlyCounts(dailyFoundAudience), audienceCountDiv, audiencePeriodDiv, audienceSpacerLine, audienceMinigraph, strings1, lang);
     monthlyDownloadsBox.addHoverListener(monthlyAudienceBox.onHoverMonth);
@@ -9182,7 +9184,7 @@ const makeHeadlineStats = ({ hourlyDownloads, dailyFoundAudience, strings: strin
         update
     };
 };
-function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanvas, lang) {
+function initDownloadsBox(n, hourlyDownloads, valueDiv, spacerLine, asofSpan, sparklineCanvas, lang) {
     const locale = lang ?? 'en-US';
     const asofFormat = new Intl.DateTimeFormat(locale, {
         weekday: 'short',
@@ -9190,6 +9192,7 @@ function initDownloadsBox(n, hourlyDownloads, valueDiv, asofSpan, sparklineCanva
         day: 'numeric',
         timeZone: 'UTC'
     });
+    if (spacerLine && lang === 'nl') spacerLine.classList.remove('hidden');
     const nDayDownloads = computeHourlyNDayDownloads(n, hourlyDownloads);
     if (Object.keys(nDayDownloads).length === 0) {
         valueDiv.textContent = getNumberFormat(lang).format(Object.values(hourlyDownloads).reduce((a, b)=>a + b, 0));
@@ -9332,7 +9335,7 @@ function initMonthlyBox(monthlyCounts, countDiv, periodDiv, spacerLine, minigrap
         0
     ];
     const initialMonth = lastMonthCount > thisMonthCount ? lastMonth : thisMonth;
-    if (lang === 'fr') spacerLine.classList.remove('hidden');
+    if (lang === 'fr' || lang === 'nl') spacerLine.classList.remove('hidden');
     const hoverListeners = [];
     const onHoverMonth = (hoverMonth)=>{
         const month = hoverMonth ?? initialMonth;

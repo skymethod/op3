@@ -125,6 +125,7 @@ export function computePreferredSupportedLanguage({ langParam, acceptLanguage }:
 export const supportedLanguageLabels: Record<string, string> = {
     en: 'English (US)',
     fr: 'Français',
+    nl: 'Nederlands',
 };
 
 export const supportedLanguages = Object.keys(supportedLanguageLabels);
