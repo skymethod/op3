@@ -287,7 +287,7 @@
   "top_latin_american_regions": {
     "fr": "Top régions d'Amérique latine",
     "nl": "Top Latijns-Amerikaanse regio's",
-    "es": "Principales regiones de América Latina"
+    "es": "Top regiones de América Latina"
   },
   "top_eu_regions": {
     "fr": "Top régions de l'UE",
@@ -302,7 +302,7 @@
   "top_australasian_regions": {
     "fr": "Top régions d'Australasie",
     "nl": "Top Australaziatische regio's",
-    "es": "Principales regiones de Australasia"
+    "es": "Top de regiones de Australasia"
   },
   "top_apps": {
     "fr": "Top applications",
@@ -322,7 +322,7 @@
   "top_browsers_and_referrers": {
     "fr": "Top navigateurs et sources",
     "nl": "Top browsers & verwijzers",
-    "es": "Principales navegadores y referrers"
+    "es": "Top navegadores y referrers"
   },
   "cancel": {
     "fr": "Annuler",
