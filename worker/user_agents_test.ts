@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@a910e4b3f7c85c34fead67ca74829c2c69bae074 (2024-02-28T21:36:38Z)
+// from user-agents-v2@56105dcca0cfe520cc08b3761d5812176ea6f87e (2024-03-03T12:11:19Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -368,7 +368,6 @@ const appTests = {
     'Google;ChromecastHD;756a522d9f1648b89e76e80be654456a;;tpapi;3.200.454': { type: 'app', name: `Chromecast device` },
     'ChurchLink/110519 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `ChurchLink` },
     'Clammr/5 CFNetwork/758.3.15 Darwin/15.4.0': { type: 'app', name: `Clammr` },
-    'Classic FM/1563188702 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Classic FM` },
     'Client/16042 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Client` },
     'Club/126 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `Club` },
     'Commotion/3.0.79 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `Commotion` },
@@ -478,7 +477,6 @@ const appTests = {
     'GBEngine/1.2 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `GBEngine` },
     'GMB Show/1.2.0 (iPad; iOS 9.3.2; Scale/2.00)': { type: 'app', name: `GMB Show` },
     'Godster/2.0.6 (Linux;Android 9) ExoPlayerLib/2.8.3': { type: 'app', name: `Godster` },
-    'Gold/1528207522 CFNetwork/902.2 Darwin/17.7.0': { type: 'app', name: `Gold` },
     'GoldenPod/0.8.4 (GNU/Linux; podcatcher; Using LWP) libwwwperl': { type: 'app', name: `GoldenPod` },
     'GoLoud/1092 CFNetwork/978.0.7 Darwin/18.6.0': { type: 'app', name: `GoLoud` },
     'Goodpods.Android / 2.2.2': { type: 'app', name: `Goodpods` },
@@ -517,7 +515,6 @@ const appTests = {
     'Hammel/1.5 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Hammel` },
     'HardCast/11 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `HardCast` },
     'Hark/10678 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Hark Audio` },
-    'Heart/1528207522 CFNetwork/897.15 Darwin/17.5.0': { type: 'app', name: `Heart` },
     'hermespod.com/v1.5.x': { type: 'app', name: `HermesPod` },
     'HiCast/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `HiCast` },
     'Highly/914 CFNetwork/758.5.3 Darwin/15.6.0': { type: 'app', name: `Highly` },
@@ -608,7 +605,6 @@ const appTests = {
     'KREAFUNK/1.7 CFNetwork/711.3.18 Darwin/14.0.0': { type: 'app', name: `KREAFUNK` },
     'labs/0.1.1.5 CFNetwork/711.2.23 Darwin/14.0.0': { type: 'app', name: `labs` },
     'Laughable/2.1.6.1 CFNetwork/808.1.4 Darwin/16.1.0': { type: 'app', name: `Laughable` },
-    'LBC/1544724632 CFNetwork/811.5.4 Darwin/16.7.0': { type: 'app', name: `LBC` },
     'Leaf/12 CFNetwork/720.0.9 Darwin/14.0.0 (x86_64)': { type: 'app', name: `Leaf` },
     'lesindesradios': { type: 'app', name: `Les Indés Radios` },
     'lesindesradios/9.1.0 (Linux;Android 8.0.0) ExoPlayerLib/2.9.2': { type: 'app', name: `Les Indés Radios` },
@@ -766,6 +762,10 @@ const appTests = {
     'GetPodcast/5.10.5.3 (Linux; Android 13; de_DE) ExoPlayerLib/2.18.2': { type: 'app', name: `radio.de` },
     'Radioline%202/5.8.4 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Radioline` },
     'Radioline': { type: 'app', name: `Radioline` },
+    'Radioplayer/7.7.4.100 ios/17.2.1 AVPlayer/5.0.0 (Swift) Radioplayer Worldwide Ltd': { type: 'app', name: `RadioPlayer` },
+    'Radioplayer/7.7.4.100 android/13 ExoPlayer/2.18.1 Radioplayer Worldwide Ltd': { type: 'app', name: `RadioPlayer` },
+    'Radioplayer/100 CFNetwork/1490.0.4 Darwin/23.2.0': { type: 'app', name: `RadioPlayer` },
+    'Radioplayer%20UK/815 CFNetwork/1490.0.4 Darwin/23.2.0': { type: 'app', name: `RadioPlayer` },
     'RadioPublic/android-2.2': { type: 'app', name: `RadioPublic` },
     'RadioPublic/iOS-2.0': { type: 'app', name: `RadioPublic` },
     'RadioPublicDraper/81b12be Faraday/0.15.2 ruby/2.3.8': { type: 'app', name: `RadioPublic` },
@@ -899,6 +899,21 @@ const appTests = {
     'Global Player/119.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
     'Global Player/119.0 (iPad; CPU iPad OS 17_2 like Mac OS X)': { type: 'app', name: `Global Player` },
     'Global Player/78.0.0 Android 14/samsung SM-S911B': { type: 'app', name: `Global Player` },
+    'Radio X/120.1 (iPhone; CPU iPhone OS 16_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Capital XTRA/119.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Capital FM/78.1.0 Android 14/samsung SM-S901B': { type: 'app', name: `Global Player` },
+    'Smooth/121.0 (iPhone; CPU iPhone OS 17_3 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'LBC/91 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'LBC/120.1 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'LBC/67.0.0 Android 13/samsung SM-A135F': { type: 'app', name: `Global Player` },
+    'Heart/120.1 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Heart/69.0.0 Android 11/samsung SM-A405FN': { type: 'app', name: `Global Player` },
+    'Classic FM/120.1 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Classic FM/78.0.0 Android 11/samsung SM-A202F': { type: 'app', name: `Global Player` },
+    'Gold/120.1 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)': { type: 'app', name: `Global Player` },
+    'Gold/78.1.0 Android 14/samsung SM-S911B': { type: 'app', name: `Global Player` },
+    'Talk%20Radio/45.2.1./iOS 17.2.1/iPhone iPhone': { type: 'app', name: `TalkRadio` },
+    'Talk%20Radio/45.2.1./iPadOS 15.8/iPad 3)': { type: 'app', name: `TalkRadio` },
 };
 
 const libraryTests = {
@@ -1067,6 +1082,9 @@ const referrerTests = {
     'https://goodpods.com': { type: 'referrer', name: `Goodpods` },
     'https://podcasts.google.com/': { type: 'referrer', name: `Google Podcasts` },
     'https://make.headliner.app/': { type: 'referrer', name: `Headliner` },
+    'https://disco.headliner.link/': { type: 'referrer', name: `Headliner` },
+    'https://eddy.headliner.app/': { type: 'referrer', name: `Headliner` },
+    'https://play.headliner.app/': { type: 'referrer', name: `Headliner` },
     'https://www.iheart.com/': { type: 'referrer', name: `iHeartRadio` },
     'https://www.inoreader.com/': { type: 'referrer', name: `Inoreader` },
     'https://www.ivoox.com/': { type: 'referrer', name: `iVoox` },
