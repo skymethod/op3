@@ -68,3 +68,7 @@ export function newQueryResponse({ startTime, format, headers, rows, continuatio
     const obj = format === 'json-a' ? { headers, rows, count, queryTime, continuationToken } : { rows, count, queryTime, continuationToken };
     return new Response(JSON.stringify(obj, undefined, 2), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
+
+export function normalizeDevice(device: string): string {
+    return device.toLowerCase().replaceAll(/[^a-z]+/g, '_');
+}

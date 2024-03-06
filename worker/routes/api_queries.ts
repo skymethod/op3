@@ -14,6 +14,7 @@ import { consoleWarn } from '../tracer.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS } from './api_contract.ts';
 import { isValidRecentEpisodes } from './api_queries_model.ts';
+import { normalizeDevice } from './api_query_common.ts';
 import { lookupShowId } from './api_shows.ts';
 import { computeAppDownloads } from './api_shows_shared.ts';
 
@@ -21,6 +22,8 @@ type Opts = { name: string, method: string, searchParams: URLSearchParams, miscB
 
 export async function computeQueriesResponse({ name, method, searchParams, miscBlobs, roMiscBlobs, rpcClient, roRpcClient, configuration, statsBlobs, roStatsBlobs }: Opts): Promise<Response> {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
+
+    const debug = searchParams.has('debug');
 
     const start = Date.now();
 
@@ -52,8 +55,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
     if (name === 'top-apps-for-show') {
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
         if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
-        const debug = searchParams.has('debug');
-
+       
         const { showUuid: showUuidParam, podcastGuid, feedUrlBase64 } = Object.fromEntries(searchParams);
         let showUuidOrPodcastGuidOrFeedUrlBase64 = '';
         try {
@@ -98,6 +100,24 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const appDownloads = Object.fromEntries(sortBy(Object.entries(unsortedAppDownloads), v => -v[1]));
         const queryTime = Date.now() - start;
         return newJsonResponse({ showUuid: showUuidInput, appDownloads, queryTime, ...(debug ? { times } : {}) });
+    }
+
+    if (name == 'top-apps') {
+        const times: Record<string, number> = {};
+
+        const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
+        if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
+
+        const { device: deviceParam = 'total' } = Object.fromEntries(searchParams);
+        const normDevice = normalizeDevice(deviceParam);
+
+        const obj = await targetStatsBlobs.get(`apps/${normDevice}.json`, 'json');
+        if (!obj) return newJsonResponse({ error: 'unknown device' }, 400);
+
+        const { appShares, device, minDate, maxDate } = obj as { appShares: Record<string, number>, device?: string, minDate: string, maxDate: string };
+
+        const queryTime = Date.now() - start;
+        return newJsonResponse({ appShares, device, minDate, maxDate, queryTime, ...(debug ? { times } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);

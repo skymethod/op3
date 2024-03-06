@@ -44,6 +44,14 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-03-06',
+        time: '2024-03-06T18:26:00.00Z',
+        title: '2024-03-06: New API query: Top apps across all OP3 shows',
+        bulletPoints: [
+            ({ origin }) => `New API call to [query top apps](${origin}/api/docs#tag/queries/operation/queryTopApps) across all OP3 shows.`,
+        ]
+    },
+    {
         id: '2024-02-28b',
         time: '2024-02-28T22:13:00.00Z',
         title: '2024-02-28: Spanish translation',

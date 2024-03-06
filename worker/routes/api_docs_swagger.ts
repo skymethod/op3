@@ -16,6 +16,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let viewShowDescriptionSuffix = '';
     let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
     let queryTopAppsForShowDescriptionSuffix = '';
+    let queryTopAppsDescriptionSuffix = '';
 
     const previewToken = templateMode ? 'PREVIEW_TOKEN_TEMPLATE' : [...previewTokens].at(0);
     let demoShowUuid: string | undefined;
@@ -35,6 +36,9 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
 
             const exampleQueryTopAppsForShowApiCall = `${origin}/api/1/queries/top-apps-for-show?showUuid=${demoShowUuid}&token=${previewToken}`;
             queryTopAppsForShowDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsForShowApiCall}](${exampleQueryTopAppsForShowApiCall})`;
+
+            const exampleQueryTopAppsApiCall = `${origin}/api/1/queries/top-apps?token=${previewToken}`;
+            queryTopAppsDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsApiCall}](${exampleQueryTopAppsApiCall})`;
         }
 
         viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>The canonical OP3 stats page for the show is returned in the \`statsPageUrl\` response field, but in general are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
@@ -51,14 +55,14 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
     
-    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix);
     const json = JSON.stringify(swagger, undefined, 2);
     return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -520,6 +524,48 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                     ]
                 }
             },
+            "/queries/top-apps": {
+                "get": {
+                    "tags": [
+                        "queries"
+                    ],
+                    "summary": "Query the top apps across all OP3 shows",
+                    "description": `List global app share over the last thirty days.\n\nResults are returned in reverse order (most downloads to fewest).${queryTopAppsDescriptionSuffix}`,
+                    "operationId": "queryTopApps",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "device",
+                            "in": "query",
+                            "description": "If specified, constrains the results to a single device.\n\nDevice names can be found in the [opawg/user-agents-v2 device list](https://github.com/opawg/user-agents-v2/blob/master/src/devices.json).\n\nBear in mind not all user-agents send enough info to derive the device, so this may be of limited utility.",
+                            "required": false,
+                            "type": "string",
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryTopAppsResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
         
         "securityDefinitions": {
@@ -831,6 +877,36 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                 },
                 "required": [
                     "showUuid", "appDownloads", "queryTime"
+                ]
+            },
+            "QueryTopAppsResponse": {
+                "type": "object",
+                "properties": {
+                    "appShares": {
+                        "type": "object",
+                        "description": "Share percentage per app over the last 30 days. Sorted by most to fewest downloads",
+                        "additionalProperties": true,
+                        "format": "{ \"App Name\": number }"
+                    },
+                    "device": {
+                        "type": "string",
+                        "description": "Device type, if filtered to a specific device",
+                    },
+                    "minDate": {
+                        "type": "string",
+                        "description": "Oldest utc day in data range",
+                    },
+                    "maxDate": {
+                        "type": "string",
+                        "description": "Newest utc day in data range",
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
+                },
+                "required": [
+                    "appShares", "minDate", "maxDate", "queryTime"
                 ]
             },
         }
