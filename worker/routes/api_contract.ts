@@ -16,4 +16,4 @@ export const QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS = {
     limitMin: 1,
 }
 
-export const computeApiVersion = (instance: string): string => `0.0.2${instance === 'prod' ? '' : `-${instance}`}`;
+export const computeApiVersion = (instance: string): string => `0.0.3${instance === 'prod' ? '' : `-${instance}`}`;

@@ -11,6 +11,7 @@ import { RpcClient } from '../rpc_model.ts';
 import { incrementAll } from '../summaries.ts';
 import { addMonthsToMonthString } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
+import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS } from './api_contract.ts';
 import { isValidRecentEpisodes } from './api_queries_model.ts';
@@ -108,16 +109,20 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
         if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
 
-        const { device: deviceParam = 'total' } = Object.fromEntries(searchParams);
-        const normDevice = normalizeDevice(deviceParam);
+        const { deviceNameParam, userAgent } = Object.fromEntries(searchParams);
+        if (typeof deviceNameParam === 'string' && typeof userAgent === 'string') return newJsonResponse({ error: `Cannot specify both 'deviceName' and 'userAgent'` }, 400);
+
+        const inferredDeviceName = userAgent ? computeUserAgentEntityResult(userAgent)?.device?.name : undefined;
+
+        const normDevice = normalizeDevice(inferredDeviceName ?? deviceNameParam ?? 'total');
 
         const obj = await targetStatsBlobs.get(`apps/${normDevice}.json`, 'json');
         if (!obj) return newJsonResponse({ error: 'unknown device' }, 400);
 
-        const { appShares, device, minDate, maxDate } = obj as { appShares: Record<string, number>, device?: string, minDate: string, maxDate: string };
+        const { appShares, device: deviceName, minDate, maxDate } = obj as { appShares: Record<string, number>, device?: string, minDate: string, maxDate: string };
 
         const queryTime = Date.now() - start;
-        return newJsonResponse({ appShares, device, minDate, maxDate, queryTime, ...(debug ? { times } : {}) });
+        return newJsonResponse({ appShares, deviceName, minDate, maxDate, queryTime, ...(debug ? { times } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);

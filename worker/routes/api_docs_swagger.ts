@@ -544,9 +544,16 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                             "type": "string",
                         },
                         {
-                            "name": "device",
+                            "name": "deviceName",
                             "in": "query",
-                            "description": "If specified, constrains the results to a single device.\n\nDevice names can be found in the [opawg/user-agents-v2 device list](https://github.com/opawg/user-agents-v2/blob/master/src/devices.json).\n\nBear in mind not all user-agents send enough info to derive the device, so this may be of limited utility.",
+                            "description": "If specified, constrains the results to a single device (e.g. `Apple iPhone`).\n\nDevice names can be found in the [opawg/user-agents-v2 device list](https://github.com/opawg/user-agents-v2/blob/master/src/devices.json).\n\nBear in mind not all user-agents contain enough info to derive the device, so this may be of limited utility.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "userAgent",
+                            "in": "query",
+                            "description": "If specified, constrains the results to a single device (e.g. `Apple iPhone`) inferred from a given user agent using the [opawg/user-agents-v2 device list](https://github.com/opawg/user-agents-v2/blob/master/src/devices.json).\n\nBear in mind not all user-agents contain enough info to derive the device, so this may be of limited utility.",
                             "required": false,
                             "type": "string",
                         },
@@ -888,9 +895,9 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                         "additionalProperties": true,
                         "format": "{ \"App Name\": number }"
                     },
-                    "device": {
+                    "deviceName": {
                         "type": "string",
-                        "description": "Device type, if filtered to a specific device",
+                        "description": "Device name, if filtered to a specific device (e.g. `Apple iPhone`)",
                     },
                     "minDate": {
                         "type": "string",
