@@ -29,11 +29,12 @@
                 <li>${s:list_item_3:'<a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/downloads.ts#L63">Duplicate</a> <a href="https://github.com/skymethod/op3/blob/006a0f72748d3f895ac791679d6f15ddcaa29ec0/worker/backend/downloads.ts#L163">requests</a> in the same UTC day (24 hours) based on the secure IP address hash + User-Agent + Referer for the same normalized episode url are ignored.'}</li>
                 <li>${s:list_item_4:'Using the User-Agent header and <a href="https://github.com/opawg/user-agents-v2">user-agents-v2</a>, we ignore:'}
                     <ul>
-                        <li>${s:ignore_list_item_1:'Requests with <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L7">no User-Agent header</a>'}</li>
-                        <li>${s:ignore_list_item_2:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L4">'bot'</a>'}</li>
-                        <li>${s:ignore_list_item_3:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L5">'library' with a category of 'bot'</a>'}</li>
-                        <li>${s:ignore_list_item_4:'An <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L6">unknown user agent including the text 'bot', 'crawler', or 'spider'</a>'}</li>
-                        <li>${s:ignore_list_item_5:'One other <a href="https://github.com/skymethod/op3/blob/d72f892d5724465af3cecd372cf17f7c5a3a299f/worker/backend/bots.ts#L9">uncommon case</a> found in the wild (using OP3 data)'}</li>
+                        <li>${s:ignore_list_item_1:'Requests with <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L7">no User-Agent header</a>'}</li>
+                        <li>${s:ignore_list_item_2:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L4">'bot'</a>'}</li>
+                        <li>${s:ignore_list_item_3:'A known user agent of type <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L5">'library' with a category of 'bot'</a>'}</li>
+                        <li>${s:ignore_list_item_4:'An <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L6">unknown user agent including the text 'bot', 'crawler', or 'spider'</a>'}</li>
+                        <li>${s:ignore_list_item_5:'One other <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L9">uncommon case</a> found in the wild (using OP3 data)'}</li>
+                        <li>${s:ignore_list_item_6:'Web apps observed to <a href="https://github.com/skymethod/op3/blob/bbd98bbd2589248cf94c19defcb741262c57212a/worker/backend/bots.ts#L13">preload audio</a> before user playback'}</li>
                     </ul>
                 </li>
             </ul>
