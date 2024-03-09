@@ -1,6 +1,6 @@
 import { R2Bucket, R2ListOptions, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody } from '../deps.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { Blobs, ListOpts, ListBlobsResponse, Multiput, GetOpts } from './blobs.ts';
+import { Blobs, ListOpts, ListBlobsResponse, Multiput, GetOpts, ListBlobsWithMetadataResponse } from './blobs.ts';
 
 export class R2BucketBlobs implements Blobs {
     private readonly bucket: R2Bucket;
@@ -72,6 +72,12 @@ export class R2BucketBlobs implements Blobs {
     }
     
     async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
+        const { entries } = await this.listWithMetadata(opts);
+        const keys = entries.map(v => v.key);
+        return { keys };
+    }
+
+    async listWithMetadata(opts: ListOpts = {}): Promise<ListBlobsWithMetadataResponse> {
         const { bucket, prefix } = this;
         const { keyPrefix, afterKey } = opts;
         let listOpts: R2ListOptions = { prefix };
@@ -79,12 +85,12 @@ export class R2BucketBlobs implements Blobs {
         if (typeof afterKey === 'string') listOpts = { ...listOpts, startAfter: prefix + afterKey };
         const res = await r2(() => bucket.list(listOpts));
         const prefixLength = prefix.length;
-        const keys: string[] = [];
-        for (const { key } of res.objects) {
+        const entries: { key: string, size: number }[] = [];
+        for (const { key, size } of res.objects) {
             if (!key.startsWith(prefix)) throw new Error(`Unexpected key: ${key}`);
-            keys.push(key.substring(prefixLength));
+            entries.push({ key: key.substring(prefixLength), size });
         }
-        return { keys };
+        return { entries };
     }
 
     async startMultiput(key: string): Promise<Multiput> {

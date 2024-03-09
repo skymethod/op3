@@ -8,7 +8,7 @@ import type { UploadPartOpts } from 'https://raw.githubusercontent.com/skymethod
 import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/bdf21619d89d6084b8027e2c7d14cc6af472a9fb/common/r2/r2.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { Blobs, ListBlobsResponse, ListOpts, Multiput } from './blobs.ts';
+import { Blobs, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from './blobs.ts';
 
 export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: string, bucket: string, prefix: string };
 
@@ -20,18 +20,24 @@ export class R2ApiBlobs implements Blobs {
     }
 
     async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
+        const { entries } = await this.listWithMetadata(opts);
+        const keys = entries.map(v => v.key);
+        return { keys };
+    }
+
+    async listWithMetadata(opts: ListOpts = {}): Promise<ListBlobsWithMetadataResponse> {
         const { keyPrefix, afterKey, limit } = opts;
         const { bucket, origin, region, context } = this.opts;
         const prefix = keyPrefix ? `${this.opts.prefix}${keyPrefix}` : this.opts.prefix;
         const startAfter = afterKey ? `${this.opts.prefix}${afterKey}` : undefined;
-        const keys: string[] = [];
+        const entries: { key: string, size: number }[] = [];
         let continuationToken: string | undefined;
         let maxKeys = limit;
         while (true) {
-            if (maxKeys !== undefined && keys.length >= maxKeys) return { keys };
+            if (maxKeys !== undefined && entries.length >= maxKeys) return { entries };
             const { isTruncated, contents, nextContinuationToken: token } = await listObjectsV2WithRetries({ bucket, origin, region, prefix, startAfter, continuationToken, maxKeys }, context, 'r2-api-blobs-list');
-            keys.push(...contents.map(v => v.key.substring(this.opts.prefix.length)));
-            if (!isTruncated) return { keys };
+            entries.push(...contents.map(({ key, size }) => ({ key: key.substring(this.opts.prefix.length), size })));
+            if (!isTruncated) return { entries };
             if (maxKeys !== undefined) maxKeys -= contents.length;
             continuationToken = token;
         }

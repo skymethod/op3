@@ -10,6 +10,7 @@ export interface Blobs {
     delete(key: string): Promise<void>;
     has(key: string): Promise<boolean>;
     list(opts?: ListOpts): Promise<ListBlobsResponse>;
+    listWithMetadata(opts?: ListOpts): Promise<ListBlobsWithMetadataResponse>;
     startMultiput(key: string): Promise<Multiput>;
     head(key: string): Promise<{ etag: string } | undefined>;
 }
@@ -19,6 +20,10 @@ export type GetOpts = { ifMatch?: string };
 
 export interface ListBlobsResponse {
     readonly keys: readonly string[];
+}
+
+export interface ListBlobsWithMetadataResponse {
+    readonly entries: readonly { key: string, size: number }[];
 }
 
 export interface Multiput {

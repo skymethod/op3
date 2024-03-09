@@ -1,4 +1,4 @@
-import { Blobs, GetOpts, ListBlobsResponse, ListOpts, Multiput } from '../backend/blobs.ts';
+import { Blobs, GetOpts, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from '../backend/blobs.ts';
 import { Bytes } from '../deps.ts';
 
 export class InMemoryBlobs implements Blobs {
@@ -52,14 +52,22 @@ export class InMemoryBlobs implements Blobs {
     }
 
     async list(opts: ListOpts = {}): Promise<ListBlobsResponse> {
+        const { entries } = await this.listWithMetadata(opts);
+        const keys = entries.map(v => v.key);
+        return { keys };
+    }
+
+    async listWithMetadata(opts: ListOpts = {}): Promise<ListBlobsWithMetadataResponse> {
+        const { data } = this;
         await Promise.resolve();
         const { keyPrefix, afterKey } = opts;
-        const keys = [...this.data.keys()]
-            .sort()
+        const keys = [...data.keys()]
             .filter(v => keyPrefix === undefined || v.startsWith(keyPrefix))
             .filter(v => afterKey === undefined || v > afterKey)
+            .sort()
             ;
-        return { keys };
+        const entries = keys.map(key => ({ key, size: data.get(key)!.arr.length }));
+        return { entries };
     }
 
     async startMultiput(key: string): Promise<Multiput> {
