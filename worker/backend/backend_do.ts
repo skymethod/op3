@@ -26,6 +26,8 @@ import { recomputeShowSummariesForMonth, tryParseRecomputeShowSummariesForMonthR
 import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeQueryDownloadsResponse } from './query_downloads.ts';
 import { HitsController } from './hits_controller.ts';
+import { CloudflareConfiguration } from '../cloudflare_configuration.ts';
+import { makeCachedConfiguration } from '../configuration.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -65,7 +67,7 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, kvNamespace } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -133,8 +135,12 @@ export class BackendDO {
                     }
 
                     const getOrLoadHitsController = () => {
+                        if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init HitsController`);
+                        const hitsBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'hits/' });
                         const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
-                        if (!this.hitsController) this.hitsController = new HitsController(storage, colo, encryptIpAddress, hashIpAddress);
+                        if (kvNamespace === undefined) throw new Error(`'kvNamespace' is required to init HitsController`);
+                        const configuration = makeCachedConfiguration(new CloudflareConfiguration(kvNamespace), () => 1000 * 30); // cache config values for 30 seconds
+                        if (!this.hitsController) this.hitsController = new HitsController(storage, hitsBlobs, configuration, colo, encryptIpAddress, hashIpAddress);
                         return this.hitsController;
                     }
 

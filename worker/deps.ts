@@ -17,3 +17,4 @@ export { zip } from 'https://deno.land/std@0.219.0/collections/zip.ts';
 export { ascend, descend } from 'https://deno.land/std@0.219.0/data_structures/comparators.ts';
 export { DelimiterStream } from 'https://deno.land/std@0.219.0/streams/delimiter_stream.ts';
 export { concat } from 'https://deno.land/std@0.219.0/bytes/concat.ts';
+export { RedBlackTree } from 'https://deno.land/std@0.219.0/data_structures/red_black_tree.ts';
