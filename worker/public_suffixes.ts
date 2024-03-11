@@ -1,7 +1,7 @@
 import { tryParseUrl } from './check.ts';
 
-export function findPublicSuffix(url: string, plus = 0): string | undefined {
-    const u = tryParseUrl(url);
+export function findPublicSuffix(url: string | URL, plus = 0): string | undefined {
+    const u = typeof url === 'string' ? tryParseUrl(url) : url;
     if (!u) return undefined;
     const tokens = u.hostname.split('.');
     let start = findPublicSuffixStart(tokens);

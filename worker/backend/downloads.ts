@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkAll, checkMatches, isValidDate, isValidInstant } from '../check.ts';
+import { check, checkAll, checkMatches, isValidDate, isValidInstant, tryParseUrl } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { Bytes, sortBy, distinct, DelimiterStream } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
@@ -15,7 +15,7 @@ import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs, Multiput } from './blobs.ts';
-import { computeBotType } from './bots.ts';
+import { computeBotType, isWebWidgetHostname } from './bots.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
@@ -81,11 +81,13 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const agentName = result?.name ?? userAgent;
             const deviceType = result?.device?.category;
             const deviceName = result?.device?.name;
+            const referrerUrl = result?.type === 'browser' && referer ? tryParseUrl(referer) : undefined;
             const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
-            const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referer ? (findPublicSuffix(referer, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
+            const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referrerUrl ? (findPublicSuffix(referrerUrl, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
             let tags = isFirstTwoBytes ? 'first-two' : undefined;
             const streaming = typeof xpsId === 'string' && xpsId !== '' || agentName === 'AppleCoreMedia';
             if (streaming) tags = (tags ? `${tags},streaming` : 'streaming');
+            if (referrerUrl && isWebWidgetHostname(referrerUrl.hostname)) tags = (tags ? `${tags},web-widget` : 'web-widget');
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
             chunks.push(encoder.encode(line));
@@ -323,7 +325,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             if (partitions[showUuid ?? ''] !== partition) continue;
             
             // associate download with bot type
-            const botType = computeBotType({ agentType, agentName, deviceType, referrerName });
+            const botType = computeBotType({ agentType, agentName, deviceType, referrerName, tags });
 
             const line = [ time, episodeId, botType, serverUrl, audienceId, showUuid, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunk = encoder.encode(line);
