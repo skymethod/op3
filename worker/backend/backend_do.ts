@@ -3,7 +3,8 @@ import { Bytes, DurableObjectState, DurableObjectStorage } from '../deps.ts';
 import { checkDOInfo, DOInfo, isRpcRequest, isValidAlarmPayload, KeyKind, RpcClient, RpcResponse } from '../rpc_model.ts';
 import { IsolateId } from '../isolate_id.ts';
 import { WorkerEnv } from '../worker_env.ts';
-import { IpAddressEncryptionFn, IpAddressHashingFn, RedirectLogController } from './redirect_log_controller.ts';
+import { RedirectLogController } from './redirect_log_controller.ts';
+import { IpAddressEncryptionFn, IpAddressHashingFn } from './raw_redirects.ts';
 import { KeyClient, KeyFetcher } from './key_client.ts';
 import { KeyController } from './key_controller.ts';
 import { encrypt, hmac, importAesKey, importHmacKey } from '../crypto.ts';
@@ -132,7 +133,8 @@ export class BackendDO {
                     }
 
                     const getOrLoadHitsController = () => {
-                        if (!this.hitsController) this.hitsController = new HitsController(storage, colo);
+                        const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
+                        if (!this.hitsController) this.hitsController = new HitsController(storage, colo, encryptIpAddress, hashIpAddress);
                         return this.hitsController;
                     }
 

@@ -14,7 +14,7 @@ import { packHashedIpAddress, unpackHashedIpAddressHash } from '../ip_addresses.
 import { importHmacKey } from '../crypto.ts';
 import { isStringRecord } from '../check.ts';
 import { DoNames } from '../do_names.ts';
-import { IpAddressHashingFn } from './redirect_log_controller.ts';
+import { IpAddressHashingFn } from './raw_redirects.ts';
 import { increment } from '../summaries.ts';
 import { MULTIPLES } from './combined_redirect_log_multiples.ts';
 

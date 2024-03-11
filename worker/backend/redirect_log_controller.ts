@@ -1,14 +1,14 @@
-import { DurableObjectStorage, chunk } from '../deps.ts';
-import { AttNums } from './att_nums.ts';
-import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
-import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
-import { AlarmPayload, PackedRedirectLogs, RpcClient, RawRedirect, Unkinded, AdminDataRequest, AdminDataResponse } from '../rpc_model.ts';
 import { check, tryParseInt } from '../check.ts';
-import { consoleError, consoleWarn, writeTraceEvent } from '../tracer.ts';
+import { DurableObjectStorage, chunk } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmPayload, PackedRedirectLogs, RawRedirect, RpcClient, Unkinded } from '../rpc_model.ts';
+import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
+import { consoleError, writeTraceEvent } from '../tracer.ts';
+import { AttNums } from './att_nums.ts';
+import { IpAddressEncryptionFn, IpAddressHashingFn, computePutBatches } from './raw_redirects.ts';
 import { computeListOpts } from './storage.ts';
-import { computeIpAddressForDownload } from '../ip_addresses.ts';
+import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -39,7 +39,7 @@ export class RedirectLogController {
     async save(rawRedirects: readonly RawRedirect[]) {
         const attNums = await this.getOrLoadAttNums();
         const attNumsMaxBefore = attNums.max();
-        const batches = await computePutBatches(rawRedirects, attNums, this.colo, () => `rl.r.${this.timestampSequence.next()}`, this.encryptIpAddress, this.hashIpAddress);
+        const batches = await computePutBatches(rawRedirects, attNums, this.colo, 'rlc', () => `rl.r.${this.timestampSequence.next()}`, this.encryptIpAddress, this.hashIpAddress);
         if (batches.length > 0) {
             await this.storage.transaction(async txn => {
                 for (const batch of batches) {
@@ -198,69 +198,4 @@ async function deleteImportedRecords(latestStartAfterTimestampId: string, limit:
         maxDeletedInstant = timestampToInstant(unpackTimestampId(maxKey.substring('rl.r.'.length)).timestamp);
     }
     return { deleted, maxInstantToDelete, minDeletedInstant, maxDeletedInstant, error, took: Date.now() - start };
-}
-
-//
-
-export type PutBatch = Record<string, string>; // timestamp-nnnn -> AttRecord
-export type IpAddressEncryptionFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
-export type IpAddressHashingFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
-
-export async function computePutBatches(rawRedirects: readonly RawRedirect[], attNums: AttNums, doColo: string, nextKey: () => string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<readonly PutBatch[]> {
-    const rt: PutBatch[] = [];
-    let batch: PutBatch = {};
-    let batchSize = 0;
-    for (const rawRedirect of rawRedirects) {
-        const key = nextKey();
-        const value = await packRawRedirect(rawRedirect, attNums, doColo, encryptIpAddress, hashIpAddress);
-        console.log(`batch item: ${key} -> ${value}`);
-        batch[key] = value;
-        batchSize++;
-        if (batchSize === 128) { // max cf batch size
-            rt.push(batch);
-            batch = {};
-            batchSize = 0;
-        }
-    }
-    if (batchSize > 0) rt.push(batch);
-    return rt;
-}
-
-export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums, doColo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
-    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, other } = rawRedirect;
-    const rt: Record<string, string> = {};
-    if (typeof uuid === 'string') rt.uuid = uuid;
-    if (typeof time !== 'number') throw new Error(`Bad rawRedirect ${uuid}: no time!`);
-    const timestamp = computeTimestamp(time);
-    rt.timestamp = timestamp;
-    if (typeof rawIpAddress === 'string') {
-        rt.encryptedIpAddress = await encryptIpAddress(rawIpAddress, { timestamp });
-        rt.hashedIpAddress = await hashIpAddress(rawIpAddress, { timestamp });
-        const ipAddressForDownload = (() => {
-            try {
-                return computeIpAddressForDownload(rawIpAddress);
-            } catch (e) {
-                consoleWarn('rlc-pack-raw-redirect', `Error in computeIpAddressForDownload: ${e.stack || e}`);
-                return rawIpAddress;
-            }
-        })(); 
-        rt.hashedIpAddressForDownload = await hashIpAddress(ipAddressForDownload, { timestamp });
-    }
-    if (typeof method === 'string') rt.method = method;
-    if (typeof url === 'string') rt.url = url;
-    if (typeof userAgent === 'string') rt.userAgent = userAgent;
-    if (typeof referer === 'string') rt.referer = referer;
-    if (typeof range === 'string') rt.range = range;
-    if (typeof ulid === 'string') rt.ulid = ulid;
-    if (typeof xpsId === 'string') rt.xpsId = xpsId;
-
-    for (const [ name, value ] of Object.entries(other ?? {})) {
-        if (typeof name === 'string' && typeof value === 'string') {
-            rt[`other.${name}`] = value;
-        }
-    }
-
-    if (typeof doColo === 'string') rt.doColo = doColo;
-    
-    return attNums.packRecord(rt);
 }

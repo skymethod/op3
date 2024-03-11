@@ -14,7 +14,7 @@ import { Backups } from './backups.ts';
 import { Blobs } from './blobs.ts';
 import { MULTIPLES } from './combined_redirect_log_multiples.ts';
 import { queryCombinedRedirectLogs } from './combined_redirect_log_query.ts';
-import { IpAddressHashingFn } from './redirect_log_controller.ts';
+import { IpAddressHashingFn } from './raw_redirects.ts';
 import { computeListOpts } from './storage.ts';
 
 export class CombinedRedirectLogController {

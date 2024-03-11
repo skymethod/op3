@@ -8,7 +8,7 @@ import { addDays, computeTimestamp, isValidTimestamp, timestampToInstant } from 
 import { consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { IndexId, INDEX_DEFINITIONS } from './combined_redirect_log_controller.ts';
-import { IpAddressHashingFn } from './redirect_log_controller.ts';
+import { IpAddressHashingFn } from './raw_redirects.ts';
 
 export async function queryCombinedRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, mostBehindTimestamp: string | undefined, attNums: AttNums, storage: DurableObjectStorage, hashIpAddress: IpAddressHashingFn): Promise<Response> {
     const { format = 'tsv', include = '' } = request;
