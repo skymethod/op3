@@ -1,4 +1,5 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
+import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse } from './rpc_model.ts';
 import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetColoStatusRequest, GetColoStatusResponse, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
@@ -16,6 +17,10 @@ export class StubRpcClient implements RpcClient {
 
     logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
         throw new Error(`StubRpcClient: logRawRedirects(${JSON.stringify({ request, target })}) not implemented`);
+    }
+
+    logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse> {
+        throw new Error(`StubRpcClient: logRawRedirectsBatch(${JSON.stringify({ request, target })}) not implemented`);
     }
 
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse> {

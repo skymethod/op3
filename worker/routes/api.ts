@@ -112,6 +112,8 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
+    } else if (targetPath.startsWith('/hits/')) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer);
     } 
     
     const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });

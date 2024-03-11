@@ -39,6 +39,7 @@ jobs:
           BLOBS_BUCKET: blobs-ci
           KV_NAMESPACE: a5f6ff554a6d4719aba41cbac9c7cfb5 # kv-ci
           QUEUE1_NAME: queue1-ci
+          QUEUE2_NAME: queue2-ci
   deploy-staging:
     runs-on: ubuntu-22.04
     env:
@@ -64,6 +65,7 @@ jobs:
           BLOBS_BUCKET: blobs-staging
           KV_NAMESPACE: 50f5df200d254590afb02b9a8166d204 # kv-staging
           QUEUE1_NAME: queue1-staging
+          QUEUE2_NAME: queue2-staging
   deploy-prod:
     runs-on: ubuntu-22.04
     env:
@@ -89,3 +91,4 @@ jobs:
           BLOBS_BUCKET: blobs-prod
           KV_NAMESPACE: 39ea09ad9de24e8d9b4d4f88df061408 # kv-prod
           QUEUE1_NAME: queue1-prod
+          QUEUE2_NAME: queue2-prod

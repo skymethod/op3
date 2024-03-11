@@ -24,6 +24,7 @@ import { DoNames } from '../do_names.ts';
 import { recomputeShowSummariesForMonth, tryParseRecomputeShowSummariesForMonthRequest } from './show_summaries.ts';
 import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeQueryDownloadsResponse } from './query_downloads.ts';
+import { HitsController } from './hits_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -38,6 +39,7 @@ export class BackendDO {
     private keyController?: KeyController;
     private apiAuthController?: ApiAuthController;
     private showController?: ShowController;
+    private hitsController?: HitsController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -129,6 +131,11 @@ export class BackendDO {
                         return this.showController;
                     }
 
+                    const getOrLoadHitsController = () => {
+                        if (!this.hitsController) this.hitsController = new HitsController(storage, colo);
+                        return this.hitsController;
+                    }
+
                     if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
                         await getOrLoadRedirectLogController().save(obj.rawRedirects);
@@ -160,7 +167,10 @@ export class BackendDO {
                         } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === DoNames.showServer) {
                             const backupBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'backup/' }) : undefined;
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs) });
-                        }
+                        } else if (targetPath.startsWith('/hits/') && durableObjectName === DoNames.hitsServer) {
+                            const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
+                            return newRpcResponse({ kind: 'admin-data', results, message });
+                        } 
 
                         const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });
                         if (csddr) {
@@ -255,6 +265,8 @@ export class BackendDO {
                         return newRpcResponse(await getOrLoadCombinedRedirectLogController().queryPackedRedirectLogs(obj));
                     } else if (obj.kind === 'get-colo-status' && durableObjectName === DoNames.combinedRedirectLog) {
                         return newRpcResponse(await getOrLoadCombinedRedirectLogController().getColoStatus(obj));
+                    } else if (obj.kind === 'log-raw-redirects-batch' && durableObjectName === DoNames.hitsServer) {
+                        return newRpcResponse({ kind: 'log-raw-redirects-batch', ...await getOrLoadHitsController().logRawRedirectsBatch(obj) });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

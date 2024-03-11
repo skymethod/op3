@@ -35,6 +35,7 @@ import { computeDownloadCalculationResponse } from './routes/download_calculatio
 import { computeStatsResponse } from './routes/stats.ts';
 import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
+import { Configuration, makeCachedConfiguration } from './configuration.ts';
 export { BackendDO } from './backend/backend_do.ts';
 
 export default {
@@ -83,43 +84,65 @@ export default {
 
     async queue(batch: QueueMessageBatch, env: WorkerEnv) {
         try {
-            const { dataset1, backendNamespace, blobsBucket } = env;
+            const { dataset1, backendNamespace, blobsBucket, queue1Name, queue2Name } = env;
             initCloudflareTracer(dataset1);
             const colo = await ManualColo.get();
             setWorkerInfo({ colo, name: 'eyeball' });
 
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-            const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
 
-            for (const { body, id, timestamp } of batch.messages) {
-                if (isRpcRequest(body)) {
-                    const { kind } = body;
-                    if (kind === 'admin-data') {
-                        const { operationKind, targetPath, parameters, dryRun } = body;
-                        const start = Date.now();
+            if (batch.queue === queue1Name) {
+                // admin data job
 
-                        const response = await routeAdminDataRequest(body, rpcClient, statsBlobs);
-                        console.log(JSON.stringify(response, undefined, 2));
-                        const millis = Date.now() - start;
-                        const { results, message } = response;
-                        writeTraceEvent({
-                            kind: 'admin-data-job',
-                            colo,
-                            messageId: id,
-                            messageInstant: timestamp.toISOString(),
-                            operationKind,
-                            targetPath,
-                            parameters,
-                            dryRun,
-                            millis,
-                            results,
-                            message,
-                        });
+                const statsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' }) : undefined;
+
+                for (const { body, id, timestamp } of batch.messages) {
+                    if (isRpcRequest(body)) {
+                        const { kind } = body;
+                        if (kind === 'admin-data') {
+                            const { operationKind, targetPath, parameters, dryRun } = body;
+                            const start = Date.now();
+
+                            const response = await routeAdminDataRequest(body, rpcClient, statsBlobs);
+                            console.log(JSON.stringify(response, undefined, 2));
+                            const millis = Date.now() - start;
+                            const { results, message } = response;
+                            writeTraceEvent({
+                                kind: 'admin-data-job',
+                                colo,
+                                messageId: id,
+                                messageInstant: timestamp.toISOString(),
+                                operationKind,
+                                targetPath,
+                                parameters,
+                                dryRun,
+                                millis,
+                                results,
+                                message,
+                            });
+                        } else {
+                            consoleWarn('queue-handler', `Cannot process '${kind}' rpcs in the queue handler`);
+                        }
                     } else {
-                        consoleWarn('queue-handler', `Cannot process '${kind}' rpcs in the queue handler`);
+                        consoleWarn('queue-handler', `Unsupported message body: ${JSON.stringify(body)}`);
                     }
-                } else {
-                    consoleWarn('queue-handler', `Unsupported message body: ${JSON.stringify(body)}`);
+                }
+            } else if (batch.queue === queue2Name) {
+                // raw redirects batch
+
+                const rawRedirectsByMessageId: Record<string, { rawRedirects: RawRedirect[], timestamp: string }> = {};
+                for (const msg of batch.messages) {
+                    const { body, id, timestamp } = msg;
+                    const rawRedirects = body as RawRedirect[];
+                    rawRedirectsByMessageId[id] = { rawRedirects, timestamp: timestamp.toISOString() };
+                }
+                const messageIds = new Set((await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer)).messageIds);
+                for (const msg of batch.messages) {
+                    if (messageIds.has(msg.id)) {
+                        msg.ack();
+                    } else {
+                        msg.retry();
+                    }
                 }
             }
         } catch (e) {
@@ -134,6 +157,7 @@ export default {
 
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
+let cachedConfiguration: Configuration | undefined;
 
 async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Promise<Response | undefined> {
     // must never throw!
@@ -168,9 +192,23 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             }
             
             if (rawRedirects.length > 0) {
+                // send raw redirects the current way
                 const doName = DoNames.redirectLogForColo(colo);
                 const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
                 await rpcClient.logRawRedirects({ rawRedirects }, doName);
+
+                // send raw redirects the future way, if enabled
+                try {
+                    const { kvNamespace, queue2 } = env;
+                    if (kvNamespace && queue2) {
+                        if (!cachedConfiguration) cachedConfiguration = makeCachedConfiguration(new CloudflareConfiguration(kvNamespace), () => 1000 * 60); // cache config values for one minute
+                        if (await cachedConfiguration.get('hits-queue') === 'enabled') {
+                            await queue2.send(rawRedirects, { contentType: 'json' });
+                        }
+                    }
+                } catch (e) {
+                    consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`)
+                }
             }
         } catch (e) {
             consoleError('worker-sending-redirects', `Error sending raw redirects: ${e.stack || e}`);

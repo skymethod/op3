@@ -14,6 +14,7 @@ export type RpcRequest =
     | GetKeyRequest
     | GetNewRedirectLogsRequest
     | LogRawRedirectsRequest 
+    | LogRawRedirectsBatchRequest 
     | ModifyApiKeyRequest
     | QueryPackedRedirectLogsRequest
     | QueryRedirectLogsRequest
@@ -36,6 +37,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'get-key' 
         || obj.kind === 'get-new-redirect-logs'
         || obj.kind === 'log-raw-redirects' 
+        || obj.kind === 'log-raw-redirects-batch' 
         || obj.kind === 'modify-api-key'
         || obj.kind === 'query-packed-redirect-logs'
         || obj.kind === 'query-redirect-logs'
@@ -64,6 +66,12 @@ export interface RawRedirect {
 export interface LogRawRedirectsRequest {
     readonly kind: 'log-raw-redirects';
     readonly rawRedirects: readonly RawRedirect[];
+}
+
+export interface LogRawRedirectsBatchRequest {
+    readonly kind: 'log-raw-redirects-batch';
+    readonly rawRedirectsByMessageId: Record<string, { rawRedirects: RawRedirect[], timestamp: string }>;
+    readonly rpcSentTime: string;
 }
 
 export type KeyKind = 'ip-address-hmac' | 'ip-address-aes';
@@ -335,6 +343,7 @@ export type RpcResponse =
     | ResolveApiTokenResponse
     | ApiKeyResponse
     | GetColoStatusResponse
+    | LogRawRedirectsBatchResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -348,6 +357,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
         || obj.kind === 'get-colo-status'
+        || obj.kind === 'log-raw-redirects-batch'
     );
 }
 
@@ -466,6 +476,11 @@ export function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
         ;
 } 
 
+export interface LogRawRedirectsBatchResponse {
+    readonly kind: 'log-raw-redirects-batch';
+    readonly messageIds: readonly string[];
+}
+
 //
 
 export type Unkinded<T extends RpcRequest | RpcResponse> = Omit<T, 'kind'>;
@@ -475,6 +490,7 @@ export interface RpcClient {
     getKey(request: Unkinded<GetKeyRequest>, target: string): Promise<GetKeyResponse>;
     sendRedirectLogsNotification(request: Unkinded<RedirectLogsNotificationRequest>, target: string): Promise<OkResponse>;
     logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse>;
+    logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse>;
     sendAlarm(request: Unkinded<AlarmRequest>, target: string): Promise<OkResponse>;
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;

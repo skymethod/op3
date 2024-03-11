@@ -11,7 +11,7 @@ fi
 
 # install deno
 DENO_VERSION="v1.41.2"
-DENOFLARE_VERSION="bdf21619d89d6084b8027e2c7d14cc6af472a9fb"
+DENOFLARE_VERSION="d570488492f40981cfa99cbc1d80ae13dee3aae3"
 curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VERSION sh -s $DENO_VERSION
 
 # exit early if already deployed
@@ -29,7 +29,7 @@ fi
 NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno test --allow-read
 
 # denoflare push the worker script to cloudflare
-NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno run --unstable --allow-all https://raw.githubusercontent.com/skymethod/denoflare/$DENOFLARE_VERSION/cli/cli.ts \
+NO_COLOR=1 DENO_VERSION=$DENO_VERSION DENOFLARE_VERSION=${DENOFLARE_VERSION} ./deno-$DENO_VERSION/bin/deno run --allow-all https://raw.githubusercontent.com/skymethod/denoflare/$DENOFLARE_VERSION/cli/cli.ts \
 push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --custom-domain $CF_CUSTOM_DOMAIN --name $CF_SCRIPT_NAME --logpush \
 --compatibility-date 2022-11-30 \
 --text-binding instance:$INSTANCE \
@@ -53,4 +53,7 @@ ${RO_BLOBS_BUCKET:+--r2-bucket-binding roBlobsBucket:$RO_BLOBS_BUCKET} \
 ${RO_RPC_CLIENT_PARAMS:+--text-binding roRpcClientParams:$RO_RPC_CLIENT_PARAMS} \
 ${KV_NAMESPACE:+--kv-namespace-binding kvNamespace:$KV_NAMESPACE} \
 ${QUEUE1_NAME:+--queue-binding queue1:$QUEUE1_NAME} \
+${QUEUE1_NAME:+--text-binding queue1Name:$QUEUE1_NAME} \
+${QUEUE2_NAME:+--queue-binding queue2:$QUEUE2_NAME} \
+${QUEUE2_NAME:+--text-binding queue2Name:$QUEUE2_NAME} \
 ${DEBUG_WEBHOOK_URL:+--secret-binding debugWebhookUrl:$DEBUG_WEBHOOK_URL}
