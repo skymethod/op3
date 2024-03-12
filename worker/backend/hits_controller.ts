@@ -2,113 +2,158 @@ import { timed } from '../async.ts';
 import { DurableObjectStorage, RedBlackTree } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, Unkinded } from '../rpc_model.ts';
 import { computeLinestream } from '../streams.ts';
-import { writeTraceEvent, consoleError, consoleWarn } from '../tracer.ts';
+import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
-import { Configuration } from '../configuration.ts';
+import { isStringRecord } from '../check.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
     private readonly hitsBlobs: Blobs;
-    private readonly configuration: Configuration;
-    private readonly state: State;
     private readonly encryptIpAddress: IpAddressEncryptionFn;
     private readonly hashIpAddress: IpAddressHashingFn;
     private readonly minuteFiles = new Map<string /* minuteTimestamp */, RedBlackTree<[ string /* record */, string /* sortKey */ ]>>();
-    private readonly maxMinuteFiles = 5; // how many of the most recently changed minutefiles can be in memory at once, expect ~682kb/minutefile
-
+    private readonly colo: string;
     private attNums: AttNums | undefined;
+    private state: State | undefined;
     private recentMinuteTimestamps: string[] = [];
 
-    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, configuration: Configuration, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, ) {
+    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, ) {
         this.storage = storage;
         this.hitsBlobs = hitsBlobs;
-        this.configuration = configuration;
-        this.state = { colo, batches: [] };
+        this.colo = colo;
         this.encryptIpAddress = encryptIpAddress;
         this.hashIpAddress = hashIpAddress;
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>): Promise<Unkinded<LogRawRedirectsBatchResponse>> {
         const { rawRedirectsByMessageId, rpcSentTime } = request;
-        const { state, encryptIpAddress, hashIpAddress, maxMinuteFiles, configuration } = this;
+        const { encryptIpAddress, hashIpAddress, colo } = this;
+        const { minuteFilesEnabled = false, maxMinuteFiles = defaultMaxMinuteFiles } = await this.getOrLoadState();
         const rpcReceivedTime = new Date().toISOString();
         const redirectCount = Object.values(rawRedirectsByMessageId).reduce((a, b) => a + b.rawRedirects.length, 0);
         const sortedTimestamps = Object.values(rawRedirectsByMessageId).map(v => v.timestamp).sort();
         const minTimestamp = sortedTimestamps.at(0);
+        const medTimestamp = sortedTimestamps.at(Math.floor(sortedTimestamps.length / 2));
         const maxTimestamp = sortedTimestamps.at(-1);
         const messageIds = Object.keys(rawRedirectsByMessageId);
         const messageCount = messageIds.length;
         
-        try {
-            // save to aggregated minute files
-            const times: Record<string, number> = {};
-            const attNums = await this.getOrLoadAttNums();
-            const attNumsMaxBefore = attNums.max();
-            const minuteTimestampsChanged = new Set<string>();
-            const minuteFilesEnabled = await configuration.get('hits-controller-minutefiles') === 'enabled';
-            for (const [ messageId, { rawRedirects, timestamp } ] of Object.entries(rawRedirectsByMessageId)) {
-                for (const rawRedirect of rawRedirects) {
-                    const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, state.colo, 'hits', encryptIpAddress, hashIpAddress));
-                    if (minuteFilesEnabled) {
-                        const obj = attNums.unpackRecord(record);
-                        const { sortKey, minuteTimestamp } = computeRecordInfo(obj);
-                        const minuteFile = await timed(times, 'ensureMinutefileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
-                        const inserted = minuteFile.insert([ record, sortKey ]);
-                        if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
-                    }
+        // save to aggregated minute files
+        const times: Record<string, number> = {};
+        const attNums = await this.getOrLoadAttNums();
+        const attNumsMaxBefore = attNums.max();
+        const minuteTimestampsChanged = new Set<string>();
+        for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
+            for (const rawRedirect of rawRedirects) {
+                const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));
+                if (minuteFilesEnabled) {
+                    const obj = attNums.unpackRecord(record);
+                    const { sortKey, minuteTimestamp } = computeRecordInfo(obj);
+                    const minuteFile = await timed(times, 'ensureMinuteFileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
+                    const inserted = minuteFile.insert([ record, sortKey ]);
+                    if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
                 }
             }
-            if (minuteFilesEnabled) {
-                // save changed minutefiles, sequentially for now...
-                for (const minuteTimestamp of minuteTimestampsChanged) {
-                    await timed(times, 'saveMinutefile', () => this.saveMinutefile(minuteTimestamp, attNums));
-                }
-
-                // evict old minutefiles from memory
-                this.recentMinuteTimestamps = [ ...minuteTimestampsChanged, ...this.recentMinuteTimestamps.filter(v => !minuteTimestampsChanged.has(v)) ];
-                while (this.recentMinuteTimestamps.length > maxMinuteFiles) {
-                    const minuteTimestamp = this.recentMinuteTimestamps.pop();
-                    if (minuteTimestamp) this.minuteFiles.delete(minuteTimestamp);
-                }
+        }
+        let evictedCount = 0;
+        if (minuteFilesEnabled) {
+            // save changed minutefiles, sequentially for now...
+            for (const minuteTimestamp of minuteTimestampsChanged) {
+                await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
             }
 
-            // save attnums if necessary
-            if (attNums.max() !== attNumsMaxBefore) {
-                await timed(times, 'saveAttNums', () => this.storage.transaction(async txn => {
-                    const record = attNums.toJson();
-                    console.log(`saveAttNums: ${JSON.stringify(record)}`);
-                    await txn.put('hits.attNums', record);
-                }));
+            // evict old minutefiles from memory
+            this.recentMinuteTimestamps = [ ...minuteTimestampsChanged, ...this.recentMinuteTimestamps.filter(v => !minuteTimestampsChanged.has(v)) ];
+            while (this.recentMinuteTimestamps.length > maxMinuteFiles) {
+                const minuteTimestamp = this.recentMinuteTimestamps.pop();
+                if (minuteTimestamp) {
+                    this.minuteFiles.delete(minuteTimestamp);
+                    evictedCount++;
+                }
             }
-
-            // update state
-            state.batches.push({ rpcSentTime, rpcReceivedTime, minTimestamp, maxTimestamp, messageCount, redirectCount });
-            while (state.batches.length > 50) state.batches.shift();
-
-            // summary analytics TODO move up to queue handler?
-            const { packRawRedirects = 0, saveAttNums = 0, ensureMinutefileLoaded = 0, saveMinutefile = 0 } = times;
-            writeTraceEvent({ kind: 'generic', type: 'hits-batch', strings: [ rpcSentTime, rpcReceivedTime, minTimestamp ?? '', maxTimestamp ?? '' ], doubles: [ messageCount, redirectCount, packRawRedirects, saveAttNums, ensureMinutefileLoaded, saveMinutefile ] });
-
-        } catch (e) {
-            consoleWarn('hits-controller', `Error in logRawRedirectsBatch: ${e.stack || e}`);
         }
 
-        // TODO consider them all acked for now
-        return { messageIds };
+        // save attnums if necessary
+        if (attNums.max() !== attNumsMaxBefore) {
+            await timed(times, 'saveAttNums', () => this.storage.transaction(async txn => {
+                const record = attNums.toJson();
+                console.log(`saveAttNums: ${JSON.stringify(record)}`);
+                await txn.put('hits.attNums', record);
+            }));
+        }
+
+        // summary analytics
+        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0 } = times;
+        const putCount = minuteTimestampsChanged.size;
+
+        return { 
+            processedMessageIds: messageIds, // TODO consider them all acked for now
+            colo,
+            rpcSentTime,
+            rpcReceivedTime,
+            minTimestamp,
+            medTimestamp,
+            maxTimestamp,
+            messageCount,
+            redirectCount,
+            putCount,
+            evictedCount,
+            times: {
+                packRawRedirects,
+                saveAttNums,
+                ensureMinuteFileLoaded,
+                saveMinuteFile,
+            }
+        };
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
-        const { operationKind, targetPath } = req;
-        const { storage, recentMinuteTimestamps } = this;
-        if (operationKind === 'select' && targetPath === '/hits/state') return { results: [ { ...this.state, recentMinuteTimestamps } ] };
+        const { operationKind, targetPath, parameters = {} } = req;
+        const { storage, recentMinuteTimestamps, colo } = this;
+       
         if (operationKind === 'select' && targetPath === '/hits/attnums') return { results: [ await storage.get('hits.attNums') ] };
+
+        if (targetPath === '/hits/state') {
+            const state = await this.getOrLoadState();
+            if (operationKind === 'select') return { results: [ { colo, ...state, recentMinuteTimestamps } ] };
+            if (operationKind === 'update') {
+                const { 'minutefiles-enabled': minuteFilesEnabledStr, 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
+                if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
+                const changes: string[] = [];
+                let newState = state;
+                if (typeof minuteFilesEnabledStr === 'string') {
+                    const minuteFilesEnabled = minuteFilesEnabledStr === 'true';
+                    if (minuteFilesEnabled !== state.minuteFilesEnabled) {
+                        newState = { ...newState, minuteFilesEnabled };
+                        changes.push(`state.minuteFilesEnabled: ${state.minuteFilesEnabled} -> ${minuteFilesEnabled}`);
+                    }
+                }
+                if (typeof maxMinuteFilesStr === 'string') {
+                    const maxMinuteFiles = parseInt(maxMinuteFilesStr);
+                    if (maxMinuteFiles !== state.maxMinuteFiles) {
+                        newState = { ...state, maxMinuteFiles };
+                        changes.push(`state.maxMinuteFiles: ${state.maxMinuteFiles} -> ${maxMinuteFiles}`);
+                    }
+                }
+                if (changes.length > 0) {
+                    await storage.put('hits.state', newState);
+                    this.state = newState;
+                }
+                return { message: changes.length > 0 ? changes.join(', ') : 'no changes' };
+            }
+        }
 
         throw new Error(`Unsupported hits query`);
     }
 
     //
+
+    private async getOrLoadState(): Promise<State> {
+        if (!this.state) this.state = await loadState(this.storage);
+        return this.state;
+    }
 
     private async getOrLoadAttNums(): Promise<AttNums> {
         if (!this.attNums) this.attNums = await loadAttNums(this.storage);
@@ -122,6 +167,7 @@ export class HitsController {
 
         const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
         const rt = new RedBlackTree(compareMinuteFileEntry);
+        minuteFiles.set(minuteTimestamp, rt);
         if (!stream) return rt;
 
         let fileAttNums: AttNums | undefined;
@@ -140,12 +186,12 @@ export class HitsController {
         return rt;
     }
 
-    private async saveMinutefile(minuteTimestamp: string, attNums: AttNums): Promise<void> {
+    private async saveMinuteFile(minuteTimestamp: string, attNums: AttNums): Promise<void> {
         const { minuteFiles, hitsBlobs } = this;
         const file = minuteFiles.get(minuteTimestamp);
         if (!file) throw new Error(`No minute file for ${minuteTimestamp}`);
 
-        const header = encoder.encode(`${attNums.toJson()}\n`);
+        const header = encoder.encode(`${JSON.stringify(attNums.toJson())}\n`);
         let contentLength = header.length;
         for (const [ record ] of file) {
             contentLength += encoder.encode(`${record}\n`).length;
@@ -170,8 +216,19 @@ export class HitsController {
 //
 
 const encoder = new TextEncoder();
+const defaultMaxMinuteFiles = 5; // how many of the most recently changed minutefiles can be in memory at once, expect ~682kb/minutefile
 
-type State = { colo: string, batches: { rpcSentTime: string, rpcReceivedTime: string, minTimestamp?: string, maxTimestamp?: string, messageCount: number, redirectCount: number }[] };
+type State = {
+    minuteFilesEnabled?: boolean, // TODO remove once default
+    maxMinuteFiles?: number,
+};
+
+function isValidState(obj: unknown): obj is State {
+    return isStringRecord(obj) 
+        && (obj.minuteFilesEnabled === undefined || typeof obj.minuteFilesEnabled === 'boolean')
+        && (obj.maxMinuteFiles === undefined || typeof obj.maxMinuteFiles === 'number')
+        ;
+}
 
 async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     const record = await storage.get('hits.attNums');
@@ -182,6 +239,20 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
         consoleError('hits-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
     }
     return new AttNums();
+}
+
+async function loadState(storage: DurableObjectStorage): Promise<State> {
+    const record = await storage.get('hits.state');
+    console.log(`loadState: ${JSON.stringify(record)}`);
+    if (record !== undefined) {
+        try {
+            if (isValidState(record)) return record;
+            throw new Error('Invalid');
+        } catch (e) {
+            consoleError('hits-loading-state', `Error loading State from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        }
+    }
+    return { minuteFilesEnabled: false, maxMinuteFiles: defaultMaxMinuteFiles };
 }
 
 function compareMinuteFileEntry(lhs: [ string, string ], rhs: [ string, string ]): number {

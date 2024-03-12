@@ -478,7 +478,23 @@ export function isApiTokenRecord(obj: unknown): obj is ApiTokenRecord {
 
 export interface LogRawRedirectsBatchResponse {
     readonly kind: 'log-raw-redirects-batch';
-    readonly messageIds: readonly string[];
+    readonly processedMessageIds: readonly string[];
+    readonly colo: string;
+    readonly rpcSentTime: string;
+    readonly rpcReceivedTime: string;
+    readonly minTimestamp: string | undefined;
+    readonly medTimestamp: string | undefined;
+    readonly maxTimestamp: string | undefined;
+    readonly messageCount: number;
+    readonly redirectCount: number;
+    readonly putCount: number;
+    readonly evictedCount: number;
+    readonly times: {
+        readonly packRawRedirects: number,
+        readonly saveAttNums: number,
+        readonly ensureMinuteFileLoaded: number,
+        readonly saveMinuteFile: number,
+    }
 }
 
 //

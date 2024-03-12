@@ -84,6 +84,7 @@ export default {
 
     async queue(batch: QueueMessageBatch, env: WorkerEnv) {
         try {
+            const consumerStart = Date.now();
             const { dataset1, backendNamespace, blobsBucket, queue1Name, queue2Name } = env;
             initCloudflareTracer(dataset1);
             const colo = await ManualColo.get();
@@ -136,7 +137,9 @@ export default {
                     const rawRedirects = body as RawRedirect[];
                     rawRedirectsByMessageId[id] = { rawRedirects, timestamp: timestamp.toISOString() };
                 }
-                const messageIds = new Set((await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer)).messageIds);
+                const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer);
+                const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile } } = response;
+                const messageIds = new Set(processedMessageIds);
                 for (const msg of batch.messages) {
                     if (messageIds.has(msg.id)) {
                         msg.ack();
@@ -144,6 +147,13 @@ export default {
                         msg.retry();
                     }
                 }
+                const consumerTime = Date.now() - consumerStart;
+                const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount ];
+                const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile ];
+                writeTraceEvent({ kind: 'generic', type: 'hits-batch',
+                    strings: [ colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '' ],
+                    doubles: [ ...doubles, ...Array(20 - doubles.length - times.length).fill(0), ...times.reverse() ],
+                });
             }
         } catch (e) {
             consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${e.stack || e}`);
