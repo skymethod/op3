@@ -130,7 +130,8 @@ export default {
                 }
             } else if (batch.queue === queue2Name) {
                 // raw redirects batch
-
+                
+                const batchUuid = generateUuid();
                 const rawRedirectsByMessageId: Record<string, { rawRedirects: RawRedirect[], timestamp: string }> = {};
                 for (const msg of batch.messages) {
                     const { body, id, timestamp } = msg;
@@ -151,7 +152,7 @@ export default {
                 const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount ];
                 const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile ];
                 writeTraceEvent({ kind: 'generic', type: 'hits-batch',
-                    strings: [ colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '' ],
+                    strings: [ batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '' ],
                     doubles: [ ...doubles, ...Array(20 - doubles.length - times.length).fill(0), ...times.reverse() ],
                 });
             }
