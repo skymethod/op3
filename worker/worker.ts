@@ -148,11 +148,12 @@ export default {
                         msg.retry();
                     }
                 }
+                const consumerStartTime = new Date(consumerStart).toISOString();
                 const consumerTime = Date.now() - consumerStart;
                 const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount ];
                 const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile ];
                 writeTraceEvent({ kind: 'generic', type: 'hits-batch',
-                    strings: [ batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '' ],
+                    strings: [ batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '', consumerStartTime ],
                     doubles: [ ...doubles, ...Array(20 - doubles.length - times.length).fill(0), ...times.reverse() ],
                 });
             }

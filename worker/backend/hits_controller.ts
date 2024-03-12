@@ -7,6 +7,8 @@ import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
 import { isStringRecord } from '../check.ts';
+import { executeWithRetries } from '../sleep.ts';
+import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -197,18 +199,20 @@ export class HitsController {
             contentLength += encoder.encode(`${record}\n`).length;
         }
 
-        // deno-lint-ignore no-explicit-any
-        const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-        const putPromise = hitsBlobs.put(computeMinuteFileKey(minuteTimestamp), readable) // don't await!
-        const writer = writable.getWriter();
-        
-        writer.write(header);
-        for (const [ record ] of file) {
-            writer.write(encoder.encode(`${record}\n`));
-        }
-        await writer.close();
-        // await writable.close(); // will throw on cf
-        await putPromise;
+        await executeWithRetries(async () => {
+            // deno-lint-ignore no-explicit-any
+            const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
+            const putPromise = hitsBlobs.put(computeMinuteFileKey(minuteTimestamp), readable) // don't await!
+            const writer = writable.getWriter();
+            
+            writer.write(header);
+            for (const [ record ] of file) {
+                writer.write(encoder.encode(`${record}\n`));
+            }
+            await writer.close();
+            // await writable.close(); // will throw on cf
+            await putPromise;
+        }, { tag: 'save-minute-file', maxRetries: 3, isRetryable: isRetryableErrorFromR2 });
     }
 
 }

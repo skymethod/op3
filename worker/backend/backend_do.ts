@@ -277,7 +277,7 @@ export class BackendDO {
                 } catch (e) {
                     const message = `${e.stack || e}`;
                     consoleError('backend-do-rpc', `Unhandled error in rpc call: ${message}`);
-                    return newRpcResponse({ kind: 'error',  message });
+                    return newRpcResponse({ kind: 'error', message });
                 }
             }
             return new Response('not found', { status: 404 });
