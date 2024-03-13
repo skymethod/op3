@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from '../tests/deps.ts';
+import { assert, assertEquals, assertThrows } from '../tests/deps.ts';
 import { AttNums } from './att_nums.ts';
 
 Deno.test({
@@ -40,5 +40,18 @@ Deno.test({
         for (const record of roundtrip) {
             assertEquals(attNums.unpackRecord(attNums.packRecord(record)), record);
         }
+
+        const attNums1 = new AttNums({ a: 0, b: 1, c: 2, d: 3, e: 4});
+        const attNums2 = new AttNums({ a: 0, b: 1, c: 2, d: 3 });
+
+        const obj = { a: 'a', b: 'b', c: 'c' };
+        assertEquals(attNums1.packRecord(obj), attNums2.packRecord(obj));
+        assert(attNums1.isSupersetOf(attNums2));
+        assert(!attNums2.isSupersetOf(attNums1));
+        assert(attNums2.isSubsetOf(attNums1));
+        assert(!attNums1.isSubsetOf(attNums2));
+        assert(attNums1.isSupersetOf(attNums1));
+        assert(attNums1.isSubsetOf(attNums1));
+
     }
 });

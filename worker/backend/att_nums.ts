@@ -12,6 +12,22 @@ export class AttNums {
         }
     }
 
+    isSubsetOf(other: AttNums): boolean {
+        const otherJson = other.toJson();
+        for (const [ name, num ] of Object.entries(this.namesToNums)) {
+            if (otherJson[name] !== num) return false;
+        }
+        return true;
+    }
+
+    isSupersetOf(other: AttNums): boolean {
+        const { namesToNums } = this;
+        for (const [ name, num ] of Object.entries(other.toJson())) {
+            if (namesToNums[name] !== num) return false;
+        }
+        return true;
+    }
+
     find(name: string): number | undefined {
         return this.namesToNums[name];
     }

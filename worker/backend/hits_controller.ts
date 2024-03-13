@@ -156,7 +156,7 @@ export class HitsController {
         const attNums = await this.getOrLoadAttNums();
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
         const records: Record<string, string> = {}; // sortKey(timestamp+uuid) -> packed record
-        
+
         if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
         if (endTimeExclusive === undefined) throw new Error(`'endTimeExclusive' is required`);
         if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
@@ -319,15 +319,16 @@ function computeMinuteFileKey(minuteTimestamp: string): string {
 
 async function* yieldRecords(stream: ReadableStream<Uint8Array>, attNums: AttNums, minuteTimestamp: string): AsyncGenerator<[ string, string], void, unknown> {
     let fileAttNums: AttNums | undefined;
+    let repack = false;
     for await (const line of computeLinestream(stream)) {
         if (line === '') continue;
         if (!fileAttNums) {
             fileAttNums = AttNums.fromJson(JSON.parse(line));
+            repack = !fileAttNums.isSubsetOf(attNums);
             continue;
         }
-        // TODO no need to repack if attnums are compatible
         const obj = fileAttNums.unpackRecord(line);
-        const record = attNums.packRecord(obj);
+        const record = repack ? attNums.packRecord(obj) : line;
         const { sortKey, minuteTimestamp: recordMinuteTimestamp } = computeRecordInfo(obj);
         if (recordMinuteTimestamp !== minuteTimestamp) throw new Error(`Bad minuteTimestamp ${recordMinuteTimestamp}, expected ${minuteTimestamp} ${JSON.stringify(obj)}`);
         yield [ record, sortKey ];
