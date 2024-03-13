@@ -10,7 +10,7 @@ import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { Blobs, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from './blobs.ts';
 
-export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: string, bucket: string, prefix: string };
+export type R2ApiBlobsOpts = { context: AwsCallContext, origin: string, region: string, bucket: string, prefix: string, readonly?: boolean };
 
 export class R2ApiBlobs implements Blobs {
     readonly opts: R2ApiBlobsOpts;
@@ -66,6 +66,7 @@ export class R2ApiBlobs implements Blobs {
     }
 
     async put(key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<{ etag: string }> {
+        this.checkWritable('put');
         const bytes = body instanceof ReadableStream ? await Bytes.ofStream(body)
             : typeof body === 'string' ? Bytes.ofUtf8(body)
             : new Bytes(new Uint8Array(body));
@@ -90,11 +91,13 @@ export class R2ApiBlobs implements Blobs {
     }
 
     async delete(key: string): Promise<void> {
+        this.checkWritable('delete');
         const { bucket, origin, region, context } = this.opts;
         await deleteObject({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context);
     }
 
     async startMultiput(key: string): Promise<Multiput> {
+        this.checkWritable('startMultiput');
         const { bucket, origin, region, context } = this.opts;
         key = `${this.opts.prefix}${key}`;
 
@@ -129,6 +132,13 @@ export class R2ApiBlobs implements Blobs {
             },
         };
         return rt;
+    }
+
+    //
+
+    private checkWritable(method: string) {
+        const { readonly } = this.opts;
+        if (readonly) throw new Error(`'${method}' not allowed (readonly)`);
     }
 
 }

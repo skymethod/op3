@@ -20,7 +20,7 @@ import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
 // phase 1: query crl for an hour's worth of hits, save one hourly downloads blob (unassigned to shows)
-export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number }) {
+export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits, target = DoNames.combinedRedirectLog }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number, target?: string }) {
     const start = Date.now();
 
     const startInstant = `${hour}:00:00.000Z`;
@@ -36,7 +36,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     let hits = 0;
     while (true) {
         if (queries >= maxQueries) break;
-        const { namesToNums, records } = await rpcClient.queryPackedRedirectLogs({ limit: querySize, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, DoNames.combinedRedirectLog);
+        const { namesToNums, records } = await rpcClient.queryPackedRedirectLogs({ limit: querySize, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, target);
         queries++;
         const attNums = new AttNums(namesToNums);
         const entries = Object.entries(records);

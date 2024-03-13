@@ -63,6 +63,12 @@ export function addHours(date: Date | string, hours: number): Date {
     return new Date(time + hours * 60 * 60 * 1000);
 }
 
+export function addMinutes(date: Date | string, minutes: number): Date {
+    if (!Number.isSafeInteger(minutes)) throw new Error(`Bad minutes: ${minutes}`);
+    const time = new Date(date).getTime();
+    return new Date(time + minutes * 60 * 1000);
+}
+
 export function addMonthsToMonthString(month: string, months: number): string {
     if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
     if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);

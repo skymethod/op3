@@ -1,6 +1,6 @@
 import { timed } from '../async.ts';
 import { DurableObjectStorage, RedBlackTree } from '../deps.ts';
-import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeLinestream } from '../streams.ts';
 import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
@@ -9,6 +9,8 @@ import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './ra
 import { isStringRecord } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
+import { addMinutes, computeTimestamp } from '../timestamp.ts';
+import { timestampToInstant } from '../timestamp.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -150,6 +152,49 @@ export class HitsController {
         throw new Error(`Unsupported hits query`);
     }
 
+    async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
+        const { hitsBlobs } = this;
+        const attNums = await this.getOrLoadAttNums();
+        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
+        const records: Record<string, string> = {}; // sortKey(timestamp+uuid) -> packed record
+        // const prefix = 'crl.r.';
+        // const startAfter = startAfterRecordKey ? `${prefix}${startAfterRecordKey}` : startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
+        // const start = startAfter ? undefined : startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined; // list() cannot be called with both start and startAfter values
+        // const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
+        // const map = await this.storage.list({ prefix, limit, start, startAfter, end });
+        // for (const [ key, record ] of map) {
+        //     if (typeof record === 'string') {
+        //         const timestampId = key.substring(prefix.length);
+        //         records[timestampId] = record;
+        //     }
+        // }
+        if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
+        if (endTimeExclusive === undefined) throw new Error(`'endTimeExclusive' is required`);
+        if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
+        if (startAfterRecordKey !== undefined) throw new Error(`'startAfterRecordKey' is not supported`);
+
+        const startTimestamp = computeTimestamp(startTimeInclusive);
+        const startMinuteTimestamp = computeMinuteTimestamp(startTimestamp);
+        const endTimestamp = computeTimestamp(endTimeExclusive);
+        const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
+
+        let minuteTimestamp = startMinuteTimestamp;
+        let recordCount = 0;
+        while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
+            console.log({ minuteTimestamp });
+            const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+            if (stream !== undefined) {
+                for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
+                    records[sortKey] = record;
+                    recordCount++;
+                    if (recordCount >= limit) break;
+                }
+            }
+            minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
+        }
+        return { kind: 'packed-redirect-logs', namesToNums: attNums.toJson(), records };
+    }
+
     //
 
     private async getOrLoadState(): Promise<State> {
@@ -172,18 +217,8 @@ export class HitsController {
         minuteFiles.set(minuteTimestamp, rt);
         if (!stream) return rt;
 
-        let fileAttNums: AttNums | undefined;
-        for await (const line of computeLinestream(stream)) {
-            if (line === '') continue;
-            if (!fileAttNums) {
-                fileAttNums = AttNums.fromJson(JSON.parse(line));
-                continue;
-            }
-            const obj = fileAttNums.unpackRecord(line);
-            const record = attNums.packRecord(obj);
-            const { sortKey, minuteTimestamp: recordMinuteTimestamp } = computeRecordInfo(obj);
-            if (recordMinuteTimestamp !== minuteTimestamp) throw new Error(`Bad minuteTimestamp ${recordMinuteTimestamp}, expected ${minuteTimestamp} ${JSON.stringify(obj)}`);
-            rt.insert([ record, sortKey ]);
+        for await (const recordAndSortKey of yieldRecords(stream, attNums, minuteTimestamp)) {
+            rt.insert(recordAndSortKey);
         }
         return rt;
     }
@@ -268,10 +303,31 @@ function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minu
     if (typeof timestamp !== 'string') throw new Error(`No timestamp! ${JSON.stringify(obj)}`);
     if (typeof uuid !== 'string') throw new Error(`No uuid! ${JSON.stringify(obj)}`);
     const sortKey = `${timestamp}-${uuid}`;
-    const minuteTimestamp = `${timestamp.substring(0, 10)}00000`;
+    const minuteTimestamp = computeMinuteTimestamp(timestamp);
     return { sortKey, minuteTimestamp };
 }
 
+function computeMinuteTimestamp(timestamp: string): string {
+    return `${timestamp.substring(0, 10)}00000`;
+} 
+
 function computeMinuteFileKey(minuteTimestamp: string): string {
     return `minutes/${minuteTimestamp}.txt`;
+}
+
+async function* yieldRecords(stream: ReadableStream<Uint8Array>, attNums: AttNums, minuteTimestamp: string): AsyncGenerator<[ string, string], void, unknown> {
+    let fileAttNums: AttNums | undefined;
+    for await (const line of computeLinestream(stream)) {
+        if (line === '') continue;
+        if (!fileAttNums) {
+            fileAttNums = AttNums.fromJson(JSON.parse(line));
+            continue;
+        }
+        // TODO no need to repack if attnums are compatible
+        const obj = fileAttNums.unpackRecord(line);
+        const record = attNums.packRecord(obj);
+        const { sortKey, minuteTimestamp: recordMinuteTimestamp } = computeRecordInfo(obj);
+        if (recordMinuteTimestamp !== minuteTimestamp) throw new Error(`Bad minuteTimestamp ${recordMinuteTimestamp}, expected ${minuteTimestamp} ${JSON.stringify(obj)}`);
+        yield [ record, sortKey ];
+    }
 }

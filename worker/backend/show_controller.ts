@@ -495,11 +495,11 @@ export async function updateShowStats({ parameters, rpcClient, statsBlobs, stora
 
     // compute hourly download tsv
     if (typeof hour === 'string') {
-        const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10' } = parameters;
+        const { maxHits: maxHitsStr = '100', querySize: querySizeStr = '100', maxQueries: maxQueriesStr = '10', target } = parameters;
         const maxHits = parseInt(maxHitsStr);
         const querySize = parseInt(querySizeStr);
         const maxQueries = parseInt(maxQueriesStr);
-        const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient });
+        const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient, target });
         return { results: [ result ] };
     }
 
