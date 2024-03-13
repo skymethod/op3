@@ -88,7 +88,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const relevantDimensionDownloads: Record<string, Record<string, number>> = {};
         for (const dimensionDownloads of Object.values(monthlyDimensionDownloads)) {
             for (const dimension of [ 'appName', 'libraryName', 'referrer']) {
-                const downloads = dimensionDownloads[dimension];
+                const downloads = dimensionDownloads[dimension] ?? {};
                 let row = relevantDimensionDownloads[dimension];
                 if (!row) {
                     row = {};
