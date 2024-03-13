@@ -6,11 +6,10 @@ import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
-import { isStringRecord } from '../check.ts';
+import { check, checkMatches, isStringRecord } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
-import { addMinutes, computeTimestamp } from '../timestamp.ts';
-import { timestampToInstant } from '../timestamp.ts';
+import { addMinutes, computeTimestamp, timestampToInstant, isValidTimestamp } from '../timestamp.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -157,41 +156,38 @@ export class HitsController {
         const attNums = await this.getOrLoadAttNums();
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
         const records: Record<string, string> = {}; // sortKey(timestamp+uuid) -> packed record
-        // const prefix = 'crl.r.';
-        // const startAfter = startAfterRecordKey ? `${prefix}${startAfterRecordKey}` : startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
-        // const start = startAfter ? undefined : startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined; // list() cannot be called with both start and startAfter values
-        // const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
-        // const map = await this.storage.list({ prefix, limit, start, startAfter, end });
-        // for (const [ key, record ] of map) {
-        //     if (typeof record === 'string') {
-        //         const timestampId = key.substring(prefix.length);
-        //         records[timestampId] = record;
-        //     }
-        // }
+        
         if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
         if (endTimeExclusive === undefined) throw new Error(`'endTimeExclusive' is required`);
         if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
-        if (startAfterRecordKey !== undefined) throw new Error(`'startAfterRecordKey' is not supported`);
 
         const startTimestamp = computeTimestamp(startTimeInclusive);
         const startMinuteTimestamp = computeMinuteTimestamp(startTimestamp);
         const endTimestamp = computeTimestamp(endTimeExclusive);
         const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
+        const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
-        let minuteTimestamp = startMinuteTimestamp;
-        let recordCount = 0;
-        while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
-            console.log({ minuteTimestamp });
-            const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
-            if (stream !== undefined) {
-                for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
-                    records[sortKey] = record;
-                    recordCount++;
-                    if (recordCount >= limit) break;
+        await (async () => {
+            let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
+            let recordCount = 0;
+            while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
+                console.log({ minuteTimestamp });
+                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+                if (stream !== undefined) {
+                    for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
+                        const recordTimestamp = sortKey.substring(0, 15);
+                        if (startTimestamp && recordTimestamp < startTimestamp) continue;
+                        if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
+                        if (endTimestamp && recordTimestamp >= endTimestamp) return;
+                        records[sortKey] = record;
+                        recordCount++;
+                        if (recordCount >= limit) return;
+                    }
                 }
+                minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
             }
-            minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
-        }
+        })();
+
         return { kind: 'packed-redirect-logs', namesToNums: attNums.toJson(), records };
     }
 
@@ -305,6 +301,12 @@ function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minu
     const sortKey = `${timestamp}-${uuid}`;
     const minuteTimestamp = computeMinuteTimestamp(timestamp);
     return { sortKey, minuteTimestamp };
+}
+
+function unpackSortKey(sortKey: string): { timestamp: string, uuid: string} {
+    const [ _, timestamp, uuid ] = checkMatches('sortKey', sortKey, /^(\d{15})-([0-9a-f]{32})$/);
+    check('sortKey', sortKey, isValidTimestamp(timestamp));
+    return { timestamp, uuid };
 }
 
 function computeMinuteTimestamp(timestamp: string): string {
