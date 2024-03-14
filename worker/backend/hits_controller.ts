@@ -1,15 +1,14 @@
 import { timed } from '../async.ts';
+import { isStringRecord } from '../check.ts';
 import { DurableObjectStorage, RedBlackTree } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
-import { computeLinestream } from '../streams.ts';
+import { executeWithRetries } from '../sleep.ts';
 import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
-import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
-import { check, checkMatches, isStringRecord } from '../check.ts';
-import { executeWithRetries } from '../sleep.ts';
+import { computeMinuteFileKey, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
-import { addMinutes, computeTimestamp, timestampToInstant, isValidTimestamp } from '../timestamp.ts';
+import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -154,41 +153,7 @@ export class HitsController {
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
         const { hitsBlobs } = this;
         const attNums = await this.getOrLoadAttNums();
-        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
-        const records: Record<string, string> = {}; // sortKey(timestamp+uuid) -> packed record
-
-        if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
-        if (endTimeExclusive === undefined) throw new Error(`'endTimeExclusive' is required`);
-        if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
-
-        const startTimestamp = computeTimestamp(startTimeInclusive);
-        const startMinuteTimestamp = computeMinuteTimestamp(startTimestamp);
-        const endTimestamp = computeTimestamp(endTimeExclusive);
-        const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
-        const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
-
-        await (async () => {
-            let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
-            let recordCount = 0;
-            while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
-                console.log({ minuteTimestamp });
-                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
-                if (stream !== undefined) {
-                    for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
-                        const recordTimestamp = sortKey.substring(0, 15);
-                        if (startTimestamp && recordTimestamp < startTimestamp) continue;
-                        if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
-                        if (endTimestamp && recordTimestamp >= endTimestamp) return;
-                        records[sortKey] = record;
-                        recordCount++;
-                        if (recordCount >= limit) return;
-                    }
-                }
-                minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
-            }
-        })();
-
-        return { kind: 'packed-redirect-logs', namesToNums: attNums.toJson(), records };
+        return await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums);
     }
 
     //
@@ -292,45 +257,4 @@ async function loadState(storage: DurableObjectStorage): Promise<State> {
 
 function compareMinuteFileEntry(lhs: [ string, string ], rhs: [ string, string ]): number {
     return lhs[1] < rhs[1] ? -1 : lhs[1] > rhs[1] ? 1 : 0;
-}
-
-function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minuteTimestamp: string } {
-    const { timestamp, uuid } = obj;
-    if (typeof timestamp !== 'string') throw new Error(`No timestamp! ${JSON.stringify(obj)}`);
-    if (typeof uuid !== 'string') throw new Error(`No uuid! ${JSON.stringify(obj)}`);
-    const sortKey = `${timestamp}-${uuid}`;
-    const minuteTimestamp = computeMinuteTimestamp(timestamp);
-    return { sortKey, minuteTimestamp };
-}
-
-function unpackSortKey(sortKey: string): { timestamp: string, uuid: string} {
-    const [ _, timestamp, uuid ] = checkMatches('sortKey', sortKey, /^(\d{15})-([0-9a-f]{32})$/);
-    check('sortKey', sortKey, isValidTimestamp(timestamp));
-    return { timestamp, uuid };
-}
-
-function computeMinuteTimestamp(timestamp: string): string {
-    return `${timestamp.substring(0, 10)}00000`;
-} 
-
-function computeMinuteFileKey(minuteTimestamp: string): string {
-    return `minutes/${minuteTimestamp}.txt`;
-}
-
-async function* yieldRecords(stream: ReadableStream<Uint8Array>, attNums: AttNums, minuteTimestamp: string): AsyncGenerator<[ string, string], void, unknown> {
-    let fileAttNums: AttNums | undefined;
-    let repack = false;
-    for await (const line of computeLinestream(stream)) {
-        if (line === '') continue;
-        if (!fileAttNums) {
-            fileAttNums = AttNums.fromJson(JSON.parse(line));
-            repack = !fileAttNums.isSubsetOf(attNums);
-            continue;
-        }
-        const obj = fileAttNums.unpackRecord(line);
-        const record = repack ? attNums.packRecord(obj) : line;
-        const { sortKey, minuteTimestamp: recordMinuteTimestamp } = computeRecordInfo(obj);
-        if (recordMinuteTimestamp !== minuteTimestamp) throw new Error(`Bad minuteTimestamp ${recordMinuteTimestamp}, expected ${minuteTimestamp} ${JSON.stringify(obj)}`);
-        yield [ record, sortKey ];
-    }
 }

@@ -1,12 +1,12 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { check, checkAll, checkMatches, isValidDate, isValidInstant, tryParseUrl } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
-import { Bytes, sortBy, distinct, DelimiterStream } from '../deps.ts';
+import { Bytes, DelimiterStream, distinct, sortBy } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { findPublicSuffix } from '../public_suffixes.ts';
 import { estimateByteRangeSize, tryParseRangeHeader } from '../range_header.ts';
-import { RpcClient } from '../rpc_model.ts';
+import { PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { computeLinestream, yieldTsvFromStream } from '../streams.ts';
 import { addHours, timestampToInstant } from '../timestamp.ts';
@@ -16,12 +16,17 @@ import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs, Multiput } from './blobs.ts';
 import { computeBotType, isWebWidgetHostname } from './bots.ts';
+import { queryPackedRedirectLogsFromHits } from './hits_common.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
 // phase 1: query crl for an hour's worth of hits, save one hourly downloads blob (unassigned to shows)
-export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits, target = DoNames.combinedRedirectLog }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number, target?: string }) {
+export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits, target = DoNames.combinedRedirectLog, hitsBlobs }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number, target?: string, hitsBlobs?: Blobs }) {
     const start = Date.now();
+
+    const query: (request: Unkinded<QueryPackedRedirectLogsRequest>) => Promise<PackedRedirectLogsResponse> = 
+        target === 'hitsBlobs' && hitsBlobs ? (request => queryPackedRedirectLogsFromHits(request, hitsBlobs, new AttNums()))
+        : (request => rpcClient.queryPackedRedirectLogs(request, target));
 
     const startInstant = `${hour}:00:00.000Z`;
     if (!isValidInstant(startInstant)) throw new Error(`Bad hour: ${hour}`);
@@ -36,7 +41,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     let hits = 0;
     while (true) {
         if (queries >= maxQueries) break;
-        const { namesToNums, records } = await rpcClient.queryPackedRedirectLogs({ limit: querySize, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey }, target);
+        const { namesToNums, records } = await query({ limit: querySize, startTimeInclusive: startInstant, endTimeExclusive: endInstant, startAfterRecordKey });
         queries++;
         const attNums = new AttNums(namesToNums);
         const entries = Object.entries(records);
