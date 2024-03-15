@@ -19,11 +19,10 @@ export function computeRecordInfo(obj: Record<string, string>): { sortKey: strin
 }
 
 export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums): Promise<PackedRedirectLogsResponse> {
-    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
+    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive = new Date().toISOString(), startAfterRecordKey } = request;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
 
     if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
-    if (endTimeExclusive === undefined) throw new Error(`'endTimeExclusive' is required`);
     if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
 
     const startTimestamp = computeTimestamp(startTimeInclusive);
