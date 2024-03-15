@@ -9,6 +9,11 @@ export function computeMinuteFileKey(minuteTimestamp: string): string {
     return `minutes/${minuteTimestamp}.txt`;
 }
 
+export function unpackMinuteFileKey(key: string): { minuteTimestamp: string } {
+    const [ _, minuteTimestamp ] = checkMatches('key', key, /^minutes\/(\d{15})\.txt$/);
+    return { minuteTimestamp };
+}
+
 export function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minuteTimestamp: string } {
     const { timestamp, uuid } = obj;
     if (typeof timestamp !== 'string') throw new Error(`No timestamp! ${JSON.stringify(obj)}`);
@@ -25,7 +30,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
     if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
 
-    const startTimestamp = computeTimestamp(startTimeInclusive);
+    const startTimestamp = computeTimestamp([ startTimeInclusive, epochMinute ].sort()[1]);
     const startMinuteTimestamp = computeMinuteTimestamp(startTimestamp);
     const endTimestamp = computeTimestamp(endTimeExclusive);
     const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
@@ -74,6 +79,8 @@ export async function* yieldRecords(stream: ReadableStream<Uint8Array>, attNums:
 }
 
 //
+
+const epochMinute = `2024-03-13T00:00:00.000Z`;
 
 function unpackSortKey(sortKey: string): { timestamp: string, uuid: string} {
     const [ _, timestamp, uuid ] = checkMatches('sortKey', sortKey, /^(\d{15})-([0-9a-f]{32})$/);
