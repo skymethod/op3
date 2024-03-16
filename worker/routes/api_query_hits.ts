@@ -86,8 +86,14 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_HITS) };
     const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
 
-    // if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
-    // if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
+    if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
+    if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
+    
+    for (const [ name, value ] of Object.entries({ userAgent, referer, ulid, xpsId })) {
+        if (typeof value === 'string') throw new Error(`The '${name}' filter is no longer supported`);
+    }
+
+    // TODO migrate
     if (typeof url === 'string') {
         throw new Error(`'url' not supported`);
         // const m = /^(https?:\/\/.+?)\*$/.exec(url);
@@ -109,16 +115,6 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         // check('urlSha256', urlSha256, isValidSha256Hex);
         // request = { ...request, urlSha256 };
     }
-    if (typeof userAgent === 'string') {
-        throw new Error(`'userAgent' not supported`);
-        // check('userAgent', userAgent, isNotBlank);
-        // request = { ...request, userAgent };
-    }
-    if (typeof referer === 'string') {
-        throw new Error(`'referer' not supported`);
-        // check('referer', referer, isNotBlank);
-        // request = { ...request, referer };
-    }
     if (typeof hashedIpAddress === 'string') {
         throw new Error(`'hashedIpAddress' not supported`);
         // if (hashedIpAddress === 'current') {
@@ -128,16 +124,6 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         //     check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
         //     request = { ...request, hashedIpAddress };
         // }
-    }
-    if (typeof ulid === 'string') {
-        throw new Error(`'ulid' not supported`);
-        // check('ulid', ulid, isNotBlank);
-        // request = { ...request, ulid };
-    }
-    if (typeof xpsId === 'string') {
-        throw new Error(`'xpsId' not supported`);
-        // check('xpsId', xpsId, isNotBlank);
-        // request = { ...request, xpsId };
     }
     if (typeof include === 'string' && admin) {
         request = { ...request, include };

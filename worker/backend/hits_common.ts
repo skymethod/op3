@@ -27,11 +27,9 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive = new Date().toISOString(), startAfterRecordKey } = request;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
 
-    if (startTimeInclusive === undefined) throw new Error(`'startTimeInclusive' is required`);
-    if (startTimeExclusive !== undefined) throw new Error(`'startTimeExclusive' is not supported`);
-
-    const startTimestamp = computeTimestamp([ startTimeInclusive, epochMinute ].sort()[1]);
-    const startMinuteTimestamp = computeMinuteTimestamp(startTimestamp);
+    const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
+    const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
+    const startMinuteTimestamp = computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(epochMinute));
     const endTimestamp = computeTimestamp(endTimeExclusive);
     const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
     const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
@@ -45,7 +43,8 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
             if (stream !== undefined) {
                 for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
                     const recordTimestamp = sortKey.substring(0, 15);
-                    if (startTimestamp && recordTimestamp < startTimestamp) continue;
+                    if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
+                    if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
                     if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
                     if (endTimestamp && recordTimestamp >= endTimestamp) return;
                     records[sortKey] = record;
