@@ -1,6 +1,6 @@
 export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload';
 
-export function computeBotType({ agentType, agentName = '', deviceType, referrerName, tags = '' }: { agentType: string, agentName?: string, deviceType?: string, referrerName?: string, tags?: string }): BotType | undefined {
+export function computeBotType({ agentType, agentName = '', deviceType, referrerName, tags = '', date }: { agentType: string, agentName?: string, deviceType?: string, referrerName?: string, tags?: string, date: string }): BotType | undefined {
     if (agentType === 'bot') return 'bot'; // easy
     if (agentType === 'bot-library') return 'bot-lib'; // user-agents-v2 type='library' with category='bot'
     if (agentType === 'unknown' && /(bot|crawler|spider)/i.test(agentName)) return 'unknown-bot'; // "bot", "crawler" or "spider" in the user-agent string for unknown agents
@@ -14,7 +14,7 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
     // 2024-03-11: Observed two other embedded player widgets requesting the entire file before user playback (preload="metadata")
     if (agentType === 'browser' && agentName === 'Podfriend' && tags.includes('web-widget')) return 'web-widget-preload';
-    if (agentType === 'browser' && agentName === 'JustCast' && tags.includes('web-widget')) return 'web-widget-preload';
+    if (agentType === 'browser' && agentName === 'JustCast' && tags.includes('web-widget') && date < '2024-03-19') return 'web-widget-preload'; // 2024-03-19: fixed!
 }
 
 export function isWebWidgetHostname(hostname: string): boolean {
