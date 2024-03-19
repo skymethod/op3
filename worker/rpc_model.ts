@@ -18,6 +18,7 @@ export type RpcRequest =
     | ModifyApiKeyRequest
     | QueryPackedRedirectLogsRequest
     | QueryRedirectLogsRequest
+    | QueryHitsIndexRequest
     | QueryDownloadsRequest
     | RedirectLogsNotificationRequest
     | RegisterDORequest 
@@ -41,6 +42,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'modify-api-key'
         || obj.kind === 'query-packed-redirect-logs'
         || obj.kind === 'query-redirect-logs'
+        || obj.kind === 'query-hits-index'
         || obj.kind === 'query-downloads'
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'register-do' 
@@ -202,6 +204,12 @@ export interface QueryRedirectLogsRequest {
     readonly rawIpAddress?: string; // only allow caller ip
     readonly ulid?: string;
     readonly xpsId?: string;
+}
+
+export interface QueryHitsIndexRequest {
+    readonly kind: 'query-hits-index';
+    readonly hashedIpAddress?: string;
+    readonly rawIpAddress?: string; // only allow caller ip
 }
 
 export interface QueryDownloadsRequest {
@@ -511,6 +519,7 @@ export interface RpcClient {
     getNewRedirectLogs(request: Unkinded<GetNewRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse>;
     queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response>;
+    queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response>;
     queryDownloads(request: Unkinded<QueryDownloadsRequest>, target: string): Promise<Response>;
     resolveApiToken(request: Unkinded<ResolveApiTokenRequest>, target: string): Promise<ResolveApiTokenResponse>;
     generateNewApiKey(request: Unkinded<GenerateNewApiKeyRequest>, target: string): Promise<ApiKeyResponse>;

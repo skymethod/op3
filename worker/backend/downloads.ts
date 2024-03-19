@@ -25,7 +25,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
     const start = Date.now();
 
     const query: (request: Unkinded<QueryPackedRedirectLogsRequest>) => Promise<PackedRedirectLogsResponse> = 
-        target === 'hitsBlobs' && hitsBlobs ? (request => queryPackedRedirectLogsFromHits(request, hitsBlobs, new AttNums()))
+        target === 'hitsBlobs' && hitsBlobs ? (request => queryPackedRedirectLogsFromHits(request, hitsBlobs, new AttNums(), undefined))
         : (request => rpcClient.queryPackedRedirectLogs(request, target));
 
     const startInstant = `${hour}:00:00.000Z`;

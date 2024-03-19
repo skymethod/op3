@@ -1,14 +1,18 @@
 import { AttNums } from '../backend/att_nums.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { queryPackedRedirectLogsFromHits } from '../backend/hits_common.ts';
+import { isValidSha1Hex } from '../crypto.ts';
 import { packError } from '../errors.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { timestampToInstant } from '../timestamp.ts';
 import { writeTraceEvent } from '../tracer.ts';
+import { check } from '../check.ts';
 import { QUERY_HITS } from './api_contract.ts';
 import { computeApiQueryCommonParameters, newQueryResponse } from './api_query_common.ts';
+import { DoNames } from '../do_names.ts';
+import { computeLinestream } from '../streams.ts';
 
 type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, rawIpAddress: string | undefined };
 export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, hitsBlobs, roHitsBlobs, rawIpAddress }: Opts): Promise<Response> {
@@ -32,11 +36,23 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
 
 //
 
-async function query(request: Unkinded<QueryRedirectLogsRequest>, _rpcClient: RpcClient, hitsBlobs: Blobs): Promise<Response> {
-    const { format = 'tsv', include = '' } = request;
+async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: RpcClient, hitsBlobs: Blobs): Promise<Response> {
+    const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress } = request;
     const startTime = Date.now();
+
+    let sortKeys: string[] | undefined;
+    if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string') {
+        const response = await rpcClient.queryHitsIndex({ hashedIpAddress, rawIpAddress }, DoNames.hitsServer);
+        if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
+        if (!response.body) throw new Error(`queryHitsIndex returned no body`);
+        sortKeys = [];
+        for await (const line of computeLinestream(response.body)) {
+            if (line.length > 0) sortKeys.push(line);
+        }
+    }
+
     const attNums = new AttNums();
-    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums);
+    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, sortKeys);
     const rows: unknown[] = [];
     const includes = include.split(',');
     const includeAsn = includes.includes('asn');
@@ -116,14 +132,13 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
         // request = { ...request, urlSha256 };
     }
     if (typeof hashedIpAddress === 'string') {
-        throw new Error(`'hashedIpAddress' not supported`);
-        // if (hashedIpAddress === 'current') {
-        //     if (typeof rawIpAddress !== 'string') throw new Error(`Unable to compute current hashedIpAddress`);
-        //     request = { ...request, rawIpAddress };
-        // } else {
-        //     check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
-        //     request = { ...request, hashedIpAddress };
-        // }
+        if (hashedIpAddress === 'current') {
+            if (typeof rawIpAddress !== 'string') throw new Error(`Unable to compute current hashedIpAddress`);
+            request = { ...request, rawIpAddress };
+        } else {
+            check('hashedIpAddress', hashedIpAddress, isValidSha1Hex);
+            request = { ...request, hashedIpAddress };
+        }
     }
     if (typeof include === 'string' && admin) {
         request = { ...request, include };

@@ -273,6 +273,8 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'log-raw-redirects-batch', ...await getOrLoadHitsController().logRawRedirectsBatch(obj) });
                     } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.hitsServer) {
                         return newRpcResponse(await getOrLoadHitsController().queryPackedRedirectLogs(obj));
+                    } else if (obj.kind === 'query-hits-index' && durableObjectName === DoNames.hitsServer) {
+                        return await getOrLoadHitsController().queryHitsIndex(obj);
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }

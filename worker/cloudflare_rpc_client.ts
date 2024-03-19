@@ -1,6 +1,6 @@
 import { isDurableObjectFetchErrorRetryable } from './cloudflare_errors.ts';
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, GetColoStatusRequest, GetColoStatusResponse, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, GetColoStatusRequest, GetColoStatusResponse, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest } from './rpc_model.ts';
 import { executeWithRetries } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
@@ -46,6 +46,10 @@ export class CloudflareRpcClient implements RpcClient {
 
     async queryRedirectLogs(request: Unkinded<QueryRedirectLogsRequest>, target: string): Promise<Response> {
         return await sendRpc<Response>({ kind: 'query-redirect-logs', ...request }, 'response', this.computeOpts(target));
+    }
+
+    async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
+        return await sendRpc<Response>({ kind: 'query-hits-index', ...request }, 'response', this.computeOpts(target));
     }
 
     async queryDownloads(request: Unkinded<QueryDownloadsRequest>, target: string): Promise<Response> {

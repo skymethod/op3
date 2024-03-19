@@ -1,7 +1,7 @@
 import { timed } from '../async.ts';
 import { isStringRecord } from '../check.ts';
 import { DurableObjectStorage, RedBlackTree } from '../deps.ts';
-import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
@@ -153,7 +153,12 @@ export class HitsController {
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
         const { hitsBlobs } = this;
         const attNums = await this.getOrLoadAttNums();
-        return await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums);
+        return await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, undefined);
+    }
+
+    async queryHitsIndex(_request: Unkinded<QueryHitsIndexRequest>): Promise<Response> {
+        await Promise.resolve();
+        throw new Error('TODO');
     }
 
     //

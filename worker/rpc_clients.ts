@@ -1,5 +1,5 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
-import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse } from './rpc_model.ts';
+import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, QueryHitsIndexRequest } from './rpc_model.ts';
 import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetColoStatusRequest, GetColoStatusResponse, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
@@ -39,6 +39,10 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: queryRedirectLogs(${JSON.stringify({ request, target })}) not implemented`);
     }
 
+    queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
+        throw new Error(`StubRpcClient: queryHitsIndex(${JSON.stringify({ request, target })}) not implemented`);
+    }
+    
     queryDownloads(request: Unkinded<QueryDownloadsRequest>, target: string): Promise<Response> {
         throw new Error(`StubRpcClient: queryDownloads(${JSON.stringify({ request, target })}) not implemented`);
     }
