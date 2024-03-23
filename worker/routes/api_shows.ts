@@ -30,7 +30,7 @@ export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searc
             showUuidInput = result;
         } else if (isValidUuid(showUuidOrPodcastGuidOrFeedUrlBase64)) {
             showUuidInput = showUuidOrPodcastGuidOrFeedUrlBase64;
-        } else if (/^[0-9a-zA-Z_-]{15,}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
+        } else if (/^[0-9a-zA-Z_-]{15,}=*$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
             const feedUrl = Bytes.ofBase64(showUuidOrPodcastGuidOrFeedUrlBase64, { urlSafe: true }).utf8();
             if (feedUrl.includes('\r') || feedUrl.includes('\n') || feedUrl.trim() !== feedUrl) throw new Error(`Invalid feedUrl: ${JSON.stringify(feedUrl)}`);
             const result = await timed(times, 'lookup-show-uuid-for-feed-url', () => lookupShowUuidForFeedUrl(feedUrl, { rpcClient, roRpcClient, searchParams }));

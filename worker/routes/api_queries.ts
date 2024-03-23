@@ -67,7 +67,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
                 if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(podcastGuid)) throw new Error(`Bad podcastGuid: ${podcastGuid}`);
                 showUuidOrPodcastGuidOrFeedUrlBase64 = podcastGuid;
             } else if (typeof feedUrlBase64 === 'string') {
-                if (!/^[0-9a-zA-Z_-]{15,}$/i.test(feedUrlBase64) || !isValidFeedUrlBase64(feedUrlBase64)) throw new Error(`Bad feedUrlBase64: ${feedUrlBase64}`);
+                if (!/^[0-9a-zA-Z_-]{15,}=*$/i.test(feedUrlBase64) || !isValidFeedUrlBase64(feedUrlBase64)) throw new Error(`Bad feedUrlBase64: ${feedUrlBase64}`);
                 showUuidOrPodcastGuidOrFeedUrlBase64 = feedUrlBase64;
             }
         } catch (e) {
