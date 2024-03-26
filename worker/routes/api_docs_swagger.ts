@@ -17,6 +17,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
     let queryTopAppsForShowDescriptionSuffix = '';
     let queryTopAppsDescriptionSuffix = '';
+    let queryShowDownloadCountsDescriptionSuffix = '';
 
     const previewToken = templateMode ? 'PREVIEW_TOKEN_TEMPLATE' : [...previewTokens].at(0);
     let demoShowUuid: string | undefined;
@@ -39,6 +40,9 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
 
             const exampleQueryTopAppsApiCall = `${origin}/api/1/queries/top-apps?token=${previewToken}`;
             queryTopAppsDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryTopAppsApiCall}](${exampleQueryTopAppsApiCall})`;
+
+            const exampleQueryShowDownloadCountsApiCall = `${origin}/api/1/queries/show-download-counts?showUuid=${demoShowUuid}&token=${previewToken}`;
+            queryShowDownloadCountsDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryShowDownloadCountsApiCall}](${exampleQueryShowDownloadCountsApiCall})`;
         }
 
         viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>The canonical OP3 stats page for the show is returned in the \`statsPageUrl\` response field, but in general are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
@@ -55,14 +59,14 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
     
-    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix, queryShowDownloadCountsDescriptionSuffix);
     const json = JSON.stringify(swagger, undefined, 2);
     return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string, queryShowDownloadCountsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -573,6 +577,63 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                     ]
                 }
             },
+            "/queries/show-download-counts": {
+                "get": {
+                    "tags": [
+                        "queries"
+                    ],
+                    "summary": "Query monthly/weekly download counts for one or more shows",
+                    "description": [
+                        `Get number of monthly downloads (last 30 days) and average weekly downloads over the last four weeks.\n\nExcludes bots. Updated daily.\n\n`,
+                        `You can pass in one or more OP3 show uuids, and the results in \`showDownloadCounts\` will be keyed by show, with the following data points for each show:\n`,
+                        ` - \`monthlyDownloads\` (number): total number of non-bot downloads for the show in the last 30 days\n`,
+                        ` - \`days\` (string): 30-character string, each character identifying whether (\`1\`) or not (\`0\`) the show had at least one-bot download in each of the last 30 days (ascending in time), useful in determining how to interpret \`monthlyDownloads\` for new shows\n`,
+                        ` - \`weeklyAvgDownloads\` (number): average number of non-bot downloads per week over the last four weeks (or at least the last few full weeks if new to OP3)\n`,
+                        ` - \`weeklyDownloads\` ([ number, number, number, number]): non-bot downloads per week over the last four weeks (ascending in time)\n`,
+                        ` - \`numWeeks\` (number): number of recent weeks with full data on OP3, denominator used in \`weeklyAvgDownloads\`. Usually \`4\`, but can be less for new shows (e.g. \`1\` if we only have data for the last 10 days)\n`,
+                        queryShowDownloadCountsDescriptionSuffix,
+                    ].join(''),
+                    "operationId": "queryShowDownloadCounts",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "showUuid",
+                            "in": "query",
+                            "description": "Specify one or more shows by OP3 show uuid.",
+                            "required": true,
+                            "type": "array",
+                            "minItems": 1,
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string",
+                                "format": "32-character hex",
+                            }
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryShowDownloadCountsResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
         
         "securityDefinitions": {
@@ -914,6 +975,29 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                 },
                 "required": [
                     "appShares", "minDate", "maxDate", "queryTime"
+                ]
+            },
+            "QueryShowDownloadCountsResponse": {
+                "type": "object",
+                "properties": {
+                    "asof": {
+                        "type": "string",
+                        "description": "Data current as of this date, usually the most recent fully-complete UTC day",
+                        "format": "yyyy-mm-dd",
+                    },
+                    "showDownloadCounts": {
+                        "type": "object",
+                        "description": "Monthly and weekly download counts per requested show (keyed by `showUuid`)",
+                        "additionalProperties": true,
+                        "format": "{ \"showUuid\": { days: string, monthlyDownloads: number, weeklyDownloads: [ number, number, number, number ], weeklyAvgDownloads: number, numWeeks: number } }"
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
+                },
+                "required": [
+                    "asof", "showDownloadCounts", "queryTime"
                 ]
             },
         }

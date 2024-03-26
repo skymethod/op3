@@ -14,7 +14,7 @@ import { consoleWarn } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS } from './api_contract.ts';
-import { isValidRecentEpisodes } from './api_queries_model.ts';
+import { isShowDownloadCountsResponse, isValidRecentEpisodes } from './api_queries_model.ts';
 import { normalizeDevice } from './api_query_common.ts';
 import { lookupShowId } from './api_shows.ts';
 import { computeAppDownloads } from './api_shows_shared.ts';
@@ -103,7 +103,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         return newJsonResponse({ showUuid: showUuidInput, appDownloads, queryTime, ...(debug ? { times } : {}) });
     }
 
-    if (name == 'top-apps') {
+    if (name === 'top-apps') {
         const times: Record<string, number> = {};
 
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
@@ -123,6 +123,24 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
 
         const queryTime = Date.now() - start;
         return newJsonResponse({ appShares, deviceName, minDate, maxDate, queryTime, ...(debug ? { times } : {}) });
+    }
+
+    if (name === 'show-download-counts') {
+        const times: Record<string, number> = {};
+
+        const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
+        if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
+        const obj = await targetStatsBlobs.get(`show-download-counts/current.json`, 'json');
+        if (!isShowDownloadCountsResponse(obj)) return newJsonResponse({ error: 'no data!' }, 400);
+
+        const showUuids = searchParams.getAll('showUuid');
+        if (showUuids.length === 0) return newJsonResponse({ error: `Specify at least one 'showUuid' query param` }, 400);
+        for (const showUuid of showUuids) {
+            if (!isValidUuid(showUuid)) return newJsonResponse({ error: `Bad 'showUuid': ${showUuid}` }, 400);
+        }
+        const showDownloadCounts = Object.fromEntries(Object.entries(obj.showDownloadCounts).filter(v => showUuids.includes(v[0])));
+        const queryTime = Date.now() - start;
+        return newJsonResponse({ ...obj, showDownloadCounts, queryTime, ...(debug ? { times } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);

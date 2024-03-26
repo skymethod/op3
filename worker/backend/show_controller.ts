@@ -259,11 +259,11 @@ export class ShowController {
                         const forceResave = force.includes('resave');
                         const message = await indexItems(result, { storage, blobs: feedBlobs, forceResave, origin, refetchMediaUrls });
                         return { message };
-                    } else if (action == 'set-show-uuid') {
+                    } else if (action === 'set-show-uuid') {
                         const { 'show-uuid': showUuid = generateUuid() } = parameters;
                         const message = await setShowUuid(result, showUuid, { storage });
                         return { message };
-                    } else if (action == 'remove-show-uuid') {
+                    } else if (action === 'remove-show-uuid') {
                         const showUuid = await removeShowUuid(result, storage);
                         return { message: `Removed ${showUuid} from ${result.url}` };
                     }
@@ -459,7 +459,7 @@ export class ShowController {
                     infos.push(r.kind);
                     if (r.kind === 'lookup-pg') {
                         await lookupPodcastGuid(r.podcastGuid, storage, podcastIndexClient);
-                    } else if (r.kind == 'lookup-feed') {
+                    } else if (r.kind === 'lookup-feed') {
                         await lookupFeed(r.feedUrl, storage, podcastIndexClient);
                     } else {
                         consoleWarn('sc-work', `Unsupported work kind: ${JSON.stringify(record)}`);

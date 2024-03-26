@@ -29,3 +29,27 @@ export function isValidEpisodeInfo(obj: unknown): obj is EpisodeInfo {
         && isStringRecord(obj.dailyDownloads)
         ;
 }
+
+export interface ShowDownloadCountsResponse {
+    readonly asof: string;
+    readonly showDownloadCounts: Record<string, ShowDownloadCounts>; // key = showUuid
+}
+
+export function isShowDownloadCountsResponse(obj: unknown): obj is ShowDownloadCountsResponse {
+    return isStringRecord(obj)
+        && typeof obj.asof === 'string'
+        && isStringRecord(obj.showDownloadCounts) && Object.values(obj.showDownloadCounts).every(isShowDownloadCounts)
+        ;
+}
+
+export type ShowDownloadCounts = { days: string, monthlyDownloads: number, weeklyDownloads: [ number, number, number, number ], weeklyAvgDownloads: number, numWeeks: number };
+
+export function isShowDownloadCounts(obj: unknown): obj is ShowDownloadCounts {
+    return isStringRecord(obj)
+        && typeof obj.days === 'string'
+        && typeof obj.monthlyDownloads === 'number'
+        && Array.isArray(obj.weeklyDownloads)
+        && typeof obj.weeklyAvgDownloads === 'number'
+        && typeof obj.numWeeks === 'number'
+        ;
+}
