@@ -230,7 +230,7 @@ const computeStubShowListenStats = (showUuid: string): ShowListenStats => ({
 });
 
 function cleanTitle(title: string | undefined): string | undefined {
-    return title === undefined ? undefined : decodeXml(title);
+    return title === undefined ? undefined : decodeXml(title, { eacute: 'é' });
 }
 
 async function computeUnderlyingShowUuid(showUuidInput: string, configuration: Configuration): Promise<string> {
