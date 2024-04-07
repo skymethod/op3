@@ -30,9 +30,9 @@ export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<
 
 async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined, admin: boolean): Promise<Unkinded<QueryRedirectLogsRequest>> {
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_REDIRECT_LOGS) };
-    const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
+    const { url, urlSha256, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
 
-    if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
+    if ([ url, urlSha256, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
     if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
     if (typeof url === 'string') {
         const m = /^(https?:\/\/.+?)\*$/.exec(url);
@@ -52,10 +52,6 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     if (typeof urlSha256 === 'string') {
         check('urlSha256', urlSha256, isValidSha256Hex);
         request = { ...request, urlSha256 };
-    }
-    if (typeof userAgent === 'string') {
-        check('userAgent', userAgent, isNotBlank);
-        request = { ...request, userAgent };
     }
     if (typeof referer === 'string') {
         check('referer', referer, isNotBlank);
@@ -86,8 +82,8 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
 
 function computeEventPayload(request: Unkinded<QueryRedirectLogsRequest>, isPreview: boolean): { strings: string[], doubles: number[] } {
     const { limit = -1, format = '', startTimeInclusive = '', startTimeExclusive = '', endTimeExclusive = '' } = request;
-    const { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId } = request;
-    const filters = { urlSha256, urlStartsWith, userAgent, referer, hashedIpAddress, rawIpAddress, ulid, xpsId };
+    const { urlSha256, urlStartsWith, referer, hashedIpAddress, rawIpAddress, ulid, xpsId } = request;
+    const filters = { urlSha256, urlStartsWith, referer, hashedIpAddress, rawIpAddress, ulid, xpsId };
     let filterName = '';
     let filterValue = '';
     for (const [ name, value ] of Object.entries(filters)) {
