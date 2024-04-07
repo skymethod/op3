@@ -230,7 +230,7 @@ export class CombinedRedirectLogController {
                 return { results };
             }
             if (operationKind === 'delete') {
-                const allowedToDelete = [ IndexId.Uuid, IndexId.EdgeColo, IndexId.DoColo, IndexId.Source, IndexId.Range, IndexId.Method ];
+                const allowedToDelete = [ IndexId.Uuid, IndexId.EdgeColo, IndexId.DoColo, IndexId.Source, IndexId.Range, IndexId.Method, IndexId.UserAgent ];
                 if (!allowedToDelete.includes(indexId)) throw new Error(`Not allowed to delete index ${indexId}`);
                 const keys = [...map.keys()];
                 const firstKey = keys.at(0);
