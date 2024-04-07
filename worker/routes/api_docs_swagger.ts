@@ -183,14 +183,6 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                             "format": "64-character hex",
                         },
                         {
-                            "name": "userAgent",
-                            "in": "query",
-                            "description": "Filter by a specific User-Agent header",
-                            "example": `AppleCoreMedia/1.0.0.19G82 (iPhone; U; CPU OS 15_6_1 like Mac OS X; en_gb)`,
-                            "required": false,
-                            "type": "string",
-                        },
-                        {
                             "name": "referer",
                             "in": "query",
                             "description": "Filter by a specific Referer header\n\n(intentionally follows the misspelling of the header name in the HTTP spec)",

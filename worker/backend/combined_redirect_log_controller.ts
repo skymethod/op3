@@ -612,7 +612,7 @@ export enum IndexId {
 
 export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string) => string | undefined | Promise<string | undefined> ][] = [
     [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(computeServerUrl(v)).sha256()).hex() ],
-    [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ],
+    [ 'userAgent', IndexId.UserAgent, _ => undefined ], // disabled 2024-04-07  [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ]
     [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
     [ 'range', IndexId.Range, _ => undefined ], // disabled 2023-12-14  [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ]
     [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
