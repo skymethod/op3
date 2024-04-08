@@ -135,10 +135,10 @@ export class RedirectLogController {
                 return { results, message };
             }
             if ((operationKind === 'update' || operationKind === 'delete') && subpath === '/sfl' && this.queue2) {
-                const { keys: keysStr } = parameters;
+                const { ids: idsStr } = parameters;
                 const isUpdate = operationKind === 'update';
-                if (typeof keysStr !== 'string') throw new Error(`Bad keys: ${JSON.stringify(parameters)}`);
-                const timestampIds = distinct(keysStr.split(',').map(v => v.trim()).filter(v => v !== ''));
+                if (typeof idsStr !== 'string') throw new Error(`Bad ids: ${JSON.stringify(parameters)}`);
+                const timestampIds = distinct(idsStr.split(',').map(v => v.trim()).filter(v => v !== ''));
                 for (const timestampId of timestampIds) {
                     const key = computeSaveForLaterKey(timestampId);
                     if (isUpdate) {
