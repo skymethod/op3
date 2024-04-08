@@ -142,7 +142,11 @@ export class BackendDO {
 
                     if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
-                        await getOrLoadRedirectLogController().save(obj.rawRedirects);
+                        if (obj.saveForLater) {
+                            await getOrLoadRedirectLogController().saveForLater(obj.rawRedirects);
+                        } else {
+                            await getOrLoadRedirectLogController().save(obj.rawRedirects);
+                        }
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'get-new-redirect-logs') {
                         const { limit, startAfterTimestampId } = obj;

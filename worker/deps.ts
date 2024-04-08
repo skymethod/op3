@@ -1,7 +1,7 @@
 export type { CfGlobalCaches, CfCache, CfCacheOptions, IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage, DurableObjectStorageMethods, 
     AnalyticsEngine, DurableObjectStorageValue, AnalyticsEngineEvent, DurableObjectStorageListOptions, DurableObjectStorageReadOptions,
     R2Bucket, R2ListOptions, KVNamespace, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody,
-    QueueMessageBatch, QueueMessage, Queue, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/cloudflare_workers_types.d.ts';
+    QueueMessageBatch, QueueMessage, Queue, QueuesContentType, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/cloudflare_workers_types.d.ts';
 export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/bytes.ts';
 export { R2, signAwsCallV4 } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/r2.ts';
 export type { AwsCall, AwsCallContext } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/r2.ts';

@@ -37,7 +37,7 @@ import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
 import { Configuration, makeCachedConfiguration } from './configuration.ts';
 export { BackendDO } from './backend/backend_do.ts';
-import { executeWithRetries } from './sleep.ts';
+import { sendWithRetries } from './queues.ts';
 
 export default {
     
@@ -216,14 +216,17 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                     if (kvNamespace && queue2) {
                         if (!cachedConfiguration) cachedConfiguration = makeCachedConfiguration(new CloudflareConfiguration(kvNamespace), () => 1000 * 60); // cache config values for one minute
                         if (await cachedConfiguration.get('hits-queue') === 'enabled') {
-                            await executeWithRetries(async () => {
-                                await queue2.send(rawRedirects, { contentType: 'json' });
-                            }, { tag: 'queue2.send', maxRetries: 3, isRetryable: e => {
-                                const error = `${e.stack || e}`;
-                                if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
-                                if (error.includes('Internal Server Error')) return true; // Error: Queue send failed: Internal Server Error
-                                return false;
-                            }});
+                            try {
+                                await sendWithRetries(queue2, rawRedirects, { tag: 'queue2.send', contentType: 'json' });
+                            } catch (e) {
+                                // save to DO for retrying later, try to avoid Queues altogether here in case the entire system is down
+                                try {
+                                    await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
+                                    consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`)
+                                } catch (e) {
+                                    throw new Error(`Error saving for later: ${e.message}`);
+                                }
+                            }
                         }
                     }
                 } catch (e) {

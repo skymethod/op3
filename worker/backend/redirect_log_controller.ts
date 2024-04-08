@@ -36,7 +36,11 @@ export class RedirectLogController {
         this.notificationDelaySeconds = notificationDelaySeconds;
     }
 
-    async save(rawRedirects: readonly RawRedirect[]) {
+    async saveForLater(rawRedirects: readonly RawRedirect[]): Promise<void> {
+        await this.storage.put(`rl.sfl.${this.timestampSequence.next()}`, rawRedirects, { noCache: true });
+    }
+
+    async save(rawRedirects: readonly RawRedirect[]): Promise<void> {
         const attNums = await this.getOrLoadAttNums();
         const attNumsMaxBefore = attNums.max();
         const batches = await computePutBatches(rawRedirects, attNums, this.colo, 'rlc', () => `rl.r.${this.timestampSequence.next()}`, this.encryptIpAddress, this.hashIpAddress);

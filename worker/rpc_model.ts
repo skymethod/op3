@@ -68,6 +68,7 @@ export interface RawRedirect {
 export interface LogRawRedirectsRequest {
     readonly kind: 'log-raw-redirects';
     readonly rawRedirects: readonly RawRedirect[];
+    readonly saveForLater?: boolean;
 }
 
 export interface LogRawRedirectsBatchRequest {
