@@ -37,6 +37,7 @@ import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
 import { Configuration, makeCachedConfiguration } from './configuration.ts';
 export { BackendDO } from './backend/backend_do.ts';
+import { executeWithRetries } from './sleep.ts';
 
 export default {
     
@@ -215,7 +216,14 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                     if (kvNamespace && queue2) {
                         if (!cachedConfiguration) cachedConfiguration = makeCachedConfiguration(new CloudflareConfiguration(kvNamespace), () => 1000 * 60); // cache config values for one minute
                         if (await cachedConfiguration.get('hits-queue') === 'enabled') {
-                            await queue2.send(rawRedirects, { contentType: 'json' });
+                            await executeWithRetries(async () => {
+                                await queue2.send(rawRedirects, { contentType: 'json' });
+                            }, { tag: 'queue2.send', maxRetries: 3, isRetryable: e => {
+                                const error = `${e.stack || e}`;
+                                if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
+                                if (error.includes('Internal Server Error')) return true; // Error: Queue send failed: Internal Server Error
+                                return false;
+                            }});
                         }
                     }
                 } catch (e) {
