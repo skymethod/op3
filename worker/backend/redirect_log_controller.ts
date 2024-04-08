@@ -1,5 +1,5 @@
 import { check, tryParseInt } from '../check.ts';
-import { DurableObjectStorage, chunk } from '../deps.ts';
+import { DurableObjectStorage, chunk, Queue, distinct } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, PackedRedirectLogs, RawRedirect, RpcClient, Unkinded } from '../rpc_model.ts';
@@ -9,6 +9,7 @@ import { AttNums } from './att_nums.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, computePutBatches } from './raw_redirects.ts';
 import { computeListOpts } from './storage.ts';
 import { TimestampSequence, unpackTimestampId } from './timestamp_sequence.ts';
+import { sendWithRetries } from '../queues.ts'
 
 export class RedirectLogController {
     static readonly notificationAlarmKind = 'RedirectLogController.notificationAlarmKind';
@@ -19,13 +20,14 @@ export class RedirectLogController {
     private readonly encryptIpAddress: IpAddressEncryptionFn;
     private readonly hashIpAddress: IpAddressHashingFn;
     private readonly notificationDelaySeconds: number;
+    private readonly queue2?: Queue;
 
     private readonly timestampSequence = new TimestampSequence(3);
     private attNums: AttNums | undefined;
     private latestStartAfterTimestampId?: string;
 
-    constructor(opts: { storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, notificationDelaySeconds?: number }) {
-        const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 5 } = opts;
+    constructor(opts: { storage: DurableObjectStorage, colo: string, doName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, notificationDelaySeconds?: number, queue2: Queue | undefined }) {
+        const { storage, colo, doName, encryptIpAddress, hashIpAddress, notificationDelaySeconds = 5, queue2 } = opts;
         check('notificationDelaySeconds', notificationDelaySeconds, v => v >= 0);
 
         this.storage = storage;
@@ -34,10 +36,11 @@ export class RedirectLogController {
         this.encryptIpAddress = encryptIpAddress;
         this.hashIpAddress = hashIpAddress;
         this.notificationDelaySeconds = notificationDelaySeconds;
+        this.queue2 = queue2;
     }
 
     async saveForLater(rawRedirects: readonly RawRedirect[]): Promise<void> {
-        await this.storage.put(`rl.sfl.${this.timestampSequence.next()}`, rawRedirects, { noCache: true });
+        await this.storage.put(computeSaveForLaterKey(this.timestampSequence.next()), rawRedirects, { noCache: true });
     }
 
     async save(rawRedirects: readonly RawRedirect[]): Promise<void> {
@@ -124,6 +127,30 @@ export class RedirectLogController {
                 const state = { latestTimestampId, latestStartAfterTimestampId };
                 return { results: [ state ] };
             }
+            if (operationKind === 'select' && subpath === '/sfl') {
+                const start = Date.now();
+                const map = await this.storage.list(computeListOpts('rl.sfl.', parameters));
+                const results = [...map.keys()].map(v => v.substring('rl.sfl.'.length));
+                const message = `storage.list took ${Date.now() - start}ms for ${results.length} results`;
+                return { results, message };
+            }
+            if ((operationKind === 'update' || operationKind === 'delete') && subpath === '/sfl' && this.queue2) {
+                const { keys: keysStr } = parameters;
+                const isUpdate = operationKind === 'update';
+                if (typeof keysStr !== 'string') throw new Error(`Bad keys: ${JSON.stringify(parameters)}`);
+                const timestampIds = distinct(keysStr.split(',').map(v => v.trim()).filter(v => v !== ''));
+                for (const timestampId of timestampIds) {
+                    const key = computeSaveForLaterKey(timestampId);
+                    if (isUpdate) {
+                        const rawRedirects = await this.storage.get(key);
+                        if (!Array.isArray(rawRedirects)) throw new Error(`Unexpected rawRedirects for ${timestampId}: ${rawRedirects}`);
+                        await sendWithRetries(this.queue2, rawRedirects, { tag: 'queue2.resend', contentType: 'json' });
+                    }
+                    await this.storage.delete(key);
+                }
+                const results = [ isUpdate ? { resent: timestampIds } : { deleted: timestampIds } ];
+                return { results };
+            }
         }
         throw new Error(`Unsupported rl-related query`);
     }
@@ -202,4 +229,9 @@ async function deleteImportedRecords(latestStartAfterTimestampId: string, limit:
         maxDeletedInstant = timestampToInstant(unpackTimestampId(maxKey.substring('rl.r.'.length)).timestamp);
     }
     return { deleted, maxInstantToDelete, minDeletedInstant, maxDeletedInstant, error, took: Date.now() - start };
+}
+
+function computeSaveForLaterKey(timestampId: string): string {
+    unpackTimestampId(timestampId); // validates
+    return `rl.sfl.${timestampId}`;
 }

@@ -65,7 +65,7 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, queue2 } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -96,7 +96,7 @@ export class BackendDO {
                         if (this.redirectLogController) return this.redirectLogController;
                         const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
                         const notificationDelaySeconds = tryParseInt(redirectLogNotificationDelaySeconds);
-                        this.redirectLogController = new RedirectLogController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds });
+                        this.redirectLogController = new RedirectLogController({ storage, colo, doName: durableObjectName, encryptIpAddress, hashIpAddress, notificationDelaySeconds, queue2 });
                         return this.redirectLogController;
                     }
 
