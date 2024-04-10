@@ -42,19 +42,37 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2024-04-10',
+        description: 'Cloudflare invoice',
+        cost: 791.97,
+        detail: [
+            { description: 'Workers Paid Subscription', cost: 5.00 },
+            { description: 'Workers requests', cost: 35.15 },
+            { description: 'Durable Objects Compute', cost: 12.50 },
+            { description: 'Durable Objects Reads/Writes/Deletes', cost: 427.60 },
+            { description: 'Durable Objects Storage', cost: 187.20 },
+            { description: 'R2 Data Storage', cost: 8.87 },
+            { description: 'R2 Storage Operations', cost: 9.00 },
+            { description: 'Queues Operations', cost: 41.60 },
+            { description: 'KV Operations', cost: 6.00 },
+            { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
+            { description: 'Sales Tax', cost: 49.05 },
+        ]
+    },
+    {
         date: '2024-03-10',
         description: 'Cloudflare invoice',
         cost: 679.83,
         detail: [
-            { description: 'Workers Paid Subscription', cost: 5.00 }, //
-            { description: 'Workers requests', cost: 32.36 }, //
-            { description: 'Durable Objects Compute', cost: 12.50 }, //
-            { description: 'Durable Objects Reads/Writes/Deletes', cost: 404.40 }, //
-            { description: 'Durable Objects Storage', cost: 162.00 }, //
-            { description: 'R2 Data Storage', cost: 6.95 }, //
-            { description: 'R2 Storage Operations', cost: 4.50 }, //
-            { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 }, //
-            { description: 'Sales Tax', cost: 42.12 }, //
+            { description: 'Workers Paid Subscription', cost: 5.00 },
+            { description: 'Workers requests', cost: 32.36 },
+            { description: 'Durable Objects Compute', cost: 12.50 },
+            { description: 'Durable Objects Reads/Writes/Deletes', cost: 404.40 },
+            { description: 'Durable Objects Storage', cost: 162.00 },
+            { description: 'R2 Data Storage', cost: 6.95 },
+            { description: 'R2 Storage Operations', cost: 4.50 },
+            { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
+            { description: 'Sales Tax', cost: 42.12 },
         ]
     },
     {
