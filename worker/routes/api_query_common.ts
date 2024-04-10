@@ -49,7 +49,14 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
     }
     if (typeof order === 'string') {
         checkMatches('order', order, /^(asc|ascending|desc|descending)$/);
-        if (order.startsWith('desc')) rt = { ...rt, descending: true };
+        if (order.startsWith('desc')) {
+            rt = { ...rt, descending: true };
+        } else if (searchParams.has('desc')) {
+            throw new Error(`Conflicting 'order' and 'desc'`);
+        }
+    }
+    if (searchParams.has('desc')) {
+        rt = { ...rt, descending: true };
     }
 
     return rt;

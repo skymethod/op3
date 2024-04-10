@@ -35,25 +35,28 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
     await (async () => {
-        // TODO implement descending
-        let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
-        let recordCount = 0;
-        while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
-            console.log({ minuteTimestamp });
-            const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
-            if (stream !== undefined) {
-                for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
-                    const recordTimestamp = sortKey.substring(0, 15);
-                    if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
-                    if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
-                    if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
-                    if (endTimestamp && recordTimestamp >= endTimestamp) return;
-                    records[sortKey] = record;
-                    recordCount++;
-                    if (recordCount >= limit) return;
+        if (descending) {
+            throw new Error(`TODO`);
+        } else {
+            let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
+            let recordCount = 0;
+            while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
+                console.log({ minuteTimestamp });
+                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+                if (stream !== undefined) {
+                    for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
+                        const recordTimestamp = sortKey.substring(0, 15);
+                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
+                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
+                        if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
+                        if (endTimestamp && recordTimestamp >= endTimestamp) return;
+                        records[sortKey] = record;
+                        recordCount++;
+                        if (recordCount >= limit) return;
+                    }
                 }
+                minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
             }
-            minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
         }
     })();
 
