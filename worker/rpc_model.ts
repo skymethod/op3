@@ -192,6 +192,7 @@ export interface QueryRedirectLogsRequest {
     readonly limit: number;
     readonly format?: string; // tsv, json-o, json-a
     readonly include?: string;
+    readonly descending?: boolean;
 
     readonly startTimeInclusive?: string; // instant
     readonly startTimeExclusive?: string; // instant

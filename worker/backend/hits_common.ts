@@ -23,7 +23,7 @@ export function computeRecordInfo(obj: Record<string, string>): { sortKey: strin
     return { sortKey, minuteTimestamp };
 }
 
-export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums, sortKeys: string[] | undefined): Promise<PackedRedirectLogsResponse> {
+export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums, sortKeys: string[] | undefined, descending: boolean): Promise<PackedRedirectLogsResponse> {
     const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive = new Date().toISOString(), startAfterRecordKey } = request;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
 
@@ -35,6 +35,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
     await (async () => {
+        // TODO implement descending
         let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
         let recordCount = 0;
         while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {

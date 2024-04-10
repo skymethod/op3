@@ -37,7 +37,7 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
 //
 
 async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: RpcClient, hitsBlobs: Blobs): Promise<Response> {
-    const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress } = request;
+    const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, descending = false } = request;
     const startTime = Date.now();
 
     let sortKeys: string[] | undefined;
@@ -52,7 +52,7 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: Rpc
     }
 
     const attNums = new AttNums();
-    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, sortKeys);
+    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, sortKeys, descending);
     const rows: unknown[] = [];
     const includes = include.split(',');
     const includeAsn = includes.includes('asn');
