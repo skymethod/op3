@@ -35,7 +35,7 @@ import { computeDownloadCalculationResponse } from './routes/download_calculatio
 import { computeStatsResponse } from './routes/stats.ts';
 import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
-import { Configuration, makeCachedConfiguration } from './configuration.ts';
+import { Configuration } from './configuration.ts';
 export { BackendDO } from './backend/backend_do.ts';
 import { sendWithRetries } from './queues.ts';
 
@@ -170,7 +170,6 @@ export default {
 
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
-let cachedConfiguration: Configuration | undefined;
 
 async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Promise<Response | undefined> {
     // must never throw!
@@ -212,20 +211,17 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
 
                 // send raw redirects the future way, if enabled
                 try {
-                    const { kvNamespace, queue2 } = env;
-                    if (kvNamespace && queue2) {
-                        if (!cachedConfiguration) cachedConfiguration = makeCachedConfiguration(new CloudflareConfiguration(kvNamespace), () => 1000 * 60); // cache config values for one minute
-                        if (await cachedConfiguration.get('hits-queue') === 'enabled') {
+                    const { queue2 } = env;
+                    if (queue2) {
+                        try {
+                            await sendWithRetries(queue2, rawRedirects, { tag: 'queue2.send', contentType: 'json' });
+                        } catch (e) {
+                            // save to DO for retrying later, try to avoid Queues altogether here in case the entire system is down
                             try {
-                                await sendWithRetries(queue2, rawRedirects, { tag: 'queue2.send', contentType: 'json' });
+                                await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
+                                consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`)
                             } catch (e) {
-                                // save to DO for retrying later, try to avoid Queues altogether here in case the entire system is down
-                                try {
-                                    await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
-                                    consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`)
-                                } catch (e) {
-                                    throw new Error(`Error saving for later: ${e.message}`);
-                                }
+                                throw new Error(`Error saving for later: ${e.message}`);
                             }
                         }
                     }
