@@ -36,11 +36,33 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
 
     await (async () => {
         if (descending) {
-            throw new Error(`TODO`);
+            let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? endMinuteTimestamp;
+            let recordCount = 0;
+            while (minuteTimestamp >= startMinuteTimestamp && recordCount < limit) {
+                console.log({ minuteTimestamp });
+                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+                if (stream !== undefined) {
+                    const reversed: [ string, string ][] = [];
+                    for await (const entry of yieldRecords(stream, attNums, minuteTimestamp)) {
+                        reversed.unshift(entry);
+                    }
+                    for await (const [ record, sortKey ] of reversed) {
+                        const recordTimestamp = sortKey.substring(0, 15);
+                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) return;
+                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) return;
+                        if (startAfterRecordKey && sortKey >= startAfterRecordKey) continue;
+                        if (endTimestamp && recordTimestamp >= endTimestamp) continue;
+                        records[sortKey] = record;
+                        recordCount++;
+                        if (recordCount >= limit) return;
+                    }
+                }
+                minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), -1));
+            }
         } else {
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
             let recordCount = 0;
-            while (minuteTimestamp < endMinuteTimestamp && recordCount < limit) {
+            while (minuteTimestamp <= endMinuteTimestamp && recordCount < limit) {
                 console.log({ minuteTimestamp });
                 const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
                 if (stream !== undefined) {
