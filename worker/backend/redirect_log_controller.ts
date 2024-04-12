@@ -130,7 +130,8 @@ export class RedirectLogController {
             if (operationKind === 'select' && subpath === '/sfl') {
                 const start = Date.now();
                 const map = await this.storage.list(computeListOpts('rl.sfl.', parameters));
-                const results = [...map.keys()].map(v => v.substring('rl.sfl.'.length));
+                const computeRawRedirectKey = (v: RawRedirect) => `${computeTimestamp(v.time)}-${v.uuid}`;
+                const results = [...map].map(v => ({ id: v[0].substring('rl.sfl.'.length), redirectKeys: (v[1] as RawRedirect[]).map(computeRawRedirectKey) }));
                 const message = `storage.list took ${Date.now() - start}ms for ${results.length} results`;
                 return { results, message };
             }

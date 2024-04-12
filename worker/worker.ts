@@ -35,7 +35,6 @@ import { computeDownloadCalculationResponse } from './routes/download_calculatio
 import { computeStatsResponse } from './routes/stats.ts';
 import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
-import { Configuration } from './configuration.ts';
 export { BackendDO } from './backend/backend_do.ts';
 import { sendWithRetries } from './queues.ts';
 
