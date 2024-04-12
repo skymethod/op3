@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@56105dcca0cfe520cc08b3761d5812176ea6f87e (2024-03-03T12:11:19Z)
+// from user-agents-v2@ccdb09004858f0f503ff04143d69da27faec18e2 (2024-04-12T22:22:06Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -34,6 +34,7 @@ const botTests = {
     'AirableBot-Podcast/1.0 (+https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
     'AirableBot-Podcast/1.0 ( https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
     'Alignabot 1.0 (https://www.alignable.com/)': { type: 'bot', name: `AlignaBot` },
+    'AllEars/1.0; (+www.allears.ai)': { type: 'bot', name: `All Ears` },
     'AnchorImport/1.0': { type: 'bot', name: `Anchor Importer` },
     'atc/1.0': { type: 'bot', name: `Apple Podcasts (Watch)` },
     'atc/1.0 watchOS/6.2 model/Watch3,3 hwp/t8004 build/17T529 (6; dt:155)': { type: 'bot', name: `Apple Podcasts (Watch)` },
@@ -137,6 +138,8 @@ const botTests = {
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
     'pdrl.fm Analyzer / 1.0.0': { type: 'bot', name: `Podroll Analyzer` },
+    'PodscanBot/1.1.0 Ubuntu/22.04 (Linux) +https://podscan.fm': { type: 'bot', name: `Podscan Bot` },
+    'PodscanBot/1.1.0 Ubuntu/22.04 (Linux) Podscan.fm': { type: 'bot', name: `Podscan Bot` },
     'Adswizz-podscribe/1.0': { type: 'bot', name: `Podscribe` },
     'Podscribe/1.1': { type: 'bot', name: `Podscribe` },
     'Mozilla/5.0 (compatible; PodUptime/1.0; +https://poduptime.com)': { type: 'bot', name: `PodUptime` },
@@ -165,6 +168,7 @@ const botTests = {
     'SupportingCast': { type: 'bot', name: `SupportingCast` },
     'Timpibot/0.8 ( http://www.timpi.io)': { type: 'bot', name: `Timpi search crawler` },
     'Tiny Tiny RSS/22.12-c30b24d09 (Unsupported) (https://tt-rss.org/)': { type: 'bot', name: `Tiny Tiny RSS` },
+    'Transistor.fm/1.0': { type: 'bot', name: `Transistor` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },

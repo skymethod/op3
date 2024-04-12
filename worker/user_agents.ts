@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@56105dcca0cfe520cc08b3761d5812176ea6f87e (2024-03-03T12:11:19Z)
+// from user-agents-v2@ccdb09004858f0f503ff04143d69da27faec18e2 (2024-04-12T22:22:06Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -30,6 +30,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/AirableBot-Podcast\//.test(userAgent)) return { name: `AirableBot`, type: 'bot' };
     if (/^AmazonNewsContentService/.test(userAgent)) return { name: `Alexa Flash Briefing cache`, type: 'bot' };
     if (/^Alignabot/.test(userAgent)) return { name: `AlignaBot`, type: 'bot' };
+    if (/^AllEars\//.test(userAgent)) return { name: `All Ears`, type: 'bot' };
     if (/^Amazon Music Podcast/.test(userAgent)) return { name: `Amazon Music Podcasts Bot`, type: 'bot' };
     if (/AnchorImport/.test(userAgent)) return { name: `Anchor Importer`, type: 'bot' };
     if (/^atc\/|\(null\) watchOS\//.test(userAgent)) return { name: `Apple Podcasts (Watch)`, type: 'bot' };
@@ -121,6 +122,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };
     if (/(podnods-crawler|podnods)/.test(userAgent)) return { name: `Podnods Bot`, type: 'bot' };
     if (/^pdrl\.fm /.test(userAgent)) return { name: `Podroll Analyzer`, type: 'bot' };
+    if (/^PodscanBot\//.test(userAgent)) return { name: `Podscan Bot`, type: 'bot' };
     if (/(^Adswizz-podscribe\/|^Podscribe\/)/.test(userAgent)) return { name: `Podscribe`, type: 'bot' };
     if (/PodUptime\/\d/.test(userAgent)) return { name: `PodUptime`, type: 'bot' };
     if (/^Podverse\/Feed Parser/.test(userAgent)) return { name: `Podverse Feed Parser`, type: 'bot' };
@@ -150,6 +152,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^SupportingCast(\/.*)?$/.test(userAgent)) return { name: `SupportingCast`, type: 'bot' };
     if (/Timpibot\//.test(userAgent)) return { name: `Timpi search crawler`, type: 'bot' };
     if (/^Tiny Tiny RSS\//.test(userAgent)) return { name: `Tiny Tiny RSS`, type: 'bot' };
+    if (/^Transistor\.fm\//.test(userAgent)) return { name: `Transistor`, type: 'bot' };
     if (/TrendsmapResolver\//.test(userAgent)) return { name: `Trendsmap Resolver`, type: 'bot' };
     if (/Twingly Recon;/.test(userAgent)) return { name: `Twingly Bot`, type: 'bot' };
     if (/^Twitterbot/.test(userAgent)) return { name: `Twitterbot`, type: 'bot' };
