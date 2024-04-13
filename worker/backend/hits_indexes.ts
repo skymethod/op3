@@ -96,7 +96,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
     } else if (typeof url === 'string') {
         const windowStartDate = windowStart.substring(0, 10);
         const dayUrlIndexDef = INDEX_DEFINITIONS.find(v => v[1] === IndexId.DayUrl)!;
-        const maxListCalls = 10; // TODO
+        const maxListCalls = 10;
         if (descending) {
             // start at end date (or current) and work backward
             let date = minString(now, endTimeExclusive ?? now).substring(0, 10);
@@ -120,7 +120,6 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
                 date = addDaysToDateString(date, -1);
             }
             return rt;
-
         } else {
             // start at start date (or window start) and work forward
             const currentDate = now.substring(0, 10);
@@ -146,8 +145,65 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
             }
             return rt;
         }
+    } else if (typeof urlStartsWith === 'string') {
+        const windowStartDate = windowStart.substring(0, 10);
+        const dayUrlIndexDef = INDEX_DEFINITIONS.find(v => v[1] === IndexId.DayUrl)!;
+        const maxListCalls = 10;
+        const startTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
+        const startAfterTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
+        const endTimestamp = endTimeExclusive ? computeTimestamp(endTimeExclusive) : undefined;
+        if (descending) {
+            // start at end date (or current) and work backward
+            let date = minString(now, endTimeExclusive ?? now).substring(0, 10);
+            let listCalls = 0;
+            while (date >= windowStartDate) {
+                const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
+                const indexValuePrefix = dayUrlIndexDef[2](urlStartsWith, datestamp);
+                const prefix = `hits.i0.${IndexId.DayUrl}.${indexValuePrefix}`;
+                if (listCalls >= maxListCalls) throw new Error(`Max list calls!`);
+                const map = await storage.list({ limit: limit - rt.length, reverse: true, noCache: true, allowConcurrency: true, prefix });
+                listCalls++;
+                for (const [ key, value ] of map) {
+                    if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    const timestamp = value.substring(0, 15);
+                    if (timestamp < windowStartTimestamp) continue;
+                    if (startTimestamp && timestamp < startTimestamp) continue;
+                    if (startAfterTimestamp && timestamp <= startAfterTimestamp) continue;
+                    if (endTimestamp && timestamp >= endTimestamp) continue;
+                    rt.push(value);
+                    if (rt.length >= limit) return rt;
+                }
+                date = addDaysToDateString(date, -1);
+            }
+            return rt;
+        } else {
+            // start at start date (or window start) and work forward
+            const currentDate = now.substring(0, 10);
+            let date = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
+            let listCalls = 0;
+            while (date <= currentDate) {
+                const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
+                const indexValuePrefix = dayUrlIndexDef[2](urlStartsWith, datestamp);
+                const prefix = `hits.i0.${IndexId.DayUrl}.${indexValuePrefix}`;
+                if (listCalls >= maxListCalls) throw new Error(`Max list calls!`);
+                const map = await storage.list({ limit: limit - rt.length, reverse: false, noCache: true, allowConcurrency: true, prefix });
+                listCalls++;
+                for (const [ key, value ] of map) {
+                    if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    const timestamp = value.substring(0, 15);
+                    if (timestamp < windowStartTimestamp) continue;
+                    if (startTimestamp && timestamp < startTimestamp) continue;
+                    if (startAfterTimestamp && timestamp <= startAfterTimestamp) continue;
+                    if (endTimestamp && timestamp >= endTimestamp) continue;
+                    rt.push(value);
+                    if (rt.length >= limit) return rt;
+                }
+                date = addDaysToDateString(date, 1);
+            }
+            return rt;
+        }
     } else {
-        throw new Error(`Unsupported request: ${request}`);
+        throw new Error(`Unsupported request: ${JSON.stringify(request)}`);
     }
 }
 
