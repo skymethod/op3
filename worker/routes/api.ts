@@ -72,7 +72,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
         }
         if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient, rawIpAddress);
-        if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, hitsBlobs, roHitsBlobs, rawIpAddress });
+        if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, rawIpAddress });
         if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
         { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
@@ -233,6 +233,7 @@ async function computeAdminRpcResponse(method: string, bodyProvider: JsonProvide
 
     const { request, target } = await bodyProvider() as { request: RpcRequest, target: string };
     if (request.kind === 'query-packed-redirect-logs') return newJsonResponse(await rpcClient.queryPackedRedirectLogs(request, target));
+    if (request.kind === 'query-hits-index') return await rpcClient.queryHitsIndex(request, target);
     
     throw new Error(`Unsupported rpc call: ${JSON.stringify({ request, target })}`);
 }

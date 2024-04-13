@@ -14,13 +14,16 @@ import { computeApiQueryCommonParameters, newQueryResponse } from './api_query_c
 import { DoNames } from '../do_names.ts';
 import { computeLinestream } from '../streams.ts';
 
-type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, rawIpAddress: string | undefined };
-export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, hitsBlobs, roHitsBlobs, rawIpAddress }: Opts): Promise<Response> {
+type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, rawIpAddress: string | undefined };
+export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, rawIpAddress }: Opts): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
     const targetHitsBlobs = searchParams.has('ro') ? roHitsBlobs : hitsBlobs;
     if (!targetHitsBlobs) throw new Error(`Need hitsBlobs`);
+
+    const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
+    if (!targetRpcClient) throw new Error(`Need targetRpcClient`);
 
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
@@ -31,7 +34,7 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
     }
-    return await query(request, rpcClient, targetHitsBlobs);
+    return await query(request, targetRpcClient, targetHitsBlobs);
 }
 
 //
@@ -42,7 +45,8 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: Rpc
 
     let sortKeys: string[] | undefined;
     if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string') {
-        const response = await rpcClient.queryHitsIndex({ hashedIpAddress, rawIpAddress }, DoNames.hitsServer);
+        const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, descending } = request;
+        const response = await rpcClient.queryHitsIndex({ limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, descending }, DoNames.hitsServer);
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
         if (!response.body) throw new Error(`queryHitsIndex returned no body`);
         sortKeys = [];

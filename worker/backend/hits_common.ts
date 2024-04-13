@@ -14,13 +14,13 @@ export function unpackMinuteFileKey(key: string): { minuteTimestamp: string } {
     return { minuteTimestamp };
 }
 
-export function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minuteTimestamp: string } {
+export function computeRecordInfo(obj: Record<string, string>): { sortKey: string, minuteTimestamp: string, timestamp: string } {
     const { timestamp, uuid } = obj;
     if (typeof timestamp !== 'string') throw new Error(`No timestamp! ${JSON.stringify(obj)}`);
     if (typeof uuid !== 'string') throw new Error(`No uuid! ${JSON.stringify(obj)}`);
     const sortKey = `${timestamp}-${uuid}`;
     const minuteTimestamp = computeMinuteTimestamp(timestamp);
-    return { sortKey, minuteTimestamp };
+    return { sortKey, minuteTimestamp, timestamp };
 }
 
 export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums, sortKeys: string[] | undefined, descending: boolean): Promise<PackedRedirectLogsResponse> {
@@ -103,15 +103,20 @@ export async function* yieldRecords(stream: ReadableStream<Uint8Array>, attNums:
     }
 }
 
-//
-
-const epochMinute = `2024-03-13T00:00:00.000Z`;
-
-function unpackSortKey(sortKey: string): { timestamp: string, uuid: string} {
+export function unpackSortKey(sortKey: string): { timestamp: string, uuid: string} {
     const [ _, timestamp, uuid ] = checkMatches('sortKey', sortKey, /^(\d{15})-([0-9a-f]{32})$/);
     check('sortKey', sortKey, isValidTimestamp(timestamp));
     return { timestamp, uuid };
 }
+
+export function isValidSortKey(sortKey: string): boolean {
+    const m = /^(\d{15})-([0-9a-f]{32})$/.exec(sortKey);
+    return !!m && isValidTimestamp(m[1]);
+}
+
+//
+
+const epochMinute = `2024-03-13T00:00:00.000Z`;
 
 function computeMinuteTimestamp(timestamp: string): string {
     return `${timestamp.substring(0, 10)}00000`;

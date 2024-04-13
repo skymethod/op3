@@ -115,6 +115,17 @@ export class ReadonlyRemoteDataRpcClient extends StubRpcClient {
         return { kind: 'admin-data', ...rt };
     }
 
+    async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
+        const { origin, token } = this;
+        const url = `${origin}/api/1/admin/rpc`;
+        const body = JSON.stringify({ request, target });
+        const res = await fetch(url, { method: 'POST', body, headers: { authorization: `Bearer ${token}`} });
+        if (res.status !== 200) {
+            throw new Error(`ReadonlyRemoteDataRpcClient: Unexpected response status: ${res.status}, url=${url}, body=${await res.text()}`);
+        }
+        return res;
+    }
+
 }
 
 export class RemoteRpcClient extends StubRpcClient {
@@ -128,12 +139,17 @@ export class RemoteRpcClient extends StubRpcClient {
     }
 
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
-        return await this.call({ kind: 'query-packed-redirect-logs', ...request }, target);
+        return await this.executeRpc({ kind: 'query-packed-redirect-logs', ...request }, target);
     }
 
     //
     
-    private async call<TResponse extends RpcResponse>(request: RpcRequest, target: string): Promise<TResponse> {
+    private async executeRpc<TResponse extends RpcResponse>(request: RpcRequest, target: string): Promise<TResponse> {
+        const res = await this.execute(request, target);
+        return await res.json() as TResponse;
+    }
+
+    private async execute(request: RpcRequest, target: string): Promise<Response> {
         const { origin, token } = this;
         const url = `${origin}/api/1/admin/rpc`;
         const body = JSON.stringify({ request, target });
@@ -141,7 +157,7 @@ export class RemoteRpcClient extends StubRpcClient {
         if (res.status !== 200) {
             throw new Error(`RemoteRpcClient: Unexpected response status: ${res.status}, url=${url}, body=${await res.text()}`);
         }
-        return await res.json() as TResponse;
+        return res;
     }
 
 }

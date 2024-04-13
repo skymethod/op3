@@ -1,14 +1,17 @@
 import { timed } from '../async.ts';
 import { isStringRecord } from '../check.ts';
-import { DurableObjectStorage, RedBlackTree } from '../deps.ts';
+import { DurableObjectStorage, RedBlackTree, chunk } from '../deps.ts';
 import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { consoleError } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeMinuteFileKey, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
+import { computeIndexRecords, queryHitsIndexFromStorage } from './hits_indexes.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
+import { computeTimestamp } from '../timestamp.ts';
+import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -31,8 +34,8 @@ export class HitsController {
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>): Promise<Unkinded<LogRawRedirectsBatchResponse>> {
         const { rawRedirectsByMessageId, rpcSentTime } = request;
-        const { encryptIpAddress, hashIpAddress, colo } = this;
-        const { minuteFilesEnabled = false, maxMinuteFiles = defaultMaxMinuteFiles } = await this.getOrLoadState();
+        const { encryptIpAddress, hashIpAddress, colo, storage } = this;
+        const { maxMinuteFiles = defaultMaxMinuteFiles } = await this.getOrLoadState();
         const rpcReceivedTime = new Date().toISOString();
         const redirectCount = Object.values(rawRedirectsByMessageId).reduce((a, b) => a + b.rawRedirects.length, 0);
         const sortedTimestamps = Object.values(rawRedirectsByMessageId).map(v => v.timestamp).sort();
@@ -42,38 +45,21 @@ export class HitsController {
         const messageIds = Object.keys(rawRedirectsByMessageId);
         const messageCount = messageIds.length;
         
-        // save to aggregated minute files
+        // process to minute files and index
         const times: Record<string, number> = {};
         const attNums = await this.getOrLoadAttNums();
         const attNumsMaxBefore = attNums.max();
         const minuteTimestampsChanged = new Set<string>();
+        const indexRecords: Record<string, string> = {};
         for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
             for (const rawRedirect of rawRedirects) {
                 const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));
-                if (minuteFilesEnabled) {
-                    const obj = attNums.unpackRecord(record);
-                    const { sortKey, minuteTimestamp } = computeRecordInfo(obj);
-                    const minuteFile = await timed(times, 'ensureMinuteFileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
-                    const inserted = minuteFile.insert([ record, sortKey ]);
-                    if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
-                }
-            }
-        }
-        let evictedCount = 0;
-        if (minuteFilesEnabled) {
-            // save changed minutefiles, sequentially for now...
-            for (const minuteTimestamp of minuteTimestampsChanged) {
-                await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
-            }
-
-            // evict old minutefiles from memory
-            this.recentMinuteTimestamps = [ ...minuteTimestampsChanged, ...this.recentMinuteTimestamps.filter(v => !minuteTimestampsChanged.has(v)) ];
-            while (this.recentMinuteTimestamps.length > maxMinuteFiles) {
-                const minuteTimestamp = this.recentMinuteTimestamps.pop();
-                if (minuteTimestamp) {
-                    this.minuteFiles.delete(minuteTimestamp);
-                    evictedCount++;
-                }
+                const obj = attNums.unpackRecord(record);
+                const { sortKey, minuteTimestamp, timestamp } = computeRecordInfo(obj);
+                const minuteFile = await timed(times, 'ensureMinuteFileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
+                const inserted = minuteFile.insert([ record, sortKey ]);
+                if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
+                await computeIndexRecords(obj, timestamp, sortKey, indexRecords);
             }
         }
 
@@ -86,8 +72,31 @@ export class HitsController {
             }));
         }
 
+        // save changed minutefiles, sequentially for now...
+        for (const minuteTimestamp of minuteTimestampsChanged) {
+            await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
+        }
+
+        // save index records
+        await timed(times, 'saveIndexRecords', async () => {
+            for (const batch of chunk(Object.entries(indexRecords), 128)) {
+                await storage.put(Object.fromEntries(batch)); // separate transactions, but ok
+            }
+        });
+
+        // evict old minutefiles from memory
+        let evictedCount = 0;
+        this.recentMinuteTimestamps = [ ...minuteTimestampsChanged, ...this.recentMinuteTimestamps.filter(v => !minuteTimestampsChanged.has(v)) ];
+        while (this.recentMinuteTimestamps.length > maxMinuteFiles) {
+            const minuteTimestamp = this.recentMinuteTimestamps.pop();
+            if (minuteTimestamp) {
+                this.minuteFiles.delete(minuteTimestamp);
+                evictedCount++;
+            }
+        }
+
         // summary analytics
-        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0 } = times;
+        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0, saveIndexRecords = 0 } = times;
         const putCount = minuteTimestampsChanged.size;
 
         return { 
@@ -107,6 +116,7 @@ export class HitsController {
                 saveAttNums,
                 ensureMinuteFileLoaded,
                 saveMinuteFile,
+                saveIndexRecords,
             }
         };
     }
@@ -121,17 +131,10 @@ export class HitsController {
             const state = await this.getOrLoadState();
             if (operationKind === 'select') return { results: [ { colo, ...state, recentMinuteTimestamps } ] };
             if (operationKind === 'update') {
-                const { 'minutefiles-enabled': minuteFilesEnabledStr, 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
+                const { 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
                 if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
                 const changes: string[] = [];
                 let newState = state;
-                if (typeof minuteFilesEnabledStr === 'string') {
-                    const minuteFilesEnabled = minuteFilesEnabledStr === 'true';
-                    if (minuteFilesEnabled !== state.minuteFilesEnabled) {
-                        newState = { ...newState, minuteFilesEnabled };
-                        changes.push(`state.minuteFilesEnabled: ${state.minuteFilesEnabled} -> ${minuteFilesEnabled}`);
-                    }
-                }
                 if (typeof maxMinuteFilesStr === 'string') {
                     const maxMinuteFiles = parseInt(maxMinuteFilesStr);
                     if (maxMinuteFiles !== state.maxMinuteFiles) {
@@ -156,9 +159,15 @@ export class HitsController {
         return await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, undefined, false);
     }
 
-    async queryHitsIndex(_request: Unkinded<QueryHitsIndexRequest>): Promise<Response> {
-        await Promise.resolve();
-        throw new Error('TODO');
+    async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>): Promise<Response> {
+        const { storage, hashIpAddress } = this;
+        const { rawIpAddress } = request;
+        if (typeof rawIpAddress === 'string') {
+            const hashedIpAddress = unpackHashedIpAddressHash(await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }));
+            request = { ...request, hashedIpAddress, rawIpAddress: undefined };
+        }
+        const sortKeys = await queryHitsIndexFromStorage(request, storage);
+        return new Response(sortKeys.map(v => `${v}\n`).join('')); // stream if allowing larger limits in the future
     }
 
     //
@@ -203,7 +212,7 @@ export class HitsController {
         await executeWithRetries(async () => {
             // deno-lint-ignore no-explicit-any
             const { readable, writable } = new (globalThis as any).FixedLengthStream(contentLength);
-            const putPromise = hitsBlobs.put(computeMinuteFileKey(minuteTimestamp), readable) // don't await!
+            const putPromise = hitsBlobs.put(computeMinuteFileKey(minuteTimestamp), readable); // don't await!
             const writer = writable.getWriter();
             
             writer.write(header);
@@ -224,13 +233,11 @@ const encoder = new TextEncoder();
 const defaultMaxMinuteFiles = 5; // how many of the most recently changed minutefiles can be in memory at once, expect ~682kb/minutefile
 
 type State = {
-    minuteFilesEnabled?: boolean, // TODO remove once default
     maxMinuteFiles?: number,
 };
 
 function isValidState(obj: unknown): obj is State {
     return isStringRecord(obj) 
-        && (obj.minuteFilesEnabled === undefined || typeof obj.minuteFilesEnabled === 'boolean')
         && (obj.maxMinuteFiles === undefined || typeof obj.maxMinuteFiles === 'number')
         ;
 }
@@ -257,7 +264,7 @@ async function loadState(storage: DurableObjectStorage): Promise<State> {
             consoleError('hits-loading-state', `Error loading State from record ${JSON.stringify(record)}: ${e.stack || e}`);
         }
     }
-    return { minuteFilesEnabled: false, maxMinuteFiles: defaultMaxMinuteFiles };
+    return { maxMinuteFiles: defaultMaxMinuteFiles };
 }
 
 function compareMinuteFileEntry(lhs: [ string, string ], rhs: [ string, string ]): number {

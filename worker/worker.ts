@@ -139,7 +139,7 @@ export default {
                     rawRedirectsByMessageId[id] = { rawRedirects, timestamp: timestamp.toISOString() };
                 }
                 const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer);
-                const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile } } = response;
+                const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords } } = response;
                 const messageIds = new Set(processedMessageIds);
                 for (const msg of batch.messages) {
                     if (messageIds.has(msg.id)) {
@@ -151,7 +151,7 @@ export default {
                 const consumerStartTime = new Date(consumerStart).toISOString();
                 const consumerTime = Date.now() - consumerStart;
                 const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount ];
-                const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile ];
+                const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords ];
                 writeTraceEvent({ kind: 'generic', type: 'hits-batch',
                     strings: [ batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '', consumerStartTime ],
                     doubles: [ ...doubles, ...Array(20 - doubles.length - times.length).fill(0), ...times.reverse() ],

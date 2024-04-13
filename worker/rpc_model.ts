@@ -210,6 +210,14 @@ export interface QueryRedirectLogsRequest {
 
 export interface QueryHitsIndexRequest {
     readonly kind: 'query-hits-index';
+
+    readonly limit: number;
+    readonly descending?: boolean;
+
+    readonly startTimeInclusive?: string; // instant
+    readonly startTimeExclusive?: string; // instant
+    readonly endTimeExclusive?: string; // instant
+
     readonly hashedIpAddress?: string;
     readonly rawIpAddress?: string; // only allow caller ip
 }
@@ -504,6 +512,7 @@ export interface LogRawRedirectsBatchResponse {
         readonly saveAttNums: number,
         readonly ensureMinuteFileLoaded: number,
         readonly saveMinuteFile: number,
+        readonly saveIndexRecords: number,
     }
 }
 
