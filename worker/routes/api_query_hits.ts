@@ -43,20 +43,20 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: Rpc
     const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, descending = false } = request;
     const startTime = Date.now();
 
-    let sortKeys: string[] | undefined;
+    let indexSortKeys: string[] | undefined;
     if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string') {
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, descending } = request;
         const response = await rpcClient.queryHitsIndex({ limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, descending }, DoNames.hitsServer);
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
         if (!response.body) throw new Error(`queryHitsIndex returned no body`);
-        sortKeys = [];
+        indexSortKeys = [];
         for await (const line of computeLinestream(response.body)) {
-            if (line.length > 0) sortKeys.push(line);
+            if (line.length > 0) indexSortKeys.push(line);
         }
     }
 
     const attNums = new AttNums();
-    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, sortKeys, descending);
+    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, indexSortKeys, descending);
     const rows: unknown[] = [];
     const includes = include.split(',');
     const includeAsn = includes.includes('asn');

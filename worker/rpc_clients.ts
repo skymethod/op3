@@ -118,7 +118,7 @@ export class ReadonlyRemoteDataRpcClient extends StubRpcClient {
     async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
         const { origin, token } = this;
         const url = `${origin}/api/1/admin/rpc`;
-        const body = JSON.stringify({ request, target });
+        const body = JSON.stringify({ request: { ...request, kind: 'query-hits-index' }, target });
         const res = await fetch(url, { method: 'POST', body, headers: { authorization: `Bearer ${token}`} });
         if (res.status !== 200) {
             throw new Error(`ReadonlyRemoteDataRpcClient: Unexpected response status: ${res.status}, url=${url}, body=${await res.text()}`);

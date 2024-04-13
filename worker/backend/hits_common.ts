@@ -4,6 +4,7 @@ import { computeLinestream } from '../streams.ts';
 import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
+import { computeIndexWindowStartInstant } from './hits_indexes.ts';
 
 export function computeMinuteFileKey(minuteTimestamp: string): string {
     return `minutes/${minuteTimestamp}.txt`;
@@ -23,38 +24,43 @@ export function computeRecordInfo(obj: Record<string, string>): { sortKey: strin
     return { sortKey, minuteTimestamp, timestamp };
 }
 
-export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums, sortKeys: string[] | undefined, descending: boolean): Promise<PackedRedirectLogsResponse> {
+export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, hitsBlobs: Blobs, attNums: AttNums, indexSortKeys: string[] | undefined, descending: boolean): Promise<PackedRedirectLogsResponse> {
     const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive = new Date().toISOString(), startAfterRecordKey } = request;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
 
     const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
     const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
-    const startMinuteTimestamp = computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(epochMinute));
+    const startMinuteTimestamp = computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(indexSortKeys ? computeIndexWindowStartInstant() : epochMinute));
     const endTimestamp = computeTimestamp(endTimeExclusive);
     const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
     const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
+    const indexSortKeySet = indexSortKeys ? new Set(indexSortKeys) : undefined;
+    const indexMinuteTimestamps = indexSortKeys ? new Set(indexSortKeys.map(v => computeMinuteTimestamp(v))) : undefined;
     await (async () => {
         if (descending) {
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? endMinuteTimestamp;
             let recordCount = 0;
             while (minuteTimestamp >= startMinuteTimestamp && recordCount < limit) {
-                console.log({ minuteTimestamp });
-                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
-                if (stream !== undefined) {
-                    const reversed: [ string, string ][] = [];
-                    for await (const entry of yieldRecords(stream, attNums, minuteTimestamp)) {
-                        reversed.unshift(entry);
-                    }
-                    for await (const [ record, sortKey ] of reversed) {
-                        const recordTimestamp = sortKey.substring(0, 15);
-                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) return;
-                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) return;
-                        if (startAfterRecordKey && sortKey >= startAfterRecordKey) continue;
-                        if (endTimestamp && recordTimestamp >= endTimestamp) continue;
-                        records[sortKey] = record;
-                        recordCount++;
-                        if (recordCount >= limit) return;
+                if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
+                    console.log({ minuteTimestamp });
+                    const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+                    if (stream !== undefined) {
+                        const reversed: [ string, string ][] = [];
+                        for await (const entry of yieldRecords(stream, attNums, minuteTimestamp)) {
+                            reversed.unshift(entry);
+                        }
+                        for await (const [ record, sortKey ] of reversed) {
+                            if (indexSortKeySet && !indexSortKeySet.has(sortKey)) continue;
+                            const recordTimestamp = sortKey.substring(0, 15);
+                            if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) return;
+                            if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) return;
+                            if (startAfterRecordKey && sortKey >= startAfterRecordKey) continue;
+                            if (endTimestamp && recordTimestamp >= endTimestamp) continue;
+                            records[sortKey] = record;
+                            recordCount++;
+                            if (recordCount >= limit) return;
+                        }
                     }
                 }
                 minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), -1));
@@ -63,18 +69,21 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
             let recordCount = 0;
             while (minuteTimestamp <= endMinuteTimestamp && recordCount < limit) {
-                console.log({ minuteTimestamp });
-                const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
-                if (stream !== undefined) {
-                    for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
-                        const recordTimestamp = sortKey.substring(0, 15);
-                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
-                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
-                        if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
-                        if (endTimestamp && recordTimestamp >= endTimestamp) return;
-                        records[sortKey] = record;
-                        recordCount++;
-                        if (recordCount >= limit) return;
+                if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
+                    console.log({ minuteTimestamp });
+                    const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
+                    if (stream !== undefined) {
+                        for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
+                            if (indexSortKeySet && !indexSortKeySet.has(sortKey)) continue;
+                            const recordTimestamp = sortKey.substring(0, 15);
+                            if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
+                            if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
+                            if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
+                            if (endTimestamp && recordTimestamp >= endTimestamp) return;
+                            records[sortKey] = record;
+                            recordCount++;
+                            if (recordCount >= limit) return;
+                        }
                     }
                 }
                 minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));

@@ -2,7 +2,7 @@ import { DurableObjectStorage } from '../deps.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
-import { computeTimestamp, addMonthsToMonthString } from '../timestamp.ts';
+import { computeTimestamp, addMonthsToMonthString, addDaysToDateString } from '../timestamp.ts';
 import { isValidSortKey } from './hits_common.ts';
 
 export enum IndexId {
@@ -27,20 +27,29 @@ export async function computeIndexRecords(record: Record<string, string>, timest
     }
 }
 
+export function computeIndexWindowStartInstant(): string {
+    // allow for querying 90 full days
+    const today = new Date().toISOString().substring(0, 10);
+    const startDate = addDaysToDateString(today, -91);
+    return maxString(`${startDate}T00:00:00.000Z`, indexEpochInstant);
+}
+
 export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {
     const { limit, descending, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress } = request;
     if (typeof rawIpAddress === 'string') throw new Error(`Not allowed to query for a raw ip address`);
     const rt: string[] = [];
     if (limit <= 0) return rt;
     if (typeof hashedIpAddress === 'string') {
-        const epochMonth = indexEpochInstant.substring(0, 7);
+        const windowStart = computeIndexWindowStartInstant();
+        const windowStartTimestamp = computeTimestamp(windowStart);
+        const windowStartMonth = windowStart.substring(0, 7);
         const now = new Date().toISOString();
-        const maxListCalls = 5; // we only keep 90 days of index data
+        const maxListCalls = 6; // window is only 90 days so this is more than enough
         if (descending) {
             // start at end month (or current) and work backward
             let month = minString(now, endTimeExclusive ?? now).substring(0, 7);
             let listCalls = 0;
-            while (month >= epochMonth) {
+            while (month >= windowStartMonth) {
                 const monthstamp = computeTimestamp(`${month}-01T00:00:00.000Z`).substring(0, 4);
                 const prefix = `hits.i0.${IndexId.MonthHashedIpAddress}.${monthstamp}.${hashedIpAddress}.`;
                 const start = startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined;
@@ -51,6 +60,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
                 listCalls++;
                 for (const [ key, value ] of map) {
                     if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    if (value < windowStartTimestamp) continue;
                     rt.push(value);
                     if (rt.length >= limit) return rt;
                 }
@@ -60,7 +70,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
         } else {
             // start at start month and work forward
             const currentMonth = now.substring(0, 7);
-            let month = maxString(now, startTimeInclusive ?? startTimeExclusive ?? epochMonth).substring(0, 7);
+            let month = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartMonth).substring(0, 7);
             let listCalls = 0;
             while (month <= currentMonth) {
                 const monthstamp = computeTimestamp(`${month}-01T00:00:00.000Z`).substring(0, 4);
@@ -73,6 +83,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
                 listCalls++;
                 for (const [ key, value ] of map) {
                     if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    if (value < windowStartTimestamp) continue;
                     rt.push(value);
                     if (rt.length >= limit) return rt;
                 }
