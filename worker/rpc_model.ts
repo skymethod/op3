@@ -200,6 +200,7 @@ export interface QueryRedirectLogsRequest {
 
     readonly urlSha256?: string;
     readonly urlStartsWith?: string;
+    readonly url?: string; // only supported by hits backend
     readonly userAgent?: string;
     readonly referer?: string;
     readonly hashedIpAddress?: string;
@@ -220,6 +221,9 @@ export interface QueryHitsIndexRequest {
 
     readonly hashedIpAddress?: string;
     readonly rawIpAddress?: string; // only allow caller ip
+
+    readonly url?: string;
+    readonly urlStartsWith?: string;
 }
 
 export interface QueryDownloadsRequest {

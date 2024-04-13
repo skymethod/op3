@@ -8,11 +8,12 @@ import { newForbiddenJsonResponse, newJsonResponse, newMethodNotAllowedResponse 
 import { ApiTokenPermission, hasPermission, QueryRedirectLogsRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { timestampToInstant } from '../timestamp.ts';
 import { writeTraceEvent } from '../tracer.ts';
-import { check } from '../check.ts';
+import { check, isValidHttpUrl, tryParseUrl } from '../check.ts';
 import { QUERY_HITS } from './api_contract.ts';
 import { computeApiQueryCommonParameters, newQueryResponse } from './api_query_common.ts';
 import { DoNames } from '../do_names.ts';
 import { computeLinestream } from '../streams.ts';
+import { computeChainDestinationUrl } from '../chain_estimate.ts';
 
 type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, rawIpAddress: string | undefined };
 export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, rawIpAddress }: Opts): Promise<Response> {
@@ -40,13 +41,13 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
 //
 
 async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: RpcClient, hitsBlobs: Blobs): Promise<Response> {
-    const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, descending = false } = request;
+    const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, url, urlStartsWith, descending = false } = request;
     const startTime = Date.now();
 
     let indexSortKeys: string[] | undefined;
-    if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string') {
+    if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string' || typeof url === 'string' || typeof urlStartsWith === 'string') {
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, descending } = request;
-        const response = await rpcClient.queryHitsIndex({ limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, descending }, DoNames.hitsServer);
+        const response = await rpcClient.queryHitsIndex({ limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith, descending }, DoNames.hitsServer);
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
         if (!response.body) throw new Error(`queryHitsIndex returned no body`);
         indexSortKeys = [];
@@ -107,33 +108,24 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
 
     if ([ url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method ].filter(v => typeof v === 'string').length > 1) throw new Error(`Cannot specify more than one filter parameter`);
-    if (typeof url === 'string' && typeof urlSha256 === 'string') throw new Error(`Specify either 'url' or 'urlSha256', not both`);
     
-    for (const [ name, value ] of Object.entries({ userAgent, referer, ulid, xpsId })) {
+    for (const [ name, value ] of Object.entries({ userAgent, referer, ulid, xpsId, urlSha256 })) {
         if (typeof value === 'string') throw new Error(`The '${name}' filter is no longer supported`);
     }
 
-    // TODO migrate
     if (typeof url === 'string') {
-        throw new Error(`'url' not supported`);
-        // const m = /^(https?:\/\/.+?)\*$/.exec(url);
-        // if (m) {
-        //     const [ _, urlStartsWith ] = m;
-        //     const destinationUrl = computeChainDestinationUrl(urlStartsWith) ?? urlStartsWith;
-        //     const u = tryParseUrl(destinationUrl);
-        //     if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid destination url ${destinationUrl}`);
-        //     if (u.pathname.length <= 1) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, destination url pathname must be at least one character long, found ${u.pathname}`);
-        //     request = { ...request, urlStartsWith };
-        // } else {
-        //     check('url', url, isValidHttpUrl);
-        //     const urlSha256 = (await Bytes.ofUtf8(url).sha256()).hex();
-        //     request = { ...request, urlSha256 };
-        // }
-    }
-    if (typeof urlSha256 === 'string') {
-        throw new Error(`'urlSha256' not supported`);
-        // check('urlSha256', urlSha256, isValidSha256Hex);
-        // request = { ...request, urlSha256 };
+        const m = /^(https?:\/\/.+?)\*$/.exec(url);
+        if (m) {
+            const [ _, urlStartsWith ] = m;
+            const destinationUrl = computeChainDestinationUrl(urlStartsWith) ?? urlStartsWith;
+            const u = tryParseUrl(destinationUrl);
+            if (!u) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, invalid destination url ${destinationUrl}`);
+            if (u.pathname.length <= 1) throw new Error(`Bad urlStartsWith: ${urlStartsWith}, destination url pathname must be at least one character long, found ${u.pathname}`);
+            request = { ...request, urlStartsWith };
+        } else {
+            check('url', url, isValidHttpUrl);
+            request = { ...request, url };
+        }
     }
     if (typeof hashedIpAddress === 'string') {
         if (hashedIpAddress === 'current') {

@@ -35,15 +35,17 @@ export function computeIndexWindowStartInstant(): string {
 }
 
 export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {
-    const { limit, descending, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress } = request;
-    if (typeof rawIpAddress === 'string') throw new Error(`Not allowed to query for a raw ip address`);
+    const { limit, descending, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith } = request;
+    if (typeof rawIpAddress === 'string') throw new Error(`Unable to query for a raw ip address, they are not stored`);
     const rt: string[] = [];
     if (limit <= 0) return rt;
+
+    const now = new Date().toISOString();
+    const windowStart = computeIndexWindowStartInstant();
+    const windowStartTimestamp = computeTimestamp(windowStart);
+
     if (typeof hashedIpAddress === 'string') {
-        const windowStart = computeIndexWindowStartInstant();
-        const windowStartTimestamp = computeTimestamp(windowStart);
         const windowStartMonth = windowStart.substring(0, 7);
-        const now = new Date().toISOString();
         const maxListCalls = 6; // window is only 90 days so this is more than enough
         if (descending) {
             // start at end month (or current) and work backward
@@ -68,7 +70,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
             }
             return rt;
         } else {
-            // start at start month and work forward
+            // start at start month (or window start) and work forward
             const currentMonth = now.substring(0, 7);
             let month = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartMonth).substring(0, 7);
             let listCalls = 0;
@@ -88,6 +90,59 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
                     if (rt.length >= limit) return rt;
                 }
                 month = addMonthsToMonthString(month, 1);
+            }
+            return rt;
+        }
+    } else if (typeof url === 'string') {
+        const windowStartDate = windowStart.substring(0, 10);
+        const dayUrlIndexDef = INDEX_DEFINITIONS.find(v => v[1] === IndexId.DayUrl)!;
+        const maxListCalls = 10; // TODO
+        if (descending) {
+            // start at end date (or current) and work backward
+            let date = minString(now, endTimeExclusive ?? now).substring(0, 10);
+            let listCalls = 0;
+            while (date >= windowStartDate) {
+                const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
+                const indexValue = dayUrlIndexDef[2](url, datestamp);
+                const prefix = `hits.i0.${IndexId.DayUrl}.${indexValue}.`;
+                const start = startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined;
+                const startAfter = startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
+                const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
+                if (listCalls >= maxListCalls) throw new Error(`Max list calls!`);
+                const map = await storage.list({ limit: limit - rt.length, reverse: true, noCache: true, allowConcurrency: true, prefix, start, startAfter, end });
+                listCalls++;
+                for (const [ key, value ] of map) {
+                    if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    if (value < windowStartTimestamp) continue;
+                    rt.push(value);
+                    if (rt.length >= limit) return rt;
+                }
+                date = addDaysToDateString(date, -1);
+            }
+            return rt;
+
+        } else {
+            // start at start date (or window start) and work forward
+            const currentDate = now.substring(0, 10);
+            let date = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
+            let listCalls = 0;
+            while (date <= currentDate) {
+                const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
+                const indexValue = dayUrlIndexDef[2](url, datestamp);
+                const prefix = `hits.i0.${IndexId.DayUrl}.${indexValue}.`;
+                const start = startTimeInclusive ? `${prefix}${computeTimestamp(startTimeInclusive)}` : undefined;
+                const startAfter = startTimeExclusive ? `${prefix}${computeTimestamp(startTimeExclusive)}` : undefined;
+                const end = endTimeExclusive ? `${prefix}${computeTimestamp(endTimeExclusive)}` : undefined;
+                if (listCalls >= maxListCalls) throw new Error(`Max list calls!`);
+                const map = await storage.list({ limit: limit - rt.length, reverse: false, noCache: true, allowConcurrency: true, prefix, start, startAfter, end });
+                listCalls++;
+                for (const [ key, value ] of map) {
+                    if (typeof value !== 'string' || !isValidSortKey(value)) throw new Error(`Unexpected index record: ${JSON.stringify({ key, value })}`);
+                    if (value < windowStartTimestamp) continue;
+                    rt.push(value);
+                    if (rt.length >= limit) return rt;
+                }
+                date = addDaysToDateString(date, 1);
             }
             return rt;
         }
