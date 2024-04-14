@@ -2,7 +2,7 @@ import { check, checkMatches } from '../check.ts';
 import { PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeLinestream } from '../streams.ts';
 import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant, addDaysToDateString } from '../timestamp.ts';
-import { maxString } from '../collections.ts';
+import { maxString, minString } from '../collections.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeIndexWindowStartInstant } from './hits_indexes.ts';
@@ -38,7 +38,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
     const endTimeExclusiveTimestamp = endTimeExclusive ? computeTimestamp(endTimeExclusive) : undefined;
     const endTimestamp = endTimeExclusiveTimestamp ?? computeTimestamp();
-    
+
     const satisfyFromHits = async () => {
         const recordCount = Object.keys(records).length;
         let remaining = limit - recordCount;
@@ -50,6 +50,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
         const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
         if (descending) {
+            // iterate hits minutefiles in descending order
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? endMinuteTimestamp;
             while (minuteTimestamp >= startMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
@@ -76,6 +77,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
                 minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), -1));
             }
         } else {
+            // iterate hits minutefiles in ascending order
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
             while (minuteTimestamp <= endMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
@@ -124,8 +126,39 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
         };
 
         if (descending) {
+            // iterate hourly backups in descending order
+            const startTime = minString(endTimeExclusive ?? maxBackupHour, maxBackupHour);
+            const startHour = startTime.substring(0, 13);
+            let date = startHour.substring(0, 10);
+            const minBackupDate = minBackupHour.substring(0, 10);
+            while (date >= minBackupDate) {
+                const backupKeys = await findDailyBackups(date);
+                for (const backupKey of backupKeys) {
+                    const { hour } = backupKey;
+                    if (hour > startHour) continue;
+                    console.log(`Getting record stream for ${hour}...`)
+                    const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
+                    if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
+                    const reversed: [ string, string ][] = []; // this is much larger for backups, hmm
+                    for await (const entry of yieldRecords(stream, attNums, undefined)) {
+                        reversed.unshift(entry);
+                    }
+                    for await (const [ record, sortKey ] of reversed) {
+                        const recordTimestamp = sortKey.substring(0, 15);
+                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) return;
+                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) return;
+                        if (startAfterRecordKey && sortKey >= startAfterRecordKey) continue;
+                        if (endTimestamp && recordTimestamp >= endTimestamp) continue;
 
+                        records[sortKey] = record;
+                        remaining--;
+                        if (remaining === 0) return;
+                    }
+                }
+                date = addDaysToDateString(date, -1);
+            }
         } else {
+            // iterate hourly backups in ascending order
             const startTime = maxString(startTimeExclusive ?? startTimeInclusive ?? minBackupHour, minBackupHour);
             const startHour = startTime.substring(0, 13);
             let date = startHour.substring(0, 10);
