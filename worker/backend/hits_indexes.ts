@@ -4,6 +4,7 @@ import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
 import { computeTimestamp, addMonthsToMonthString, addDaysToDateString } from '../timestamp.ts';
 import { isValidSortKey } from './hits_common.ts';
+import { maxString, minString } from '../collections.ts';
 
 export enum IndexId {
     MonthHashedIpAddress = 1,
@@ -210,11 +211,3 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
 //
 
 const indexEpochInstant = '2024-04-13T00:00:00.000Z';
-
-function minString(lhs: string, rhs: string): string {
-    return lhs < rhs ? lhs : rhs;
-}
-
-function maxString(lhs: string, rhs: string): string {
-    return lhs > rhs ? lhs : rhs;
-}

@@ -2,6 +2,7 @@ import { check, checkMatches } from '../check.ts';
 import { PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeLinestream } from '../streams.ts';
 import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
+import { maxString } from '../collections.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeIndexWindowStartInstant } from './hits_indexes.ts';
@@ -26,25 +27,27 @@ export function computeRecordInfo(obj: Record<string, string>): { sortKey: strin
 }
 
 export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, opts: { hitsBlobs: Blobs, attNums: AttNums, indexSortKeys: string[] | undefined, descending: boolean, backupBlobs?: Blobs }): Promise<PackedRedirectLogsResponse> {
-    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive = new Date().toISOString(), startAfterRecordKey } = request;
+    const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
     const { hitsBlobs, attNums, indexSortKeys, descending, backupBlobs } = opts;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
-
-    const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
-    const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
-    const startMinuteTimestamp = computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(indexSortKeys ? computeIndexWindowStartInstant() : hitsEpochMinute));
-    const endTimestamp = computeTimestamp(endTimeExclusive);
-    const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
-    const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
     const indexSortKeySet = indexSortKeys ? new Set(indexSortKeys) : undefined;
     const indexMinuteTimestamps = indexSortKeys ? new Set(indexSortKeys.map(v => computeMinuteTimestamp(v))) : undefined;
 
-    // try to satisfy from hits
-    await (async () => {
+    const satisfyFromHits = async () => {
+        const recordCount = Object.keys(records).length;
+        let remaining = limit - recordCount;
+        if (remaining === 0) return;
+
+        const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
+        const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
+        const startMinuteTimestamp = maxString(computeTimestamp(hitsEpochMinute), computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(indexSortKeys ? computeIndexWindowStartInstant() : hitsEpochMinute)));
+        const endTimestamp = computeTimestamp(endTimeExclusive);
+        const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
+        const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
+
         if (descending) {
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? endMinuteTimestamp;
-            let recordCount = 0;
             while (minuteTimestamp >= startMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
                     console.log({ minuteTimestamp });
@@ -62,8 +65,8 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
                             if (startAfterRecordKey && sortKey >= startAfterRecordKey) continue;
                             if (endTimestamp && recordTimestamp >= endTimestamp) continue;
                             records[sortKey] = record;
-                            recordCount++;
-                            if (recordCount >= limit) return;
+                            remaining--;
+                            if (remaining === 0) return;
                         }
                     }
                 }
@@ -71,7 +74,6 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
             }
         } else {
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
-            let recordCount = 0;
             while (minuteTimestamp <= endMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
                     console.log({ minuteTimestamp });
@@ -85,43 +87,67 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
                             if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
                             if (endTimestamp && recordTimestamp >= endTimestamp) return;
                             records[sortKey] = record;
-                            recordCount++;
-                            if (recordCount >= limit) return;
+                            remaining--;
+                            if (remaining === 0) return;
                         }
                     }
                 }
                 minuteTimestamp = computeTimestamp(addMinutes(timestampToInstant(minuteTimestamp), 1));
             }
         }
-    })();
+    };
 
-    // enrich with old crl backups if applicable (before the hits epoch, and not using new indexes)
-    // await (async () => {
-    //     if (indexSortKeys === undefined && backupBlobs) {
-    //         const { limit } = request;
-    //         const recordCount = Object.keys(records).length;
-    //         let remaining = limit - recordCount;
-    //         if (remaining > 0) {
-    //             if (descending) {
+    const satisfyFromBackups = async () => {
+        if (indexSortKeys !== undefined) return; // only applicable for queries with no filters
+        if (!backupBlobs) return;
 
-    //             } else {
-    //                 const date = backupEpochHour.substring(0, 10);
-    //                 const backupKeys = await findDailyBackups(date, backupBlobs, descending);
-    //                 for (const backupKey of backupKeys) {
-    //                     const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
-    //                     if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
-    //                     for await (const [ record, sortKey ] of yieldRecords(stream, attNums, undefined)) {
-    //                         // TODO apply query filters
-    //                         records[sortKey] = record;
-    //                         remaining--;
-    //                         if (remaining === 0) return;
-    //                     }
-    //                 }
-    //                 // TODO next day
-    //             }
-    //         }
-    //     }
-    // })();
+        const recordCount = Object.keys(records).length;
+        let remaining = limit - recordCount;
+        if (remaining === 0) return;
+
+        type Hitmap = { packedKeys: string[] };
+        const hitmaps = new Map<string, Hitmap>();
+        const findDailyBackups = async (date: string): Promise<BackupKey[]> => {
+            const month = date.substring(0, 7);
+            if (!hitmaps.has(month)) {
+                console.log(`Getting hitmap for ${month}...`);
+                const hitmap = await backupBlobs.get(`hitmaps/1/daily/${month}.json`, 'json') as Hitmap ?? { packedKeys: [] };
+                hitmaps.set(month, hitmap);
+            }
+            const packedKeys = [...hitmaps.get(month)!.packedKeys];
+            packedKeys.sort();
+            if (descending) packedKeys.reverse();
+            return packedKeys.map(unpackBackupKey).filter(v => v.hour.startsWith(date));
+        };
+
+        if (descending) {
+
+        } else {
+            // TODO start at the right place
+            const date = backupEpochHour.substring(0, 10);
+            const backupKeys = await findDailyBackups(date);
+            for (const backupKey of backupKeys) {
+                const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
+                console.log(`Stream(${backupKey.hour}): ${stream}`);
+                if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
+                for await (const [ record, sortKey ] of yieldRecords(stream, attNums, undefined)) {
+                    // TODO apply query filters
+                    records[sortKey] = record;
+                    remaining--;
+                    if (remaining === 0) return;
+                }
+            }
+            // TODO next day
+        } 
+    };
+
+    if (descending) {
+        await satisfyFromHits();
+        await satisfyFromBackups();
+    } else {
+        await satisfyFromBackups();
+        await satisfyFromHits();
+    }
 
     return { kind: 'packed-redirect-logs', namesToNums: attNums.toJson(), records };
 }
@@ -162,18 +188,4 @@ const backupEpochHour = `2022-09-15T21:00:00.000Z`;
 
 function computeMinuteTimestamp(timestamp: string): string {
     return `${timestamp.substring(0, 10)}00000`;
-}
-
-async function findDailyBackups(date: string, backupBlobs: Blobs, descending: boolean): Promise<BackupKey[]> {
-    const dailyBackupKeysByHour: Record<string, BackupKey> = {};
-    const { keys } = await backupBlobs.list({ keyPrefix: `hits/1/${date}T` });
-    for (const backupKey of keys.map(v => v.substring('hits/1'.length)).map(unpackBackupKey)) {
-        const { hour, timestamp, tag } = backupKey;
-        if (tag !== 'daily') continue;
-        const existing = dailyBackupKeysByHour[hour];
-        if (!existing || existing.timestamp < timestamp) dailyBackupKeysByHour[hour] = backupKey;
-    }
-    const hours = Object.keys(dailyBackupKeysByHour);
-    if (descending) hours.reverse();
-    return hours.map(v => dailyBackupKeysByHour[v]);
 }
