@@ -486,6 +486,23 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
             consoleWarn('crlc-bad-source-obj-timestamp', `CombinedRedirectLogController: Skipping bad source obj (invalid timestamp): ${JSON.stringify(obj)}`);
             continue;
         }
+
+        // 2024-04-14: stop saving a known abusive ip
+        const { 'other.colo': colo, hashedIpAddress } = obj;
+        if (colo === 'CNN' && hashedIpAddress) {
+            try {
+                const unpacked = unpackHashedIpAddressHash(hashedIpAddress);
+                if (unpacked === '62cc84934b1d7d28cd08720ce4b5f2419dee0399') {
+                    writeTraceEvent({ kind: 'generic', type: 'abusive-ip-ignored', strings: [ uuid, timestamp, unpacked ] });
+                    continue;
+                }
+            } catch (e) {
+                const msg = `${e.stack || e}`.substring(0, 1024);
+                writeTraceEvent({ kind: 'generic', type: 'abusive-ip-ignore-failed', strings: [ uuid, timestamp, msg ] });
+                continue;
+            }
+        }
+
         const timestampAndUuid = `${timestamp}-${uuid}`;
         const key = `crl.r.${timestampAndUuid}`;
         obj.source = doName;
