@@ -141,16 +141,20 @@ export default {
                 const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer);
                 const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords } } = response;
                 const messageIds = new Set(processedMessageIds);
+                let ackCount = 0;
+                let retryCount = 0;
                 for (const msg of batch.messages) {
                     if (messageIds.has(msg.id)) {
                         msg.ack();
+                        ackCount++;
                     } else {
                         msg.retry();
+                        retryCount++;
                     }
                 }
                 const consumerStartTime = new Date(consumerStart).toISOString();
                 const consumerTime = Date.now() - consumerStart;
-                const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount ];
+                const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount, ackCount, retryCount ];
                 const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords ];
                 writeTraceEvent({ kind: 'generic', type: 'hits-batch',
                     strings: [ batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '', consumerStartTime ],
@@ -330,7 +334,8 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     { const r = tryParseShowOgImageRequest({ method, pathname }); if (r && configuration) return computeShowOgImageResponse(r, { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, podcastIndexCredentials, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs }); }
     const { blobs: miscBlobs, roBlobs: roMiscBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'misc/' });
     const { blobs: hitsBlobs, roBlobs: roHitsBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'hits/' });
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs });
+    const { blobs: backupBlobs, roBlobs: roBackupBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'backup/' });
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

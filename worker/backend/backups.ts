@@ -1,8 +1,23 @@
 import { Blobs, Multiput } from './blobs.ts';
 import { DurableObjectStorage, DurableObjectStorageValue, concat } from '../deps.ts';
-import { check, checkMatches, tryParseInt } from '../check.ts';
-import { computeTimestamp } from '../timestamp.ts';
+import { check, checkMatches, isValidHour, tryParseInt } from '../check.ts';
+import { computeTimestamp, isValidTimestamp } from '../timestamp.ts';
 import { AdminDataResponse, Unkinded } from '../rpc_model.ts';
+
+export type BackupKey = { hour: string, timestamp: string, tag: string };
+
+export function packBackupKey(key: BackupKey): string {
+    return `${key.hour}.${key.timestamp}.${key.tag}.txt`;
+}
+
+export function unpackBackupKey(key: string): BackupKey {
+    // 2022-09-15T20.231227235930908.test.txt
+    const [ _, hour, timestamp, tag ] = checkMatches('key', key, /^(\d{4}-\d{2}-\d{2}T\d{2})\.(\d{15})\.([^.]+)\.txt$/);
+    check('hour', hour, isValidHour);
+    check('timestamp', timestamp, isValidTimestamp);
+    checkMatches('tag', tag, /^[a-z0-9]+(-[a-z0-9]+)*$/);
+    return { hour, timestamp, tag };
+}
 
 type Opts = { 
     operationKind: string, 

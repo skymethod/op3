@@ -156,7 +156,7 @@ export class HitsController {
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
         const { hitsBlobs } = this;
         const attNums = await this.getOrLoadAttNums();
-        return await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, undefined, false);
+        return await queryPackedRedirectLogsFromHits(request, { hitsBlobs, attNums, indexSortKeys: undefined, descending: false });
     }
 
     async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>): Promise<Response> {

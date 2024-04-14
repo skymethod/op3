@@ -5,7 +5,7 @@ import { tryParseDurationMillis } from '../duration.ts';
 export type ApiQueryCommonParameters = { readonly limit: number, readonly startTimeInclusive?: string, readonly startTimeExclusive?: string, readonly endTimeExclusive?: string, readonly format?: string, readonly continuationToken?: string, skipHeaders?: boolean, descending?: boolean };
 
 export function computeApiQueryCommonParameters(searchParams: URLSearchParams, { limitDefault, limitMin, limitMax }: { limitDefault: number, limitMin: number, limitMax: number }): ApiQueryCommonParameters {
-    const { start, startAfter, end, limit, format, continuationToken, skip, order } = Object.fromEntries(searchParams);
+    const { start, startAfter, end, limit, format, continuationToken, skip, desc } = Object.fromEntries(searchParams);
 
     const checkTime = (name: string, value: string) => {
         const duration = tryParseDurationMillis(value);
@@ -47,16 +47,9 @@ export function computeApiQueryCommonParameters(searchParams: URLSearchParams, {
     if (skip === 'headers') {
         rt = { ...rt, skipHeaders: true };
     }
-    if (typeof order === 'string') {
-        checkMatches('order', order, /^(asc|ascending|desc|descending)$/);
-        if (order.startsWith('desc')) {
-            rt = { ...rt, descending: true };
-        } else if (searchParams.has('desc')) {
-            throw new Error(`Conflicting 'order' and 'desc'`);
-        }
-    }
     if (searchParams.has('desc')) {
-        rt = { ...rt, descending: true };
+        const descending = !(typeof desc === 'string' && /^n|no|f|false|0$/i.test(desc));
+        rt = { ...rt, descending };
     }
 
     return rt;

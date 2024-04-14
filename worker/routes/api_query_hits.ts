@@ -15,13 +15,16 @@ import { DoNames } from '../do_names.ts';
 import { computeLinestream } from '../streams.ts';
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 
-type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, rawIpAddress: string | undefined };
-export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, rawIpAddress }: Opts): Promise<Response> {
+type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, rawIpAddress: string | undefined };
+export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress }: Opts): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
     const targetHitsBlobs = searchParams.has('ro') ? roHitsBlobs : hitsBlobs;
     if (!targetHitsBlobs) throw new Error(`Need hitsBlobs`);
+
+    const targetBackupBlobs = searchParams.has('ro') ? roBackupBlobs : backupBlobs;
+    if (!targetBackupBlobs) throw new Error(`Need backupBlobs`);
 
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need targetRpcClient`);
@@ -35,12 +38,12 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
     }
-    return await query(request, targetRpcClient, targetHitsBlobs);
+    return await query(request, { rpcClient: targetRpcClient, hitsBlobs: targetHitsBlobs, backupBlobs: targetBackupBlobs });
 }
 
 //
 
-async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: RpcClient, hitsBlobs: Blobs): Promise<Response> {
+async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, hitsBlobs, backupBlobs }: { rpcClient: RpcClient, hitsBlobs: Blobs, backupBlobs: Blobs }): Promise<Response> {
     const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, url, urlStartsWith, descending = false } = request;
     const startTime = Date.now();
 
@@ -57,7 +60,7 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: Rpc
     }
 
     const attNums = new AttNums();
-    const response = await queryPackedRedirectLogsFromHits(request, hitsBlobs, attNums, indexSortKeys, descending);
+    const response = await queryPackedRedirectLogsFromHits(request, { hitsBlobs, attNums, indexSortKeys, descending, backupBlobs });
     const rows: unknown[] = [];
     const includes = include.split(',');
     const includeAsn = includes.includes('asn');
@@ -75,7 +78,6 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, rpcClient: Rpc
             'other.asn': asn,
         } = attNums.unpackRecord(record);
         if (typeof timestamp !== 'string') continue;
-        // if (typeof mostBehindTimestamp === 'string' && timestamp > mostBehindTimestamp) continue;
         if (typeof uuid !== 'string') continue;
         const time = timestampToInstant(timestamp);
         const hashedIpAddress = typeof packedHashedIpAddress === 'string' ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
