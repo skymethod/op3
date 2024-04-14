@@ -1,7 +1,7 @@
 import { check, checkMatches } from '../check.ts';
 import { PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded } from '../rpc_model.ts';
 import { computeLinestream } from '../streams.ts';
-import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
+import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant, addDaysToDateString } from '../timestamp.ts';
 import { maxString } from '../collections.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
@@ -34,15 +34,18 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
     const indexSortKeySet = indexSortKeys ? new Set(indexSortKeys) : undefined;
     const indexMinuteTimestamps = indexSortKeys ? new Set(indexSortKeys.map(v => computeMinuteTimestamp(v))) : undefined;
 
+    const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
+    const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
+    const endTimeExclusiveTimestamp = endTimeExclusive ? computeTimestamp(endTimeExclusive) : undefined;
+    const endTimestamp = endTimeExclusiveTimestamp ?? computeTimestamp();
+    
     const satisfyFromHits = async () => {
         const recordCount = Object.keys(records).length;
         let remaining = limit - recordCount;
         if (remaining === 0) return;
 
-        const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
-        const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
         const startMinuteTimestamp = maxString(computeTimestamp(hitsEpochMinute), computeMinuteTimestamp(startTimeExclusiveTimestamp ?? startTimeInclusiveTimestamp ?? computeTimestamp(indexSortKeys ? computeIndexWindowStartInstant() : hitsEpochMinute)));
-        const endTimestamp = computeTimestamp(endTimeExclusive);
+        
         const endMinuteTimestamp = computeMinuteTimestamp(endTimestamp);
         const startAfterRecordKeyMinuteTimestamp = startAfterRecordKey ? computeMinuteTimestamp(unpackSortKey(startAfterRecordKey).timestamp) : undefined;
 
@@ -123,21 +126,31 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
         if (descending) {
 
         } else {
-            // TODO start at the right place
-            const date = backupEpochHour.substring(0, 10);
-            const backupKeys = await findDailyBackups(date);
-            for (const backupKey of backupKeys) {
-                const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
-                console.log(`Stream(${backupKey.hour}): ${stream}`);
-                if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
-                for await (const [ record, sortKey ] of yieldRecords(stream, attNums, undefined)) {
-                    // TODO apply query filters
-                    records[sortKey] = record;
-                    remaining--;
-                    if (remaining === 0) return;
+            const startTime = maxString(startTimeExclusive ?? startTimeInclusive ?? minBackupHour, minBackupHour);
+            const startHour = startTime.substring(0, 13);
+            let date = startHour.substring(0, 10);
+            while (date < maxBackupHour) {
+                const backupKeys = await findDailyBackups(date);
+                for (const backupKey of backupKeys) {
+                    const { hour } = backupKey;
+                    if (hour < startHour) continue;
+                    console.log(`Getting record stream for ${hour}...`)
+                    const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
+                    if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
+                    for await (const [ record, sortKey ] of yieldRecords(stream, attNums, undefined)) {
+                        const recordTimestamp = sortKey.substring(0, 15);
+                        if (startTimeInclusiveTimestamp && recordTimestamp < startTimeInclusiveTimestamp) continue;
+                        if (startTimeExclusiveTimestamp && recordTimestamp <= startTimeExclusiveTimestamp) continue;
+                        if (startAfterRecordKey && sortKey <= startAfterRecordKey) continue;
+                        if (endTimestamp && recordTimestamp >= endTimestamp) return;
+
+                        records[sortKey] = record;
+                        remaining--;
+                        if (remaining === 0) return;
+                    }
                 }
+                date = addDaysToDateString(date, 1);
             }
-            // TODO next day
         } 
     };
 
@@ -184,7 +197,8 @@ export function isValidSortKey(sortKey: string): boolean {
 //
 
 const hitsEpochMinute = `2024-03-13T00:00:00.000Z`;
-const backupEpochHour = `2022-09-15T21:00:00.000Z`;
+const minBackupHour = `2022-09-15T21:00:00.000Z`;
+const maxBackupHour = `2024-03-31T23:00:00.000Z`;
 
 function computeMinuteTimestamp(timestamp: string): string {
     return `${timestamp.substring(0, 10)}00000`;
