@@ -6,5 +6,5 @@ export const MULTIPLES = Object.fromEntries([
     [ DoNames.redirectLogForColo('ORD'), 4 ],
     [ DoNames.redirectLogForColo('DFW'), 4 ],
     [ DoNames.redirectLogForColo('LAX'), 2 ],
-    [ DoNames.redirectLogForColo('CNN'), 8 ],
+    [ DoNames.redirectLogForColo('CNN'), 16 ],
 ]);
