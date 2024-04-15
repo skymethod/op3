@@ -5,7 +5,6 @@ import { addMinutes, computeTimestamp, isValidTimestamp, timestampToInstant, add
 import { maxString, minString } from '../collections.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
-import { computeIndexWindowStartInstant } from './hits_indexes.ts';
 import { unpackBackupKey, BackupKey, packBackupKey } from './backups.ts';
 
 export function computeMinuteFileKey(minuteTimestamp: string): string {
@@ -33,6 +32,9 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
 
     const indexSortKeySet = indexSortKeys ? new Set(indexSortKeys) : undefined;
     const indexMinuteTimestamps = indexSortKeys ? new Set(indexSortKeys.map(v => computeMinuteTimestamp(v))) : undefined;
+    if (indexMinuteTimestamps && indexMinuteTimestamps.size > maxMinutefileReadsPerRequest) {
+        throw new Error(`Your query is too expensive, try setting the 'limit' closer to ${maxMinutefileReadsPerRequest}.`);
+    }
 
     const startTimeInclusiveTimestamp = startTimeInclusive ? computeTimestamp(startTimeInclusive) : undefined;
     const startTimeExclusiveTimestamp = startTimeExclusive ? computeTimestamp(startTimeExclusive) : undefined;
@@ -227,11 +229,22 @@ export function isValidSortKey(sortKey: string): boolean {
     return !!m && isValidTimestamp(m[1]);
 }
 
+export function computeIndexWindowStartInstant(): string {
+    // allow for querying 90 full days
+    const today = new Date().toISOString().substring(0, 10);
+    const startDate = addDaysToDateString(today, -91);
+    return maxString(`${startDate}T00:00:00.000Z`, minIndexInstant);
+}
+
 //
 
 const hitsEpochMinute = `2024-03-13T00:00:00.000Z`;
 const minBackupHour = `2022-09-15T21:00:00.000Z`;
 const maxBackupHour = `2024-03-31T23:00:00.000Z`;
+
+const minIndexInstant = '2024-04-13T00:00:00.000Z';
+
+const maxMinutefileReadsPerRequest = 100;
 
 function computeMinuteTimestamp(timestamp: string): string {
     return `${timestamp.substring(0, 10)}00000`;

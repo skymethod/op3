@@ -1,6 +1,6 @@
 import { AttNums } from '../backend/att_nums.ts';
 import { Blobs } from '../backend/blobs.ts';
-import { queryPackedRedirectLogsFromHits } from '../backend/hits_common.ts';
+import { queryPackedRedirectLogsFromHits, computeIndexWindowStartInstant } from '../backend/hits_common.ts';
 import { isValidSha1Hex } from '../crypto.ts';
 import { packError } from '../errors.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
@@ -113,6 +113,12 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
     
     for (const [ name, value ] of Object.entries({ userAgent, referer, ulid, xpsId, urlSha256 })) {
         if (typeof value === 'string') throw new Error(`The '${name}' filter is no longer supported`);
+    }
+
+    if (typeof url === 'string' || typeof hashedIpAddress === 'string') {
+        const { endTimeExclusive } = request;
+        const indexWindowStartInstant = computeIndexWindowStartInstant();
+        if (endTimeExclusive && endTimeExclusive <= indexWindowStartInstant) throw new Error(`The window for 'url' or 'hashedIpAddress' queries begins on ${indexWindowStartInstant}`);
     }
 
     if (typeof url === 'string') {

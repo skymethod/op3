@@ -3,7 +3,7 @@ import { computeServerUrl } from '../client_params.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
 import { computeTimestamp, addMonthsToMonthString, addDaysToDateString } from '../timestamp.ts';
-import { isValidSortKey } from './hits_common.ts';
+import { isValidSortKey, computeIndexWindowStartInstant } from './hits_common.ts';
 import { maxString, minString } from '../collections.ts';
 
 export enum IndexId {
@@ -26,13 +26,6 @@ export async function computeIndexRecords(record: Record<string, string>, timest
         if (typeof indexValue !== 'string') continue;
         outIndexRecords[`hits.i0.${indexId}.${indexValue}.${sortKey}`] = sortKey;
     }
-}
-
-export function computeIndexWindowStartInstant(): string {
-    // allow for querying 90 full days
-    const today = new Date().toISOString().substring(0, 10);
-    const startDate = addDaysToDateString(today, -91);
-    return maxString(`${startDate}T00:00:00.000Z`, indexEpochInstant);
 }
 
 export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {
@@ -207,7 +200,3 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
         throw new Error(`Unsupported request: ${JSON.stringify(request)}`);
     }
 }
-
-//
-
-const indexEpochInstant = '2024-04-13T00:00:00.000Z';
