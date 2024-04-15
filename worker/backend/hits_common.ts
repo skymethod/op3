@@ -25,9 +25,9 @@ export function computeRecordInfo(obj: Record<string, string>): { sortKey: strin
     return { sortKey, minuteTimestamp, timestamp };
 }
 
-export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, opts: { hitsBlobs: Blobs, attNums: AttNums, indexSortKeys: string[] | undefined, descending: boolean, backupBlobs?: Blobs }): Promise<PackedRedirectLogsResponse> {
+export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPackedRedirectLogsRequest>, opts: { hitsBlobs: Blobs, attNums: AttNums, indexSortKeys: string[] | undefined, descending: boolean, backupBlobs?: Blobs, quiet?: boolean }): Promise<PackedRedirectLogsResponse> {
     const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, startAfterRecordKey } = request;
-    const { hitsBlobs, attNums, indexSortKeys, descending, backupBlobs } = opts;
+    const { hitsBlobs, attNums, indexSortKeys, descending, backupBlobs, quiet } = opts;
     const records: Record<string, string> = {}; // sortKey(timestamp-uuid) -> packed record
 
     const indexSortKeySet = indexSortKeys ? new Set(indexSortKeys) : undefined;
@@ -56,7 +56,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? endMinuteTimestamp;
             while (minuteTimestamp >= startMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
-                    console.log({ minuteTimestamp });
+                    if (!quiet) console.log({ minuteTimestamp });
                     const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
                     if (stream !== undefined) {
                         const reversed: [ string, string ][] = [];
@@ -83,7 +83,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
             let minuteTimestamp = startAfterRecordKeyMinuteTimestamp ?? startMinuteTimestamp;
             while (minuteTimestamp <= endMinuteTimestamp && recordCount < limit) {
                 if (!indexMinuteTimestamps || indexMinuteTimestamps.has(minuteTimestamp)) {
-                    console.log({ minuteTimestamp });
+                    if (!quiet) console.log({ minuteTimestamp });
                     const stream = await hitsBlobs.get(computeMinuteFileKey(minuteTimestamp), 'stream');
                     if (stream !== undefined) {
                         for await (const [ record, sortKey ] of yieldRecords(stream, attNums, minuteTimestamp)) {
@@ -117,7 +117,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
         const findDailyBackups = async (date: string): Promise<BackupKey[]> => {
             const month = date.substring(0, 7);
             if (!hitmaps.has(month)) {
-                console.log(`Getting hitmap for ${month}...`);
+                if (!quiet) console.log(`Getting hitmap for ${month}...`);
                 const hitmap = await backupBlobs.get(`hitmaps/1/daily/${month}.json`, 'json') as Hitmap ?? { packedKeys: [] };
                 hitmaps.set(month, hitmap);
             }
@@ -138,7 +138,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
                 for (const backupKey of backupKeys) {
                     const { hour } = backupKey;
                     if (hour > startHour) continue;
-                    console.log(`Getting record stream for ${hour}...`)
+                    if (!quiet) console.log(`Getting record stream for ${hour}...`)
                     const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
                     if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
                     const reversed: [ string, string ][] = []; // this is much larger for backups, hmm
@@ -169,7 +169,7 @@ export async function queryPackedRedirectLogsFromHits(request: Unkinded<QueryPac
                 for (const backupKey of backupKeys) {
                     const { hour } = backupKey;
                     if (hour < startHour) continue;
-                    console.log(`Getting record stream for ${hour}...`)
+                    if (!quiet) console.log(`Getting record stream for ${hour}...`)
                     const stream = await backupBlobs.get(`hits/1/${packBackupKey(backupKey)}`, 'stream');
                     if (!stream) throw new Error(`Expected stream for ${JSON.stringify(backupKey)}`);
                     for await (const [ record, sortKey ] of yieldRecords(stream, attNums, undefined)) {
