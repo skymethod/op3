@@ -207,12 +207,10 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             }
             
             if (rawRedirects.length > 0) {
-                // send raw redirects the current way
-                const doName = DoNames.redirectLogForColo(colo);
                 const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
-                await rpcClient.logRawRedirects({ rawRedirects }, doName);
+                const doName = DoNames.redirectLogForColo(colo);
 
-                // send raw redirects the future way, if enabled
+                // send raw redirects the new/future way
                 try {
                     const { queue2 } = env;
                     if (queue2) {
@@ -231,6 +229,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 } catch (e) {
                     consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`)
                 }
+
+                // send raw redirects the old/current way
+                await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }
         } catch (e) {
             consoleError('worker-sending-redirects', `Error sending raw redirects: ${e.stack || e}`);
