@@ -174,7 +174,8 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadApiAuthController().adminExecuteDataQuery(obj) });
                         } else if ((targetPath === '/feed-notifications' || targetPath.startsWith('/show/')) && durableObjectName === DoNames.showServer) {
                             const backupBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'backup/' }) : undefined;
-                            return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs) });
+                            const hitsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'hits/' }) : undefined;
+                            return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs, hitsBlobs) });
                         } else if (targetPath.startsWith('/hits/') && durableObjectName === DoNames.hitsServer) {
                             const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });

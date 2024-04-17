@@ -94,7 +94,7 @@ export class ShowController {
         await this.notifications.receiveExternalNotification({ notification, received });
     }
 
-    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>, backupBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
+    async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>, backupBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
         const { notifications, storage, origin, feedBlobs } = this;
         const res = await notifications.adminExecuteDataQuery(req);
         if (res) return res;
@@ -330,7 +330,7 @@ export class ShowController {
 
         if (targetPath === '/show/stats' && operationKind === 'update') {
             const { rpcClient, statsBlobs } = this;
-            return await updateShowStats({ parameters, rpcClient, statsBlobs, storage });
+            return await updateShowStats({ parameters, rpcClient, statsBlobs, storage, hitsBlobs });
         }
 
         if (targetPath === '/show/storage/lookup-show-bulk' && operationKind === 'select') {
@@ -490,7 +490,7 @@ export class ShowController {
     }
 }
 
-export async function updateShowStats({ parameters, rpcClient, statsBlobs, storage }: { parameters: Record<string, string>, rpcClient: RpcClient, statsBlobs: Blobs, storage: DurableObjectStorage }): Promise<Unkinded<AdminDataResponse>> {
+export async function updateShowStats({ parameters, rpcClient, statsBlobs, storage, hitsBlobs }: { parameters: Record<string, string>, rpcClient: RpcClient, statsBlobs: Blobs, storage: DurableObjectStorage, hitsBlobs: Blobs | undefined }): Promise<Unkinded<AdminDataResponse>> {
     const { hour, date, type } = parameters;
 
     // compute hourly download tsv
@@ -499,7 +499,7 @@ export async function updateShowStats({ parameters, rpcClient, statsBlobs, stora
         const maxHits = parseInt(maxHitsStr);
         const querySize = parseInt(querySizeStr);
         const maxQueries = parseInt(maxQueriesStr);
-        const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient, target });
+        const result = await computeHourlyDownloads(hour, { statsBlobs, maxHits, maxQueries, querySize, rpcClient, target, hitsBlobs });
         return { results: [ result ] };
     }
 
