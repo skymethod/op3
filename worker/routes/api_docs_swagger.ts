@@ -1,5 +1,5 @@
 import { Configuration } from '../configuration.ts';
-import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_REDIRECT_LOGS, computeApiVersion } from './api_contract.ts';
+import { QUERY_DOWNLOADS, QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS, QUERY_HITS, computeApiVersion } from './api_contract.ts';
 import { computeNonProdWarning } from './instances.ts';
 
 export async function computeApiDocsSwaggerResponse(opts: { instance: string, origin: string, previewTokens: Set<string>, configuration: Configuration | undefined, searchParams: URLSearchParams }): Promise<Response> {
@@ -11,7 +11,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const instance = instanceParam ?? instanceOpt;
     const version = templateMode ? 'API_VERSION_TEMPLATE' : computeApiVersion(instance);
     let descriptionSuffix = `\n\n# Endpoint\n\nBase url for all API calls: \`${origin}/api/1\`\n\n# Authentication\n\nEvery call to the OP3 API requires a bearer token associated with a valid API Key.\n\n> [Manage your API Keys and bearer tokens →](/api/keys)\n\nPass your bearer token either: \n - as an authorization header: \`Authorization: Bearer mytoken\`\n - or using this query param: \`?token=mytoken\`\n\n`;
-    let queryRedirectLogsDescriptionSuffix = '';
+    let queryHitsDescriptionSuffix = '';
     let queryDownloadsDescriptionSuffix = '';
     let viewShowDescriptionSuffix = '';
     let queryRecentEpisodesWithTranscriptsDescriptionSuffix = '';
@@ -24,8 +24,8 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     if (previewToken) {
         descriptionSuffix += `\n\nYou can also use the sample bearer token \`${previewToken}\` to preview API access on this instance.`;
 
-        const exampleRedirectLogsApiCall = `${origin}/api/1/redirect-logs?start=-24h&format=json&token=${previewToken}`;
-        queryRedirectLogsDescriptionSuffix = `\n\nFor example, to view logs starting 24 hours ago in json format:\n\n\GET [${exampleRedirectLogsApiCall}](${exampleRedirectLogsApiCall})`;
+        const exampleHitsApiCall = `${origin}/api/1/hits?start=-24h&format=json&token=${previewToken}`;
+        queryHitsDescriptionSuffix = `\n\nFor example, to view hits starting 24 hours ago in json format:\n\n\GET [${exampleHitsApiCall}](${exampleHitsApiCall})`;
 
         demoShowUuid = templateMode ? 'DEMO_SHOW_UUID_TEMPLATE' : await configuration?.get('demo-show-1');
         if (demoShowUuid) {
@@ -59,14 +59,14 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
     
-    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryRedirectLogsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix, queryShowDownloadCountsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryHitsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix, queryShowDownloadCountsDescriptionSuffix);
     const json = JSON.stringify(swagger, undefined, 2);
     return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryRedirectLogsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string, queryShowDownloadCountsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryHitsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string, queryShowDownloadCountsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -86,7 +86,7 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
         "basePath": "/api/1",
         "tags": [
             {
-                "name": "redirect-logs",
+                "name": "hits",
                 "description": `Lowest-level log records saved for every prefix redirect processed.\n\nThis is the raw material on which higher-level metrics like [downloads](#tag/downloads) can be [derived](${origin}/download-calculation).`,
             },
         ],
@@ -94,14 +94,14 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
             "https",
         ],
         "paths": {
-            "/redirect-logs": {
+            "/hits": {
                 "get": {
                     "tags": [
-                        "redirect-logs"
+                        "hits"
                     ],
-                    "summary": "Query redirect logs",
-                    "description": `Perform a query of every request logged using the redirect.\n\nThis can be used to verify that requests are stored properly in the system.\n\nResults are returned in ascending order by time (plus uuid to break ties for multiple requests in the same millisecond).\n\nYou can filter by a time range and one additional optional dimension (such as \`url\`).${queryRedirectLogsDescriptionSuffix}`,
-                    "operationId": "queryRedirectLogs",
+                    "summary": "Query hits",
+                    "description": `Perform a query of every request ("hit") logged using the redirect.\n\nThis can be used to verify that requests are stored properly in the system.\n\nResults are returned in ascending order by time (plus uuid to break ties for multiple requests in the same millisecond) unless the \`desc\` param is specified.\n\nYou can filter by a time range and one additional optional dimension (\`url\` or \`hashedIpAddress\`, which only have data for the last 90 days).${queryHitsDescriptionSuffix}`,
+                    "operationId": "queryHits",
                     "produces": [
                         "application/json",
                         "text/tab-separated-values"
@@ -133,9 +133,9 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                             "description": "Maximum number of rows to return",
                             "required": false,
                             "type": "integer",
-                            "maximum": QUERY_REDIRECT_LOGS.limitMax,
-                            "minimum": QUERY_REDIRECT_LOGS.limitMin,
-                            "default": QUERY_REDIRECT_LOGS.limitDefault,
+                            "maximum": QUERY_HITS.limitMax,
+                            "minimum": QUERY_HITS.limitMin,
+                            "default": QUERY_HITS.limitDefault,
                         },
                         {
                             "name": "start",
@@ -167,28 +167,11 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                         {
                             "name": "url",
                             "in": "query",
-                            "description": `Filter by a specific episode url\n\nYou can specify either \`url\` or \`urlSha256\`, not both\n\n**[New]** Supports trailing wildcards, i.e. "starts with"\n\nExample: \`url=${origin}/e/example.com/path/to/*\``,
+                            "description": `Filter by a specific episode url\n\nAlso supports trailing wildcards, i.e. "starts with" queries.\n\nExample: \`url=${origin}/e/example.com/path/to/*\``,
                             "example": `${origin}/e/example.com/path/to/episode.mp3`,
                             "required": false,
                             "type": "string",
                             "format": "url",
-                        },
-                        {
-                            "name": "urlSha256",
-                            "in": "query",
-                            "description": "Filter by the SHA-256 hash of a specific episode url\n\nYou can specify either `url` or `urlSha256`, not both",
-                            "example": `b72a551aa68b46480c9cc461387598b57db3c234ebec0dea062b230ab0032749`,
-                            "required": false,
-                            "type": "string",
-                            "format": "64-character hex",
-                        },
-                        {
-                            "name": "referer",
-                            "in": "query",
-                            "description": "Filter by a specific Referer header\n\n(intentionally follows the misspelling of the header name in the HTTP spec)",
-                            "example": `https://www.jam.ai/`,
-                            "required": false,
-                            "type": "string",
                         },
                         {
                             "name": "hashedIpAddress",
@@ -199,25 +182,18 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                             "type": "40-character hex",
                         },
                         {
-                            "name": "ulid",
+                            "name": "desc",
                             "in": "query",
-                            "description": "Filter by a specific ULID\n\nLearn more about ULIDs at [podcastlistening.com](https://podcastlistening.com/)",
-                            "example": `43b811dc-3697-4361-85ef-489bf9bf2deb`,
+                            "description": `If provided, sorts the results in time-descending order (most recent first)`,
                             "required": false,
-                        },
-                        {
-                            "name": "xpsId",
-                            "in": "query",
-                            "description": "Filter by a specific x-playback-session-id",
-                            "example": `2C2A32DC-F9D1-4C21-A1D2-7EE48B4B8DEF`,
-                            "required": false,
-                        },
+                            "type": "boolean",
+                        }
                     ],
                     "responses": {
                         "200": {
                             "description": "successful operation",
                             "schema": {
-                                "$ref": "#/definitions/QueryRedirectLogsResponse"
+                                "$ref": "#/definitions/QueryHitsResponse"
                             }
                         }
                     },
@@ -636,19 +612,19 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
             }
         },
         "definitions": {
-            "QueryRedirectLogsResponse": {
+            "QueryHitsResponse": {
                 "type": "object",
                 "properties": {
                     "rows": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/QueryRedirectLogsResponse.Log"
+                            "$ref": "#/definitions/QueryHitsResponse.Hit"
                         },
-                        "description": "Logs that match the query"
+                        "description": "Hits that match the query"
                     },
                     "count": {
                         "type": "integer",
-                        "description": "Number of logs in the response"
+                        "description": "Number of hits in the response"
                     },
                     "queryTime": {
                         "type": "integer",
@@ -656,7 +632,7 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                     }
                 }
             },
-            "QueryRedirectLogsResponse.Log": {
+            "QueryHitsResponse.Hit": {
                 "type": "object",
                 "properties": {
                     "time": {

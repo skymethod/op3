@@ -10,20 +10,28 @@ import { writeTraceEvent } from '../tracer.ts';
 import { QUERY_REDIRECT_LOGS } from './api_contract.ts';
 import { computeApiQueryCommonParameters } from './api_query_common.ts';
 
-export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, rawIpAddress: string | undefined): Promise<Response> {
-    if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
-    if (method !== 'GET') return newMethodNotAllowedResponse(method);
-
-    let request: Unkinded<QueryRedirectLogsRequest>;
-    try {
-        const admin = permissions.has('admin');
-        request = await parseRequest(searchParams, rawIpAddress, admin);
-        if (!admin) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request, permissions.has('preview')) });
-    } catch (e) {
-        const { message } = packError(e);
-        return newJsonResponse({ message }, 400);
+export async function computeQueryRedirectLogsResponse(permissions: ReadonlySet<ApiTokenPermission>, origin: string, method: string, searchParams: URLSearchParams, rpcClient: RpcClient, rawIpAddress: string | undefined): Promise<Response> {
+    const u = new URL(`${origin}/api/1/hits`);
+    for (const [ name, value ] of searchParams) {
+        u.searchParams.append(name, value);
     }
-    return await rpcClient.queryRedirectLogs(request, DoNames.combinedRedirectLog);
+    const location = u.toString();
+    return new Response('', { status: 308, headers: { location } });
+    
+    // OBSOLETE as of 2024-04-17
+    // if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
+    // if (method !== 'GET') return newMethodNotAllowedResponse(method);
+
+    // let request: Unkinded<QueryRedirectLogsRequest>;
+    // try {
+    //     const admin = permissions.has('admin');
+    //     request = await parseRequest(searchParams, rawIpAddress, admin);
+    //     if (!admin) writeTraceEvent({ kind: 'generic', type: 'qrl', ...computeEventPayload(request, permissions.has('preview')) });
+    // } catch (e) {
+    //     const { message } = packError(e);
+    //     return newJsonResponse({ message }, 400);
+    // }
+    // return await rpcClient.queryRedirectLogs(request, DoNames.combinedRedirectLog);
 }
 
 //

@@ -71,7 +71,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
             if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
         }
-        if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, method, searchParams, rpcClient, rawIpAddress);
+        if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, origin, method, searchParams, rpcClient, rawIpAddress);
         if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress });
         if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
         if (path === '/api-keys') return await computeApiKeysResponse({ instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
