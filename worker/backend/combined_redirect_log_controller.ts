@@ -1,8 +1,7 @@
 import { checkMatches, isStringRecord, isValidHour } from '../check.ts';
 import { computeServerUrl } from '../client_params.ts';
-import { Bytes, chunk, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
+import { chunk, DurableObjectStorage, DurableObjectStorageValue } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
-import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { getOrInit } from '../maps.ts';
 import { newTextResponse } from '../responses.ts';
 import { AdminDataRequest, AdminDataResponse, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmPayload, ColoStatus, GetColoStatusRequest, GetColoStatusResponse, isUrlInfo, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RpcClient, Unkinded, UrlInfo, UrlsExternalNotification } from '../rpc_model.ts';
@@ -628,19 +627,19 @@ export enum IndexId {
 }
 
 export const INDEX_DEFINITIONS: [ string, IndexId, (v: string, timestamp: string) => string | undefined | Promise<string | undefined> ][] = [
-    [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(computeServerUrl(v)).sha256()).hex() ],
+    [ 'url', IndexId.UrlSha256, _ => undefined ], // disabled 2024-04-17 [ 'url', IndexId.UrlSha256, async (v: string) => (await Bytes.ofUtf8(computeServerUrl(v)).sha256()).hex() ],
     [ 'userAgent', IndexId.UserAgent, _ => undefined ], // disabled 2024-04-07  [ 'userAgent', IndexId.UserAgent, (v: string) => v.substring(0, 1024) ]
-    [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
+    [ 'referer', IndexId.Referer, _ => undefined ], // disabled 2024-04-17 [ 'referer', IndexId.Referer, (v: string) => v.substring(0, 1024) ],
     [ 'range', IndexId.Range, _ => undefined ], // disabled 2023-12-14  [ 'range', IndexId.Range, (v: string) => v.substring(0, 1024) ]
-    [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
+    [ 'hashedIpAddress', IndexId.HashedIpAddress, _ => undefined ], // disabled 2024-04-17 [ 'hashedIpAddress', IndexId.HashedIpAddress, unpackHashedIpAddressHash ],
     [ 'other.colo', IndexId.EdgeColo, _ => undefined ], // disabled 2023-02-12 [ 'other.colo', IndexId.EdgeColo, v => v ],
     [ 'doColo', IndexId.DoColo, _ => undefined ], // disabled 2023-02-12 [ 'doColo', IndexId.DoColo, v => v ],
     [ 'source', IndexId.Source, _ => undefined ], // disabled 2023-02-12 [ 'source', IndexId.Source, v => v ],
-    [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
+    [ 'ulid', IndexId.Ulid, _ => undefined ], // disabled 2024-04-17 [ 'ulid', IndexId.Ulid, v => v.substring(0, 1024) ],
     [ 'method', IndexId.Method, _ => undefined ], // disabled 2024-01-05 [ 'method', IndexId.Method, v => v === 'GET' ? undefined : v.substring(0, 1024) ], // vast majority will be GET, only the other ones are interesting
     [ 'uuid', IndexId.Uuid, _ => undefined ], // disabled 2023-02-10 [ 'uuid', IndexId.Uuid, v => v ],
-    [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${computeServerUrl(v).substring(0, 1024)}` ],
-    [ 'xpsId', IndexId.XpsId, (v: string) => v.substring(0, 1024) ],
+    [ 'url', IndexId.DayUrl, _ => undefined ], // disabled 2024-04-17 [ 'url', IndexId.DayUrl, (v, timestamp) => `${timestamp.substring(0, 6)}.${computeServerUrl(v).substring(0, 1024)}` ],
+    [ 'xpsId', IndexId.XpsId, _ => undefined ], // disabled 2024-04-17 [ 'xpsId', IndexId.XpsId, (v: string) => v.substring(0, 1024) ],
 ];
 
 //
