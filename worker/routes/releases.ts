@@ -44,6 +44,16 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-04-17',
+        time: '2024-04-17T16:39:00.00Z',
+        title: '2024-04-17: New API query: Monthly/weekly downloads counts',
+        bulletPoints: [
+            ({ origin }) => `New API call to [query monthly/weekly download counts](${origin}/api/docs#tag/queries/operation/queryShowDownloadCounts) for one or more shows that OP3 measures.`,
+            ({ origin }) => `Renamed the redirect-logs API to [hits](${origin}/api/docs#tag/hits), limited optional filters to _url_ and _hashedIpAddress_ (which are also limited to the last 90 days).`,
+            ({ origin }) => `The renamed [hits](${origin}/api/docs#tag/hits) API supports a new _desc_ param to return results in descending order, and in general should reflect live requests much faster than before.`,
+        ]
+    },
+    {
         id: '2024-03-06',
         time: '2024-03-06T18:26:00.00Z',
         title: '2024-03-06: New API query: Top apps across all OP3 shows',
