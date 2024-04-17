@@ -240,9 +240,9 @@ export function computeIndexWindowStartInstant(): string {
 
 const hitsEpochMinute = `2024-03-13T00:00:00.000Z`;
 const minBackupHour = `2022-09-15T21:00:00.000Z`;
-const maxBackupHour = `2024-03-31T23:00:00.000Z`;
+const maxBackupHour = `2024-04-14T23:00:00.000Z`; // up to the official switchover date
 
-const minIndexInstant = '2024-04-13T00:00:00.000Z';
+const minIndexInstant = '2024-04-15T00:00:00.000Z'; // data started during the day 4/13, but 4/15 is the official switchover date
 
 const maxMinutefileReadsPerRequest = 100;
 
