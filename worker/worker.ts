@@ -210,7 +210,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
                 const doName = DoNames.redirectLogForColo(colo);
 
-                // send raw redirects the new/future way
+                // send raw redirects the new way
                 try {
                     const { queue2 } = env;
                     if (queue2) {
@@ -230,7 +230,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                     consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`)
                 }
 
-                // send raw redirects the old/current way
+                // send raw redirects the old way (for now)
                 await rpcClient.logRawRedirects({ rawRedirects }, doName);
             }
         } catch (e) {

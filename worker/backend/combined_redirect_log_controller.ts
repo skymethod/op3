@@ -463,7 +463,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
 
     // fetch some new records from the source DO
     const startAfterTimestampId = state.haveTimestampId;
-    const { namesToNums, records } = await rpcClient.getNewRedirectLogs({ limit: 10, startAfterTimestampId }, doName);
+    const { namesToNums, records } = await rpcClient.getNewRedirectLogs({ limit: 50, startAfterTimestampId }, doName); // 2024-04-17 upped from 10 to 50 now that indexes are disabled
     console.log(`${Object.keys(records).length} records`);
 
     const sourceAttNums = new AttNums(namesToNums);
@@ -515,6 +515,30 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
     }
     let newState: SourceState | undefined;
     if (Object.keys(newRecords).length > 0 || newIndexRecords.size > 0 || maxTimestampId !== startAfterTimestampId || Object.keys(newPendingUrlNotificationRecords).length > 0) {
+        // 2024-04-17: can run in single transaction now that indexes are disabled
+        await storage.transaction(async txn => {
+            if (Object.keys(newRecords).length > 0) {
+                console.log(`CombinedRedirectLogController: Saving ${Object.keys(newRecords).length} imported records from ${doName}`);
+                await txn.put(newRecords);
+            }
+            if (Object.keys(newPendingUrlNotificationRecords).length > 0) {
+                console.log(`CombinedRedirectLogController: Saving ${Object.keys(newPendingUrlNotificationRecords).length} pending url notifications`);
+                await txn.put(newPendingUrlNotificationRecords);
+            }
+            if (newIndexRecords.size > 0) {
+                for (const [ indexId, records ] of newIndexRecords) {
+                    console.log(`CombinedRedirectLogController: Saving ${Object.keys(records).length} ${IndexId[indexId]} index records from ${doName}`);
+                    await txn.put(records);
+                }
+            }
+            if (maxTimestampId !== startAfterTimestampId) {
+                console.log(`CombinedRedirectLogController: Updating haveTimestampId from ${startAfterTimestampId} to ${maxTimestampId} for ${doName}`);
+                newState = { ...state, haveTimestampId: maxTimestampId };
+                await txn.put(`crl.ss.${doName}`, newState);
+            }
+        });
+
+        /* OBSOLETE
         // two transactions to stay under 128
         // it's ok if this first transaction runs more than once
 
@@ -544,6 +568,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
                 await txn.put(`crl.ss.${doName}`, newState);
             }
         });
+        */
     }
     return newState;
 }
