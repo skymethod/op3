@@ -1,17 +1,19 @@
 import { timed } from '../async.ts';
 import { isStringRecord } from '../check.ts';
 import { DurableObjectStorage, RedBlackTree, chunk } from '../deps.ts';
-import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded, QueryHitsIndexRequest } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, PackedRedirectLogsResponse, QueryPackedRedirectLogsRequest, Unkinded, QueryHitsIndexRequest, RpcClient, UrlsExternalNotification } from '../rpc_model.ts';
 import { executeWithRetries } from '../sleep.ts';
-import { consoleError } from '../tracer.ts';
+import { consoleError, consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeMinuteFileKey, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
 import { computeIndexRecords, queryHitsIndexFromStorage } from './hits_indexes.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
-import { computeTimestamp } from '../timestamp.ts';
+import { computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
+import { DoNames } from '../do_names.ts';
+import { computeServerUrl } from '../client_params.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -20,21 +22,27 @@ export class HitsController {
     private readonly hashIpAddress: IpAddressHashingFn;
     private readonly minuteFiles = new Map<string /* minuteTimestamp */, RedBlackTree<[ string /* record */, string /* sortKey */ ]>>();
     private readonly colo: string;
+    private readonly rpcClient?: RpcClient;
+    private readonly durableObjectName: string;
+    private readonly knownServerUrls: string[] = [];
+
     private attNums: AttNums | undefined;
     private state: State | undefined;
     private recentMinuteTimestamps: string[] = [];
 
-    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, ) {
+    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, colo: string, rpcClient: RpcClient | undefined, durableObjectName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, ) {
         this.storage = storage;
         this.hitsBlobs = hitsBlobs;
         this.colo = colo;
+        this.rpcClient = rpcClient;
+        this.durableObjectName = durableObjectName;
         this.encryptIpAddress = encryptIpAddress;
         this.hashIpAddress = hashIpAddress;
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>): Promise<Unkinded<LogRawRedirectsBatchResponse>> {
         const { rawRedirectsByMessageId, rpcSentTime } = request;
-        const { encryptIpAddress, hashIpAddress, colo, storage } = this;
+        const { encryptIpAddress, hashIpAddress, colo, storage, rpcClient, durableObjectName, knownServerUrls } = this;
         const { maxMinuteFiles = defaultMaxMinuteFiles } = await this.getOrLoadState();
         const rpcReceivedTime = new Date().toISOString();
         const redirectCount = Object.values(rawRedirectsByMessageId).reduce((a, b) => a + b.rawRedirects.length, 0);
@@ -51,6 +59,7 @@ export class HitsController {
         const attNumsMaxBefore = attNums.max();
         const minuteTimestampsChanged = new Set<string>();
         const indexRecords: Record<string, string> = {};
+        const serverUrlFoundTimestamps: Record<string /* serverUrl */ , string /* found timestamp */> = {};
         for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
             for (const rawRedirect of rawRedirects) {
                 const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));
@@ -60,6 +69,12 @@ export class HitsController {
                 const inserted = minuteFile.insert([ record, sortKey ]);
                 if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
                 await computeIndexRecords(obj, timestamp, sortKey, indexRecords);
+                const { url } = obj;
+                if (typeof url === 'string') {
+                    const serverUrl = computeServerUrl(url);
+                    const existing = serverUrlFoundTimestamps[serverUrl];
+                    if (!existing || timestamp < existing) serverUrlFoundTimestamps[serverUrl] = timestamp;
+                }
             }
         }
 
@@ -95,8 +110,37 @@ export class HitsController {
             }
         }
 
+        // send new urls notification
+        let newUrlCount = 0;
+        if (rpcClient) {
+            try {
+                const newUrlInfos = Object.entries(serverUrlFoundTimestamps).map(v => ({ url: v[0], found: timestampToInstant(v[1]) })).filter(v => !knownServerUrls.includes(v.url));
+                newUrlCount = newUrlInfos.length;
+                if (newUrlCount > 0) {
+                    const time = new Date().toISOString();
+                    const notification: UrlsExternalNotification = {
+                        type: 'urls',
+                        sender: durableObjectName,
+                        sent: time,
+                        urls: newUrlInfos,
+                    };
+                
+                    await timed(times, 'sendNotification', () => rpcClient.receiveExternalNotification({ received: time, notification }, DoNames.showServer));
+                    for (const { url } of newUrlInfos) {
+                        const i = knownServerUrls.indexOf(url);
+                        if (i > 0) knownServerUrls.splice(i, 1);
+                        knownServerUrls.unshift(url);
+                    }
+                    while (knownServerUrls.length > 1000) knownServerUrls.pop();
+                }
+            } catch (e) {
+                // no big deal, we'll see them again
+                consoleWarn('hits-notifier', `HitsController: Failed to send notification: ${e.stack || e}`);
+            }
+        }
+
         // summary analytics
-        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0, saveIndexRecords = 0 } = times;
+        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0, saveIndexRecords = 0, sendNotification = 0 } = times;
         const putCount = minuteTimestampsChanged.size;
 
         return { 
@@ -111,25 +155,27 @@ export class HitsController {
             redirectCount,
             putCount,
             evictedCount,
+            newUrlCount,
             times: {
                 packRawRedirects,
                 saveAttNums,
                 ensureMinuteFileLoaded,
                 saveMinuteFile,
                 saveIndexRecords,
+                sendNotification,
             }
         };
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         const { operationKind, targetPath, parameters = {} } = req;
-        const { storage, recentMinuteTimestamps, colo } = this;
+        const { storage, recentMinuteTimestamps, colo, knownServerUrls } = this;
        
         if (operationKind === 'select' && targetPath === '/hits/attnums') return { results: [ await storage.get('hits.attNums') ] };
 
         if (targetPath === '/hits/state') {
             const state = await this.getOrLoadState();
-            if (operationKind === 'select') return { results: [ { colo, ...state, recentMinuteTimestamps } ] };
+            if (operationKind === 'select') return { results: [ { colo, ...state, recentMinuteTimestamps, knownServerUrls: knownServerUrls.length } ] };
             if (operationKind === 'update') {
                 const { 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
                 if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);

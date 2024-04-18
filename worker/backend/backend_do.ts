@@ -136,7 +136,7 @@ export class BackendDO {
                         if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init HitsController`);
                         const hitsBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'hits/' });
                         const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
-                        if (!this.hitsController) this.hitsController = new HitsController(storage, hitsBlobs, colo, encryptIpAddress, hashIpAddress);
+                        if (!this.hitsController) this.hitsController = new HitsController(storage, hitsBlobs, colo, rpcClient, durableObjectName, encryptIpAddress, hashIpAddress);
                         return this.hitsController;
                     }
 

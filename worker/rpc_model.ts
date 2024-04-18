@@ -511,12 +511,14 @@ export interface LogRawRedirectsBatchResponse {
     readonly redirectCount: number;
     readonly putCount: number;
     readonly evictedCount: number;
+    readonly newUrlCount: number;
     readonly times: {
         readonly packRawRedirects: number,
         readonly saveAttNums: number,
         readonly ensureMinuteFileLoaded: number,
         readonly saveMinuteFile: number,
         readonly saveIndexRecords: number,
+        readonly sendNotification: number,
     }
 }
 
