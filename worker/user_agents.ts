@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@ccdb09004858f0f503ff04143d69da27faec18e2 (2024-04-12T22:22:06Z)
+// from user-agents-v2@11e6945b1607466e236fd326edb8ade5ad416491 (2024-04-19T19:58:14Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -78,7 +78,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
     if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feedfetcher-Google|google-xrawler|^Googlebot-News/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
-    if (/Headliner\//.test(userAgent)) return { name: `Headliner`, type: 'bot' };
+    if (/^Headliner\/.*\+https:\/\/headliner\.app$/.test(userAgent)) return { name: `Headliner`, type: 'bot' };
     if (/HubSpot Crawler/.test(userAgent)) return { name: `HubSpot Crawler`, type: 'bot' };
     if (/Archive-It;|web\.archive\.org/.test(userAgent)) return { name: `Internet Archive`, type: 'bot' };
     if (/^Jaunt\//.test(userAgent)) return { name: `Jaunt`, type: 'bot' };
@@ -391,6 +391,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Hammel\//.test(userAgent)) return { name: `Hammel`, type: 'app' };
     if (/^HardCast\//.test(userAgent)) return { name: `HardCast`, type: 'app' };
     if (/^Hark\//.test(userAgent)) return { name: `Hark Audio`, type: 'app' };
+    if (/^Headliner\/.*\(Headliner-.*\+https:\/\/www\.headliner\.app\)$/.test(userAgent)) return { name: `Headliner`, type: 'app' };
     if (/hermespod\.com\//.test(userAgent)) return { name: `HermesPod`, type: 'app' };
     if (/^HiCast\//.test(userAgent)) return { name: `HiCast`, type: 'app' };
     if (/^Highly\//.test(userAgent)) return { name: `Highly`, type: 'app' };
