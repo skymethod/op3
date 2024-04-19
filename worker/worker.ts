@@ -222,7 +222,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                                 await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
                                 consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`)
                             } catch (e) {
-                                throw new Error(`Error saving for later: ${e.message}`);
+                                throw new Error(`Error saving for later (colo=${colo}): ${e.message}`);
                             }
                         }
                     }
