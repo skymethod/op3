@@ -1162,7 +1162,8 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     let show = record;
     const upsertRecords: Record<string, DurableObjectStorageValue> = {};
     let deleteIndexKey: string | undefined;
-    const { title, podcastGuid, link, itunesAuthor } = feedRecord;
+    const { title, podcastGuid: feedPodcastGuid, link, itunesAuthor, piFeed } = feedRecord;
+    const podcastGuid = feedPodcastGuid ?? piFeed?.podcastGuid;
     if (show.title !== title) {
         messages.push(`show.title ${show.title} -> ${title}`);
         show = { ...show, title };
