@@ -1,11 +1,11 @@
 // minimal deps to facilitate sharing across projects
-import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/bytes.ts';
-import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/get_head_object.ts';
-import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/put_object.ts';
-import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/r2.ts';
-import type { ListBucketResult, ListObjectsOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/list_objects_v2.ts';
-import type { UploadPartOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/upload_part.ts';
-import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/36a2a22afd5b5d47f8bb7737ad37c4f8d4cc5e65/common/r2/r2.ts';
+import { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/bytes.ts';
+import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/get_head_object.ts';
+import type { PutObjectOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/put_object.ts';
+import type { AwsCallContext, CompletedPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/r2.ts';
+import type { ListBucketResult, ListObjectsOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/list_objects_v2.ts';
+import type { UploadPartOpts } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/upload_part.ts';
+import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.githubusercontent.com/skymethod/denoflare/7314a1c723e6117d5e28313fa724bfbc62079faa/common/r2/r2.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { Blobs, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from './blobs.ts';
