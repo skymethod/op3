@@ -220,9 +220,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                             // save to DO for retrying later, try to avoid Queues altogether here in case the entire system is down
                             try {
                                 await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
-                                consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`)
-                            } catch (e) {
-                                throw new Error(`Error saving for later (colo=${colo}): ${e.message}`);
+                                consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`);
+                            } catch (e2) {
+                                throw new Error(`Error saving for later (colo=${colo}): ${e2.message} queue2.send error: ${e.stack || e}`);
                             }
                         }
                     }
