@@ -146,6 +146,7 @@ async function getHmacKeyForMonth(month: string, kvNamespace: KVNamespace, cache
     if (key) return key;
     const cached = await getCachedString(`redirects-hmac-${month}`, kvNamespace, cache);
     if (!cached) throw new Error(`Key not found for month ${month}`);
+    if (!/^[0-9a-f]{128}$/.test(cached)) throw new Error(`Invalid key found for month ${month}`);
     key = await importHmacKey(Bytes.ofHex(cached));
     hmacKeys.set(month, key);
     return key;
