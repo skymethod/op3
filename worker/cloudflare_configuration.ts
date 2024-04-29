@@ -1,5 +1,5 @@
 import { Configuration } from './configuration.ts';
-import { KVNamespace } from './deps.ts';
+import { CfCache, KVNamespace } from './deps.ts';
 import { executeWithRetries } from './sleep.ts';
 
 export class CloudflareConfiguration implements Configuration {
@@ -23,6 +23,20 @@ export class CloudflareConfiguration implements Configuration {
         }, { tag: 'cc.kv.get-obj', maxRetries: 3, isRetryable });
     }
 
+}
+
+export async function getCachedString(key: string, namespace: KVNamespace, cache: CfCache): Promise<string | undefined> {
+    const cacheKey = `http://op3.com/_kvcache/${key}`; // must be a valid hostname, but never routable to avoid conflicts with worker fetch
+    const res = await cache.match(cacheKey);
+    if (res) return await res.text();
+    const val = await executeWithRetries(async () => {
+        const value = await namespace.get(name);
+        return typeof value === 'string' ? value : undefined;
+    }, { tag: 'cc.kv.get', maxRetries: 3, isRetryable });
+    if (typeof val === 'string') {
+        await cache.put(cacheKey, new Response(val));
+    }
+    return val;
 }
 
 //

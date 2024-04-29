@@ -77,6 +77,18 @@ interface Redirect {
     readonly hasXForwardedFor: boolean;
     readonly ipAddressShape: string;
     readonly ipAddressVersion: 0 | 4 | 6;
+    readonly errors: string[];
+    readonly asn?: number;
+    readonly apVersion?: number;
+    readonly cfVersion?: number;
+    readonly dwVersion?: number;
+    readonly timeUuid?: string; // <instant>-<uuid>
+    readonly botType?: string;
+    readonly hashedIpAddress?: string;
+    readonly hashedIpAddressForDownload?: string;
+    readonly audienceIdDownloadId?: string; // <audienceid>-<downloadid>
+    readonly audienceIdDownloadId2?: string; // <audienceid>-<downloadid>
+    readonly agentTypeAgentName?: string; // <agentType>-<agentName>
 }
 
 export interface ValidRedirect extends Redirect {

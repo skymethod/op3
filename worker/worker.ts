@@ -1,5 +1,5 @@
 import { computeOther, computeRawIpAddress, tryComputeColo } from './cloudflare_request.ts';
-import { CfGlobalCaches, ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
+import { CfCache, CfGlobalCaches, ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
@@ -19,7 +19,6 @@ import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
 import { consoleError, consoleWarn, writeTraceEvent } from './tracer.ts';
-import { computeChainDestinationHostname } from './chain_estimate.ts';
 import { initCloudflareTracer, setWorkerInfo } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
@@ -37,6 +36,7 @@ import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
 export { BackendDO } from './backend/backend_do.ts';
 import { sendWithRetries } from './queues.ts';
+import { computeRedirectTraceEvent } from './redirect_trace_events.ts';
 
 export default {
     
@@ -48,11 +48,12 @@ export default {
             const colo = tryComputeColo(request);
             setWorkerInfo({ colo: colo ?? 'XXX', name: 'eyeball' });
 
-            if (!banlist) banlist = new Banlist(env.kvNamespace, (globalThis.caches as unknown as CfGlobalCaches).default);
+            const cache = (globalThis.caches as unknown as CfGlobalCaches).default;
+            if (!banlist) banlist = new Banlist(env.kvNamespace, cache);
         
             // first, handle redirects - the most important function
             // be careful here: must never throw
-            const redirectResponse = await tryComputeRedirectResponse(request, { env, context, requestTime });
+            const redirectResponse = await tryComputeRedirectResponse(request, { env, context, requestTime, cache });
             if (redirectResponse) return redirectResponse;
 
             // handle all other requests
@@ -174,12 +175,12 @@ export default {
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
 
-async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number }): Promise<Response | undefined> {
+async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number, cache: CfCache }): Promise<Response | undefined> {
     // must never throw!
     const redirectRequest = tryParseRedirectRequest(request.url);
     if (!redirectRequest) return undefined;
 
-    const { env, context, requestTime } = opts;
+    const { env, context, requestTime, cache } = opts;
     const rawRedirects = pendingRawRedirects.splice(0);
 
     // ban check is the only awaited thing, it needs to be in the direct line of the response
@@ -188,10 +189,11 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
 
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
-        const { backendNamespace } = env;
+        const { backendNamespace, kvNamespace } = env;
         const { method } = request;
         let colo = 'XXX';
         let rawIpAddress = '';
+        let validRawRedirect: RawRedirect | undefined;
         try {
             IsolateId.log();
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
@@ -204,6 +206,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                 rawRedirects.push(rawRedirect);
+                validRawRedirect = rawRedirect;
             }
             
             if (rawRedirects.length > 0) {
@@ -242,18 +245,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 return { kind: 'error-saving-redirect', colo, error: `${e.stack || e}`, country, uuids: rawRedirects.map(v => v.uuid) };
             });
         } finally {
-            writeTraceEvent(() => {
-                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-                const { url, headers } = request;
-                const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
-                const userAgent = headers.get('user-agent') ?? '<missing>';
-                const referer = headers.get('referer') ?? '<missing>';
-                const hasForwarded = headers.has('forwarded');
-                const hasXForwardedFor = headers.has('x-forwarded-for');
-                const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
-                const ipAddressVersion = /^n{1,3}\.n{1,3}\.n{1,3}\.n{1,3}$/.test(ipAddressShape) ? 4 : ipAddressShape.includes(':') ? 6 : 0;
-                return { kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect', colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor, ipAddressShape, ipAddressVersion };
-            });
+            writeTraceEvent(await computeRedirectTraceEvent({ request, redirectRequest, validRawRedirect, rawIpAddress, banned, cache, kvNamespace }));
         }
     })());
     if (banned) {
