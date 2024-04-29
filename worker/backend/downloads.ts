@@ -20,6 +20,19 @@ import { queryPackedRedirectLogsFromHits } from './hits_common.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { isValidPartition } from './show_controller_model.ts';
 
+export function computeAgentInfo({ userAgent, referer }: { userAgent: string | undefined, referer: string | undefined }) {
+    const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
+    const agentType = result?.type === 'library' && result.category === 'bot' ? 'bot-library' : (result?.type ?? 'unknown');
+    const agentName = result?.name ?? userAgent;
+    const deviceType = result?.device?.category;
+    const deviceName = result?.device?.name;
+    const referrerUrl = result?.type === 'browser' && referer ? tryParseUrl(referer) : undefined;
+    const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
+    const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referrerUrl ? (findPublicSuffix(referrerUrl, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
+    const isWebWidget = referrerUrl && isWebWidgetHostname(referrerUrl.hostname);
+    return { agentType, agentName, deviceType, deviceName, referrerType, referrerName, isWebWidget };
+}
+
 // phase 1: query crl for an hour's worth of hits, save one hourly downloads blob (unassigned to shows)
 export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClient, maxQueries, querySize, maxHits, target = DoNames.combinedRedirectLog, hitsBlobs }: { statsBlobs: Blobs, rpcClient: RpcClient, maxQueries: number, querySize: number, maxHits: number, target?: string, hitsBlobs?: Blobs }) {
     const start = Date.now();
@@ -81,18 +94,11 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             }
             // TODO: do the ip tagging here
             const time = timestampToInstant(timestamp);
-            const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
-            const agentType = result?.type === 'library' && result.category === 'bot' ? 'bot-library' : (result?.type ?? 'unknown');
-            const agentName = result?.name ?? userAgent;
-            const deviceType = result?.device?.category;
-            const deviceName = result?.device?.name;
-            const referrerUrl = result?.type === 'browser' && referer ? tryParseUrl(referer) : undefined;
-            const referrerType = result?.type === 'browser' ? (result?.referrer?.category ?? (referer ? 'domain' : undefined)) : undefined;
-            const referrerName = result?.type === 'browser' ? (result?.referrer?.name ?? (referrerUrl ? (findPublicSuffix(referrerUrl, 1) ?? `unknown:[${referer}]`) : undefined)) : undefined;
+            const { agentType, agentName, deviceType, deviceName, referrerType, referrerName, isWebWidget } = computeAgentInfo({ userAgent, referer });
             let tags = isFirstTwoBytes ? 'first-two' : undefined;
             const streaming = typeof xpsId === 'string' && xpsId !== '' || agentName === 'AppleCoreMedia';
             if (streaming) tags = (tags ? `${tags},streaming` : 'streaming');
-            if (referrerUrl && isWebWidgetHostname(referrerUrl.hostname)) tags = (tags ? `${tags},web-widget` : 'web-widget');
+            if (isWebWidget) tags = (tags ? `${tags},web-widget` : 'web-widget');
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
             chunks.push(encoder.encode(line));

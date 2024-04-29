@@ -88,7 +88,12 @@ interface Redirect {
     readonly hashedIpAddressForDownload?: string;
     readonly audienceIdDownloadId?: string; // <audienceid>-<downloadid>
     readonly audienceIdDownloadId2?: string; // <audienceid>-<downloadid>
-    readonly agentTypeAgentName?: string; // <agentType>-<agentName>
+    readonly agentTypeAgentName?: string; // <agentType>-<agentName> // maxtype: bot-library
+    readonly deviceTypeDeviceName?: string; // <deviceType>-<deviceName> // maxtype: smart_speaker
+    readonly referrerTypeReferrerName?: string; // <referrerType>-<referrerName> // maxtype: host
+    readonly regionCodeRegionName?: string; // <regionCode>-<regionName>  // code: [0-9A-Z]{1,3}  maxname: Administrative-Territorial Units of the Left Bank of the Dniester
+    readonly timezone?: string, // max: America/Argentina/Buenos_Aires
+    readonly metroCode?: string, // [0-9]{3}
 }
 
 export interface ValidRedirect extends Redirect {

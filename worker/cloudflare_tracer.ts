@@ -27,16 +27,16 @@ function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineEvent {
         return { blobs: [ kind, colo, trim(error), country, trim(uuids.join(',')) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'valid-redirect' || kind === 'invalid-redirect' || kind === 'banned-redirect') {
         const { colo, url, country, destinationHostname, userAgent, referer, hasForwarded, hasXForwardedFor, ipAddressShape, ipAddressVersion, errors, asn = 0, apVersion = 0, cfVersion = 0, dwVersion = 0, timeUuid = null, botType = null, hashedIpAddress = null, hashedIpAddressForDownload = null, 
-            audienceIdDownloadId = null, audienceIdDownloadId2 = null, agentTypeAgentName = null } = event;
+            audienceIdDownloadId = null, audienceIdDownloadId2 = null, agentTypeAgentName = null, deviceTypeDeviceName = null, referrerTypeReferrerName = null, regionCodeRegionName = null, timezone = null, metroCode = null } = event;
         const bits = (hasForwarded ? 1 : 0) | (hasXForwardedFor ? 2 : 0);
         const errorCount = errors.length;
         const errorsOrIpAddressShape = errorCount > 0 ? errors.join(',') : trim(ipAddressShape);
-        // TODO disable v1 when v2 done
-        if (kind !== undefined) return { blobs: [ kind, colo, trim(url), country, trim(destinationHostname), trim(userAgent), trim(referer), trim(ipAddressShape) ], doubles: [ 1, bits, ipAddressVersion ], indexes: [ kind ] }; // version 1
+        // if (kind !== undefined) return { blobs: [ kind, colo, trim(url), country, trim(destinationHostname), trim(userAgent), trim(referer), trim(ipAddressShape) ], doubles: [ 1, bits, ipAddressVersion ], indexes: [ kind ] }; // version 1
         return { blobs: [ 
             kind, colo, trim(url), country, trim(destinationHostname),
             trim(userAgent), trim(referer), errorsOrIpAddressShape, timeUuid, botType,
             hashedIpAddress, hashedIpAddressForDownload, audienceIdDownloadId, audienceIdDownloadId2, agentTypeAgentName,
+            deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode,
         ], doubles: [
             2, bits, ipAddressVersion, errorCount, asn,
             apVersion, cfVersion, dwVersion,
