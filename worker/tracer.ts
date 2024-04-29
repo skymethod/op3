@@ -90,7 +90,7 @@ interface Redirect {
     readonly audienceIdDownloadId2?: string; // <audienceid>-<downloadid>
     readonly agentTypeAgentName?: string; // <agentType>-<agentName> // maxtype: bot-library maxname: (312) Mozilla/5.0 (Linux armv7l) AppleWebKit/602.1.28+ (KHTML, like Gecko) Version/9.1 Safari/601.5.17 WPE/2.22.1, VirginMedia_STB_/VIP5002W-mon-web-03.02-169-ac-AL-20230513204624-na001 (Arris_liberty,VIP5002W-PRD,Wireless) HZN/5.04 (MN=VIP5002W-PRD;PC=APLSTB;FV=VIP5002W-mon-web-03.02-169-ac-AL-20230513204624-na001;)
     readonly deviceTypeDeviceName?: string; // <deviceType>-<deviceName> // maxtype: smart_speaker   maxname: Amazon Smart Speaker
-    readonly referrerTypeReferrerName?: string; // <referrerType>-<referrerName> // maxtype: host  maxname: (unlimited) unknown:[http://localhost:...]
+    readonly referrerTypeReferrerName?: string; // <referrerType>-<referrerName> // maxtype: domain  maxname: (unlimited) unknown:[http://localhost:...]
     readonly regionCodeRegionName?: string; // <regionCode>-<regionName>  // code: [0-9A-Z]{1,3}  maxname: Administrative-Territorial Units of the Left Bank of the Dniester
     readonly timezone?: string, // max: America/Argentina/Buenos_Aires
     readonly metroCode?: string, // [0-9]{3}

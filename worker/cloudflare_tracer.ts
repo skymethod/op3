@@ -28,8 +28,8 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
         const { colo, country, hasForwarded, hasXForwardedFor, ipAddressShape, ipAddressVersion, errors, asn = 0, apVersion = 0, cfVersion = 0, dwVersion = 0, timeUuid = null, botType = null, hashedIpAddress = null, hashedIpAddressForDownload = null, 
             audienceIdDownloadId = null, audienceIdDownloadId2 = null, deviceTypeDeviceName = null, regionCodeRegionName = null, timezone = null, metroCode = null } = event;
         let { url, destinationHostname, userAgent, referer, agentTypeAgentName = null, referrerTypeReferrerName = null } = event;
-        if (typeof referer === 'string' && typeof referrerTypeReferrerName === 'string' && referrerTypeReferrerName.length > (4 + 1 + 1024)) {
-            referrerTypeReferrerName = referrerTypeReferrerName.substring(0, 4 + 1 + 1024);
+        if (typeof referer === 'string' && typeof referrerTypeReferrerName === 'string' && referrerTypeReferrerName.length > (6 + 1 + 1024)) {
+            referrerTypeReferrerName = referrerTypeReferrerName.substring(0, 6 + 1 + 1024);
         }
         if (typeof userAgent === 'string' && userAgent.length > 1024 && typeof agentTypeAgentName === 'string' && agentTypeAgentName.includes(userAgent)) {
             agentTypeAgentName = agentTypeAgentName.replace(userAgent, trim(userAgent));

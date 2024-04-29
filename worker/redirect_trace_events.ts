@@ -59,7 +59,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     const { agentType, agentName, deviceType, deviceName, referrerType, referrerName, isWebWidget } = computeAgentInfo({ userAgent, referer });
     const agentTypeAgentName = `${agentType.padEnd(11, ' ')}-${agentName ?? ''}`;
     const deviceTypeDeviceName = deviceType ? `${deviceType.padEnd(13, ' ')}-${deviceName ?? ''}` : undefined;
-    const referrerTypeReferrerName = referrerType ? `${referrerType.padEnd(4, ' ')}-${referrerName ?? ''}` : undefined;
+    const referrerTypeReferrerName = referrerType ? `${referrerType.padEnd(6, ' ')}-${referrerName ?? ''}` : undefined;
     const regionCodeRegionName = regionCode ? `${regionCode.padEnd(3, ' ')}-${region ?? ''}` : undefined;
     if (validRawRedirect) {
         const { time, uuid } = validRawRedirect;
