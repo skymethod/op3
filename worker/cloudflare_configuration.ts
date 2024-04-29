@@ -30,7 +30,7 @@ export async function getCachedString(key: string, namespace: KVNamespace, cache
     const res = await cache.match(cacheKey);
     if (res) return await res.text();
     const val = await executeWithRetries(async () => {
-        const value = await namespace.get(name);
+        const value = await namespace.get(key);
         return typeof value === 'string' ? value : undefined;
     }, { tag: 'cc.kv.get', maxRetries: 3, isRetryable });
     if (typeof val === 'string') {

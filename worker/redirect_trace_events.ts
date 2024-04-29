@@ -2,7 +2,7 @@ import { parseApplePodcastsUserAgent } from './apple_podcasts_ua.ts';
 import { computeBotType } from './backend/bots.ts';
 import { computeAgentInfo } from './backend/downloads.ts';
 import { computeChainDestinationHostname, computeChainDestinationUrl } from './chain_estimate.ts';
-import { check, checkMatches, isValidInstant } from './check.ts';
+import { check, checkMatches, isValidInstant, } from './check.ts';
 import { computeServerUrl } from './client_params.ts';
 import { getCachedString } from './cloudflare_configuration.ts';
 import { computeOther } from './cloudflare_request.ts';
@@ -30,14 +30,16 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     function trySync<T>(error: string, fn: () => T): T | undefined {
         try {
             return fn();
-        } catch {
+        } catch (e) {
+            console.warn(`${e.stack || e}`);
             errors.push(error);
         }
     };
     async function tryAsync<T>(error: string, fn: () => Promise<T>): Promise<T | undefined> {
         try {
             return await fn();
-        } catch {
+        } catch (e) {
+            console.warn(`${e.stack || e}`);
             errors.push(error);
         }
     };
@@ -108,7 +110,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
         }
     }
     const result = trySync('apua', () => {
-        if (!userAgent || agentTypeAgentName !== 'app-Apple Podcasts') return undefined;
+        if (!userAgent || agentTypeAgentName !== 'app        -Apple Podcasts') return undefined;
         const result = parseApplePodcastsUserAgent(userAgent);
         if (result) {
             const { appVersion, cfVersion, dwVersion } = result;
@@ -129,9 +131,10 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
      };
 }
 
-export function packAppleVersion(version: string): number { // 0000.1111.2222 => 000011112222
-    const [ _, a, b, c ] = checkMatches('version', version, /^(\d{4})\.(\d{4})\.(\d{4})$/);
-    return parseInt(a) * 100000000 + parseInt(b) * 10000 + parseInt(c);
+export function packAppleVersion(version: string): number { // 0000.1111.2222.3333 => 0000111122223333
+    checkMatches('version', version, /^\d{4}(\.\d{4}){3}$/);
+    const parts = version.split('.');
+    return parts.reduce((prev, cur, i) => prev + parseInt(cur) * Math.pow(10, 4 * (parts.length - i - 1)), 0);
 }
 
 //
