@@ -40,7 +40,10 @@ export class RedirectLogController {
     }
 
     async saveForLater(rawRedirects: readonly RawRedirect[]): Promise<void> {
-        await this.storage.put(computeSaveForLaterKey(this.timestampSequence.next()), rawRedirects, { noCache: true });
+        const { storage, timestampSequence, colo } = this;
+        const timestampId = timestampSequence.next();
+        await storage.put(computeSaveForLaterKey(timestampId), rawRedirects, { noCache: true });
+        writeTraceEvent({ kind: 'generic', type: 'sfl', strings: [ colo, timestampId ], doubles: [ rawRedirects.length ] });
     }
 
     async save(rawRedirects: readonly RawRedirect[]): Promise<void> {
