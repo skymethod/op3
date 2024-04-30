@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@3120d7ee680dd4fc934c10f2e2734a703edba163 (2024-04-30T16:42:47Z)
+// from user-agents-v2@cef7b53b5a331f154654efd56918a5d3214592f8 (2024-04-30T22:59:46Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -57,6 +57,7 @@ const botTests = {
     'AwarioSmartBot/1.0 (+https://awario.com/bots.html; bots@awario.com)': { type: 'bot', name: `AwarioSmartBot` },
     'Baidu-YunGuanCe-SLABot(ce.baidu.com)': { type: 'bot', name: `Baidu` },
     'bbot/0.1': { type: 'bot', name: `bbot` },
+    'Beacon/1.0 Podcast Sync +https://getbeacons.com/': { type: 'bot', name: `Beacon Podcast Sync` },
     'bl.uk_ldfc_bot/3.4.0-20200518 ( http://www.bl.uk/aboutus/legaldeposit/websites/websites/faqswebmaster/index.html)': { type: 'bot', name: `British Library` },
     'Blubrry Migration Service': { type: 'bot', name: `Blubrry Migration Service` },
     'BullhornCrawler/unknown-version(+http://bullhorn.fm/)': { type: 'bot', name: `Bullhorn Crawler` },
@@ -97,11 +98,14 @@ const botTests = {
     'Feedfetcher-Google; (+http://www.google.com/feedfetcher.html; 1 subscribers; feed-id=4653447469100830145)': { type: 'bot', name: `Googlebot` },
     'google-xrawler': { type: 'bot', name: `Googlebot` },
     'Googlebot-News Audio': { type: 'bot', name: `Googlebot` },
+    'Google-Safety': { type: 'bot', name: `Googlebot` },
     'Gumball.fm Analytics Prefix Checker': { type: 'bot', name: `Gumball` },
     'Headliner/1.0.0 +https://headliner.app': { type: 'bot', name: `Headliner` },
     'Mozilla/5.0 (compatible; HubSpot Crawler; +https://www.hubspot.com)': { type: 'bot', name: `HubSpot Crawler` },
     'Mozilla/5.0 (compatible; special_archiver; Archive-It; http://archive-it.org/files/site-owners-special.html)': { type: 'bot', name: `Internet Archive` },
     'ia_archiver-web.archive.org': { type: 'bot', name: `Internet Archive` },
+    'IPFS Podcasting Node/0.6n (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
+    'IPFS Podcasting Node/0.7p,u,s (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
     'Jaunt/1.5': { type: 'bot', name: `Jaunt` },
     'Mozilla/5.0 (compatible; LAC_IAHarvester/3.3.0; +https://library-archives.canada.ca/eng/services/government-canada/web-social-media-preservation-program/Pages/web-archive.aspx)': { type: 'bot', name: `Library and Archives Canada` },
     'Libsyn4-Download': { type: 'bot', name: `Libsyn` },
@@ -170,6 +174,7 @@ const botTests = {
     'Timpibot/0.8 ( http://www.timpi.io)': { type: 'bot', name: `Timpi search crawler` },
     'Tiny Tiny RSS/22.12-c30b24d09 (Unsupported) (https://tt-rss.org/)': { type: 'bot', name: `Tiny Tiny RSS` },
     'Transistor.fm/1.0': { type: 'bot', name: `Transistor` },
+    'Triton Digital Podcast Sync': { type: 'bot', name: `Triton Digital Podcast Sync` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },

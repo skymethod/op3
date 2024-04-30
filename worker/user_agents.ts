@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@3120d7ee680dd4fc934c10f2e2734a703edba163 (2024-04-30T16:42:47Z)
+// from user-agents-v2@cef7b53b5a331f154654efd56918a5d3214592f8 (2024-04-30T22:59:46Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -44,6 +44,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Barkrowler\//.test(userAgent)) return { name: `Babbar`, type: 'bot' };
     if (/\(ce\.baidu\.com/.test(userAgent)) return { name: `Baidu`, type: 'bot' };
     if (/^bbot\//.test(userAgent)) return { name: `bbot`, type: 'bot' };
+    if (/^Beacon\/\d/.test(userAgent)) return { name: `Beacon Podcast Sync`, type: 'bot' };
     if (/^bl\.uk_ldfc_bot/.test(userAgent)) return { name: `British Library`, type: 'bot' };
     if (/^Blubrry Migration Service/.test(userAgent)) return { name: `Blubrry Migration Service`, type: 'bot' };
     if (/^BullhornCrawler\//.test(userAgent)) return { name: `Bullhorn Crawler`, type: 'bot' };
@@ -77,11 +78,12 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Mediapartners-Google/.test(userAgent)) return { name: `Google Adsense Bot`, type: 'bot' };
     if (/AdsBot-Google/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
-    if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feedfetcher-Google|google-xrawler|^Googlebot-News/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
+    if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feedfetcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
     if (/^Headliner\/.*\+https:\/\/headliner\.app$/.test(userAgent)) return { name: `Headliner`, type: 'bot' };
     if (/HubSpot Crawler/.test(userAgent)) return { name: `HubSpot Crawler`, type: 'bot' };
     if (/Archive-It;|web\.archive\.org/.test(userAgent)) return { name: `Internet Archive`, type: 'bot' };
+    if (/^IPFS Podcasting Node\//.test(userAgent)) return { name: `IPFS Podcasting Node`, type: 'bot' };
     if (/^Jaunt\//.test(userAgent)) return { name: `Jaunt`, type: 'bot' };
     if (/INA dlweb/.test(userAgent)) return { name: `l'Institut national de l'audiovisuel`, type: 'bot' };
     if (/LAC_IAHarvester\//.test(userAgent)) return { name: `Library and Archives Canada`, type: 'bot' };
@@ -155,6 +157,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Tiny Tiny RSS\//.test(userAgent)) return { name: `Tiny Tiny RSS`, type: 'bot' };
     if (/^Transistor\.fm\//.test(userAgent)) return { name: `Transistor`, type: 'bot' };
     if (/TrendsmapResolver\//.test(userAgent)) return { name: `Trendsmap Resolver`, type: 'bot' };
+    if (/^Triton Digital Podcast Sync$/.test(userAgent)) return { name: `Triton Digital Podcast Sync`, type: 'bot' };
     if (/Twingly Recon;/.test(userAgent)) return { name: `Twingly Bot`, type: 'bot' };
     if (/^Twitterbot/.test(userAgent)) return { name: `Twitterbot`, type: 'bot' };
     if (/^Typhoeus/.test(userAgent)) return { name: `Typhoeus`, type: 'bot' };
