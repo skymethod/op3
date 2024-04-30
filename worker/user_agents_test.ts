@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@11e6945b1607466e236fd326edb8ade5ad416491 (2024-04-19T19:58:14Z)
+// from user-agents-v2@3120d7ee680dd4fc934c10f2e2734a703edba163 (2024-04-30T16:42:47Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -59,6 +59,7 @@ const botTests = {
     'bbot/0.1': { type: 'bot', name: `bbot` },
     'bl.uk_ldfc_bot/3.4.0-20200518 ( http://www.bl.uk/aboutus/legaldeposit/websites/websites/faqswebmaster/index.html)': { type: 'bot', name: `British Library` },
     'Blubrry Migration Service': { type: 'bot', name: `Blubrry Migration Service` },
+    'BullhornCrawler/unknown-version(+http://bullhorn.fm/)': { type: 'bot', name: `Bullhorn Crawler` },
     'Buzzsprout Importer': { type: 'bot', name: `Buzzsprout Importer` },
     'Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)': { type: 'bot', name: `Bytespider.*bytedance` },
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },

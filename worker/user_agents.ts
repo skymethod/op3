@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@11e6945b1607466e236fd326edb8ade5ad416491 (2024-04-19T19:58:14Z)
+// from user-agents-v2@3120d7ee680dd4fc934c10f2e2734a703edba163 (2024-04-30T16:42:47Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -46,6 +46,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^bbot\//.test(userAgent)) return { name: `bbot`, type: 'bot' };
     if (/^bl\.uk_ldfc_bot/.test(userAgent)) return { name: `British Library`, type: 'bot' };
     if (/^Blubrry Migration Service/.test(userAgent)) return { name: `Blubrry Migration Service`, type: 'bot' };
+    if (/^BullhornCrawler\//.test(userAgent)) return { name: `Bullhorn Crawler`, type: 'bot' };
     if (/^Buzzsprout Importer/.test(userAgent)) return { name: `Buzzsprout Importer`, type: 'bot' };
     if (/Bytespider/.test(userAgent)) return { name: `Bytespider.*bytedance`, type: 'bot' };
     if (/^CastFeedValidator\//.test(userAgent)) return { name: `CastFeedValidator`, type: 'bot' };
