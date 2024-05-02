@@ -230,11 +230,13 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                         }
                     }
                 } catch (e) {
-                    consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`)
+                    consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`);
                 }
 
-                // send raw redirects the old way (for now)
-                await rpcClient.logRawRedirects({ rawRedirects }, doName);
+                // send raw redirects the old way, until the turndown time
+                if (requestTime < 1714748400000) { // Friday, May 3, 2024 15:00:00 gmt (10am central)
+                    await rpcClient.logRawRedirects({ rawRedirects }, doName);
+                }
             }
         } catch (e) {
             consoleError('worker-sending-redirects', `Error sending raw redirects: ${e.stack || e}`);
