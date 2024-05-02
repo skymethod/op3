@@ -56,10 +56,11 @@ export type TraceEvent =
     | AdminDataJob
     | Generic
     | StorageWrite
+    | HitsBatch
     ;
 
 export interface ErrorSavingRedirect {
-    readonly kind: 'error-saving-redirect',
+    readonly kind: 'error-saving-redirect';
     readonly colo: string;
     readonly error: string;
     readonly country: string;
@@ -97,24 +98,24 @@ interface Redirect {
 }
 
 export interface ValidRedirect extends Redirect {
-    readonly kind: 'valid-redirect',
+    readonly kind: 'valid-redirect';
 }
 
 export interface InvalidRedirect extends Redirect {
-    readonly kind: 'invalid-redirect',
+    readonly kind: 'invalid-redirect';
 }
 
 export interface BannedRedirect extends Redirect {
-    readonly kind: 'banned-redirect',
+    readonly kind: 'banned-redirect';
 }
 
 export interface ErrorComputingTraceEvent {
-    readonly kind: 'error-computing-trace-event',
+    readonly kind: 'error-computing-trace-event';
     readonly error: string;
 }
 
 export interface WorkerRequest {
-    readonly kind: 'worker-request',
+    readonly kind: 'worker-request';
     readonly colo: string;
     readonly pathname: string;
     readonly search: string;
@@ -126,7 +127,7 @@ export interface WorkerRequest {
 }
 
 export interface DurableObjectFetchRequest {
-    readonly kind: 'do-fetch',
+    readonly kind: 'do-fetch';
     readonly colo: string;
     readonly durableObjectName: string;
     readonly durableObjectId: string;
@@ -137,7 +138,7 @@ export interface DurableObjectFetchRequest {
 }
 
 export interface DurableObjectAlarmRequest {
-    readonly kind: 'do-alarm',
+    readonly kind: 'do-alarm';
     readonly colo: string;
     readonly durableObjectName: string;
     readonly durableObjectId: string;
@@ -146,25 +147,25 @@ export interface DurableObjectAlarmRequest {
 }
 
 export interface ConsoleInfo {
-    readonly kind: 'console-info',
+    readonly kind: 'console-info';
     readonly spot: string;
     readonly message: string;
 }
 
 export interface ConsoleWarning {
-    readonly kind: 'console-warning',
+    readonly kind: 'console-warning';
     readonly spot: string;
     readonly message: string;
 }
 
 export interface ConsoleError {
-    readonly kind: 'console-error',
+    readonly kind: 'console-error';
     readonly spot: string;
     readonly message: string;
 }
 
 export interface AdminDataJob {
-    readonly kind: 'admin-data-job',
+    readonly kind: 'admin-data-job';
     readonly colo: string;
     readonly messageId: string;
     readonly messageInstant: string;
@@ -178,15 +179,21 @@ export interface AdminDataJob {
 }
 
 export interface Generic {
-    readonly kind: 'generic',
+    readonly kind: 'generic';
     readonly type: string;
     readonly strings?: string[];
     readonly doubles?: number[];
 }
 
 export interface StorageWrite {
-    readonly kind: 'storage-write',
+    readonly kind: 'storage-write';
     readonly durableObjectName: string;
     readonly spot: string;
     readonly alarms?: number;
+}
+
+export interface HitsBatch {
+    readonly kind: 'hits-batch';
+    readonly strings: string[];
+    readonly doubles: number[];
 }

@@ -97,6 +97,9 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
     } else if (kind === 'storage-write') {
         const { durableObjectName, spot, alarms = 0 } = event;
         return { blobs: [ kind, durableObjectName, spot ], doubles: [ alarms ], indexes: [ kind ] };
+    } else if (kind === 'hits-batch') {
+        const { strings, doubles } = event;
+        return { blobs: [ kind, ...strings ], doubles, indexes: [ kind ] };
     } else {
         throw new Error(`CloudflareTracer: Unsupported kind: ${kind}`);
     }
