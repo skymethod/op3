@@ -117,7 +117,7 @@ function checkSearchPodcastsByTermResponse(obj: unknown): obj is SearchPodcastsB
 export interface Feed {
     readonly id: number;
     readonly title: string;
-    readonly author: string;
+    readonly author: string | null;
     readonly ownerName: string;
     readonly url: string; // feed url
     readonly originalUrl: string; // feed url
@@ -131,7 +131,7 @@ function checkFeed(obj: unknown): obj is Feed {
     const { id, title, author, ownerName, url, originalUrl, image, artwork } = obj;
     if (typeof id !== 'number') throw new StatusError(`Unexpected id: ${JSON.stringify(id)}`);
     if (typeof title !== 'string') throw new StatusError(`Unexpected title: ${JSON.stringify(title)}`);
-    if (typeof author !== 'string') throw new StatusError(`Unexpected author: ${JSON.stringify(author)}`);
+    if (!(author === null || typeof author === 'string')) throw new StatusError(`Unexpected author: ${JSON.stringify(author)}`);
     if (typeof ownerName !== 'string') throw new StatusError(`Unexpected ownerName: ${JSON.stringify(ownerName)}`);
     if (typeof url !== 'string') throw new StatusError(`Unexpected url: ${JSON.stringify(url)}`);
     if (typeof originalUrl !== 'string') throw new StatusError(`Unexpected originalUrl: ${JSON.stringify(originalUrl)}`);
