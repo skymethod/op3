@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@cef7b53b5a331f154654efd56918a5d3214592f8 (2024-04-30T22:59:46Z)
+// from user-agents-v2@ae9bfd3978ae585ba865ba7a56f974dba5cade48 (2024-05-06T15:24:24Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -54,6 +54,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Castopod\/\d/.test(userAgent)) return { name: `Castopod`, type: 'bot' };
     if (/^Trackable\//.test(userAgent)) return { name: `Chartable`, type: 'bot' };
     if (/^clark-crawler2/.test(userAgent)) return { name: `Clark-Crawler, unknown`, type: 'bot' };
+    if (/ClaudeBot\//.test(userAgent)) return { name: `Claudebot`, type: 'bot' };
     if (/^Podcast-CriticalMention\//.test(userAgent)) return { name: `Critical Mention`, type: 'bot' };
     if (/^curl|^libcurl\/|^PycURL\/| curl\//.test(userAgent)) return { name: `curl`, type: 'bot' };
     if (/DataForSeoBot\//.test(userAgent)) return { name: `DataforSEO`, type: 'bot' };
@@ -371,8 +372,11 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^FreeMusicPlusFree\//.test(userAgent)) return { name: `FreeMusicPlusFree`, type: 'app' };
     if (/^FrequencePlus\//.test(userAgent)) return { name: `Fréquence Plus`, type: 'app' };
     if (/^GaanaAndroid-|^Gaana-iOS|^Gaana\//.test(userAgent)) return { name: `Gaana`, type: 'app' };
-    if (/^Garmin fenix 5X Plus/.test(userAgent)) return { name: `Garmin fenix 5X`, type: 'app' };
+    if (/^Garmin fenix /.test(userAgent)) return { name: `Garmin fenix`, type: 'app' };
     if (/^Garmin Forerunner/.test(userAgent)) return { name: `Garmin Forerunner`, type: 'app' };
+    if (/^Garmin tactix/.test(userAgent)) return { name: `Garmin tactix`, type: 'app' };
+    if (/^Garmin Venu /.test(userAgent)) return { name: `Garmin Venu`, type: 'app' };
+    if (/^Garmin v/.test(userAgent)) return { name: `Garmin Vivoactive`, type: 'app' };
     if (/^GBEngine\//.test(userAgent)) return { name: `GBEngine`, type: 'app' };
     if (/^GMB Show\//.test(userAgent)) return { name: `GMB Show`, type: 'app' };
     if (/^Godster\//.test(userAgent)) return { name: `Godster`, type: 'app' };
@@ -485,6 +489,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^MusicBee/.test(userAgent)) return { name: `MusicBee`, type: 'app' };
     if (/^Music%20Download\//.test(userAgent)) return { name: `Music Download App`, type: 'app' };
     if (/^myTuner Radio app\/|^myTuner%20Radio%20app\/|^mytuner_podcasts_androidplayer\/|^MyTuner-|^myTuner$|^myTuneriOS%20Free\//.test(userAgent)) return { name: `MyTuner`, type: 'app' };
+    if (/^NetNewsWire/.test(userAgent)) return { name: `NetNewsWire`, type: 'app' };
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
     if (/^NPR\/|^NPR%20One\/|^NPROneAndroid|nprone_android\//.test(userAgent)) return { name: `NPR`, type: 'app' };
@@ -571,6 +576,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS Sportbladet Hermes\//.test(userAgent)) return { name: `Sportbladet iOS app`, type: 'app' };
     if (/^Spotify\/.+Linux|Macintosh.+Spotify\/|^Spotify\/.+OSX|Windows.+Spotify\/|^Spotify\/.+Win32|^Spotify\/.+Android|^Spotify\/.+iOS|^Spotify\/.+Polestar|^Spotify\/.+Volvo|^spotify_|^Spotify-Lite|^Spotify\/\d/.test(userAgent)) return { name: `Spotify`, type: 'app' };
     if (/(^Spreaker for Android|Spreaker\/)/.test(userAgent)) return { name: `Spreaker`, type: 'app' };
+    if (/^Sprewell\//.test(userAgent)) return { name: `Sprewell`, type: 'app' };
     if (/Android SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad Android app`, type: 'app' };
     if (/iOS SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad iOS app`, type: 'app' };
     if (/^Stitcher\/|^Stitcher Demo\/|^AlexaMediaPlayer\/Stitcher/.test(userAgent)) return { name: `Stitcher`, type: 'app' };
@@ -682,6 +688,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Firefox\/|(Android|iPhone|iPad).*Focus\/| FxiOS\//.test(userAgent)) return { name: `Firefox`, type: 'browser' };
     if (/MSIE | Trident\//.test(userAgent)) return { name: `Internet Explorer`, type: 'browser' };
     if (/^NCSA Mosaic\//.test(userAgent)) return { name: `NCSA Mosaic`, type: 'browser' };
+    if (/^DuckDuckGo/.test(userAgent)) return { name: `DuckDuckGo`, type: 'browser' };
     if (/Macintosh.*AppleWebKit.*Safari\/|Windows.*AppleWebKit.*Safari\/|iPhone.*AppleWebKit.*Safari\/|iPad.*AppleWebKit.*Safari\/|^MobileSafari\/|^Safari\//.test(userAgent)) return { name: `Safari`, type: 'browser' };
     if (/Mozilla\/5\.0 \([A-Za-z ]+; CPU( iPhone)? OS [\d_]+ like Mac OS X\) AppleWebKit\/[\d.]+ \(KHTML, like Gecko\) Mobile\/[0-9A-Z]{6,}/.test(userAgent)) return { name: `iOS WebView`, type: 'browser' };
 }
@@ -704,7 +711,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON|^Denon;DENON-DWHS|^Storybutton\//.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
     if (/Lavf\/|desktop|Linux|linux|VLC|^okhttp\/|CastBox\//.test(userAgent)) return { name: `Other Computer`, type: 'device', category: 'computer' };
     if (/tablet|Tablet/.test(userAgent)) return { name: `Other Tablet`, type: 'device', category: 'mobile' };
-    if (/watch|Watch/.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };
+    if (/watch|Watch|^Garmin /.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };
     if (/Player FM$|^Podkicker\/|spotify_unknown|^Castro|^Swoot Agent| KAIOS\/|^Zune\/|^PodcastGuru |^Pocket Casts$|^AmazonMusic$|RTL\+/.test(userAgent)) return { name: `Other Mobile Device`, type: 'device', category: 'mobile' };
 }
 

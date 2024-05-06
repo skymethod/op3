@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@cef7b53b5a331f154654efd56918a5d3214592f8 (2024-04-30T22:59:46Z)
+// from user-agents-v2@ae9bfd3978ae585ba865ba7a56f974dba5cade48 (2024-05-06T15:24:24Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -66,6 +66,7 @@ const botTests = {
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
+    'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)': { type: 'bot', name: `Claudebot` },
     'Podcast-CriticalMention/1.0': { type: 'bot', name: `Critical Mention` },
     'libcurl/7.65.1': { type: 'bot', name: `curl` },
     'PycURL/7.43.0 libcurl/7.47.0 GnuTLS/3.4.10 zlib/1.2.8 libidn/1.32 librtmp/2.3': { type: 'bot', name: `curl` },
@@ -482,8 +483,13 @@ const appTests = {
     'GaanaAndroid-8.13.0/Dalvik/2.1.0 (Linux; U; Android 5.1; Micromax P701 Build/LMY47D)': { type: 'app', name: `Gaana` },
     'Gaana-iOS': { type: 'app', name: `Gaana` },
     'Gaana/1768 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Gaana` },
-    'Garmin fenix 5X Plus/18.0': { type: 'app', name: `Garmin fenix 5X` },
+    'Garmin fenix 5X Plus/18.0': { type: 'app', name: `Garmin fenix` },
+    'Garmin fenix 6 Pro/26.0': { type: 'app', name: `Garmin fenix` },
+    'Garmin fenix 6X Sapphire/26.0': { type: 'app', name: `Garmin fenix` },
     'Garmin Forerunner 245 Music/11.60': { type: 'app', name: `Garmin Forerunner` },
+    'Garmin tactix Delta/26.0': { type: 'app', name: `Garmin tactix` },
+    'Garmin Venu 2S/17.4': { type: 'app', name: `Garmin Venu` },
+    'Garmin vivoactive 3 Music/6.30': { type: 'app', name: `Garmin Vivoactive` },
     'GBEngine/1.2 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `GBEngine` },
     'GMB Show/1.2.0 (iPad; iOS 9.3.2; Scale/2.00)': { type: 'app', name: `GMB Show` },
     'Godster/2.0.6 (Linux;Android 9) ExoPlayerLib/2.8.3': { type: 'app', name: `Godster` },
@@ -673,6 +679,7 @@ const appTests = {
     'MyTuner-ExoPlayerAdapter': { type: 'app', name: `MyTuner` },
     'myTuner': { type: 'app', name: `MyTuner` },
     'myTuneriOS%20Free/120 CFNetwork/1402.0.8 Darwin/22.2.0': { type: 'app', name: `MyTuner` },
+    'NetNewsWire (RSS Reader; https://netnewswire.com/)': { type: 'app', name: `NetNewsWire` },
     'Newsboat/2.29.0 (Linux x86_64)': { type: 'app', name: `Newsboat` },
     'Newsly': { type: 'app', name: `Newsly` },
     'NPR%20One/234 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `NPR` },
@@ -817,6 +824,7 @@ const appTests = {
     'Spotify/4.3.2.0 Polestar/30 (Polestar)': { type: 'app', name: `Spotify` },
     'Spotify/4.3.2.0 Volvo/30 (Volvo)': { type: 'app', name: `Spotify` },
     'Spotify/8.7.76.359 SM-R870/30 (SM-R870)': { type: 'app', name: `Spotify` },
+    'Sprewell/101 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'app', name: `Sprewell` },
     'Android SA Hermes/1000094692 _app_': { type: 'app', name: `Stavanger Aftenblad Android app` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS SA Hermes/90.0.0 _app_': { type: 'app', name: `Stavanger Aftenblad iOS app` },
     'Stitcher Demo/4.8.0 (Linux;Android 11) ExoPlayerLib/2.10.7': { type: 'app', name: `Stitcher` },
@@ -992,6 +1000,7 @@ const browserTests = {
     'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)': { type: 'browser', name: `Internet Explorer` },
     'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko': { type: 'browser', name: `Internet Explorer` },
     'NCSA Mosaic/1.0 (X11;SunOS 4.1.4 sun4m)': { type: 'browser', name: `NCSA Mosaic` },
+    'DuckDuckGo/3 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'browser', name: `DuckDuckGo` },
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15': { type: 'browser', name: `Safari` },
     'MobileSafari/604.1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'browser', name: `Safari` },
     'Safari/18614.4.6.1.6 CFNetwork/1404.0.5 Darwin/22.3.0': { type: 'browser', name: `Safari` },
