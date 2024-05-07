@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@ae9bfd3978ae585ba865ba7a56f974dba5cade48 (2024-05-06T15:24:24Z)
+// from user-agents-v2@5e0a30addffe984e7321aa061e5c17a39c04b3b1 (2024-05-07T16:59:05Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -605,7 +605,6 @@ const appTests = {
     'Saavn Player': { type: 'app', name: `JioSaavn` },
     'Microsoft-Windows-XP/2002, UPnP/1.1, J. River Internet Reader/2.0 (compatible; Windows-Media-Player/10)': { type: 'app', name: `JRiver Media Center` },
     'Juice/2.2 (Darwin) +http://juicereceiver.sf.net/': { type: 'app', name: `Juice` },
-    'just_audio/3.6.2 (Linux;Android 9) ExoPlayerLib/2.13.1': { type: 'app', name: `Just Audio` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KajabiMobileApp': { type: 'app', name: `Kajabi` },
     'KajabiPodcast': { type: 'app', name: `Kajabi` },
     'KakaoTalk/2019.10.30.1 CFNetwork/1120 Darwin/19.0.0': { type: 'app', name: `KakaoTalk` },
@@ -965,6 +964,8 @@ const libraryTests = {
     'GuzzleHttp/7': { type: 'library', name: `Guzzle` },
     'hackney/1.18.1': { type: 'library', name: `hackney (elixir)` },
     'HTTP-Tiny/0.076': { type: 'library', name: `HTTP:Tiny` },
+    'just_audio/3.6.2 (Linux;Android 9) ExoPlayerLib/2.13.1': { type: 'library', name: `Just Audio` },
+    'just_audio/1.0.68 (Linux;Android 12) ExoPlayerLib/2.18.7': { type: 'library', name: `Just Audio` },
     'KaiOS Downloader': { type: 'library', name: `KaiOS Downloader` },
     'libsoup/2.68.2': { type: 'library', name: `libsoup` },
     'Android.LVLDM': { type: 'library', name: `Android License Verification Library` },

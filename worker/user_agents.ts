@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@ae9bfd3978ae585ba865ba7a56f974dba5cade48 (2024-05-06T15:24:24Z)
+// from user-agents-v2@5e0a30addffe984e7321aa061e5c17a39c04b3b1 (2024-05-07T16:59:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -437,7 +437,6 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/(^com\.jio\.media\.jiobeats|^com\.saavn\.android|^[sS]aavn)/.test(userAgent)) return { name: `JioSaavn`, type: 'app' };
     if (/J\. River Internet Reader/.test(userAgent)) return { name: `JRiver Media Center`, type: 'app' };
     if (/^Juice\//.test(userAgent)) return { name: `Juice`, type: 'app' };
-    if (/just_audio\//.test(userAgent)) return { name: `Just Audio`, type: 'app' };
     if (/ Kajabi|KajabiPodcast/.test(userAgent)) return { name: `Kajabi`, type: 'app' };
     if (/^KakaoTalk\//.test(userAgent)) return { name: `KakaoTalk`, type: 'app' };
     if (/^KaoticRadio\.com\//.test(userAgent)) return { name: `KaoticRadio.com`, type: 'app' };
@@ -658,6 +657,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^gvfs/.test(userAgent)) return { name: `gvfs`, type: 'library' };
     if (/^hackney\/\d/.test(userAgent)) return { name: `hackney (elixir)`, type: 'library', category: 'bot' };
     if (/^HTTP-Tiny\//.test(userAgent)) return { name: `HTTP:Tiny`, type: 'library', category: 'bot' };
+    if (/^just_audio\//.test(userAgent)) return { name: `Just Audio`, type: 'library' };
     if (/KaiOS Downloader/.test(userAgent)) return { name: `KaiOS Downloader`, type: 'library' };
     if (/^libsoup\//.test(userAgent)) return { name: `libsoup`, type: 'library' };
     if (/^Android\.LVLDM$/.test(userAgent)) return { name: `Android License Verification Library`, type: 'library' };
