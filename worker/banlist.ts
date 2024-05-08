@@ -17,6 +17,7 @@ export class Banlist {
     async isBanned(targetUrl: string): Promise<boolean> {
         // must never throw!
         if (targetUrl.includes('js/netsoltrademark.php')) return true; // ban /e/http://bad.domain/__media__/js/netsoltrademark.php?d=anotherbad.domain%2Fpath%2F
+        if (targetUrl.includes('/bitrix/redirect.php?')) return true; // ban /e/https://bad.domain/bitrix/redirect.php?goto=https%3A%2F%2Fanotherbad.domain%2F
 
         const { namespace, cache } = this;
         if (!namespace) return false;
