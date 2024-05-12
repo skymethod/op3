@@ -37,6 +37,7 @@ import { computeListenTimeCalculationResponse } from './routes/listen_time_calcu
 export { BackendDO } from './backend/backend_do.ts';
 import { sendWithRetries } from './queues.ts';
 import { computeRedirectTraceEvent } from './redirect_trace_events.ts';
+import { computeFaviconSvgResponse } from './routes/favicons.ts';
 
 export default {
     
@@ -291,6 +292,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
 
     if (protocol === 'http:' && env.origin?.startsWith('https:')) return computeHttpToHttpsRedirectResponse(request.url); // redirect http -> https for all non-episode-redirect requests
     if (method === 'GET' && pathname === '/') return computeHomeResponse({ instance, origin, productionOrigin, cfAnalyticsToken, deploySha, deployTime, searchParams, acceptLanguage });
+    if (method === 'GET' && pathname === '/favicon.svg') return computeFaviconSvgResponse();
     if (method === 'GET' && pathname === '/terms') return computeTermsResponse({ instance, hostname, origin, productionOrigin, productionDomain, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/costs') return computeCostsResponse({ instance, hostname, origin, productionOrigin, cfAnalyticsToken });
     if (method === 'GET' && pathname === '/privacy') return computePrivacyResponse({ instance, origin, hostname, productionOrigin, cfAnalyticsToken });

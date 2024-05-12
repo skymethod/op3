@@ -1072,12 +1072,21 @@ a.svg:hover {
   background-color: rgb(154 52 18 / var(--tw-bg-opacity));
 }
 
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
 .fill-neutral-500 {
   fill: #737373;
 }
 
 .fill-neutral-600 {
   fill: #525252;
+}
+
+.fill-neutral-400 {
+  fill: #a3a3a3;
 }
 
 .stroke-transparent {
@@ -1205,6 +1214,10 @@ a.svg:hover {
   font-weight: 600;
 }
 
+.font-thin {
+  font-weight: 100;
+}
+
 .leading-none {
   line-height: 1;
 }
@@ -1251,6 +1264,11 @@ a.svg:hover {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
 .underline {

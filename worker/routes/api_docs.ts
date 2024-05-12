@@ -34,6 +34,7 @@ const html = (origin: string, titleSuffix: string, finalApiDocsHtml: string, cfA
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href="${origin}/api/docs" />
+    <link rel="icon" href="${origin}/favicon.svg" type="image/svg+xml" />
     <style>
       body {
         margin: 0;
