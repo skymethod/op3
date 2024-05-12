@@ -1,7 +1,7 @@
-# op3
-OP3: The Open Podcast Prefix Project
+# OP3: The Open Podcast Prefix Project
 
-<img width="366" alt="OP3 logo on dark background" src="https://github.com/skymethod/op3/assets/47259736/3babd9f4-44bf-48ef-8162-1a14673cb5b1">
+<img width="200" alt="OP3 logo on dark background" src="https://github.com/skymethod/op3/assets/47259736/3babd9f4-44bf-48ef-8162-1a14673cb5b1.png">
+<br><br>
 
 The [Open Podcast Prefix Project (OP3)](https://op3.dev/) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
 
@@ -13,8 +13,6 @@ Podcasters or podcast hosting companies can prepend
 to podcast episode urls in their feed to participate and start sending data.
 
 Anyone can verify the data using the [OP3 API](https://op3.dev/api/docs).  Only a safe set of request attributes are currently stored and returned by this API.
-
-The service is still in early development, but any and all data is appreciated and will help improve the system. 
 
 # The Vision
 A free service for podcasters and podcast hosts to compute standard episode/show-level analytics and make them available to everyone
