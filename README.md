@@ -1,7 +1,7 @@
 # op3
 OP3: The Open Podcast Prefix Project
 
-<img width="366" alt="image" src="https://user-images.githubusercontent.com/47259736/196559392-77f5f200-46bf-42f9-96a7-cb414b0b08b8.png">
+<img width="366" alt="OP3 logo on dark background" src="https://github.com/skymethod/op3/assets/47259736/3babd9f4-44bf-48ef-8162-1a14673cb5b1">
 
 The [Open Podcast Prefix Project (OP3)](https://op3.dev/) is a free and open-source podcast [prefix analytics service](https://soundsprofitable.com/update/prefix-analytics) committed to open data and listener privacy.
 
