@@ -1,13 +1,13 @@
 export type { CfGlobalCaches, CfCache, CfCacheOptions, IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage, DurableObjectStorageMethods, 
     AnalyticsEngine, DurableObjectStorageValue, AnalyticsEngineEvent, DurableObjectStorageListOptions, DurableObjectStorageReadOptions,
     R2Bucket, R2ListOptions, KVNamespace, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody,
-    QueueMessageBatch, QueueMessage, Queue, QueuesContentType, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/cloudflare_workers_types.d.ts';
-export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/bytes.ts';
-export { R2, signAwsCallV4 } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/r2/r2.ts';
-export type { AwsCall, AwsCallContext } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/r2/r2.ts';
-export { importText } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/import_text.ts';
-export { encodeXml, decodeXml } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/xml_util.ts';
-export { setEqual, setIntersect, setSubtract } from 'https://raw.githubusercontent.com/skymethod/denoflare/b696e886e60e4ef330674e8de7a98fbc084c9d03/common/sets.ts';
+    QueueMessageBatch, QueueMessage, Queue, QueuesContentType, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/cloudflare_workers_types.d.ts';
+export { Bytes } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/bytes.ts';
+export { R2, signAwsCallV4 } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/r2/r2.ts';
+export type { AwsCall, AwsCallContext } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/r2/r2.ts';
+export { importText } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/import_text.ts';
+export { encodeXml, decodeXml } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/xml_util.ts';
+export { setEqual, setIntersect, setSubtract } from 'https://raw.githubusercontent.com/skymethod/denoflare/e3625368d31c39c5c74ef542df0e0bf2ddb40482/common/sets.ts';
 export { chunk } from 'https://deno.land/std@0.224.0/collections/chunk.ts';
 export { sortBy } from 'https://deno.land/std@0.224.0/collections/sort_by.ts';
 export { XMLParser } from 'https://cdn.skypack.dev/fast-xml-parser@4.0.11?dts';
