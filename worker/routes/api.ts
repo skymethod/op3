@@ -23,6 +23,7 @@ import { computeQueriesResponse } from './api_queries.ts';
 import { computeQueryHitsResponse } from './api_query_hits.ts';
 import { Baselime } from '../baselime.ts';
 import { generateUuid } from '../uuid.ts';
+import { Limiter } from '../limiter.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined, deploySha: string | undefined, deployTime: string | undefined }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo, deploySha, deployTime } = opts;
@@ -39,10 +40,10 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined };
+type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter } = opts;
 
     const start = Date.now();
     const namespace = `op3-${instance}-api-${method.toLowerCase()}${computeNamespaceSuffix(path)}`;
@@ -56,7 +57,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             const identity = await computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient });
             console.log(`computeApiResponse`, { method, path, identity: identityResultToJson(identity) });
             data.identity = `${identity.kind}-${identity.kind === 'invalid' ? identity.reason : [...identity.permissions].join('-') }`;
-        
+
             // all api endpoints require an auth token
             if (identity.kind === 'invalid' && identity.reason === 'missing-token') return newJsonResponse({ error: 'unauthorized' }, 401);
             if (identity.kind === 'invalid' && identity.reason === 'expired-token') return newJsonResponse({ error: 'expired' }, 401);
@@ -66,10 +67,15 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             if (identity.kind === 'invalid') return newForbiddenJsonResponse();
     
             const { permissions } = identity;
-            if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
-    
             const hasAdmin = permissions.has('admin');
-    
+
+            if (!hasAdmin && limiter) {
+                const { success } = await limiter.isAllowed(`api:ip:${rawIpAddress}`);
+                if (!success) return new Response('slow down', { status: 429 });
+            }
+
+            if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
+        
             if (path.startsWith('/admin/')) {
                 // all other admin endpoints require admin
                 if (!hasAdmin) return newForbiddenJsonResponse();

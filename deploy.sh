@@ -58,4 +58,5 @@ ${QUEUE2_NAME:+--queue-binding queue2:$QUEUE2_NAME} \
 ${QUEUE2_NAME:+--text-binding queue2Name:$QUEUE2_NAME} \
 ${DEBUG_WEBHOOK_URL:+--secret-binding debugWebhookUrl:$DEBUG_WEBHOOK_URL} \
 ${BASELIME_EVENTS_URL:+--text-binding baselimeEventsUrl:$BASELIME_EVENTS_URL} \
-${BASELIME_API_KEY:+--secret-binding baselimeApiKey:$BASELIME_API_KEY}
+${BASELIME_API_KEY:+--secret-binding baselimeApiKey:$BASELIME_API_KEY} \
+${LIMITER_1:+--ratelimit-binding limiter1:$LIMITER_1}
