@@ -26,4 +26,6 @@ export interface WorkerEnv {
     readonly queue2Name?: string;
     readonly roRpcClientParams?: string;
     readonly debugWebhookUrl?: string;
+    readonly baselimeEventsUrl?: string;
+    readonly baselimeApiKey?: string;
 }

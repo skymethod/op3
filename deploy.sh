@@ -56,4 +56,6 @@ ${QUEUE1_NAME:+--queue-binding queue1:$QUEUE1_NAME} \
 ${QUEUE1_NAME:+--text-binding queue1Name:$QUEUE1_NAME} \
 ${QUEUE2_NAME:+--queue-binding queue2:$QUEUE2_NAME} \
 ${QUEUE2_NAME:+--text-binding queue2Name:$QUEUE2_NAME} \
-${DEBUG_WEBHOOK_URL:+--secret-binding debugWebhookUrl:$DEBUG_WEBHOOK_URL}
+${DEBUG_WEBHOOK_URL:+--secret-binding debugWebhookUrl:$DEBUG_WEBHOOK_URL} \
+${BASELIME_EVENTS_URL:+--text-binding baselimeEventsUrl:$BASELIME_EVENTS_URL} \
+${BASELIME_API_KEY:+--secret-binding baselimeApiKey:$BASELIME_API_KEY}

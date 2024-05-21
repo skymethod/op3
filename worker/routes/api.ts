@@ -21,6 +21,8 @@ import { computeShowsResponse, computeShowStatsResponse, computeShowSummaryStats
 import { Configuration } from '../configuration.ts';
 import { computeQueriesResponse } from './api_queries.ts';
 import { computeQueryHitsResponse } from './api_query_hits.ts';
+import { Baselime } from '../baselime.ts';
+import { generateUuid } from '../uuid.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo } = opts;
@@ -37,65 +39,81 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined };
+type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime } = opts;
 
-    try {
-        // handle cors pre-flight
-        if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } });
-
-        // first, we need to know who's calling
-        const identity = await computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient });
-        console.log(`computeApiResponse`, { method, path, identity: identityResultToJson(identity) });
+    const start = Date.now();
+    const namespace = `op3-${instance}-api-${method.toLowerCase()}${computeNamespaceSuffix(path)}`;
+    const data: Record<string, unknown> = { method, bearerToken, origin, colo };
+    const response = await (async () => {
+        try {
+            // handle cors pre-flight
+            if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } });
     
-        // all api endpoints require an auth token
-        if (identity.kind === 'invalid' && identity.reason === 'missing-token') return newJsonResponse({ error: 'unauthorized' }, 401);
-        if (identity.kind === 'invalid' && identity.reason === 'expired-token') return newJsonResponse({ error: 'expired' }, 401);
-        if (identity.kind === 'invalid' && identity.reason === 'blocked-token') return newJsonResponse({ error: 'blocked' }, 401);
+            // first, we need to know who's calling
+            const identity = await computeIdentityResult({ bearerToken, searchParams, adminTokens, previewTokens, rpcClient });
+            console.log(`computeApiResponse`, { method, path, identity: identityResultToJson(identity) });
+            data.identity = `${identity.kind}-${identity.kind === 'invalid' ? identity.reason : [...identity.permissions].join('-') }`;
+        
+            // all api endpoints require an auth token
+            if (identity.kind === 'invalid' && identity.reason === 'missing-token') return newJsonResponse({ error: 'unauthorized' }, 401);
+            if (identity.kind === 'invalid' && identity.reason === 'expired-token') return newJsonResponse({ error: 'expired' }, 401);
+            if (identity.kind === 'invalid' && identity.reason === 'blocked-token') return newJsonResponse({ error: 'blocked' }, 401);
+        
+            // invalid token or any other invalid reason
+            if (identity.kind === 'invalid') return newForbiddenJsonResponse();
     
-        // invalid token or any other invalid reason
-        if (identity.kind === 'invalid') return newForbiddenJsonResponse();
-
-        const { permissions } = identity;
-        if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
-
-        const hasAdmin = permissions.has('admin');
-
-        if (path.startsWith('/admin/')) {
-            // all other admin endpoints require admin
-            if (!hasAdmin) return newForbiddenJsonResponse();
-
-            if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
-            if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
-            if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
+            const { permissions } = identity;
+            if (path === '/admin/metrics') return await computeAdminGetMetricsResponse(permissions, method, rpcClient);
+    
+            const hasAdmin = permissions.has('admin');
+    
+            if (path.startsWith('/admin/')) {
+                // all other admin endpoints require admin
+                if (!hasAdmin) return newForbiddenJsonResponse();
+    
+                if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
+                if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
+                if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
+            }
+            if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, origin, method, searchParams, rpcClient, rawIpAddress);
+            if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress });
+            if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
+            if (path === '/api-keys') return await computeApiKeysResponse({ instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
+            { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
+            if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
+            if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
+            if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
+            if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
+            { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
+            { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
+            { const m = /^\/shows\/([0-9a-f]{32})\/summary-stats$/.exec(path); if (m && configuration) return await computeShowSummaryStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
+            { const m = /^\/queries\/([0-9a-z-]+)$/.exec(path); if (m && configuration) return await computeQueriesResponse({ name: m[1], method, searchParams, miscBlobs, roMiscBlobs, configuration, rpcClient, roRpcClient, statsBlobs, roStatsBlobs }); }
+        
+            // unknown api endpoint
+            return newJsonResponse({ error: 'not found' }, 404);
+        } catch (e) {
+            if (e instanceof StatusError) {
+                return newJsonResponse({ error: e.message }, e.status);
+            } else {
+                const error = `${e.stack || e}`;
+                consoleError('api-call', `Error in api call: ${error}`);
+                return newJsonResponse({ error }, 500);
+            }
         }
-        if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, origin, method, searchParams, rpcClient, rawIpAddress);
-        if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress });
-        if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
-        if (path === '/api-keys') return await computeApiKeysResponse({ instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
-        { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
-        if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
-        if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
-        if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
-        if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
-        { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
-        { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
-        { const m = /^\/shows\/([0-9a-f]{32})\/summary-stats$/.exec(path); if (m && configuration) return await computeShowSummaryStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
-        { const m = /^\/queries\/([0-9a-z-]+)$/.exec(path); if (m && configuration) return await computeQueriesResponse({ name: m[1], method, searchParams, miscBlobs, roMiscBlobs, configuration, rpcClient, roRpcClient, statsBlobs, roStatsBlobs }); }
-    
-        // unknown api endpoint
-        return newJsonResponse({ error: 'not found' }, 404);
-    } catch (e) {
-        if (e instanceof StatusError) {
-            return newJsonResponse({ error: e.message }, e.status);
-        } else {
-            const error = `${e.stack || e}`;
-            consoleError('api-call', `Error in api call: ${error}`);
-            return newJsonResponse({ error }, 500);
-        }
-    }
+    })();
+    baselime?.sendEvents([ { 
+        requestId: generateUuid(), 
+        service: `op3-${instance}`, 
+        namespace, 
+        duration: Math.max(1, Date.now() - start), 
+        level: response.status >= 500 ? 'error' : response.status >= 400 ? 'warning' : 'info',
+        error: response.status >= 500 ? `status ${response.status}` : undefined,
+        data: { ...data, status: response.status, ip: rawIpAddress, contentType: response.headers.get('content-type') ?? undefined },
+    } ]);
+    return response;
 }
 
 export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>, rpcClient: RpcClient, statsBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
@@ -170,6 +188,19 @@ export async function computeIdentityResult({ bearerToken, searchParams, adminTo
     if (res.reason === 'blocked') return { kind: 'invalid', reason: 'blocked-token' };
     if (res.reason === 'expired') return { kind: 'invalid', reason: 'expired-token' };
     return { kind: 'invalid', reason: 'invalid-token' };
+}
+
+export function computeNamespaceSuffix(path: string): string {
+    if (typeof path !== 'string') return '-unknown';
+    if (path === '' || path === '/') return '';
+    if (!path.startsWith('/')) return '-unknown';
+    path = path.substring(1);
+    if (path.endsWith('/')) path = path.substring(0, path.length - 1);
+    return '-' + path.split('/').map(v => {
+        if (v === '') return 'e';
+        if (/^[a-z0-9-]{1,20}$/.test(v)) return v;
+        return 'x';
+    }).join('-');
 }
 
 //
