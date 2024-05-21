@@ -24,15 +24,15 @@ import { computeQueryHitsResponse } from './api_query_hits.ts';
 import { Baselime } from '../baselime.ts';
 import { generateUuid } from '../uuid.ts';
 
-export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined }): ApiRequest | undefined {
-    const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo } = opts;
+export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined, deploySha: string | undefined, deployTime: string | undefined }): ApiRequest | undefined {
+    const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo, deploySha, deployTime } = opts;
     const m = /^\/api\/1(\/[a-z\/-]+(\/.+?)?)$/.exec(pathname);
     if (!m) return undefined;
     const [ _, path ] = m;
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
     const bearerToken = m2 ? m2[1] : undefined;
     const rawIpAddress = computeRawIpAddress(headers);
-    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo };
+    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime };
 }
 
 // deno-lint-ignore no-explicit-any
@@ -41,12 +41,12 @@ export type Background = (work: () => Promise<unknown>) => void;
 
 type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
-    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo } = request;
+    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime } = request;
     const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime } = opts;
 
     const start = Date.now();
     const namespace = `op3-${instance}-api-${method.toLowerCase()}${computeNamespaceSuffix(path)}`;
-    const data: Record<string, unknown> = { method, bearerToken, origin, colo };
+    const data: Record<string, unknown> = { method, bearerToken, origin, colo, path, searchParams: searchParams.toString(), deploySha, deployTime };
     const response = await (async () => {
         try {
             // handle cors pre-flight
@@ -111,7 +111,11 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
         duration: Math.max(1, Date.now() - start), 
         level: response.status >= 500 ? 'error' : response.status >= 400 ? 'warning' : 'info',
         error: response.status >= 500 ? `status ${response.status}` : undefined,
-        data: { ...data, status: response.status, ip: rawIpAddress, contentType: response.headers.get('content-type') ?? undefined },
+        data: { 
+            ...data, 
+            status: response.status, 
+            ip: rawIpAddress, 
+            contentType: response.headers.get('content-type') ?? undefined },
     } ]);
     return response;
 }
@@ -216,6 +220,8 @@ export interface ApiRequest {
     readonly rawIpAddress?: string;
     readonly bodyProvider: JsonProvider;
     readonly colo?: string;
+    readonly deploySha?: string;
+    readonly deployTime?: string;
 }
 
 export type IdentityResult = ValidIdentityResult | InvalidIdentityResult;
