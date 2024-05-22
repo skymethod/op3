@@ -24,7 +24,7 @@ export async function lookupShowId({ showUuidOrPodcastGuidOrFeedUrlBase64, searc
     let showUuid: string;
     let showUuidInput: string;
     try {
-        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9A-F]{32}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(showUuidOrPodcastGuidOrFeedUrlBase64)) {
             const result = await timed(times, 'lookup-show-uuid-for-podcast-guid', () => lookupShowUuidForPodcastGuid(showUuidOrPodcastGuidOrFeedUrlBase64.toLowerCase(), { rpcClient, roRpcClient, searchParams }));
             if (!result) return newJsonResponse({ message: 'not found' }, 404);
             showUuidInput = result;
