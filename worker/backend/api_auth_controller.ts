@@ -21,7 +21,7 @@ export class ApiAuthController {
             const rec = await findApiTokenRecord(token, tx);
             if (!rec) return { 'kind': 'resolve-api-token', reason: 'invalid' };
 
-            const { permissions, shows, expires, blockReason } = rec;
+            const { permissions, shows, expires, blockReason, lastUsed } = rec;
             const now = new Date().toISOString();
             if (expires && now > expires) {
                 console.log('Expired, delete token');
@@ -32,9 +32,11 @@ export class ApiAuthController {
                 console.log('Blocked!');
                 return { 'kind': 'resolve-api-token', reason: 'blocked' };
             }
-
-            const newRec: ApiTokenRecord = { ...rec, lastUsed: now };
-            await saveApiTokenRecord(newRec, tx);
+            const today = `${now.substring(0, 10)}T00:00:00.000Z`;
+            if (today !== lastUsed) {
+                const newRec: ApiTokenRecord = { ...rec, lastUsed: today };
+                await saveApiTokenRecord(newRec, tx);
+            }
             return { 'kind': 'resolve-api-token', permissions, shows };
         });
     }
