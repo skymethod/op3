@@ -33,7 +33,8 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
     const m2 = /^bearer (.*?)$/i.exec(headers.get('authorization') ?? '');
     const bearerToken = m2 ? m2[1] : undefined;
     const rawIpAddress = computeRawIpAddress(headers);
-    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime };
+    const userAgent = headers.get('user-agent') ?? undefined;
+    return { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime, userAgent };
 }
 
 // deno-lint-ignore no-explicit-any
@@ -42,7 +43,7 @@ export type Background = (work: () => Promise<unknown>) => void;
 
 type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
-    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime } = request;
+    const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime, userAgent } = request;
     const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter } = opts;
 
     const start = Date.now();
@@ -121,7 +122,9 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             ...data, 
             status: response.status, 
             ip: rawIpAddress, 
-            contentType: response.headers.get('content-type') ?? undefined },
+            contentType: response.headers.get('content-type') ?? undefined,
+            userAgent,
+        },
     } ]);
     return response;
 }
@@ -226,6 +229,7 @@ export interface ApiRequest {
     readonly rawIpAddress?: string;
     readonly bodyProvider: JsonProvider;
     readonly colo?: string;
+    readonly userAgent?: string;
     readonly deploySha?: string;
     readonly deployTime?: string;
 }
