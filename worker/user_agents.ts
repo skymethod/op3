@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@0a01915b46ad810cb110917f235ea62658312d81 (2024-05-10T16:02:16Z)
+// from user-agents-v2@4a974cd86e9a3ec56ceca7edcd3259da39a06f6a (2024-05-30T17:18:45Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -142,6 +142,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/qiniu.*spider/.test(userAgent)) return { name: `Qiniu spider`, type: 'bot' };
     if (/^Radioline Stream Monitoring/.test(userAgent)) return { name: `Radioline Stream Monitoring`, type: 'bot' };
     if (/RedCircle/.test(userAgent)) return { name: `RedCircle`, type: 'bot' };
+    if (/^Rephonic\/\d/.test(userAgent)) return { name: `Rephonic`, type: 'bot' };
     if (/ RidderBot\//.test(userAgent)) return { name: `Ridder Bot`, type: 'bot' };
     if (/^RSStT/.test(userAgent)) return { name: `RSS to Telegram`, type: 'bot' };
     if (/^RSSRadio \(/.test(userAgent)) return { name: `RSSRadio`, type: 'bot' };
@@ -335,11 +336,13 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^DownMan\//.test(userAgent)) return { name: `DownMan`, type: 'app' };
     if (/^DowntonAppy\//.test(userAgent)) return { name: `DowntonAppy`, type: 'app' };
     if (/^DriveCast\//.test(userAgent)) return { name: `DriveCast`, type: 'app' };
+    if (/^DRN1;/.test(userAgent)) return { name: `DRN1`, type: 'app' };
     if (/^DroolRadio\//.test(userAgent)) return { name: `DroolRadio`, type: 'app' };
     if (/^Dynamo\//.test(userAgent)) return { name: `Dynamo`, type: 'app' };
     if (/Android E24 Hermes\//.test(userAgent)) return { name: `E24 Android app`, type: 'app' };
     if (/iOS E24 Hermes\//.test(userAgent)) return { name: `E24 iOS app`, type: 'app' };
     if (/^Earbud\//.test(userAgent)) return { name: `Earbud`, type: 'app' };
+    if (/^Earmark\//.test(userAgent)) return { name: `Earmark`, type: 'app' };
     if (/^EasyGet\//.test(userAgent)) return { name: `EasyGet`, type: 'app' };
     if (/^TheEconomist-Darwin-/.test(userAgent)) return { name: `Economist Espresso`, type: 'app' };
     if (/^Elevation_Health\//.test(userAgent)) return { name: `Elevation Health`, type: 'app' };
@@ -520,6 +523,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
     if (/^Podchaser |^Podchaser-Parser/.test(userAgent)) return { name: `Podchaser`, type: 'app' };
+    if (/^Podcini\/\d/.test(userAgent)) return { name: `Podcini`, type: 'app' };
     if (/^Podclipper\//.test(userAgent)) return { name: `Podclipper`, type: 'app' };
     if (/^Podcoin/.test(userAgent)) return { name: `Podcoin`, type: 'app' };
     if (/^PodCruncher\/.* CFNetwork\//.test(userAgent)) return { name: `PodCruncher`, type: 'app' };

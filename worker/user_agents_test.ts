@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@0a01915b46ad810cb110917f235ea62658312d81 (2024-05-10T16:02:16Z)
+// from user-agents-v2@4a974cd86e9a3ec56ceca7edcd3259da39a06f6a (2024-05-30T17:18:45Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -163,6 +163,7 @@ const botTests = {
     'z0-qiniu-imgstg-spider-1.0': { type: 'bot', name: `Qiniu spider` },
     'Radioline Stream Monitoring (tech@radioline.co)': { type: 'bot', name: `Radioline Stream Monitoring` },
     'RedCircle': { type: 'bot', name: `RedCircle` },
+    'Rephonic/1.0': { type: 'bot', name: `Rephonic` },
     'Mozilla/5.0 (compatible; RidderBot/1.0; bot@ridder.co)': { type: 'bot', name: `Ridder Bot` },
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
     'Mozilla/5.0 (compatible; Mechanize/2.7.4)': { type: 'bot', name: `Ruby Mechanize` },
@@ -439,11 +440,15 @@ const appTests = {
     'DownMan/3.0.1 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `DownMan` },
     'DowntonAppy/1382280772 CFNetwork/548.0.4 Darwin/11.0.0': { type: 'app', name: `DowntonAppy` },
     'DriveCast/2.9 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `DriveCast` },
+    'DRN1; iPhone; iOS 17.4.1': { type: 'app', name: `DRN1` },
+    'DRN1; Android; Samsung 17.4.1': { type: 'app', name: `DRN1` },
     'DroolRadio/38 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `DroolRadio` },
     'Dynamo/1.0': { type: 'app', name: `Dynamo` },
     'Android E24 Hermes/1000094692 _app_': { type: 'app', name: `E24 Android app` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS E24 Hermes/90.0.0 _app_': { type: 'app', name: `E24 iOS app` },
     'Earbud/0 CFNetwork/758.4.3 Darwin/15.5.0': { type: 'app', name: `Earbud` },
+    'Earmark/1.0 Android': { type: 'app', name: `Earmark` },
+    'Earmark/1.0 iOS': { type: 'app', name: `Earmark` },
     'EasyGet/1.0.70 CFNetwork/672.1.13 Darwin/14.0.0': { type: 'app', name: `EasyGet` },
     'TheEconomist-Darwin-android-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'TheEconomist-Darwin-ios-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
@@ -741,6 +746,7 @@ const appTests = {
     'Podcastly': { type: 'app', name: `Podcastly` },
     'Podchaser (https://podchaser.com)': { type: 'app', name: `Podchaser` },
     'Podchaser-Parser': { type: 'app', name: `Podchaser` },
+    'Podcini/4.6.2': { type: 'app', name: `Podcini` },
     'Podclipper/4.2 (miguelDSP.Podclipper; build:4; iOS 13.1.3) Alamofire/4.7.3': { type: 'app', name: `Podclipper` },
     'PodCruncher/3.7.1 CFNetwork/1125.2 Darwin/19.4.0': { type: 'app', name: `PodCruncher` },
     'PodCruncher/3.7.1 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `PodCruncher` },
