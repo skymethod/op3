@@ -41,7 +41,7 @@ A free service for podcasters and podcast hosts to compute standard episode/show
     
 ## Commitment to **high-performance redirects**
   - Since any prefix service is in the path of serving podcast episodes, it needs to be lightning-fast
-  - Runs entirely on Cloudflare's CDN platform, a global infrastructure with edge nodes in over 275 cites in over 100 countries
+  - Runs entirely on Cloudflare's CDN platform, a global infrastructure with edge nodes in over 320 cities in over 120 countries
   - The redirects always succeed, even if the backend storage is down. Logging is done in the background after the response is returned
  
 ## Commitment to **sustainable development**

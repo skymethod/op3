@@ -33,7 +33,7 @@
     "string": "See our <em>readable</em> <a href=\"/privacy\">privacy policy</a> for more details."
   },
   "paragraph_4": {
-    "string": "OP3 runs on a global CDN with edge nodes in over 300 cites in over 120 countries, it is one of the fastest (if not the fastest) podcast redirect service.  Keep an eye on our <a href=\"https://poduptime.com/op3/\">independently-measured uptime</a>."
+    "string": "OP3 runs on a global CDN with edge nodes in over 320 cities in over 120 countries, it is one of the fastest (if not the fastest) podcast redirect service.  Keep an eye on our <a href=\"https://poduptime.com/op3/\">independently-measured uptime</a>."
   },
   "paragraph_5": {
     "string": "We've been running smoothly since Sept 2022, now measuring over %d million podcast downloads every month across more than %d shows. Our data is available to the public via the <a href=\"/api/docs\">OP3 API</a>."
