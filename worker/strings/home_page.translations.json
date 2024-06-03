@@ -55,9 +55,9 @@
     "es": "Vea nuestra <em>legible</em> <a href=\"/privacy\">política de privacidad</a> para obtener más detalles."
   },
   "paragraph_4": {
-    "fr": "OP3 fonctionne sur un CDN mondial avec des connexions dans plus de 300 villes réparties dans plus de 120 pays. C'est l'un des services de redirection de podcast les plus rapides (si ce n'est le plus rapide). Gardez un œil sur notre <a href=\"https://poduptime.com/op3/\">temps de disponibilité mesuré de manière indépendante</a>.",
-    "nl": "OP3 draait op een wereldwijd CDN met edge nodes in meer dan 300 steden in meer dan 120 landen. Het is een van de snelste (zo niet dé snelste) podcast-omleidingsdiensten. Houd onze <a href=\"https://poduptime.com/op3/\">onafhankelijk gemeten uptime</a> in de gaten.",
-    "es": "OP3 se ejecuta en una CDN global con nodos de borde en más de 300 ciudades de más de 120 países, es uno de los servicios de redireccionamiento de podcasts más rápidos (si no el más rápido). Eche un ojo a nuestro <a href=\"https://poduptime.com/op3/\">tiempo de actividad medido de forma independiente</a>."
+    "fr": "OP3 fonctionne sur un CDN mondial avec des connexions dans plus de 320 villes réparties dans plus de 120 pays. C'est l'un des services de redirection de podcast les plus rapides (si ce n'est le plus rapide). Gardez un œil sur notre <a href=\"https://poduptime.com/op3/\">temps de disponibilité mesuré de manière indépendante</a>.",
+    "nl": "OP3 draait op een wereldwijd CDN met edge nodes in meer dan 320 steden in meer dan 120 landen. Het is een van de snelste (zo niet dé snelste) podcast-omleidingsdiensten. Houd onze <a href=\"https://poduptime.com/op3/\">onafhankelijk gemeten uptime</a> in de gaten.",
+    "es": "OP3 se ejecuta en una CDN global con nodos de borde en más de 320 ciudades de más de 120 países, es uno de los servicios de redireccionamiento de podcasts más rápidos (si no el más rápido). Eche un ojo a nuestro <a href=\"https://poduptime.com/op3/\">tiempo de actividad medido de forma independiente</a>."
   },
   "paragraph_5": {
     "fr": "Nous fonctionnons sans problème depuis septembre 2022, mesurant maintenant plus de %d millions de téléchargements de podcasts chaque mois sur plus de %d émissions. Nos données sont disponibles au public via l'<a href=\"/api/docs\">API OP3</a>.",
