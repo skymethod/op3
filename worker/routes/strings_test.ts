@@ -20,6 +20,7 @@ Deno.test({
             ' fr ': 'fr',
             ' FR-FR ': 'fr',
             'en-US,en;q=0.5': 'en',
+            'en-AU,en;q=0.5': 'en-gb',
             'fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5': 'fr',
         }
         for (const [ acceptLanguage, expected ] of Object.entries(acceptLanguageTests)) {
