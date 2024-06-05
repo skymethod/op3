@@ -111,6 +111,8 @@ const app = (() => {
     const [ showPagePreviewAlert, showPageLink, feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList, fpPodcastGuidSpan ] = 
         [ 'show-page-preview', 'show-page-link', 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list', 'fp-podcast-guid' ].map(v => document.getElementById(v));
 
+    const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
+
     const reset = () => {
         searchResults = [];
         searchResultsPageIndex = 0;
@@ -266,7 +268,9 @@ const app = (() => {
             feedPanel.feed = feed;
             feedPanel.feedAnalysis = feedAnalysis;
             feedPanel.feedAnalysisError = feedAnalysisError;
-            showPageLink.href = `${document.location.origin}/show/${feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : ''}`;
+            const u = new URL(`${document.location.origin}/show/${feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : ''}`);
+            if (langParam) u.searchParams.set('lang', langParam);
+            showPageLink.href = u.toString();
         }
         statusSpinner.style.visibility = status && status.pending ? 'visible' : 'hidden';
         statusMessage.textContent = status && status.message ? status.message : '';
