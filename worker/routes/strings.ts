@@ -108,7 +108,8 @@ export function computePreferredSupportedLanguage({ langParam, acceptLanguage }:
         qualityValues.push(...acceptLanguage.split(',').map(v => v.toLowerCase().trim()).filter(v => v.length > 0).map(v => { 
             const m = /^([a-zA-Z0-9-_]+)(;q=([0-9.]+))?$/.exec(v);
             if (!m) return undefined;
-            const [ _, value, _2, qStr ] = m;
+            const [ _, valueStr, _2, qStr ] = m;
+            const value = valueStr === 'en-au' ? 'en-gb' : valueStr; // default en-au to en-gb
             return { value, q: qStr === undefined ? 1 : parseFloat(qStr) };
         }).filter(v => v !== undefined) as QualityValue[]);
     }
