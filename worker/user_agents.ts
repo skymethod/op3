@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@4a974cd86e9a3ec56ceca7edcd3259da39a06f6a (2024-05-30T17:18:45Z)
+// from user-agents-v2@40ed1983b4ef5449591dac952426f52b1b48f0af (2024-06-05T22:37:31Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -474,6 +474,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Luminary(Preprod)?\/|^luminary\.next\//.test(userAgent)) return { name: `Luminary`, type: 'app' };
     if (/^MacJournal\//.test(userAgent)) return { name: `MacJournal`, type: 'app' };
     if (/^MajelanApp/.test(userAgent)) return { name: `Majelan`, type: 'app' };
+    if (/^Mame%20Cast\//.test(userAgent)) return { name: `Mame Cast`, type: 'app' };
     if (/^MaxTubePro\//.test(userAgent)) return { name: `MaxTubePro`, type: 'app' };
     if (/^Meadowbrook Church\//.test(userAgent)) return { name: `Meadowbrook Church`, type: 'app' };
     if (/^MediaMonkey/.test(userAgent)) return { name: `MediaMonkey`, type: 'app' };
@@ -485,7 +486,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Metacast(\/.*)?$/.test(userAgent)) return { name: `Metacast`, type: 'app' };
     if (/^Outlook-Android\/|^Microsoft Office\/.*?Microsoft Outlook/.test(userAgent)) return { name: `Microsoft Outlook`, type: 'app' };
     if (/^microsoft;xbox_/.test(userAgent)) return { name: `Microsoft Xbox`, type: 'app' };
-    if (/^Mimir(-macOS)?\//.test(userAgent)) return { name: `Mimir`, type: 'app' };
+    if (/^Mimir(-macOS|-iOS)?\//.test(userAgent)) return { name: `Mimir`, type: 'app' };
     if (/^Miro\/.+Windows/.test(userAgent)) return { name: `Miro`, type: 'app' };
     if (/^Mixcloud\//.test(userAgent)) return { name: `Mixcloud`, type: 'app' };
     if (/^MixerBox(%20Pro)?\//.test(userAgent)) return { name: `MixerBox`, type: 'app' };
@@ -720,11 +721,11 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/GoogleChirp|Google-Speech-Actions|CrKey.*DeviceType\/SmartSpeaker/.test(userAgent)) return { name: `Google Home`, type: 'device', category: 'smart_speaker' };
     if (/Chromebook|CrOS/.test(userAgent)) return { name: `Google Chromebook`, type: 'device', category: 'computer' };
     if (/[a|A]ndroid.*[t|T]ablet|[t|T]ablet.*[a|A]ndroid|SM-T| GT-|^ZTE;Xview/.test(userAgent)) return { name: `Android Tablet`, type: 'device', category: 'mobile' };
-    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;[uq]n\d|^hisense;(c235x|c205x)|^skyworth;NoblexTV|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;VSB|^TPV;[A-Z0-9]+AndroidTV;/.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
+    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;[uq][nej]\d|^hisense;(c235x|c205x)|^skyworth;NoblexTV|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;VSB|^TPV;[A-Z0-9]+AndroidTV;|^(CVT_NULL|MediaTek);SMARTTV;|^NVIDIA;SHIELDAndroidTV|UHDAndroidTV;|^westinghouse;7808x;|^ZTE;B820C/.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
     if (/ServeStream|Android|android|HTC|ExoPlayer|^AntennaPod\/|^GSA\/.*\.arm(64)?$|^sp-agent|^PRDownloader$|^(Turtlecast|TURTLECAST)\//.test(userAgent)) return { name: `Android Phone`, type: 'device', category: 'mobile' };
     if (/Windows|windows|WMPlayer|Winamp|Win32|Win64|NSPlayer|MediaMonkey|NSPlayer|PC/.test(userAgent)) return { name: `Windows Computer`, type: 'device', category: 'computer' };
     if (/Alexa|^Echo\/|^Amazon;Echo/.test(userAgent)) return { name: `Amazon Smart Speaker`, type: 'device', category: 'smart_speaker' };
-    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar)|^HEOS;DENON|^Denon;DENON-DWHS|^Storybutton\//.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
+    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar|Portable_Home|Smart_Speaker)|^HEOS;DENON|^Denon;DENON-DWHS|^Storybutton\/|^Bluesound;|^Yamaha;WX-/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
     if (/Lavf\/|desktop|Linux|linux|VLC|^okhttp\/|CastBox\//.test(userAgent)) return { name: `Other Computer`, type: 'device', category: 'computer' };
     if (/tablet|Tablet/.test(userAgent)) return { name: `Other Tablet`, type: 'device', category: 'mobile' };
     if (/watch|Watch|^Garmin /.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };
@@ -744,6 +745,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/:\/\/curiocaster\.com\//.test(referer)) return { name: `CurioCaster`, type: 'referrer', category: 'app' };
     if (/^https:\/\/ceskepodcasty\.cz\//.test(referer)) return { name: `Czech Podcasts`, type: 'referrer' };
     if (/^https:\/\/www\.deezer\.com\//.test(referer)) return { name: `Deezer`, type: 'referrer', category: 'app' };
+    if (/:\/\/[^\/]+\.discordsays\.com\//.test(referer)) return { name: `Discord`, type: 'referrer', category: 'app' };
     if (/^https?:\/\/(lm|m|www|l)\.facebook\.com\//.test(referer)) return { name: `Facebook`, type: 'referrer', category: 'app' };
     if (/:\/\/feedly\.com\//.test(referer)) return { name: `Feedly`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.feedspot\.com\//.test(referer)) return { name: `Feedspot`, type: 'referrer', category: 'app' };
