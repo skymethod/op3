@@ -8369,7 +8369,9 @@ const supportedLanguageLabels = {
     en: 'English (US)',
     es: 'Español',
     fr: 'Français',
-    nl: 'Nederlands'
+    nl: 'Nederlands',
+    de: 'Deutsch',
+    'en-gb': 'English (British)'
 };
 Object.keys(supportedLanguageLabels);
 const withCommas = new Intl.NumberFormat('en-US');

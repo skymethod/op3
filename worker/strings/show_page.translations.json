@@ -2,361 +2,505 @@
   "export_download_details": {
     "fr": "Exporter les données en détail",
     "nl": "Exporteer downloadgegevens",
-    "es": "Exportar detalle de las descargas"
+    "es": "Exportar detalle de las descargas",
+    "de": "Download-Details exportieren",
+    "en-gb": "Export download details"
   },
   "daily_downloads": {
     "fr": "Téléchargements par jour",
     "nl": "Dagelijkse Downloads",
-    "es": "Descargas diarias"
+    "es": "Descargas diarias",
+    "de": "Tägliche Downloads",
+    "en-gb": "Daily Downloads"
   },
   "twelve_hourly_downloads": {
     "fr": "Téléchargements en 12 heures",
     "nl": "Downloads om de 12 uur",
-    "es": "12 horas de descargas"
+    "es": "12 horas de descargas",
+    "de": "12-Stündliche Downloads",
+    "en-gb": "12-hourly Downloads"
   },
   "six_hourly_downloads": {
     "fr": "Téléchargements en 6 heures",
     "nl": "Downloads om de 6 uur",
-    "es": "6 horas de descargas"
+    "es": "6 horas de descargas",
+    "de": "6-Stündliche Downloads",
+    "en-gb": "6-hourly Downloads"
   },
   "hourly_downloads": {
     "fr": "Téléchargements par heure",
     "nl": "Uurlijkse Downloads",
-    "es": "Descargas por hora"
+    "es": "Descargas por hora",
+    "de": "Stündliche Downloads",
+    "en-gb": "Hourly Downloads"
   },
   "in_month": {
     "fr": "en %s",
     "nl": "in %s",
-    "es": "en %s"
+    "es": "en %s",
+    "de": "in %s",
+    "en-gb": "in %s"
   },
   "so_far": {
     "fr": "jusqu'à présent",
     "nl": "tot nu toe",
-    "es": "hasta ahora"
+    "es": "hasta ahora",
+    "de": "bisher",
+    "en-gb": "so far"
   },
   "day_n": {
     "fr": "Jour %d",
     "nl": "Dag %d",
-    "es": "Día %d"
+    "es": "Día %d",
+    "de": "Tag %d",
+    "en-gb": "Day %d"
   },
   "hour_n": {
     "fr": "Heure %d",
     "nl": "Uur %d",
-    "es": "Hora %d"
+    "es": "Hora %d",
+    "de": "Stunde %d",
+    "en-gb": "Hour %d"
   },
   "minute_n": {
     "fr": "Minute %d",
     "nl": "Minuut %d",
-    "es": "Minuto %d"
+    "es": "Minuto %d",
+    "de": "Minute %d",
+    "en-gb": "Minute %d"
   },
   "page_x_of_n": {
     "fr": "Page %d sur %d",
     "nl": "Pagina %d van %d",
-    "es": "Página %d de %d"
+    "es": "Página %d de %d",
+    "de": "Seite %d von %d",
+    "en-gb": "Page %d of %d"
   },
   "x_of_n_anonymized_sessions": {
     "fr": "%d des %d sessions anonymisées",
     "nl": "%d van %d geanonimiseerde sessies",
-    "es": "%d de %d sesiones anonimizadas"
+    "es": "%d de %d sesiones anonimizadas",
+    "de": "%d von %d anonymisierten Sessions",
+    "en-gb": "%d of %d anonymised sessions"
   },
   "published_episode": {
     "fr": "Publié : %s",
     "nl": "Gepubliceerd: %s",
-    "es": "Publicado: %s"
+    "es": "Publicado: %s",
+    "de": "Veröffentlicht: %s",
+    "en-gb": "Published: %s"
   },
   "one_download": {
     "fr": "%d téléchargement",
     "nl": "%d download",
-    "es": "%d descarga"
+    "es": "%d descarga",
+    "de": "%d Download",
+    "en-gb": "%d download"
   },
   "multiple_downloads": {
     "fr": "%d téléchargements",
     "nl": "%d downloads",
-    "es": "%d descargas"
+    "es": "%d descargas",
+    "de": "%d Downloads",
+    "en-gb": "%d downloads"
   },
   "one_hour": {
     "fr": "%d heure",
     "nl": "%d uur",
-    "es": "%d hora"
+    "es": "%d hora",
+    "de": "%d Stunde",
+    "en-gb": "%d hour"
   },
   "multiple_hours": {
     "fr": "%d heures",
     "nl": "%d uren",
-    "es": "%d horas"
+    "es": "%d horas",
+    "de": "%d Stunden",
+    "en-gb": "%d hours"
   },
   "utc": {
     "fr": "UTC",
     "nl": "UTC",
-    "es": "UTC"
+    "es": "UTC",
+    "de": "UTC",
+    "en-gb": "UTC"
   },
   "tz_is_equal_to_utc": {
     "fr": "%s est égal à %s",
     "nl": "%s is gelijk aan %s",
-    "es": "%s es igual a %s"
+    "es": "%s es igual a %s",
+    "de": "%s ist gleich wie %s",
+    "en-gb": "%s is equal to %s"
   },
   "tz_is_behind_utc": {
     "fr": "%s est %s derrière %s",
     "nl": "%s loopt %s achter op %s",
-    "es": "%s está con %s menos que %s"
+    "es": "%s está con %s menos que %s",
+    "de": "%s ist %s hinter %s",
+    "en-gb": "%s is %s behind %s"
   },
   "tz_is_ahead_of_utc": {
     "fr": "%s est %s devant %s",
     "nl": "%s loopt %s voor op %s",
-    "es": "%s está con %s más que %s"
+    "es": "%s está con %s más que %s",
+    "de": "%s ist %s vor %s",
+    "en-gb": "%s is %s ahead of %s"
   },
   "downloads_in_last_n_days": {
     "fr": "téléchargements au cours des %d derniers jours",
     "nl": "Downloads in de laatste %d dagen",
-    "es": "descargas en los últimos %d días"
+    "es": "descargas en los últimos %d días",
+    "de": "Downloads in den letzten %d Tagen",
+    "en-gb": "downloads in last %d days"
   },
   "as_of": {
     "fr": "à partir de",
     "nl": "vanaf",
-    "es": "a"
+    "es": "a",
+    "de": "wie",
+    "en-gb": "as of"
   },
   "download_sparkline_info": {
     "fr": "Nombre total de téléchargements pour ce podcast au cours des %d derniers jours, et courbe de l'évolution.",
     "nl": "Totaal aantal downloads voor deze podcast in de laatste %d dagen, en een grafiek die de recente geschiedenis van deze waarde laat zien.",
-    "es": "Número total de descargas de este podcast en los últimos %d días, y un gráfico que muestra el historial reciente de este valor."
+    "es": "Número total de descargas de este podcast en los últimos %d días, y un gráfico que muestra el historial reciente de este valor.",
+    "de": "Gesamte Anzahl an Downloads für diesen Podcast in den letzten %d Tagen und ein Diagramm mit den neuersten Änderungen dieses Wertes.",
+    "en-gb": "Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value."
   },
   "download_definition_info": {
     "fr": "En OP3, un téléchargement est une requête GET unique par adresse IP dans une période de 24 heures (jour UTC), sans les bots.",
     "nl": "In OP3 wordt een download gedefinieerd als een uniek GET-verzoek per IP-hash binnen een periode van 24 uur (UTC-dag) vanuit een niet-bot-gebruikersagent.",
-    "es": "En OP3, una descarga se define como una única solicitud GET por hash IP  dentro de un periodo de 24 horas (día UTC) desde un agente de usuario no bot."
+    "es": "En OP3, una descarga se define como una única solicitud GET por hash IP  dentro de un periodo de 24 horas (día UTC) desde un agente de usuario no bot.",
+    "de": "In OP3, ist ein Download als ein einzigartiger GET-Request pro IP-Hash definiert, welcher innerhalb eines 24-Stunden-Zeitraums (UTC-Tag) von einem nicht-Bot User-Agent gestellt wird.",
+    "en-gb": "In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent."
   },
   "downloads": {
     "fr": "téléchargements",
     "nl": "downloads",
-    "es": "descargas"
+    "es": "descargas",
+    "de": "Downloads",
+    "en-gb": "downloads"
   },
   "monthly_downloads_info": {
     "fr": "Téléchargements pour ce podcast au cours du mois indiqué.",
     "nl": "Downloads voor deze podcast in een bepaalde maand.",
-    "es": "Descargas para este podcast en un mes determinado."
+    "es": "Descargas para este podcast en un mes determinado.",
+    "de": "Downloads für diesen Podcast innerhalb eines Monats.",
+    "en-gb": "Downloads for this podcast in a given month."
   },
   "unique_audience": {
     "fr": "auditeurices uniques",
     "nl": "Uniek publiek",
-    "es": "audiencia única"
+    "es": "audiencia única",
+    "de": "einzigartiges Publikum",
+    "en-gb": "unique audience"
   },
   "audience_info": {
     "fr": "Auditeurices uniques (filtre par IP) pour ce podcast au cours du mois indiqué.",
     "nl": "Unieke luisteraars (IP-hash) voor deze podcast in een bepaalde maand.",
-    "es": "Oyentes únicos (hash de IP) para este podcast en un mes determinado."
+    "es": "Oyentes únicos (hash de IP) para este podcast en un mes determinado.",
+    "de": "Einzigartige Hörer (IP-Hash) für diesen Podcast innerhalb eines Monats.",
+    "en-gb": "Unique listeners (IP hash) for this podcast in a given month."
   },
   "audience_definition_info": {
     "fr": "OP3 change le chiffrement IP des auditeurices tous les mois pour des raisons de confidentialité.",
     "nl": "OP3 roteert luisteraar-IP-hashes elke maand om privacyredenen.",
-    "es": "OP3 rota los hashes de IPs de los oyentes cada mes por razones de privacidad."
+    "es": "OP3 rota los hashes de IPs de los oyentes cada mes por razones de privacidad.",
+    "de": "Aus Datenschutzgründen werden bei OP3 die IP-Hashes monatlich rotiert.",
+    "en-gb": "OP3 rotates listener IP hashes every month for privacy reasons."
   },
   "how_op3_calculates_downloads": {
     "fr": "Comment OP3 calcule les téléchargements",
     "nl": "Hoe OP3 downloads berekent",
-    "es": "Cómo calcula OP3 las descargas"
+    "es": "Cómo calcula OP3 las descargas",
+    "de": "Wie OP3 Downloads berechnet",
+    "en-gb": "How OP3 calculates downloads"
   },
   "older_downloads": {
     "fr": "Téléchargements plus anciens",
     "nl": "Oudere downloads",
-    "es": "Descargas antiguas"
+    "es": "Descargas antiguas",
+    "de": "Ältere Downloads",
+    "en-gb": "Older downloads"
   },
   "daily": {
     "fr": "Par jour",
     "nl": "Dagelijks",
-    "es": "Diarias"
+    "es": "Diarias",
+    "de": "Täglich",
+    "en-gb": "Daily"
   },
   "hourly": {
     "fr": "Par heure",
     "nl": "Uurlijks",
-    "es": "Por hora"
+    "es": "Por hora",
+    "de": "Stündlich",
+    "en-gb": "Hourly"
   },
   "episode_markers": {
     "fr": "Indicateur d'épisode",
     "nl": "Afleveringsmarkeringen",
-    "es": "Marcadores de episodios"
+    "es": "Marcadores de episodios",
+    "de": "Episoden-Marker",
+    "en-gb": "Episode markers"
   },
   "newer_downloads": {
     "fr": "Téléchargements plus récents",
     "nl": "Nieuwere downloads",
-    "es": "Descargas recientes"
+    "es": "Descargas recientes",
+    "de": "Neuere Downloads",
+    "en-gb": "Newer downloads"
   },
   "listen_time": {
     "fr": "Temps d'écoute",
     "nl": "Luistertijd",
-    "es": "Tiempo de escucha"
+    "es": "Tiempo de escucha",
+    "de": "Hörzeit",
+    "en-gb": "Listen time"
   },
   "of_listeners_listen_to": {
     "fr": "des auditeurices écoutent au moins",
     "nl": "van luisteraars luistert minstens",
-    "es": "de escucha de oyentes hasta al menos"
+    "es": "de escucha de oyentes hasta al menos",
+    "de": "der Zuhörer hörten bis mindestens",
+    "en-gb": "of listeners listen to at least"
   },
   "of_an_episode": {
     "fr": "d'un épisode",
     "nl": "van een aflevering",
-    "es": "de un episodio"
+    "es": "de un episodio",
+    "de": "einer Episode",
+    "en-gb": "of an episode"
   },
   "half": {
     "fr": "la moitié",
     "nl": "de helft",
-    "es": "la mitad"
+    "es": "la mitad",
+    "de": "hälfte",
+    "en-gb": "half"
   },
   "from": {
     "fr": "de",
     "nl": "van",
-    "es": "desde"
+    "es": "desde",
+    "de": "von",
+    "en-gb": "from"
   },
   "based_on": {
     "fr": "Basé sur",
     "nl": "Gebaseerd op",
-    "es": "Basado en"
+    "es": "Basado en",
+    "de": "Basierend auf",
+    "en-gb": "Based on"
   },
   "anonymized_playback_sessions": {
     "fr": "des sessions de lecture anonymisées",
     "nl": "geanonimiseerde afspeelsessies",
-    "es": "sesiones anonimizadas de reproducción"
+    "es": "sesiones anonimizadas de reproducción",
+    "de": "anonymisierte Abspiel-Sessions",
+    "en-gb": "anonymised playback sessions"
   },
   "how_op3_calculates_listen_time": {
     "fr": "Comment OP3 calcule le temps d'écoute côté auditeurice.",
     "nl": "Hoe OP3 de luistertijd aan de clientzijde berekent",
-    "es": "Cómo calcula OP3 el tiempo de escucha del cliente"
+    "es": "Cómo calcula OP3 el tiempo de escucha del cliente",
+    "de": "Wie OP3 die clientbasierte Hörzeit berechnet",
+    "en-gb": "How OP3 calculates client-side listen time"
   },
   "previous": {
     "fr": "Précédent",
     "nl": "Vorige",
-    "es": "Anterior"
+    "es": "Anterior",
+    "de": "Vorherige",
+    "en-gb": "Previous"
   },
   "minutes_played_from": {
     "fr": "Minutes écoutées à partir de",
     "nl": "Afgespeelde minuten van",
-    "es": "Minutos reproducidos de"
+    "es": "Minutos reproducidos de",
+    "de": "Minuten gespielt ab",
+    "en-gb": "Minutes played from"
   },
   "next": {
     "fr": "Suivant",
     "nl": "Volgende",
-    "es": "Siguiente"
+    "es": "Siguiente",
+    "de": "Nächste",
+    "en-gb": "Next"
   },
   "episode_pacing": {
     "fr": "Evolution des épisodes",
     "nl": "Afleveringsritme",
-    "es": "Cronología de los episodios"
+    "es": "Cronología de los episodios",
+    "de": "Pacing",
+    "en-gb": "Episode pacing"
   },
   "3_day": {
     "fr": "3 jours",
     "nl": "3 dagen",
-    "es": "3 días"
+    "es": "3 días",
+    "de": "3-Tage",
+    "en-gb": "3-day"
   },
   "7_day": {
     "fr": "7 jours",
     "nl": "7 dagen",
-    "es": "7 días"
+    "es": "7 días",
+    "de": "7-Tage",
+    "en-gb": "7-day"
   },
   "30_day": {
     "fr": "30 jours",
     "nl": "30 dagen",
-    "es": "30 días"
+    "es": "30 días",
+    "de": "30-Tage",
+    "en-gb": "30-day"
   },
   "newer_episodes": {
     "fr": "Épisodes plus récents",
     "nl": "Nieuwere afleveringen",
-    "es": "Nuevos episodios"
+    "es": "Nuevos episodios",
+    "de": "Neuere Episoden",
+    "en-gb": "Newer episodes"
   },
   "older_episodes": {
     "fr": "Épisodes plus anciens",
     "nl": "Oudere afleveringen",
-    "es": "Episodios antiguos"
+    "es": "Episodios antiguos",
+    "de": "Ältere Episoden",
+    "en-gb": "Older episodes"
   },
   "export": {
     "fr": "Exporter",
     "nl": "Exporteren",
-    "es": "Exportar"
+    "es": "Exportar",
+    "de": "Exportieren",
+    "en-gb": "Export"
   },
   "top_countries": {
     "fr": "Top pays",
     "nl": "Top landen",
-    "es": "Principales países"
+    "es": "Principales países",
+    "de": "Top Länder",
+    "en-gb": "Top countries"
   },
   "top_us_metros": {
     "fr": "Top régions des USA",
     "nl": "Top Amerikaanse steden",
-    "es": "Principales ciudades de EE. UU."
+    "es": "Principales ciudades de EE. UU.",
+    "de": "Top US-Metros",
+    "en-gb": "Top US metros"
   },
   "top_canadian_regions": {
     "fr": "Top régions du Canada",
     "nl": "Top Canadese regio's",
-    "es": "Principales regiones de Canadá"
+    "es": "Principales regiones de Canadá",
+    "de": "Top Kanada-Regionen",
+    "en-gb": "Top Canadian regions"
   },
   "top_latin_american_regions": {
     "fr": "Top régions d'Amérique latine",
     "nl": "Top Latijns-Amerikaanse regio's",
-    "es": "Top regiones de América Latina"
+    "es": "Top regiones de América Latina",
+    "de": "Top Lateinamerika-Regionen",
+    "en-gb": "Top Latin American regions"
   },
   "top_eu_regions": {
     "fr": "Top régions de l'UE",
     "nl": "Top EU-regio's",
-    "es": "Principales regiones de la UE"
+    "es": "Principales regiones de la UE",
+    "de": "Top EU-Regionen",
+    "en-gb": "Top EU regions"
   },
   "top_asian_regions": {
     "fr": "Top régions d'Asie",
     "nl": "Top Aziatische regio's",
-    "es": "Principales regiones asiáticas"
+    "es": "Principales regiones asiáticas",
+    "de": "Top Asien-Regionen",
+    "en-gb": "Top Asian regions"
   },
   "top_australasian_regions": {
     "fr": "Top régions d'Australasie",
     "nl": "Top Australaziatische regio's",
-    "es": "Top de regiones de Australasia"
+    "es": "Top de regiones de Australasia",
+    "de": "Top Australasien-Regionen",
+    "en-gb": "Top Australasian regions"
   },
   "top_apps": {
     "fr": "Top applications",
     "nl": "Top-apps",
-    "es": "Aplicaciones principales"
+    "es": "Aplicaciones principales",
+    "de": "Top Apps",
+    "en-gb": "Top apps"
   },
   "top_devices": {
     "fr": "Top appareils",
     "nl": "Top apparaten",
-    "es": "Dispositivos principales"
+    "es": "Dispositivos principales",
+    "de": "Top Geräte",
+    "en-gb": "Top devices"
   },
   "top_device_types": {
     "fr": "Top types d'appareils",
     "nl": "Top apparaattypen",
-    "es": "Principales tipos de dispositivos"
+    "es": "Principales tipos de dispositivos",
+    "de": "Top Geräte-Typen",
+    "en-gb": "Top device types"
   },
   "top_browsers_and_referrers": {
     "fr": "Top navigateurs et sources",
     "nl": "Top browsers & verwijzers",
-    "es": "Top navegadores y referrers"
+    "es": "Top navegadores y referrers",
+    "de": "Top Browser und Referrer",
+    "en-gb": "Top browsers & referrers"
   },
   "cancel": {
     "fr": "Annuler",
     "nl": "Annuleren",
-    "es": "Cancelar"
+    "es": "Cancelar",
+    "de": "Abbrechen",
+    "en-gb": "Cancel"
   },
   "older": {
     "fr": "Plus ancien",
     "nl": "Oudere",
-    "es": "Más antiguos"
+    "es": "Más antiguos",
+    "de": "Älter",
+    "en-gb": "Older"
   },
   "include_bots": {
     "fr": "Inclure les bots",
     "nl": "Inclusief bots",
-    "es": "Incluir bots"
+    "es": "Incluir bots",
+    "de": "Bots einschließen",
+    "en-gb": "Include bots"
   },
   "last_updated": {
     "fr": "Dernière mise à jour",
     "nl": "Laatste update",
-    "es": "Última actualización"
+    "es": "Última actualización",
+    "de": "Zuletzt aktualisiert",
+    "en-gb": "Last updated"
   },
   "dates_and_times_are_in": {
     "fr": "Les dates et les heures sont en",
     "nl": "Datums en tijdstippen zijn in",
-    "es": "Las fechas y horas están en"
+    "es": "Las fechas y horas están en",
+    "de": "Daten und Zeiten sind in",
+    "en-gb": "Dates and times are in"
   },
   "utc_stands_for": {
     "fr": "UTC signifie Coordinated Universal Time (temps universel coordonné).",
     "nl": "UTC staat voor Gecoördineerde Universele Tijd.",
-    "es": "UTC son las siglas de Tiempo Universal Coordinado."
+    "es": "UTC son las siglas de Tiempo Universal Coordinado.",
+    "de": "UTC steht für Coordinated Universal Time.",
+    "en-gb": "UTC stands for Coordinated Universal Time."
   },
   "utc_is_a_standardized_time_reference": {
     "fr": "Il s'agit d'une échelle de temps normalisée qui n'est pas affectée par l'heure d'été.",
     "nl": "Het is een gestandaardiseerde tijdreferentie die niet wordt beïnvloed door de zomertijd.",
-    "es": "Es una referencia horaria normalizada que no se ve afectada por el horario de verano."
+    "es": "Es una referencia horaria normalizada que no se ve afectada por el horario de verano.",
+    "de": "Eine standatisierte Zeitzone, die nicht von Zeitumstellungen beeinträchtigt wird.",
+    "en-gb": "It is a standardised time reference that is not affected by summer time or similar."
   }
 }

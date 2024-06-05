@@ -21,6 +21,8 @@ export function computeLanguageSelection(contentLanguage: string): string {
         langLabelEs: supportedLanguageLabels['es'],
         langLabelFr: supportedLanguageLabels['fr'],
         langLabelNl: supportedLanguageLabels['nl'],
+        langLabelDe: supportedLanguageLabels['de'],
+        langLabelEnGb: supportedLanguageLabels['en-gb'],
         shoelaceCommon,
         contentLanguage,
     });

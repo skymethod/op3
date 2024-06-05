@@ -115,6 +115,7 @@ export function computePreferredSupportedLanguage({ langParam, acceptLanguage }:
     if (qualityValues.length === 0) return undefined;
     qualityValues.sort((a, b) => b.q - a.q);
     for (const { value } of qualityValues) {
+        if (value.includes('-') && supportedLanguages.includes(value)) return value; // en-gb
         const lang = value.split('-').at(0) ?? value;
         if (lang === 'up') return lang; // for testing
         if (supportedLanguages.includes(lang)) return lang;
@@ -127,6 +128,8 @@ export const supportedLanguageLabels: Record<string, string> = {
     es: 'Español',
     fr: 'Français',
     nl: 'Nederlands',
+    de: 'Deutsch',
+    'en-gb': 'English (British)',
 };
 
 export const supportedLanguages = Object.keys(supportedLanguageLabels);

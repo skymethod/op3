@@ -2,126 +2,176 @@
   "paragraph_1": {
     "fr": "Le projet Open Podcast Prefix (OP3) est un <a href=\"https://soundsprofitable.com/update/prefix-analytics\">service d'analyse de préfixe</a> de podcast <a href=\"https://github.com/skymethod/op3\">open-source</a> et gratuit, engagé envers les données ouvertes et la confidentialité des auditeurs.",
     "nl": "Het Open Podcast Prefix Project (OP3) is een gratis en <a href=\"https://github.com/skymethod/op3\">open-source</a> dienst voor <a href=\"https://soundsprofitable.com/update/prefix-analytics\">podcast-prefixanalyse</a> die zich inzet voor open data en de privacy van luisteraars.",
-    "es": "El Proyecto de Prefijo de Podcast Abierto o en inglés Open Podcast Prefix Project (OP3) es un <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servicio de análisis de prefijos</a> de podcasts de <a href=\"https://github.com/skymethod/op3\">código abierto</a> y libre comprometido con los datos abiertos y la privacidad de los oyentes."
+    "es": "El Proyecto de Prefijo de Podcast Abierto o en inglés Open Podcast Prefix Project (OP3) es un <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servicio de análisis de prefijos</a> de podcasts de <a href=\"https://github.com/skymethod/op3\">código abierto</a> y libre comprometido con los datos abiertos y la privacidad de los oyentes.",
+    "de": "Das Open Podcast Prefix Project (OP3) ist ein kostenloser und <a href=\"https://github.com/skymethod/op3\">open-source</a> <a href=\"https://soundsprofitable.com/update/prefix-analytics\">Analysedienst für Podcast-Präfixe</a>, der sich für offene Daten und den Schutz der Hörer einsetzt.",
+    "en-gb": "The Open Podcast Prefix Project (OP3) is a free and <a href=\"https://github.com/skymethod/op3\">open-source</a> podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a> committed to open data and listener privacy."
   },
   "box_1_line_1": {
     "fr": "C'est facile : aucune inscription ni connexion n'est requise",
     "nl": "Het is zo makkelijk: geen aanmelding of inloggen vereist.",
-    "es": "Es fácil: no se requiere registro ni inicio de sesión."
+    "es": "Es fácil: no se requiere registro ni inicio de sesión.",
+    "de": "Es ist einfach: keine registrierung oder login nötig",
+    "en-gb": "It's easy: no signup or login required"
   },
   "box_1_line_2": {
     "fr": "Les podcasteurices ou les hébergeurs de podcasts peuvent ajouter un préfixe d'URL",
     "nl": "Podcasters of podcasthosts kunnen een URL-voorvoegsel toevoegen",
-    "es": "Los podcasters o las empresas de alojamiento de podcasts pueden anteponer"
+    "es": "Los podcasters o las empresas de alojamiento de podcasts pueden anteponer",
+    "de": "Podcaster oder Podcast-Hosting-Unternehmen können ",
+    "en-gb": "Podcasters or podcast hosting companies can prepend"
   },
   "box_1_line_3": {
     "fr": "au lien vers l'épisode pour commencer à mesurer les téléchargements.",
     "nl": "naar podcastaflevering url's in hun feed om deel te nemen en downloads te gaan meten.",
-    "es": "a las URL de los episodios de podcast en su feed, para participar y empezar a medir las descargas."
+    "es": "a las URL de los episodios de podcast en su feed, para participar y empezar a medir las descargas.",
+    "de": "die URLs von Podcast-Episoden in ihren Feed einfügen, um teilzunehmen und Downloads zu messen.",
+    "en-gb": "to podcast episode urls in their feed to participate and start measuring downloads."
   },
   "box_1_line_4": {
     "fr": "(Pas besoin de supprimer les préfixes existants, il peut y en avoir plus d'un)",
     "nl": "(Geen noodzaak om bestaande voorvoegsels te verwijderen, er kunnen er meer dan één zijn)",
-    "es": "(No es necesario eliminar los prefijos existentes, puede haber más de uno)"
+    "es": "(No es necesario eliminar los prefijos existentes, puede haber más de uno)",
+    "de": "(Es ist nicht nötig bereits existierende Prefixe zu entfernen. Es können mehrere gleichzeitig genutzt werden)",
+    "en-gb": "(No need to remove existing prefixes, there can be more than one)"
   },
   "box_1_line_5": {
     "fr": "Pour plus d'informations, consultez votre flux en utilisant notre page de <a href=\"/setup\" class=\"localized\">configuration →</a>",
     "nl": "Voor meer instructies, controleer uw feed met behulp van onze <a href=\"/setup\" class=\"localized\">installatiepagina →</a>",
-    "es": "Para obtener más instrucciones, compruebe su feed utilizando nuestra <a href=\"/setup\" class=\"localized\">página de configuración →</a>"
+    "es": "Para obtener más instrucciones, compruebe su feed utilizando nuestra <a href=\"/setup\" class=\"localized\">página de configuración →</a>",
+    "de": "Weitere Anleitungen findest du auf unserer <a href=\"/setup\" class=\"localized\">Einrichtungsseite → </a>",
+    "en-gb": "For more instructions, check your feed using our <a href=\"/setup\" class=\"localized\">setup page →</a>"
   },
   "paragraph_2": {
     "fr": "Une fois que vous commencez à utiliser ce préfixe, vous permettez la captation d'audience de votre émission au monde entier, <i>sans compromettre la vie privée de vos auditeurs</i>. Les développeurs d'applications et les entreprises peuvent commencer à créer des produits et des services pour vous en utilisant ces données ouvertes, sans que vous ayez à gérer une intégration personnalisée.",
     "nl": "Zodra u deze voorvoegsel begint te gebruiken, opent u de luistercijfers van uw show voor de wereld, <i>zonder de privacy van uw luisteraars in gevaar te brengen</i>. App-ontwikkelaars en bedrijven kunnen beginnen met het bouwen van producten en diensten voor u met behulp van deze open data, zonder dat u een aangepaste integratie hoeft te beheren.",
-    "es": "Una vez que comiences a usar este prefijo, estarás abriendo el número de oyentes de tu programa al mundo, <i>sin comprometer la privacidad de tus oyentes</i>. Los desarrolladores de aplicaciones y las empresas pueden comenzar a crear productos y servicios para ti utilizando estos datos abiertos, sin que tengas que gestionar una integración personalizada."
+    "es": "Una vez que comiences a usar este prefijo, estarás abriendo el número de oyentes de tu programa al mundo, <i>sin comprometer la privacidad de tus oyentes</i>. Los desarrolladores de aplicaciones y las empresas pueden comenzar a crear productos y servicios para ti utilizando estos datos abiertos, sin que tengas que gestionar una integración personalizada.",
+    "de": "Sobald du anfängst diesen Prefix zu nutzen, zeigst du deine Hörerzahlen der Welt, <i>ohne die Privatsphäre deiner Hörerschaft zu gefährden</i>. App-Entwickler und -Unternehmen können mit diesen Daten, auf dich zugeschnittene Produkte und Dienstleistungen erstellen, ohne dass du dich um benutzerdefinierte Intergration kümmern musst.",
+    "en-gb": "Once you start using this prefix, you are opening up your show's listener numbers to the world, <i>without compromising your listeners' privacy</i>.  App developers and companies can start building products and services for you using this open data, without you having to manage a custom integration."
   },
   "stats_box_paragraph_1": {
     "fr": "Chaque émission mesurée par OP3 reçoit automatiquement une page de statistiques gratuite et publique avec des métriques de téléchargements de podcast standard de l'industrie, en détails, et même l'export des données sous forme d'une feuille de calculs<em>avec un historique complet</em>.",
     "nl": "Elke show die gemeten wordt door OP3 ontvangt automatisch een gratis, openbare statistiekenpagina met podcast-downloadstatistieken die voldoen aan de industriestandaard, gedetailleerde analyses, zelfs export van gegevens naar spreadsheets <em>met volledige geschiedenis</em>.",
-    "es": "Cada programa medido por OP3 recibe automáticamente una página de estadísticas pública y gratuita con métricas de descarga de podcasts estándar del sector, desgloses detallados e incluso exportaciones de datos a hojas de cálculo <em>con todo el historial</em>."
+    "es": "Cada programa medido por OP3 recibe automáticamente una página de estadísticas pública y gratuita con métricas de descarga de podcasts estándar del sector, desgloses detallados e incluso exportaciones de datos a hojas de cálculo <em>con todo el historial</em>.",
+    "de": "Jede Show, die von OP3 bemessen wird, erhält automatische eine kostenfreie, öffentliche Statistikseite mit branchenüblichen Podcast-Download-Metriken, detaillierte Aufschlüsselungen und sogar Tabellenkalkulationsdatenexporte <em>mit vollständiger Historie</em>.",
+    "en-gb": "Every show measured by OP3 automatically receives a free, public stats page with industry-standard podcast download metrics, detailed breakdowns, even spreadsheet data exports <em>with full history</em>."
   },
   "stats_box_demo_link_label": {
     "fr": "Exemple d'une page de statistiques publique →",
     "nl": "Voorbeeld van een openbare statistiekenpagina →",
-    "es": "Ejemplo de página pública de estadísticas → "
+    "es": "Ejemplo de página pública de estadísticas → ",
+    "de": "Öffentliche Beispiel-Statistikseite →",
+    "en-gb": "Example public stats page →"
   },
   "paragraph_3": {
     "fr": "Ce service est différent de tous les autres services d'analyse, car ouvert (open source) et vérifiable. L'ensemble du code source est disponible pour vérification sur <a href=\"https://github.com/skymethod/op3\">GitHub</a>, tout comme les actions de déploiement associées. OP3 s'exécute sur une seule plateforme cloud, sans mélanger les données avec des bases de données d'adresses IP tierces externes !",
     "nl": "Deze service onderscheidt zich van alle andere analyseservices doordat hij open - open source - en verifieerbaar is. De volledige codebase is beschikbaar voor audit op <a href=\"https://github.com/skymethod/op3\">GitHub</a>, evenals de bijbehorende implementatieacties. OP3 wordt uitgevoerd op een enkel cloudplatform, waarbij geen gegevens worden gemengd met externe IP-adresdatabases van derden!",
-    "es": "Este servicio se desmarca de todos los demás servicios de análisis: es una máquina abierta y auditable. Todo el código base está disponible para auditar en <a href=\"https://github.com/skymethod/op3\">GitHub</a>, al igual que las acciones de despliegue asociadas. OP3 se ejecuta en una única plataforma en la nube, ¡sin mezclar con bases de datos externas de direcciones IP de terceros los datos!"
+    "es": "Este servicio se desmarca de todos los demás servicios de análisis: es una máquina abierta y auditable. Todo el código base está disponible para auditar en <a href=\"https://github.com/skymethod/op3\">GitHub</a>, al igual que las acciones de despliegue asociadas. OP3 se ejecuta en una única plataforma en la nube, ¡sin mezclar con bases de datos externas de direcciones IP de terceros los datos!",
+    "de": "Diesr Dienst unterscheidet sich von allen anderen Analysediensten – er ist eine offene und überprüfbare machine. Die gesamte Codebasis kann auf <a href=\"https://github.com/skymethod/op3\">GitHub</a> geprüft werden, ebenso wie die zugehörigen Bereitstellungsaktionen. OP3 wird auf einer einzigen Cloud-Plattform ausgeführt, keine Vermischung von Daten mit externen IP-Adressdatenbanken von Drittanbietern!",
+    "en-gb": "This service is a departure from all other analytics services, it's an open and auditable machine.  The entire codebase available to audit on <a href=\"https://github.com/skymethod/op3\">GitHub</a>, as are associated deployment actions. OP3 executes on a single cloud platform, no mixing data with external third-party IP address databases!"
   },
   "privacy_policy_line": {
     "fr": "Pour plus de détails, consultez notre <a href=\"/privacy\">politique de confidentialité</a>.",
     "nl": "Bekijk onze <em>leesbare</em> <a href=\"/privacy\">privacyverklaring</a> voor meer details.",
-    "es": "Vea nuestra <em>legible</em> <a href=\"/privacy\">política de privacidad</a> para obtener más detalles."
+    "es": "Vea nuestra <em>legible</em> <a href=\"/privacy\">política de privacidad</a> para obtener más detalles.",
+    "de": "Siehe unsere <em>lesbare</em> <a href=\"/privacy\">Datenschutzrichtlinie</a> für mehr Details.",
+    "en-gb": "See our <em>readable</em> <a href=\"/privacy\">privacy policy</a> for more details."
   },
   "paragraph_4": {
     "fr": "OP3 fonctionne sur un CDN mondial avec des connexions dans plus de 320 villes réparties dans plus de 120 pays. C'est l'un des services de redirection de podcast les plus rapides (si ce n'est le plus rapide). Gardez un œil sur notre <a href=\"https://poduptime.com/op3/\">temps de disponibilité mesuré de manière indépendante</a>.",
     "nl": "OP3 draait op een wereldwijd CDN met edge nodes in meer dan 320 steden in meer dan 120 landen. Het is een van de snelste (zo niet dé snelste) podcast-omleidingsdiensten. Houd onze <a href=\"https://poduptime.com/op3/\">onafhankelijk gemeten uptime</a> in de gaten.",
-    "es": "OP3 se ejecuta en una CDN global con nodos de borde en más de 320 ciudades de más de 120 países, es uno de los servicios de redireccionamiento de podcasts más rápidos (si no el más rápido). Eche un ojo a nuestro <a href=\"https://poduptime.com/op3/\">tiempo de actividad medido de forma independiente</a>."
+    "es": "OP3 se ejecuta en una CDN global con nodos de borde en más de 320 ciudades de más de 120 países, es uno de los servicios de redireccionamiento de podcasts más rápidos (si no el más rápido). Eche un ojo a nuestro <a href=\"https://poduptime.com/op3/\">tiempo de actividad medido de forma independiente</a>.",
+    "de": "OP3 läuft über ein globales CDN mit Edge Nodes in über 320 Städten in mehr als 120 Ländern und ist damit einer der schnellsten (wenn nicht sogar der schnellste) Podcast-Weiterleitungsdienst. Behalte unsere <a href=\"https://poduptime.com/op3/\">unabhängig gemessene Betriebszeit</a> im Auge.",
+    "en-gb": "OP3 runs on a global CDN with edge nodes in over 320 cities in over 120 countries, it is one of the fastest (if not the fastest) podcast redirect service.  Keep an eye on our <a href=\"https://poduptime.com/op3/\">independently-measured uptime</a>."
   },
   "paragraph_5": {
     "fr": "Nous fonctionnons sans problème depuis septembre 2022, mesurant maintenant plus de %d millions de téléchargements de podcasts chaque mois sur plus de %d émissions. Nos données sont disponibles au public via l'<a href=\"/api/docs\">API OP3</a>.",
     "nl": "Sinds september 2022 draaien we soepel en meten we nu meer dan %d miljoen podcastdownloads per maand over meer dan %d shows. Onze gegevens zijn beschikbaar voor het publiek via de <a href=\"/api/docs\">OP3 API</a>.",
-    "es": "Llevamos funcionando sin problemas desde septiembre de 2022 y ahora medimos más de %d millones de descargas de podcasts cada mes en más de %d programas. Nuestros datos están a disposición del público a través de la <a href=\"/api/docs\">API OP3</a>."
+    "es": "Llevamos funcionando sin problemas desde septiembre de 2022 y ahora medimos más de %d millones de descargas de podcasts cada mes en más de %d programas. Nuestros datos están a disposición del público a través de la <a href=\"/api/docs\">API OP3</a>.",
+    "de": "Wir arbeiten seit September 2022 reibungslos und messen jetzt jeden Monat über %d Millionen Podcast-Downloads für mehr als %d Sendungen. Unsere Daten sind für die Öffentlichkeit über die <a href=\"/api/docs\">OP3-API</a> verfügbar.",
+    "en-gb": "We've been running smoothly since Sept 2022, now measuring over %d million podcast downloads every month across more than %d shows. Our data is available to the public via the <a href=\"/api/docs\">OP3 API</a>."
   },
   "paragraph_6": {
     "fr": "OP3 est un projet indépendant de <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, reposant uniquement sur des sponsors qui partagent notre vision pour aider à couvrir nos <a href=\"/costs\">coûts</a> - nous n'existerions pas sans eux.",
     "nl": "OP3 is een onafhankelijk project van <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a> en vertrouwt uitsluitend op sponsors die onze visie delen om onze <a href=\"/costs\">kosten</a> te dekken - we zouden niet bestaan zonder hen.",
-    "es": "OP3 es un proyecto independiente de <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, que depende únicamente de patrocinadores que comparten nuestra visión para ayudar a cubrir nuestros <a href=\"/costs\">costes</a>: no existiríamos sin ellos."
+    "es": "OP3 es un proyecto independiente de <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, que depende únicamente de patrocinadores que comparten nuestra visión para ayudar a cubrir nuestros <a href=\"/costs\">costes</a>: no existiríamos sin ellos.",
+    "de": "OP3 ist ein unabhängiges Projekt von <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, das ausschließlich auf die Unterstützung von Sponsoren angewiesen ist, die unsere Vision teilen, um unsere <a href=\"/costs\">Kosten</a> zu decken - ohne sie würden wir nicht existieren.",
+    "en-gb": "OP3 is an independent project by <a href=\"https://twitter.com/johnspurlock\">John Spurlock</a>, relying solely on sponsors that share our vision to help cover our <a href=\"/costs\">costs</a> - we wouldn't exist without them."
   },
   "sponsor_us_link_label": {
     "fr": "Devenez sponsor !",
     "nl": "Sponsor ons!",
-    "es": "¡Patrocínenos!"
+    "es": "¡Patrocínenos!",
+    "de": "Unterstütze uns!",
+    "en-gb": "Sponsor us!"
   },
   "learn_more_line": {
     "fr": "En savoir plus sur nos projets futurs sur le <a href=\"https://github.com/skymethod/op3#op3\">GitHub →",
     "nl": "Lees meer over onze toekomstplannen op de <a href=\"https://github.com/skymethod/op3#op3\">GitHub readme →",
-    "es": "Más información sobre nuestros planes de futuro en el archivo <a href=\"https://github.com/skymethod/op3#op3\">Léame de GitHub  →"
+    "es": "Más información sobre nuestros planes de futuro en el archivo <a href=\"https://github.com/skymethod/op3#op3\">Léame de GitHub →",
+    "de": "Erfahre mehr über unsere zukünftigen Pläne auf dem <a href=\"https://github.com/skymethod/op3#op3\">GitHub Readme →",
+    "en-gb": "Learn more about our future plans on the <a href=\"https://github.com/skymethod/op3#op3\">GitHub readme →"
   },
   "privacy_policy_link_label": {
     "fr": "Politique de confidentialité",
     "nl": "Privacybeleid",
-    "es": "Política de privacidad"
+    "es": "Política de privacidad",
+    "de": "Datenschutzrichtlinie",
+    "en-gb": "Privacy Policy"
   },
   "terms_of_service_link_label": {
     "fr": "C.G.U.",
     "nl": "Algemene voorwaarden",
-    "es": "Términos de servicio"
+    "es": "Términos de servicio",
+    "de": "Allgemeine Geschäftsbedingungen",
+    "en-gb": "Terms of Service"
   },
   "costs_link_label": {
     "fr": "Coûts",
     "nl": "Kosten",
-    "es": "Costes"
+    "es": "Costes",
+    "de": "Kosten",
+    "en-gb": "Costs"
   },
   "releases_link_label": {
     "fr": "Versions",
     "nl": "Versies",
-    "es": "Lanzamientos"
+    "es": "Lanzamientos",
+    "de": "Releases",
+    "en-gb": "Releases"
   },
   "status_link_label": {
     "fr": "Statut",
     "nl": "Status",
-    "es": "Estado"
+    "es": "Estado",
+    "de": "Status",
+    "en-gb": "Status"
   },
   "email_link_label": {
     "fr": "E-mail",
     "nl": "E-mail",
-    "es": "Correo electrónico"
+    "es": "Correo electrónico",
+    "de": "Email",
+    "en-gb": "Email"
   },
   "sponsor_link_label": {
     "fr": "Sponsor",
     "nl": "Sponsor",
-    "es": "Patrocinador"
+    "es": "Patrocinador",
+    "de": "Sponsor",
+    "en-gb": "Sponsor"
   },
   "version": {
     "fr": "Version",
     "nl": "Versie",
-    "es": "Versión"
+    "es": "Versión",
+    "de": "Version",
+    "en-gb": "Version"
   },
   "deployed": {
     "fr": "Déploiement",
     "nl": "Geïmplementeerd",
-    "es": "Desplegado"
+    "es": "Desplegado",
+    "de": "Deployed",
+    "en-gb": "Deployed"
   }
 }

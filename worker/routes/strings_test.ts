@@ -7,9 +7,11 @@ Deno.test({
         assertEquals(computePreferredSupportedLanguage({ }), undefined);
 
         assertEquals(computePreferredSupportedLanguage({ langParam: 'en' }), 'en');
-        assertEquals(computePreferredSupportedLanguage({ langParam: 'de' }), undefined);
+        assertEquals(computePreferredSupportedLanguage({ langParam: 'de' }), 'de');
+        assertEquals(computePreferredSupportedLanguage({ langParam: 'pl' }), undefined);
         assertEquals(computePreferredSupportedLanguage({ langParam: 'end' }), undefined);
         assertEquals(computePreferredSupportedLanguage({ langParam: 'en-US' }), 'en');
+        assertEquals(computePreferredSupportedLanguage({ langParam: 'en-GB' }), 'en-gb');
 
         const acceptLanguageTests = {
             '': undefined,
@@ -25,7 +27,7 @@ Deno.test({
         }
 
         assertEquals(computePreferredSupportedLanguage({ langParam: 'en', acceptLanguage: 'fr-FR' }), 'en');
-        assertEquals(computePreferredSupportedLanguage({ langParam: 'de', acceptLanguage: 'fr-FR' }), 'fr');
+        assertEquals(computePreferredSupportedLanguage({ langParam: 'pl', acceptLanguage: 'fr-FR' }), 'fr');
     }
 });
 
