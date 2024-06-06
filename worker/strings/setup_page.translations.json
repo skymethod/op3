@@ -38,14 +38,14 @@
     "fr": "Analyse du podcast terminée",
     "nl": "Analyse van de podcast is voltooid",
     "es": "Finalizado el análisis del podcast",
-    "de": "Podcastanalyse abgeschlossen",
+    "de": "Podcast-Analyse abgeschlossen",
     "en-gb": "Finished analysing podcast"
   },
   "analyze_failed_message": {
     "fr": "L'analyse du podcast a échoué",
     "nl": "Podcastanalyse is mislukt",
     "es": "Análisis de podcast fallido",
-    "de": "Podcastanalyse fehlgeschlagen",
+    "de": "Podcast-Analyse fehlgeschlagen",
     "en-gb": "Podcast analysis failed"
   },
   "analyze_failed_default_error_message": {
@@ -206,7 +206,7 @@
     "fr": "le lien vers l'épisode pour commencer à mesurer les téléchargements.",
     "nl": "aan podcast-episode-URL's in hun feed om deel te nemen en te beginnen met het meten van downloads.",
     "es": "a las URL de los episodios en su feed para participar y empezar a medir las descargas.",
-    "de": "Podcast-Episoden-URLs in ihrem Feed vorangestellt werden, um teilzunehmen und Downloads zu messen.",
+    "de": "an die Podcast-Episoden-URLs in ihrem Feed voranstellen, um teilzunehmen und Downloads zu messen.",
     "en-gb": "to podcast episode urls in their feed to participate and start measuring downloads."
   },
   "instructions_box_line_3": {
@@ -220,7 +220,7 @@
     "fr": "Certains hébergeurs de podcasts (comme <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) vous permettent d'ajouter un préfixe personnalisé dans l'espace configuration de votre podcast, et d'autres (comme <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> et <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) le rendent aussi simple que cocher une case !",
     "nl": "Sommige podcasthostingbedrijven (zoals <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) stellen u in staat om een aangepast voorvoegsel toe te voegen in het dashboard van uw podcast, en sommige (zoals <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> en <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) maken het zo eenvoudig als het aanvinken van een vakje!",
     "es": "Algunas compañías de alojamiento (como <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) le permiten agregar un prefijo personalizado en el panel de control de su podcast, ¡y algunas (como  <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> o <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) lo hacen tan fácil como marcar una casilla!",
-    "de": "Bei einigen Podcast-Hosting-Anbietern (wie<a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\"> Megaphone</a>) kannst du im Dashboard Ihres Podcasts ein benutzerdefiniertes Präfix hinzufügen, und bei anderen (wie <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> und <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) musst du lediglich ein Kästchen markieren!",
+    "de": "Bei einigen Podcast-Hosting-Anbietern (wie<a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\"> Megaphone</a>) kannst du im Dashboard deines Podcasts ein benutzerdefiniertes Präfix hinzufügen, und bei anderen (wie <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> und <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) musst du lediglich ein Kästchen markieren!",
     "en-gb": "Some podcast hosting companies (like <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, and some (like <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> and <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) make it as easy as checking a box!"
   },
   "instructions_box_line_5": {
@@ -304,7 +304,7 @@
     "fr": "Accueil",
     "nl": "Startpagina",
     "es": "Inicio",
-    "de": "Home",
+    "de": "Startseite",
     "en-gb": "Home"
   }
 }

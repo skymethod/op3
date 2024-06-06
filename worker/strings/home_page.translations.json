@@ -10,7 +10,7 @@
     "fr": "C'est facile : aucune inscription ni connexion n'est requise",
     "nl": "Het is zo makkelijk: geen aanmelding of inloggen vereist.",
     "es": "Es fácil: no se requiere registro ni inicio de sesión.",
-    "de": "Es ist einfach: keine registrierung oder login nötig",
+    "de": "Es ist einfach: keine Registrierung oder login nötig",
     "en-gb": "It's easy: no signup or login required"
   },
   "box_1_line_2": {
@@ -24,7 +24,7 @@
     "fr": "au lien vers l'épisode pour commencer à mesurer les téléchargements.",
     "nl": "naar podcastaflevering url's in hun feed om deel te nemen en downloads te gaan meten.",
     "es": "a las URL de los episodios de podcast en su feed, para participar y empezar a medir las descargas.",
-    "de": "die URLs von Podcast-Episoden in ihren Feed einfügen, um teilzunehmen und Downloads zu messen.",
+    "de": "an die URLs von Podcast-Episoden in ihren Feed voranstellen, um teilzunehmen und Downloads zu messen.",
     "en-gb": "to podcast episode urls in their feed to participate and start measuring downloads."
   },
   "box_1_line_4": {
@@ -59,14 +59,14 @@
     "fr": "Exemple d'une page de statistiques publique →",
     "nl": "Voorbeeld van een openbare statistiekenpagina →",
     "es": "Ejemplo de página pública de estadísticas → ",
-    "de": "Öffentliche Beispiel-Statistikseite →",
+    "de": "Beispiel-Statistikseite →",
     "en-gb": "Example public stats page →"
   },
   "paragraph_3": {
     "fr": "Ce service est différent de tous les autres services d'analyse, car ouvert (open source) et vérifiable. L'ensemble du code source est disponible pour vérification sur <a href=\"https://github.com/skymethod/op3\">GitHub</a>, tout comme les actions de déploiement associées. OP3 s'exécute sur une seule plateforme cloud, sans mélanger les données avec des bases de données d'adresses IP tierces externes !",
     "nl": "Deze service onderscheidt zich van alle andere analyseservices doordat hij open - open source - en verifieerbaar is. De volledige codebase is beschikbaar voor audit op <a href=\"https://github.com/skymethod/op3\">GitHub</a>, evenals de bijbehorende implementatieacties. OP3 wordt uitgevoerd op een enkel cloudplatform, waarbij geen gegevens worden gemengd met externe IP-adresdatabases van derden!",
     "es": "Este servicio se desmarca de todos los demás servicios de análisis: es una máquina abierta y auditable. Todo el código base está disponible para auditar en <a href=\"https://github.com/skymethod/op3\">GitHub</a>, al igual que las acciones de despliegue asociadas. OP3 se ejecuta en una única plataforma en la nube, ¡sin mezclar con bases de datos externas de direcciones IP de terceros los datos!",
-    "de": "Diesr Dienst unterscheidet sich von allen anderen Analysediensten – er ist eine offene und überprüfbare machine. Die gesamte Codebasis kann auf <a href=\"https://github.com/skymethod/op3\">GitHub</a> geprüft werden, ebenso wie die zugehörigen Bereitstellungsaktionen. OP3 wird auf einer einzigen Cloud-Plattform ausgeführt, keine Vermischung von Daten mit externen IP-Adressdatenbanken von Drittanbietern!",
+    "de": "Diesr Dienst unterscheidet sich von allen anderen Analysediensten – er ist ein offenes und überprüfbares System. Die gesamte Codebasis kann auf <a href=\"https://github.com/skymethod/op3\">GitHub</a> geprüft werden, ebenso wie die zugehörigen Bereitstellungsaktionen. OP3 wird auf einer einzigen Cloud-Plattform ausgeführt, keine Vermischung von Daten mit externen IP-Adressdatenbanken von Drittanbietern!",
     "en-gb": "This service is a departure from all other analytics services, it's an open and auditable machine.  The entire codebase available to audit on <a href=\"https://github.com/skymethod/op3\">GitHub</a>, as are associated deployment actions. OP3 executes on a single cloud platform, no mixing data with external third-party IP address databases!"
   },
   "privacy_policy_line": {
