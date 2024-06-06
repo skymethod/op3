@@ -44,6 +44,16 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2024-06-06',
+        time: '2024-06-06T14:35:00.00Z',
+        title: '2024-06-06: German and British English translations',
+        bulletPoints: [
+            () => `New German translation, thanks to [Daniel Siebiesiuk](https://heldendumm.de/)`,
+            () => `New British English translation, thanks to [James Cridland (Podnews)](https://podnews.net)`,
+            () => `It's free and easy to help us translate into other languages, see the [OP3 Translation](https://github.com/skymethod/op3/blob/master/translation.md) page to get started.`,
+        ]
+    },
+    {
         id: '2024-04-17',
         time: '2024-04-17T16:39:00.00Z',
         title: '2024-04-17: New API query: Monthly/weekly downloads counts',
