@@ -39,6 +39,7 @@ Deno.test({
                 referer, 
                 hasForwarded: false, 
                 hasXForwardedFor: false,
+                usedXForwardedFor: false,
                 ipAddressShape: 'n.n.n.n',
                 ipAddressVersion: 4,
                 errors: [],

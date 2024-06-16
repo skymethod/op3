@@ -76,6 +76,7 @@ interface Redirect {
     readonly referer: string;
     readonly hasForwarded: boolean;
     readonly hasXForwardedFor: boolean;
+    readonly usedXForwardedFor: boolean;
     readonly ipAddressShape: string;
     readonly ipAddressVersion: 0 | 4 | 6;
     readonly errors: string[];

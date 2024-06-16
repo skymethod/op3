@@ -8,7 +8,6 @@ import { IsolateId } from './isolate_id.ts';
 import { Background, computeApiResponse, routeAdminDataRequest, tryParseApiRequest } from './routes/api.ts';
 import { CloudflareRpcClient } from './cloudflare_rpc_client.ts';
 import { generateUuid } from './uuid.ts';
-import { tryParseUlid } from './client_params.ts';
 import { isRpcRequest, RawRedirect } from './rpc_model.ts';
 import { computeApiDocsResponse } from './routes/api_docs.ts';
 import { computeApiDocsSwaggerResponse } from './routes/api_docs_swagger.ts';
@@ -40,6 +39,7 @@ import { computeRedirectTraceEvent } from './redirect_trace_events.ts';
 import { computeFaviconSvgResponse } from './routes/favicons.ts';
 import { makeBaselimeFromWorkerContext } from './baselime.ts';
 import { makeCloudflareLimiter } from './limiter.ts';
+import { computeRawRedirect } from './backend/raw_redirects.ts';
 
 export default {
     
@@ -263,18 +263,6 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
         console.log(`Invalid redirect url: ${request.url}`);
         return new Response('Invalid redirect url', { status: 400 });
     }
-}
-
-function computeRawRedirect(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRedirect {
-    const { time, method, rawIpAddress, other } = opts;
-    const { url } = request;
-    const uuid = generateUuid();
-    const ulid = tryParseUlid(url);
-    const userAgent = request.headers.get('user-agent') ?? undefined;
-    const referer = request.headers.get('referer') ?? undefined;
-    const range = request.headers.get('range') ?? undefined;
-    const xpsId = request.headers.get('x-playback-session-id') ?? undefined;
-    return { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, other };
 }
 
 function parseStringSet(commaDelimitedString: string | undefined): Set<string> {

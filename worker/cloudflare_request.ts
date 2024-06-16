@@ -1,15 +1,14 @@
 import { IncomingRequestCf } from './deps.ts';
 
-export function computeRawIpAddress(headers: Headers): string | undefined {
+export function computeRawIpAddress(headers: Headers, header = 'cf-connecting-ip'): string | undefined {
     // e.g. 1.1.1.1
     // e.g. 1.1.1.1, 2.2.2.2
-    return (headers.get('cf-connecting-ip') ?? '')
+    return (headers.get(header) ?? '')
         .split(',')
         .map(v => v.trim())
         .filter(v => v !== '')
         .at(0);
 }
-
 
 export function computeOther(request: Request): Record<string, string> | undefined {
     const req = request as IncomingRequestCf;

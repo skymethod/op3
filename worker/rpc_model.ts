@@ -55,6 +55,7 @@ export interface RawRedirect {
     readonly uuid: string;
     readonly time: number; // epoch millis
     readonly rawIpAddress: string;
+    readonly ipSource?: string; // e.g. x-forwarded-for
     readonly method: string;
     readonly url: string;
     readonly userAgent?: string;

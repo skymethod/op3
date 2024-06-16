@@ -54,6 +54,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     let apVersion: number | undefined;
     let cfVersion: number | undefined;
     let dwVersion: number | undefined;
+    let usedXForwardedFor = false;
 
     const asn = typeof asnStr === 'string' ? trySync('asn', () => parseInt(asnStr)) : undefined;
     const { agentType, agentName, deviceType, deviceName, referrerType, referrerName, isWebWidget } = computeAgentInfo({ userAgent, referer });
@@ -62,7 +63,8 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     const referrerTypeReferrerName = referrerType ? `${referrerType.padEnd(6, ' ')}-${referrerName ?? ''}` : undefined;
     const regionCodeRegionName = regionCode ? `${regionCode.padEnd(3, ' ')}-${region ?? ''}` : undefined;
     if (validRawRedirect) {
-        const { time, uuid } = validRawRedirect;
+        const { time, uuid, ipSource } = validRawRedirect;
+        usedXForwardedFor = ipSource === 'x-forwarded-for';
         timeUuid = trySync('time-uuid', () => {
             const instant = new Date(time).toISOString();
             check('instant', instant, isValidInstant);
@@ -125,7 +127,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
 
     return {
         kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect',
-        colo, url, country, destinationHostname, userAgent: userAgent ?? '<missing>', referer : referer ?? '<missing>', hasForwarded, hasXForwardedFor, ipAddressShape, ipAddressVersion,
+        colo, url, country, destinationHostname, userAgent: userAgent ?? '<missing>', referer : referer ?? '<missing>', hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion,
         errors, asn, apVersion, cfVersion, dwVersion, timeUuid, botType, hashedIpAddress, hashedIpAddressForDownload, audienceIdDownloadId, audienceIdDownloadId2, agentTypeAgentName,
         deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode,
      };

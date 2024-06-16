@@ -1,8 +1,12 @@
-import { computeIpAddressForDownload } from '../ip_addresses.ts';
+import { computeIpAddressForDownload, computeListenerIpAddress } from '../ip_addresses.ts';
 import { RawRedirect } from '../rpc_model.ts';
 import { computeTimestamp } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
+import { tryParseUlid } from '../client_params.ts';
+import { generateUuid } from '../uuid.ts';
+import { tryParseInt } from '../check.ts';
+import { computeRawIpAddress } from '../cloudflare_request.ts';
 
 export type PutBatch = Record<string, string>; // timestamp-nnnn -> AttRecord
 export type IpAddressEncryptionFn = (rawIpAddress: string, opts: { timestamp: string }) => Promise<string>;
@@ -29,7 +33,7 @@ export async function computePutBatches(rawRedirects: readonly RawRedirect[], at
 }
 
 export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums, doColo: string, callerTag: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<string> {
-    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, other } = rawRedirect;
+    const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, ipSource, other } = rawRedirect;
     const rt: Record<string, string> = {};
     if (typeof uuid === 'string') rt.uuid = uuid;
     if (typeof time !== 'number') throw new Error(`Bad rawRedirect ${uuid}: no time!`);
@@ -55,6 +59,7 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof range === 'string') rt.range = range;
     if (typeof ulid === 'string') rt.ulid = ulid;
     if (typeof xpsId === 'string') rt.xpsId = xpsId;
+    if (typeof ipSource === 'string') rt.ipSource = ipSource;
 
     for (const [ name, value ] of Object.entries(other ?? {})) {
         if (typeof name === 'string' && typeof value === 'string') {
@@ -65,4 +70,21 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof doColo === 'string') rt.doColo = doColo;
     
     return attNums.packRecord(rt);
+}
+
+export function computeRawRedirect(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRedirect {
+    const { time, method, rawIpAddress, other } = opts;
+    const { url } = request;
+    const uuid = generateUuid();
+    const ulid = tryParseUlid(url);
+    const userAgent = request.headers.get('user-agent') ?? undefined;
+    const referer = request.headers.get('referer') ?? undefined;
+    const range = request.headers.get('range') ?? undefined;
+    const xpsId = request.headers.get('x-playback-session-id') ?? undefined;
+    const xForwardedFor = computeRawIpAddress(request.headers, 'x-forwarded-for');
+    const asnStr = (other ?? {}).asn;
+    const asn = typeof asnStr === 'string' ? tryParseInt(asnStr) : undefined;
+    const { listenerIpAddress = rawIpAddress, usedXForwardedFor } = computeListenerIpAddress({ rawIpAddress, xForwardedFor, asn, userAgent });
+    const ipSource = usedXForwardedFor ? 'x-forwarded-for' : undefined;
+    return { uuid, time, rawIpAddress: listenerIpAddress, method, url, userAgent, referer, range, ulid, xpsId, ipSource, other };
 }
