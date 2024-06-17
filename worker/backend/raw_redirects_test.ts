@@ -22,7 +22,7 @@ Deno.test({
             assertEquals(ipSource, undefined);
         }
         {
-            const rawRedirect = computeRawRedirect(new Request('https://example.com', { headers: { 'X-Forwarded-For': '2.3.4.5', 'User-Agent': 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G)' }}), { time, method, rawIpAddress, other: { asn: '174' } });
+            const rawRedirect = computeRawRedirect(new Request('https://example.com', { headers: { 'X-Forwarded-For': '2.3.4.5', 'User-Agent': 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0' }}), { time, method, rawIpAddress, other: { asn: '174' } });
             assertEquals(rawRedirect.rawIpAddress, '2.3.4.5');
             assertEquals(rawRedirect.ipSource, 'x-forwarded-for');
             const record = await packRawRedirect(rawRedirect, attNums, doColo, 'test', encryptIpAddress, hashIpAddress);
@@ -31,7 +31,7 @@ Deno.test({
             assertEquals(ipSource, 'x-forwarded-for');
         }
         {
-            const rawRedirect = computeRawRedirect(new Request('https://example.com', { headers: { 'X-Forwarded-For': '2.3.4.5, 3.4.5.6', 'User-Agent': 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G)' }}), { time, method, rawIpAddress, other: { asn: '174' } });
+            const rawRedirect = computeRawRedirect(new Request('https://example.com', { headers: { 'X-Forwarded-For': '2.3.4.5, 3.4.5.6', 'User-Agent': 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0' }}), { time, method, rawIpAddress, other: { asn: '174' } });
             assertEquals(rawRedirect.rawIpAddress, '2.3.4.5');
             assertEquals(rawRedirect.ipSource, 'x-forwarded-for');
             const record = await packRawRedirect(rawRedirect, attNums, doColo, 'test', encryptIpAddress, hashIpAddress);

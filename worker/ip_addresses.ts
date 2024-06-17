@@ -37,7 +37,7 @@ export function tryExpandIpv6(rawIpAddress: string): string | undefined {
 
 export function computeListenerIpAddress({ rawIpAddress, xForwardedFor, asn, userAgent }: { rawIpAddress: string | undefined, xForwardedFor: string | undefined, asn: number | undefined, userAgent: string | undefined }): { listenerIpAddress: string | undefined, usedXForwardedFor: boolean } {
     if (typeof xForwardedFor === 'string' && typeof userAgent === 'string') {
-        if (/cloud phone/i.test(userAgent) && asn === 174) { // 2024-06-16: Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0
+        if (/cloud phone;.*podlp/i.test(userAgent) && asn === 174) { // 2024-06-16: Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0
             return { listenerIpAddress: xForwardedFor, usedXForwardedFor: true };
         }
     }
