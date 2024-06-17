@@ -63,7 +63,8 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             hits++;
             if (recordKey > (startAfterRecordKey ?? '')) startAfterRecordKey = recordKey;
             const obj = attNums.unpackRecord(record);
-            const { method, range, ulid: _, xpsId, ipSource, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode, 'other.asn': asn } = obj;
+            const { method, range, ulid: _, xpsId, ipSource, url, hashedIpAddress: packedHashedIpAddress, userAgent, referer, timestamp, encryptedIpAddress: __, 'other.asn': asn } = obj;
+            let { 'other.country': countryCode, 'other.continent': continentCode, 'other.regionCode': regionCode, 'other.region': regionName, 'other.timezone': timezone, 'other.metroCode': metroCode } = obj;
             if (method !== 'GET') continue; // ignore all non-GET requests
             const ranges = range ? tryParseRangeHeader(range) : undefined;
             const isFirstTwoBytes = ranges && ranges.length === 1 && 'start' in ranges[0] && ranges[0].start === 0 && ranges[0].end === 1; // bytes=0-1
@@ -99,7 +100,10 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             const streaming = typeof xpsId === 'string' && xpsId !== '' || agentName === 'AppleCoreMedia';
             if (streaming) tags = (tags ? `${tags},streaming` : 'streaming');
             if (isWebWidget) tags = (tags ? `${tags},web-widget` : 'web-widget');
-            if (ipSource === 'x-forwarded-for') tags = (tags ? `${tags},x-forwarded-for` : 'x-forwarded-for');
+            if (ipSource === 'x-forwarded-for') {
+                tags = (tags ? `${tags},x-forwarded-for` : 'x-forwarded-for');
+                countryCode = continentCode = regionCode = regionName = timezone = metroCode = ''; // geo atts no longer represent the listener
+            }
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
             chunks.push(encoder.encode(line));

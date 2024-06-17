@@ -23,12 +23,12 @@ Deno.test({
                     const seq = new TimestampSequence(3);
                     const attNums = new AttNums();
                     const records: Record<string, string> = {};
-                    const addHit = ({ url, ipAddress, range = '' }: { url: string, ipAddress: string, range?: string }) => {
+                    const addHit = ({ url, ipAddress, range = '', ipSource }: { url: string, ipAddress: string, range?: string, ipSource?: string }) => {
                         const timestampId = seq.next();
                         const { timestamp } = unpackTimestampId(timestampId);
                         const signature = Bytes.ofUtf8(ipAddress);
                         const hashedIpAddress = packHashedIpAddress('1', signature);
-                        const record = attNums.packRecord({ method: 'GET', range, url, hashedIpAddress, userAgent: 'test-agent', timestamp });
+                        const record = attNums.packRecord({ method: 'GET', range, url, hashedIpAddress, userAgent: 'test-agent', timestamp, 'other.country': 'US', ...(ipSource ? { ipSource } : {}) });
                         records[timestampId] = record;
                     }
                     addHit({ url: 'https://a.com/1.mp3', ipAddress: '0.1' });
@@ -40,6 +40,8 @@ Deno.test({
                     addHit({ url: 'https://a.com/4.mp3', ipAddress: '0.4' });
                     addHit({ url: 'https://a.com/5.mp3', ipAddress: '0.5', range: 'bytes=1000-1000' }); // ignored
                     addHit({ url: 'https://a.com/6.mp3', ipAddress: '0.6', range: 'bytes=1000-1001' }); // ignored
+                    addHit({ url: 'https://a.com/7.mp3', ipAddress: '0.7', ipSource: 'x-forwarded-for' }); // geoatts cleared
+                    addHit({ url: 'https://a.com/8.mp3', ipAddress: '0.8' }); // geoatts maintained
                     const namesToNums = attNums.toJson();
                     return { kind: 'packed-redirect-logs', namesToNums, records };
                 }
@@ -47,16 +49,17 @@ Deno.test({
             }
         }
         const res = await computeHourlyDownloads(hour, { statsBlobs, rpcClient, maxHits: 1000000, maxQueries: 100, querySize });
-        assertEquals(res.downloads, 5);
+        assertEquals(res.downloads, 7);
         const key = computeHourlyKey(hour);
         const downloads = await statsBlobs.get(key, 'text');
         if (!downloads) fail('no downloads blob');
 
         const lines = downloads.split('\n').filter(v => v !== '');
-        assertEquals(lines.length, 6);
+        assertEquals(lines.length, 8);
         const headers = lines[0].split('\t');
         const serverUrlIndex = headers.indexOf('serverUrl');
         const tagsIndex = headers.indexOf('tags');
+        const countryCodeIndex = headers.indexOf('countryCode');
 
         const firstTwoOverridden = lines[3].split('\t');
         assertEquals(firstTwoOverridden[serverUrlIndex], 'https://a.com/2.mp3');
@@ -65,6 +68,9 @@ Deno.test({
         const firstTwo = lines[4].split('\t');
         assertEquals(firstTwo[serverUrlIndex], 'https://a.com/3.mp3');
         assertEquals(firstTwo[tagsIndex], 'first-two');
+
+        assertEquals(lines[6].split('\t')[countryCodeIndex], '');  // geoatts cleared
+        assertEquals(lines[7].split('\t')[countryCodeIndex], 'US');  // geoatts maintained
     }
 });
 
