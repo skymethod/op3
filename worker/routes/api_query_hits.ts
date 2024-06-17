@@ -65,9 +65,10 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, h
     const includes = include.split(',');
     const includeAsn = includes.includes('asn');
     const includeHashedIpAddressForDownload = includes.includes('hashedIpAddressForDownload');
+    const includeIpSource = includes.includes('ipSource');
     for (const [ _sortKey, record ] of Object.entries(response.records)) {
         if (typeof record !== 'string') continue;
-        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, hashedIpAddressForDownload: packedHashedIpAddressForDownload, method, url, userAgent, referer, range, ulid, xpsId,
+        const { timestamp, uuid, hashedIpAddress: packedHashedIpAddress, hashedIpAddressForDownload: packedHashedIpAddressForDownload, method, url, userAgent, referer, range, ulid, xpsId, ipSource,
             'other.colo': edgeColo,
             'other.continent': continent,
             'other.country': country,
@@ -86,22 +87,25 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, h
             const arr = [ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode, 
                 ...(includeAsn ? [ asn ] : []),
                 ...(includeHashedIpAddressForDownload ? [ hashedIpAddressForDownload ] : []),
+                ...(includeIpSource ? [ ipSource ] : []),
             ];
             rows.push(format === 'tsv' ? arr.join('\t') : arr);
         } else {
             rows.push({ time, uuid, hashedIpAddress, method, url, userAgent, referer, range, xpsId, ulid, edgeColo, continent, country, timezone, regionCode, region, metroCode,
                 ...(includeAsn ? { asn } : {}),
                 ...(includeHashedIpAddressForDownload ? { hashedIpAddressForDownload } : {}),
+                ...(includeIpSource ? { ipSource } : {}),
             });
         }
     }
-    const headers = computeHeaders(includeAsn, includeHashedIpAddressForDownload);
+    const headers = computeHeaders(includeAsn, includeHashedIpAddressForDownload, includeIpSource);
     return newQueryResponse({ startTime, format, headers, rows, continuationToken: undefined });
 }
 
-const computeHeaders = (includeAsn: boolean, includeHashedIpAddressForDownload: boolean) => [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode',
+const computeHeaders = (includeAsn: boolean, includeHashedIpAddressForDownload: boolean, includeIpSource: boolean) => [ 'time', 'uuid', 'hashedIpAddress', 'method', 'url', 'userAgent', 'referer', 'range', 'xpsId', 'ulid', 'edgeColo', 'continent', 'country', 'timezone', 'regionCode', 'region', 'metroCode',
     ...(includeAsn ? [ 'asn' ] : []),
     ...(includeHashedIpAddressForDownload ? [ 'hashedIpAddressForDownload' ] : []),
+    ...(includeIpSource ? [ 'ipSource' ] : []),
 ];
 
 async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined, admin: boolean): Promise<Unkinded<QueryRedirectLogsRequest>> {
