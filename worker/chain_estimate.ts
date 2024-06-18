@@ -274,6 +274,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'cohost', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://swap.fm/track/12345ABCDEabcde12345/a.com/path/to/episode.mp3
+    // http redirects to https
+    // no suffix protocol support
+    m = /^https?:\/\/swap\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'swapfm', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -318,6 +328,7 @@ export interface ChainItem {
         | 'podsights'
         | 'podtrac'
         | 'spotify'
+        | 'swapfm'
         | 'veritonic'
         | 'voxalyze'
         | 'vpixl'

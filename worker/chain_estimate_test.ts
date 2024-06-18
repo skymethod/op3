@@ -387,6 +387,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'zencastr', url: 'https://r.zencastr.com/r/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://swap.fm/track/12345ABCDEabcde12345/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'swapfm', url: 'https://swap.fm/track/12345ABCDEabcde12345/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
         
     }
 });
