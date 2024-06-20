@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@40ed1983b4ef5449591dac952426f52b1b48f0af (2024-06-05T22:37:31Z)
+// from user-agents-v2@e2738ba8ad4a5d82e35b4aaad8bb4d9042a37b58 (2024-06-20T17:14:28Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -374,6 +374,7 @@ const appTests = {
     'CastBox/8.5.1 (fm.castbox.audiobook.radio.podcast; build:11; iOS 13.1.2)': { type: 'app', name: `CastBox` },
     'CastBox/5.7.5-190508115.r1a805d3': { type: 'app', name: `CastBox` },
     'CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4, CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4, CastBox/10.1.0-221129106 (Linux;Android 10) ExoPlayerLib/2.10.4': { type: 'app', name: `CastBox` },
+    'fm.castbox.audiobook.radio.podcast/240611306 (Linux; U; Android 13; en_GB; Lenovo TB125FU; Build/TP1A.220624.014; Cronet/126.0.6423.0)': { type: 'app', name: `CastBox` },
     'Casterbate/1 CFNetwork/744.5 Darwin/14.4.0': { type: 'app', name: `Casterbate` },
     'castero 0.9.5 <https://github.com/xgi/castero>': { type: 'app', name: `castero` },
     'castget 1.2.4 (castget rss enclosure downloader)': { type: 'app', name: `castget` },

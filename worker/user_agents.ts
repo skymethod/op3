@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@40ed1983b4ef5449591dac952426f52b1b48f0af (2024-06-05T22:37:31Z)
+// from user-agents-v2@e2738ba8ad4a5d82e35b4aaad8bb4d9042a37b58 (2024-06-20T17:14:28Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -282,7 +282,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Cast\//.test(userAgent)) return { name: `Cast`, type: 'app' };
     if (/^Castamatic\//.test(userAgent)) return { name: `Castamatic`, type: 'app' };
     if (/^Castaway\//.test(userAgent)) return { name: `Castaway`, type: 'app' };
-    if (/^Cast[Bb]ox/.test(userAgent)) return { name: `CastBox`, type: 'app' };
+    if (/^Cast[Bb]ox|^fm\.castbox\./.test(userAgent)) return { name: `CastBox`, type: 'app' };
     if (/^Casterbate\//.test(userAgent)) return { name: `Casterbate`, type: 'app' };
     if (/^castero \d/.test(userAgent)) return { name: `castero`, type: 'app' };
     if (/^castget /.test(userAgent)) return { name: `castget`, type: 'app' };
