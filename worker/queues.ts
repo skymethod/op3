@@ -9,6 +9,7 @@ export async function sendWithRetries(queue: Queue, message: unknown, opts: { ta
         const error = `${e.stack || e}`;
         if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
         if (error.includes('Internal Server Error')) return true; // Error: Queue send failed: Internal Server Error
+        if (error.includes('Service Temporarily Unavailable')) return true; //  Error: Queue send failed: Service Temporarily Unavailable
         return false;
     }});
 }
