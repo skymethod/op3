@@ -58,6 +58,11 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/item/podcast:transcript') {
                 if (PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
                     transcripts = transcripts ?? [];
+                    if (attributes.size === 0 && transcripts.length === 0) {
+                        // step 1 of 3 of the workaround for <podcast:transcript>https://podcast.example.com/path/to/transcript.srt</podcast:transcript>
+                        transcripts.push({ url: 'WORKAROUND', type: 'WORKAROUND' });
+                        return;
+                    }
                     const url = attributes.get('url');
                     let type = attributes.get('type');
                     if (type === undefined && url) {
@@ -150,6 +155,20 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/item/title') itemTitle = text;
             if (xpath === '/rss/channel/item/pubDate') pubdate = text;
             if (xpath === '/rss/channel/item/itunes:duration' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) itunesDuration = text;
+            if (xpath === '/rss/channel/item/podcast:transcript' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                if (transcripts?.length === 1 && transcripts.at(0)?.url === 'WORKAROUND') {
+                    // step 2 of 3 of the workaround
+                    transcripts.splice(0);
+                    const url = text.trim();
+                    if (!/^https?:\/\//i.test(url)) throw new Error(`Invalid podcast:transcript text`);
+                    let type = 'text/plain';
+                    const u = tryParseUrl(url);
+                    if (u && /\.srt$/i.test(u.pathname)) {
+                        type = 'application/x-subrip';
+                    }
+                    transcripts.push({ type, url });
+                }
+            }
         },
         onEndElement: (path, _attributes, findNamespaceUri) => {
             const xpath = '/' + path.join('/');
@@ -161,6 +180,10 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             }
             if (xpath === '/rss/channel/item') {
                 items.push({ guid: itemGuid, title: itemTitle, enclosures, alternateEnclosures, pubdate, pubdateInstant: tryParsePubdate(pubdate ?? ''), transcripts, chapters, value, itunesDuration });
+            }
+            if (xpath === '/rss/channel/item/podcast:transcript' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
+                // step 3 of 3 of the workaround
+                if (transcripts?.length === 1 && transcripts[0].url === 'WORKAROUND') throw new Error(`Empty podcast:transcript`);
             }
             level--;
         },
