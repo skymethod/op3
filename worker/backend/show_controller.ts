@@ -205,10 +205,17 @@ export class ShowController {
                 const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
                 const feedRecord = await storage.get(computeFeedRecordKey(feedRecordId));
                 if (!isFeedRecord(feedRecord)) throw new Error(`No feed record for: ${feedUrl}`);
-                if (feedRecord.showUuid) throw new Error(`Not allowed to delete items for feeds assigned to a show`);
-                const go = parameters.go === 'true';
                 const { matchUrlPrefix, itemGuids: itemGuidsStr } = parameters;
                 const itemGuids = typeof itemGuidsStr === 'string' ? itemGuidsStr.split(',').map(v => v.trim()).filter(v => v !== '') : undefined;
+                const { showUuid } = feedRecord;
+                if (showUuid) {
+                    if (itemGuids?.length === 1 && await storage.get(computeEpisodeKey({ showUuid, id: await computeEpisodeId(itemGuids[0]) }), { noCache: true }) === undefined) {
+                        // only allow deleting items for show feeds if there is no associated episode record, and only one item at a time
+                    } else {
+                        throw new Error(`Not allowed to delete items for feeds assigned to a show`);
+                    }
+                }
+                const go = parameters.go === 'true';
                 const results = [ await deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, storage }) ];
                 return { results };
             }
@@ -313,6 +320,18 @@ export class ShowController {
                         const map = await storage.list({ prefix: computeEpisodeKeyPrefix({ showUuid })});
                         const results = [...map.values()].filter(isEpisodeRecord);
                         return { results };
+                    } else if (operationKind === 'delete') {
+                        const { episodeId } = parameters;
+                        if (typeof episodeId !== 'string' || episodeId.length === 0) throw new Error(`Provide 'episodeId'`);
+                        const episodeKey = computeEpisodeKey({ showUuid, id: episodeId });
+                        const episode = await storage.get(episodeKey);
+                        if (!isEpisodeRecord(episode)) throw new Error(`Episode '${episodeId}' for show '${showUuid}' not found`);
+                        const { pubdateInstant } = episode;
+                        const keysToDelete = [ episodeKey ];
+                        keysToDelete.push(computeShowEpisodesIndexKey(showUuid, episodeId));
+                        if (pubdateInstant) keysToDelete.push(computeShowEpisodesByPubdateIndexKey({ pubdateInstant, showUuid, episodeId }));
+                        const deleted = await storage.delete(keysToDelete);
+                        return { results: [ { showUuid, episodeId, deleted, episode } ] };
                     }
                 } else {
                     if (operationKind === 'select') {
