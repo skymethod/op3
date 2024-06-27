@@ -46,7 +46,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-22.04
     env:
-      DEPLOY_SHA: 51cb4071eb94d9263ad87f43eb25094fc3a032c8
+      DEPLOY_SHA: 6ed12ab80e086537825b1b8044db13572bd0d4cc
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -72,7 +72,7 @@ jobs:
   deploy-prod:
     runs-on: ubuntu-22.04
     env:
-      DEPLOY_SHA: 51cb4071eb94d9263ad87f43eb25094fc3a032c8
+      DEPLOY_SHA: 6ed12ab80e086537825b1b8044db13572bd0d4cc
     steps:
       - name: Checkout
         uses: actions/checkout@v3
