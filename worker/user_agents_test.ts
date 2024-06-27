@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@e2738ba8ad4a5d82e35b4aaad8bb4d9042a37b58 (2024-06-20T17:14:28Z)
+// from user-agents-v2@f72ba95803cb5e51f10c584e831f4397fa661c10 (2024-06-27T16:47:28Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -831,6 +831,9 @@ const appTests = {
     'ServeStream Dynamo/1.0': { type: 'app', name: `ServeStream` },
     'ServeStream': { type: 'app', name: `ServeStream` },
     'SiriusXM/1608138304 CFNetwork/1206 Darwin/20.1.0': { type: 'app', name: `SiriusXM` },
+    'SXMApp/36270 CFNetwork/1496.0.7 Darwin/23.5.0': { type: 'app', name: `SiriusXM` },
+    'sxm-android/7.5.2 samsung/SM-S918U Android/14': { type: 'app', name: `SiriusXM` },
+    'sxm-android/7.5.0 motorola/motorola-edge-plus-5G-UW-(2022) Android/13': { type: 'app', name: `SiriusXM` },
     'Snipd/90 CFNetwork/1329 Darwin/21.3.0': { type: 'app', name: `Snipd` },
     'AppEngine-Google; (+http://code.google.com/appengine; appid: s~snapchat-proxy)': { type: 'app', name: `Snapchat` },
     'Sodes/1657 CFNetwork/1098.6 Darwin/19.0.0': { type: 'app', name: `Sodes` },

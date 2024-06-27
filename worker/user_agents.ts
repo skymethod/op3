@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@e2738ba8ad4a5d82e35b4aaad8bb4d9042a37b58 (2024-06-20T17:14:28Z)
+// from user-agents-v2@f72ba95803cb5e51f10c584e831f4397fa661c10 (2024-06-27T16:47:28Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -574,7 +574,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^sp-agent/.test(userAgent)) return { name: `Samsung Podcasts`, type: 'app' };
     if (/^ServeStream Dynamo\/|^ServeStream$/.test(userAgent)) return { name: `ServeStream`, type: 'app' };
     if (/^Shadow/.test(userAgent)) return { name: `Shadow`, type: 'app' };
-    if (/^SiriusXM\//.test(userAgent)) return { name: `SiriusXM`, type: 'app' };
+    if (/^SiriusXM\/|^SXMApp\/|^sxm-android\//.test(userAgent)) return { name: `SiriusXM`, type: 'app' };
     if (/^Slack\//.test(userAgent)) return { name: `Slack`, type: 'app' };
     if (/^Snipd\//.test(userAgent)) return { name: `Snipd`, type: 'app' };
     if (/s~snapchat-proxy/.test(userAgent)) return { name: `Snapchat`, type: 'app' };
