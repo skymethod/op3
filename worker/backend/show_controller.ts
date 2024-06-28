@@ -194,8 +194,8 @@ export class ShowController {
         {
             const m = /^\/show\/feeds\/(.+?)\/items$/.exec(targetPath);
             if (m && operationKind === 'select') {
-                const feedUrl = m[1];
-                const feedRecordId = await computeFeedRecordId(cleanUrl(feedUrl));
+                const feedUrlOrRecordId = m[1];
+                const feedRecordId = isValidSha256Hex(feedUrlOrRecordId) ? feedUrlOrRecordId : await computeFeedRecordId(cleanUrl(feedUrlOrRecordId));
                 const map = await storage.list(computeListOpts(computeFeedItemRecordKeyPrefix(feedRecordId), parameters));
                 const results = [...map.values()].filter(isFeedItemRecord);
                 return { results };
