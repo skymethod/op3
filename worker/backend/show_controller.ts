@@ -154,7 +154,7 @@ export class ShowController {
 
         {
             const m = /^\/show\/index\/(podcast-guid|match-url|queryless-match-url|feed-to-show|show-episodes|feed-media-urls|show-episodes-by-pubdate|podcast-guid-to-show-uuid)$/.exec(targetPath);
-            if (m && (operationKind === 'select' || operationKind === 'update')) {
+            if (m && (operationKind === 'select' || operationKind === 'update' || operationKind === 'delete')) {
                 const indexType = {
                     'podcast-guid': IndexType.PodcastGuid,
                     'match-url': IndexType.MatchUrlToFeedItem,
@@ -187,6 +187,15 @@ export class ShowController {
                     } else {
                         throw new Error(`Unsupported index update: ${IndexType[indexType]}`);
                     }
+                }
+                if (operationKind === 'delete' && indexType) {
+                    if (indexType === IndexType.MatchUrlToFeedItem) {
+                        const { key } = parameters;
+                        if (typeof key !== 'string' || !/^sc\.i0\.2\./.test(key)) throw new Error(`Unexpected key: ${key}`);
+                        const deleted = await storage.delete(key);
+                        return { results: [ { key, deleted }] };
+                    }
+                    throw new Error(`Unsupported index delete: ${IndexType[indexType]}`);
                 }
             }
         }
