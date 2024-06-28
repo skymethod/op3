@@ -122,12 +122,13 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://claritaspod.com/measure/
+    // https://www.claritaspod.com/measure/
     // https://clrtpod.com/m/
     // https://claritas.com/podcast-attribution-audience-identification/
     // http redirects to target https
-    m = /^https?:\/\/(claritaspod\.com\/measure|clrtpod\.com\/m)\/(.*?)$/.exec(url);
+    m = /^https?:\/\/((www\.)?claritaspod\.com\/measure|clrtpod\.com\/m)\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, __, suffix ] = m;
+        const [ _, __, ___, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'claritas', url }, ...computeChainEstimate(targetUrl) ];
     }
