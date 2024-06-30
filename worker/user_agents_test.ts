@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@f72ba95803cb5e51f10c584e831f4397fa661c10 (2024-06-27T16:47:28Z)
+// from user-agents-v2@dfebcd6d24eedf68db6a65f7535d91a8cbefbff3 (2024-06-30T18:15:28Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -705,6 +705,8 @@ const appTests = {
     'NetNewsWire (RSS Reader; https://netnewswire.com/)': { type: 'app', name: `NetNewsWire` },
     'Newsboat/2.29.0 (Linux x86_64)': { type: 'app', name: `Newsboat` },
     'Newsly': { type: 'app', name: `Newsly` },
+    'Noice/3.38.1 (Apple; iOS 17.4.1) AVQueuePlayer/0': { type: 'app', name: `Noice` },
+    'Noice/3.39 (Apple; iOS 17.4.1) AVQueuePlayer/0': { type: 'app', name: `Noice` },
     'NPR%20One/234 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `NPR` },
     'NPROneAndroid': { type: 'app', name: `NPR` },
     'NPR/618 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `NPR` },
@@ -730,6 +732,7 @@ const appTests = {
     'Parler Staging/542 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Parler` },
     'PeaCast/0.7': { type: 'app', name: `PeaCast` },
     'Playapod/2.4.11': { type: 'app', name: `Playapod` },
+    'PlaydioCast/272 CFNetwork/1496.0.7 Darwin/23.5.0': { type: 'app', name: `PlaydioCast Podcast Radio` },
     'Player%20FM/588 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `Player FM` },
     'Alpha%20PlayerFM/108 CFNetwork/808.0.2 Darwin/16.0.0': { type: 'app', name: `Player FM` },
     'Pocket Casts': { type: 'app', name: `Pocket Casts` },
@@ -868,6 +871,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS SvD Hermes/90.0.0 _app_': { type: 'app', name: `Svenska Dagbladet iOS app` },
     'SvD Hermes/999999999 _app_': { type: 'app', name: `Svenska Dagbladet Android app` },
     'Swinsian/472 CFNetwork/978.0.7 Darwin/18.7.0 (x86_64)': { type: 'app', name: `Swinsian` },
+    'Sybel': { type: 'app', name: `Sybel` },
     'SYOK/965 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `SYOK` },
     'my.com.astro.player': { type: 'app', name: `SYOK` },
     'TED POD-2.0.2': { type: 'app', name: `TED` },
@@ -979,6 +983,7 @@ const libraryTests = {
     'AHC/2.1': { type: 'library', name: `Async Http Client (java)` },
     'AHC/2.0': { type: 'library', name: `Async Http Client (java)` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
+    'Bubble': { type: 'library', name: `Bubble (no-code)` },
     'Bun/1.0.7': { type: 'library', name: `Bun` },
     'CarrierWave/2.2.4': { type: 'library', name: `CarrierWave (ruby)` },
     'colly - https://github.com/gocolly/colly': { type: 'library', name: `Colly` },

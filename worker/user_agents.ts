@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@f72ba95803cb5e51f10c584e831f4397fa661c10 (2024-06-27T16:47:28Z)
+// from user-agents-v2@dfebcd6d24eedf68db6a65f7535d91a8cbefbff3 (2024-06-30T18:15:28Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -502,6 +502,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^NetNewsWire/.test(userAgent)) return { name: `NetNewsWire`, type: 'app' };
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
+    if (/^Noice\//.test(userAgent)) return { name: `Noice`, type: 'app' };
     if (/^NPR\/|^NPR%20One\/|^NPROneAndroid|nprone_android\//.test(userAgent)) return { name: `NPR`, type: 'app' };
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
     if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
@@ -513,6 +514,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Parler( Staging)?\//.test(userAgent)) return { name: `Parler`, type: 'app' };
     if (/^PeaCast\//.test(userAgent)) return { name: `PeaCast`, type: 'app' };
     if (/^Playapod/.test(userAgent)) return { name: `Playapod`, type: 'app' };
+    if (/^PlaydioCast\//.test(userAgent)) return { name: `PlaydioCast Podcast Radio`, type: 'app' };
     if (/^Player FM|^Player%20FM|^Alpha%20PlayerFM\//.test(userAgent)) return { name: `Player FM`, type: 'app' };
     if (/^Pocket Casts|^PocketCasts\/|^Shifty Jelly Pocket Casts/.test(userAgent)) return { name: `Pocket Casts`, type: 'app' };
     if (/^Podbay\//.test(userAgent)) return { name: `Podbay`, type: 'app' };
@@ -602,6 +604,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet iOS app`, type: 'app' };
     if (/SvD Hermes\//.test(userAgent)) return { name: `Svenska Dagbladet Android app`, type: 'app' };
     if (/^Swinsian\//.test(userAgent)) return { name: `Swinsian`, type: 'app' };
+    if (/^Sybel$/.test(userAgent)) return { name: `Sybel`, type: 'app' };
     if (/^SYOK|^my\.com\.astro\.player/.test(userAgent)) return { name: `SYOK`, type: 'app' };
     if (/^TED |^TED\//.test(userAgent)) return { name: `TED`, type: 'app' };
     if (/^The God Minute\//.test(userAgent)) return { name: `The God Minute`, type: 'app' };
@@ -654,6 +657,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
     if (/^AHC\/\d+\.\d+/.test(userAgent)) return { name: `Async Http Client (java)`, type: 'library', category: 'bot' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
+    if (/^Bubble$/.test(userAgent)) return { name: `Bubble (no-code)`, type: 'library' };
     if (/^Bun\/\d/.test(userAgent)) return { name: `Bun`, type: 'library', category: 'bot' };
     if (/^CarrierWave\//.test(userAgent)) return { name: `CarrierWave (ruby)`, type: 'library', category: 'bot' };
     if (/github\.com\/gocolly/.test(userAgent)) return { name: `Colly`, type: 'library', category: 'bot' };
