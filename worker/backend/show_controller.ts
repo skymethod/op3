@@ -1130,6 +1130,10 @@ function computeRelevantUrls(item: Item, knownRedirects?: Record<string, string[
     return rt;
 }
 
+function isValidPodcastGuid(podcastGuid: string): boolean {
+    return typeof podcastGuid === 'string' && (isValidGuid(podcastGuid) || /^0x[a-fA-F0-9]{40}$/.test(podcastGuid)); // 0x1bECc6153CBdF5654357E5AAc813D5f1a45c40a6
+}
+
 async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: string, opts: { storage: DurableObjectStorage }): Promise<string> {
     const { storage } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
@@ -1144,7 +1148,7 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
             if (feedRecord.piFeed === undefined) throw new Error(`Feed must have a piFeed`);
             podcastGuid = feedRecord.piFeed.podcastGuid;
         }
-        if (podcastGuid === undefined || !isValidGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
+        if (podcastGuid === undefined || !isValidPodcastGuid(podcastGuid)) throw new Error(`Feed must have a piFeed with a valid podcastGuid`);
         showRecord = { uuid: showUuid, title: feedRecord.title, podcastGuid };
     }
 
