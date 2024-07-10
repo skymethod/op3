@@ -59,6 +59,14 @@ const COSTS: Cost[] = [
         ]
     },
     {
+        date: '2023-07-08',
+        description: 'Domains invoice',
+        cost: 24.99,
+        detail: [
+            { description: 'op3.dev renew 1 year', cost: 24.99 },
+        ]
+    },
+    {
         date: '2024-06-10',
         description: 'Cloudflare invoice',
         cost: 763.94,
