@@ -28,6 +28,40 @@ export async function computeIndexRecords(record: Record<string, string>, timest
     }
 }
 
+type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
+
+export async function trimIndexRecords({ maxIterations, go }: { maxIterations: number, go: boolean }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
+    const windowStart = computeIndexWindowStartInstant();
+    const windowStartTimestamp = computeTimestamp(windowStart);
+    const windowStartTimestampMonth = windowStartTimestamp.substring(0, 4);
+    const windowStartTimestampDay = windowStartTimestamp.substring(0, 6);
+    
+    const rt: Record<string, DeletionInfo> = {};
+
+    const trimIndex = async (indexId: IndexId, type: 'day' | 'month') => {
+        const end = `hits.i0.${indexId}.${type === 'month' ? windowStartTimestampMonth : windowStartTimestampDay}`;
+        const info: DeletionInfo = { end, iterations: 0, listed: 0, deleted: 0 };
+        rt[IndexId[indexId]] = info;
+        const limit = 128; // max delete
+        for (let i = 0; i < maxIterations; i++) {
+            info.iterations++;
+            const map = await storage.list({ prefix: `hits.i0.${indexId}.`, end, limit, allowConcurrency: true, noCache: true });
+            const keys = [...map.keys()].sort();
+            if (keys.length === 0) break;
+            info.listed += keys.length;
+            if (info.minKey === undefined || keys[0] < info.minKey) info.minKey = keys[0];
+            if (info.maxKey === undefined || keys[keys.length - 1] > info.maxKey) info.maxKey = keys[keys.length - 1];
+            if (!go) break;
+            info.deleted += await storage.delete(keys, { noCache: true });
+            if (keys.length < limit) break;
+        }
+    }
+    await trimIndex(IndexId.MonthHashedIpAddress, 'month');
+    await trimIndex(IndexId.DayUrl, 'day');
+
+    return rt;
+}
+
 export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {
     const { limit, descending, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith } = request;
     if (typeof rawIpAddress === 'string') throw new Error(`Unable to query for a raw ip address, they are not stored`);

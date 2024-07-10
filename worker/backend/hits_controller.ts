@@ -7,7 +7,7 @@ import { consoleError, consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeMinuteFileKey, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
-import { computeIndexRecords, queryHitsIndexFromStorage } from './hits_indexes.ts';
+import { computeIndexRecords, queryHitsIndexFromStorage, trimIndexRecords } from './hits_indexes.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
 import { computeTimestamp, timestampToInstant } from '../timestamp.ts';
@@ -194,6 +194,15 @@ export class HitsController {
                 }
                 return { message: changes.length > 0 ? changes.join(', ') : 'no changes' };
             }
+        }
+
+        if (targetPath === '/hits/indexes' && operationKind === 'delete') {
+            const { 'max-iterations': maxIterationsStr = '1', go: goStr, ...rest } = parameters;
+            if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
+            const maxIterations = parseInt(maxIterationsStr);
+            const go = goStr === 'true';
+            const result = await trimIndexRecords({ maxIterations, go }, storage);
+            return { results: [ result ] };
         }
 
         throw new Error(`Unsupported hits query`);
