@@ -59,7 +59,7 @@ const COSTS: Cost[] = [
         ]
     },
     {
-        date: '2023-07-08',
+        date: '2024-07-08',
         description: 'Domains invoice',
         cost: 24.99,
         detail: [

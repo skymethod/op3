@@ -28,7 +28,7 @@ export async function computeIndexRecords(record: Record<string, string>, timest
     }
 }
 
-type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
+export type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
 
 export async function trimIndexRecords({ maxIterations, go }: { maxIterations: number, go: boolean }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
     const windowStart = computeIndexWindowStartInstant();
