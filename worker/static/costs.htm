@@ -26,20 +26,16 @@
         </p>
     </div>
 
-    <div class="text-xs md:text-base md:w-10/12 md:max-w-2xl mx-2 md:mx-auto select-none mt-8">
-        <div class="grid grid-cols-5 gap-4 text-neutral-500">
-            <div>Date</div>
-            <div class="col-span-3">Description</div>
-            <div class="text-right">Cost</div>
-        </div>
+    <div class="text-xs md:text-base md:w-10/12 md:max-w-2xl mx-2 md:mx-auto select-none mt-8 grid grid-cols-5 gap-x-4">
+        <div class="text-neutral-500">Date</div>
+        <div class="text-neutral-500 col-span-3">Description</div>
+        <div class="text-right text-neutral-500">Cost</div>
 
 ${costsHtml}
 
         <template id="ytd">
-            <div class="grid grid-cols-5 gap-4 my-4">
-                <div>total</div>
-                <div class="col-start-5 text-right">$nnn.nn</div>
-            </div>
+            <div class="mt-4">total</div>
+            <div class="mt-4 col-span-4 text-right">$nnn.nn</div>
         </template>
     </div>
 

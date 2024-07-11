@@ -668,6 +668,14 @@ a.svg:hover {
   grid-column: span 6 / span 6;
 }
 
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+.col-span-4 {
+  grid-column: span 4 / span 4;
+}
+
 .col-start-2 {
   grid-column-start: 2;
 }
@@ -964,6 +972,10 @@ a.svg:hover {
 
 .grid-cols-\[min-content_1fr\] {
   grid-template-columns: min-content 1fr;
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .flex-row {
