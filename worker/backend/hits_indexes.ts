@@ -30,7 +30,8 @@ export async function computeIndexRecords(record: Record<string, string>, timest
 
 export type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
 
-export async function trimIndexRecords({ maxIterations, go }: { maxIterations: number, go: boolean }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
+export async function trimIndexRecords({ maxIterations, go, type }: { maxIterations: number, go: boolean, type?: string }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
+    if (type !== undefined && type !== 'month' && type !== 'day') throw new Error(`Bad type: ${type}`);
     const windowStart = computeIndexWindowStartInstant();
     const windowStartTimestamp = computeTimestamp(windowStart);
     const windowStartTimestampMonth = windowStartTimestamp.substring(0, 4);
@@ -56,8 +57,8 @@ export async function trimIndexRecords({ maxIterations, go }: { maxIterations: n
             if (keys.length < limit) break;
         }
     }
-    await trimIndex(IndexId.MonthHashedIpAddress, 'month');
-    await trimIndex(IndexId.DayUrl, 'day');
+    if (type === undefined || type === 'month') await trimIndex(IndexId.MonthHashedIpAddress, 'month');
+    if (type === undefined || type === 'day') await trimIndex(IndexId.DayUrl, 'day');
 
     return rt;
 }

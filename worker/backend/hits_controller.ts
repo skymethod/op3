@@ -197,11 +197,11 @@ export class HitsController {
         }
 
         if (targetPath === '/hits/indexes' && operationKind === 'delete') {
-            const { 'max-iterations': maxIterationsStr = '1', go: goStr, ...rest } = parameters;
+            const { 'max-iterations': maxIterationsStr = '1', go: goStr, type, ...rest } = parameters;
             if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
             const maxIterations = parseInt(maxIterationsStr);
             const go = goStr === 'true';
-            const result = await trimIndexRecords({ maxIterations, go }, storage);
+            const result = await trimIndexRecords({ maxIterations, go, type }, storage);
             return { results: [ result ] };
         }
 
