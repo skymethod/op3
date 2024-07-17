@@ -285,6 +285,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'swapfm', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://pdcds.co/asdfg12345/a.com/path/to/episode.mp3
+    // http redirects to https
+    // no suffix protocol support
+    m = /^https?:\/\/pdcds\.co\/[^/]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podcards', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -321,6 +331,7 @@ export interface ChainItem {
         | 'ipfspodcasting'
         | 'letscast'
         | 'magellan'
+        | 'podcards'
         | 'podcorn'
         | 'podder'
         | 'podkite'

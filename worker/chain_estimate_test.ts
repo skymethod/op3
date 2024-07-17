@@ -397,6 +397,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'claritas', url: 'https://www.claritaspod.com/measure/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://pdcds.co/asdf1234za/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podcards', url: 'https://pdcds.co/asdf1234za/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
         
     }
 });
