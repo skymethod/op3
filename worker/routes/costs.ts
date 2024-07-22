@@ -69,7 +69,7 @@ const COSTS: Cost[] = [
     {
         date: '2024-06-10',
         description: 'Cloudflare invoice',
-        cost: 763.94,
+        cost: 480.38,
         detail: [
             { description: 'Workers Paid Subscription', cost: 5.00 },
             { description: 'Workers requests', cost: 22.16 },
@@ -81,6 +81,7 @@ const COSTS: Cost[] = [
             { description: 'Queues Operations', cost: 50.80 },
             { description: 'Advanced Certificate Manager (op3.st)', cost: 10.00 },
             { description: 'Sales Tax', cost: 47.32 },
+            { description: 'Refund', cost: -283.56 },
         ]
     },
     {
