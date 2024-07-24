@@ -9,8 +9,8 @@
         ]
     },
     "tasks": {
-        "build": "deno bundle show.ts | deno run -A build.ts ../worker/static/show.js",
-        "build-watch": "deno bundle show.ts ../worker/static/show.js --watch",
+        "build": "deno bundle app.ts | deno run -A build.ts ../worker/static/app.js",
+        "build-watch": "deno bundle app.ts ../worker/static/app.js --watch",
     },
     "fmt": {
         "singleQuote": true,

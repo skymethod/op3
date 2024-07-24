@@ -3,10 +3,10 @@ import { Blobs } from '../backend/blobs.ts';
 import { importText } from '../deps.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
+import { appJs } from './static.ts';
 import { Stats } from './stats_model.ts';
 
 const statsHtm = await importText(import.meta.url, '../static/stats.htm');
-const showJs = await importText(import.meta.url, '../static/show.js');
 
 type Opts = { searchParams: URLSearchParams, instance: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined };
 
@@ -34,7 +34,7 @@ export async function computeStatsResponse(opts: Opts): Promise<Response> {
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,
-        showJs,
+        appJs,
     });
 
     return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8'} });

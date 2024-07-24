@@ -11,10 +11,11 @@ import { compute404Response } from './404.ts';
 import { computeShowsResponse, computeShowStatsResponse, DEMO_SHOW_1, lookupShowUuidForPodcastGuid } from './api_shows.ts';
 import { computeCloudflareAnalyticsSnippet, computeHtml, computeShoelaceCommon, computeStyleTag } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
+import { appJs } from './static.ts';
 import { Translations, supportedLanguageLabels } from './strings.ts';
 
 const showHtm = await importText(import.meta.url, '../static/show.htm');
-const showJs = await importText(import.meta.url, '../static/show.js');
+
 const showPageTranslationsJson = await importText(import.meta.url, '../strings/show_page.translations.json');
 const translations = new Translations(showPageTranslationsJson);
 
@@ -107,7 +108,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         origin,
-        showJs,
+        appJs,
         previewToken: [...previewTokens].at(0) ?? '',
         contentLanguage,
         langLabelCurrent: supportedLanguageLabels[lang ?? 'en'],

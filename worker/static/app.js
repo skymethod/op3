@@ -10518,268 +10518,276 @@ function drawGraph(canvas, labelsAndValues, sessions, strings1) {
     const chart = new xt(ctx, config);
     return chart;
 }
-const app = await (async ()=>{
-    xt.register(Vt);
-    xt.register(ic);
-    xt.register(De);
-    xt.register(Oe);
-    xt.register(ie);
-    xt.register(ae);
-    xt.register(ft);
-    xt.register(te);
-    xt.register(re);
-    xt.register(Ul);
-    const [debugDiv] = [
-        element('debug')
-    ];
-    console.log(initialData);
-    const { showObj, statsObj, times, lang } = initialData;
-    const { showUuid, episodes = [], title: showTitle } = showObj;
-    if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
-    const grabMoreDataIfNecessary = async (page)=>{
-        const { episodeHourlyDownloads, months } = statsObj;
-        let changed = false;
-        try {
-            let needMonth;
-            let epsByPubdate = sortBy(episodes, (v)=>v.pubdate ?? '1970').reverse();
-            if (page === 'first') epsByPubdate = epsByPubdate.slice(0, 8);
-            for (const ep of epsByPubdate){
-                const firstHour = statsObj.episodeFirstHours[ep.id];
-                if (firstHour) {
-                    const month = firstHour.substring(0, 7);
-                    needMonth = needMonth === undefined ? month : month < needMonth ? month : needMonth;
+async function initShow() {
+    const app = await (async ()=>{
+        xt.register(Vt);
+        xt.register(ic);
+        xt.register(De);
+        xt.register(Oe);
+        xt.register(ie);
+        xt.register(ae);
+        xt.register(ft);
+        xt.register(te);
+        xt.register(re);
+        xt.register(Ul);
+        const [debugDiv] = [
+            element('debug')
+        ];
+        console.log(initialData);
+        const { showObj, statsObj, times, lang } = initialData;
+        const { showUuid, episodes = [], title: showTitle } = showObj;
+        if (typeof showUuid !== 'string') throw new Error(`Bad showUuid: ${JSON.stringify(showUuid)}`);
+        const grabMoreDataIfNecessary = async (page)=>{
+            const { episodeHourlyDownloads, months } = statsObj;
+            let changed = false;
+            try {
+                let needMonth;
+                let epsByPubdate = sortBy(episodes, (v)=>v.pubdate ?? '1970').reverse();
+                if (page === 'first') epsByPubdate = epsByPubdate.slice(0, 8);
+                for (const ep of epsByPubdate){
+                    const firstHour = statsObj.episodeFirstHours[ep.id];
+                    if (firstHour) {
+                        const month = firstHour.substring(0, 7);
+                        needMonth = needMonth === undefined ? month : month < needMonth ? month : needMonth;
+                    }
+                }
+                let haveMonth = statsObj.months[0];
+                console.log(JSON.stringify({
+                    page,
+                    haveMonth,
+                    needMonth
+                }));
+                if (needMonth === undefined) return changed;
+                if (months.includes(needMonth)) return changed;
+                const moreMonths = [];
+                let grabs = 0;
+                while(grabs < 10){
+                    if (!haveMonth) return changed;
+                    if (moreMonths.includes(needMonth)) return changed;
+                    const latestMonth = addMonthsToMonthString(haveMonth, -1);
+                    const qp = new URLSearchParams(document.location.search);
+                    const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
+                    if (qp.has('ro')) u.searchParams.set('ro', 'true');
+                    u.searchParams.set('token', previewToken);
+                    u.searchParams.set('overall', 'stub');
+                    u.searchParams.set('latestMonth', latestMonth);
+                    u.searchParams.set('lookbackMonths', 2..toString());
+                    console.log(`grab more show stats: ${JSON.stringify({
+                        latestMonth,
+                        lookbackMonths: 2
+                    })}`);
+                    const res = await fetch(u.toString());
+                    if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
+                    const moreStats = await res.json();
+                    for (const [episodeId, hourlyDownloads] of Object.entries(moreStats.episodeHourlyDownloads)){
+                        const merged = {
+                            ...hourlyDownloads,
+                            ...episodeHourlyDownloads[episodeId]
+                        };
+                        episodeHourlyDownloads[episodeId] = merged;
+                    }
+                    changed = true;
+                    haveMonth = moreStats.months[0];
+                    moreMonths.push(...moreStats.months);
+                    grabs++;
+                }
+            } finally{
+                if (page === 'first') {
+                    class DataLoaded extends HTMLElement {
+                    }
+                    customElements.define('data-loaded', DataLoaded);
                 }
             }
-            let haveMonth = statsObj.months[0];
-            console.log(JSON.stringify({
-                page,
-                haveMonth,
-                needMonth
-            }));
-            if (needMonth === undefined) return changed;
-            if (months.includes(needMonth)) return changed;
-            const moreMonths = [];
-            let grabs = 0;
-            while(grabs < 10){
-                if (!haveMonth) return changed;
-                if (moreMonths.includes(needMonth)) return changed;
-                const latestMonth = addMonthsToMonthString(haveMonth, -1);
-                const qp = new URLSearchParams(document.location.search);
-                const u = new URL(`/api/1/shows/${showUuid}/stats`, document.location.href);
-                if (qp.has('ro')) u.searchParams.set('ro', 'true');
-                u.searchParams.set('token', previewToken);
-                u.searchParams.set('overall', 'stub');
-                u.searchParams.set('latestMonth', latestMonth);
-                u.searchParams.set('lookbackMonths', 2..toString());
-                console.log(`grab more show stats: ${JSON.stringify({
-                    latestMonth,
-                    lookbackMonths: 2
-                })}`);
-                const res = await fetch(u.toString());
-                if (res.status !== 200) throw new Error(`Unexpected status: ${res.status} ${await res.text()}`);
-                const moreStats = await res.json();
-                for (const [episodeId, hourlyDownloads] of Object.entries(moreStats.episodeHourlyDownloads)){
-                    const merged = {
-                        ...hourlyDownloads,
-                        ...episodeHourlyDownloads[episodeId]
-                    };
-                    episodeHourlyDownloads[episodeId] = merged;
-                }
-                changed = true;
-                haveMonth = moreStats.months[0];
-                moreMonths.push(...moreStats.months);
-                grabs++;
-            }
-        } finally{
-            if (page === 'first') {
-                class DataLoaded extends HTMLElement {
-                }
-                customElements.define('data-loaded', DataLoaded);
-            }
-        }
-        return changed;
-    };
-    await grabMoreDataIfNecessary('first');
-    const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks } = statsObj;
-    const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
-    const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
-            v[0],
-            insertZeros(v[1])
-        ]));
-    const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([episodeId, firstHour])=>({
-            firstHour,
-            ...episodes.find((v)=>v.id === episodeId)
-        }));
-    const showSlug = computeShowSlug(showTitle);
-    const debug = new URLSearchParams(document.location.search).has('debug');
-    const mostRecentDate = Object.keys(hourlyDownloads).at(-1)?.substring(0, 10);
-    if (debug) {
-        debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
-    } else {
-        debugDiv.style.display = 'none';
-    }
-    const headlineStats = makeHeadlineStats({
-        hourlyDownloads,
-        dailyFoundAudience,
-        strings,
-        lang
-    });
-    makeDownloadsGraph({
-        hourlyDownloads,
-        episodes: episodesWithFirstHours,
-        episodeHourlyDownloads,
-        debug,
-        strings,
-        lang
-    });
-    const exportDownloads = makeExportDownloads({
-        showUuid,
-        showSlug,
-        previewToken,
-        strings,
-        lang
-    });
-    const shot = new URLSearchParams(document.location.search).has('shot');
-    const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
-        episodeHourlyDownloads,
-        episodes,
-        showTitle,
-        showSlug,
-        mostRecentDate,
-        shot,
-        strings,
-        lang
-    });
-    makeListens({
-        episodeListens,
-        episodes,
-        knownAppLinks,
-        debug,
-        strings
-    });
-    const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
-            month,
-            Object.values(v['countryCode'] ?? {}).reduce((a, b)=>a + b, 0)
-        ]));
-    makeTopCountries({
-        showSlug,
-        monthlyDimensionDownloads,
-        strings,
-        lang
-    });
-    makeTopApps({
-        showSlug,
-        monthlyDimensionDownloads,
-        strings,
-        lang
-    });
-    makeTopDevices({
-        showSlug,
-        monthlyDimensionDownloads,
-        strings,
-        lang
-    });
-    makeTopDeviceTypes({
-        showSlug,
-        monthlyDimensionDownloads,
-        strings,
-        lang
-    });
-    makeTopBrowserDownloads({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopMetros({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopCaRegions({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopEuRegions({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopAuRegions({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopAsRegions({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeTopLatamRegions({
-        showSlug,
-        monthlyDimensionDownloads,
-        downloadsPerMonth,
-        strings,
-        lang
-    });
-    makeFooter({
-        mostRecentDate,
-        strings,
-        lang
-    });
-    const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
-    if (langParam) {
-        const localized = document.querySelectorAll('a.localized');
-        for (const a of localized){
-            const u = new URL(a.href);
-            u.searchParams.set('lang', langParam);
-            a.href = u.toString();
-        }
-    }
-    function update() {
-        exportDownloads.update();
-        headlineStats.update();
-    }
-    (async ()=>{
-        if (shot) return;
-        const changed = await grabMoreDataIfNecessary('all');
-        updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
+            return changed;
+        };
+        await grabMoreDataIfNecessary('first');
+        const { episodeFirstHours, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks } = statsObj;
+        const hourlyDownloads = insertZeros(statsObj.hourlyDownloads);
+        const episodeHourlyDownloads = Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
                 v[0],
                 insertZeros(v[1])
-            ])) : undefined, true);
+            ]));
+        const episodesWithFirstHours = Object.entries(episodeFirstHours).map(([episodeId, firstHour])=>({
+                firstHour,
+                ...episodes.find((v)=>v.id === episodeId)
+            }));
+        const showSlug = computeShowSlug(showTitle);
+        const debug = new URLSearchParams(document.location.search).has('debug');
+        const mostRecentDate = Object.keys(hourlyDownloads).at(-1)?.substring(0, 10);
+        if (debug) {
+            debugDiv.textContent = Object.entries(times).map((v)=>v.join(': ')).join('\n');
+        } else {
+            debugDiv.style.display = 'none';
+        }
+        const headlineStats = makeHeadlineStats({
+            hourlyDownloads,
+            dailyFoundAudience,
+            strings,
+            lang
+        });
+        makeDownloadsGraph({
+            hourlyDownloads,
+            episodes: episodesWithFirstHours,
+            episodeHourlyDownloads,
+            debug,
+            strings,
+            lang
+        });
+        const exportDownloads = makeExportDownloads({
+            showUuid,
+            showSlug,
+            previewToken,
+            strings,
+            lang
+        });
+        const shot = new URLSearchParams(document.location.search).has('shot');
+        const { updateEpisodeHourlyDownloads } = makeEpisodePacing({
+            episodeHourlyDownloads,
+            episodes,
+            showTitle,
+            showSlug,
+            mostRecentDate,
+            shot,
+            strings,
+            lang
+        });
+        makeListens({
+            episodeListens,
+            episodes,
+            knownAppLinks,
+            debug,
+            strings
+        });
+        const downloadsPerMonth = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([month, v])=>[
+                month,
+                Object.values(v['countryCode'] ?? {}).reduce((a, b)=>a + b, 0)
+            ]));
+        makeTopCountries({
+            showSlug,
+            monthlyDimensionDownloads,
+            strings,
+            lang
+        });
+        makeTopApps({
+            showSlug,
+            monthlyDimensionDownloads,
+            strings,
+            lang
+        });
+        makeTopDevices({
+            showSlug,
+            monthlyDimensionDownloads,
+            strings,
+            lang
+        });
+        makeTopDeviceTypes({
+            showSlug,
+            monthlyDimensionDownloads,
+            strings,
+            lang
+        });
+        makeTopBrowserDownloads({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopMetros({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopCaRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopEuRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopAuRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopAsRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopLatamRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeFooter({
+            mostRecentDate,
+            strings,
+            lang
+        });
+        const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
+        if (langParam) {
+            const localized = document.querySelectorAll('a.localized');
+            for (const a of localized){
+                const u = new URL(a.href);
+                u.searchParams.set('lang', langParam);
+                a.href = u.toString();
+            }
+        }
+        function update() {
+            exportDownloads.update();
+            headlineStats.update();
+        }
+        (async ()=>{
+            if (shot) return;
+            const changed = await grabMoreDataIfNecessary('all');
+            updateEpisodeHourlyDownloads(changed ? Object.fromEntries(Object.entries(statsObj.episodeHourlyDownloads).map((v)=>[
+                    v[0],
+                    insertZeros(v[1])
+                ])) : undefined, true);
+        })();
+        return {
+            update
+        };
     })();
-    return {
-        update
-    };
-})();
-globalThis.addEventListener('DOMContentLoaded', ()=>{
-    console.log('Document content loaded');
-    app.update();
-});
-function insertZeros(hourlyDownloads) {
-    const hours = Object.keys(hourlyDownloads);
-    if (hours.length < 2) return hourlyDownloads;
-    const maxHour = hours.at(-1);
-    let hour = hours[0];
-    const rt = {};
-    while(hour <= maxHour){
-        rt[hour] = hourlyDownloads[hour] ?? 0;
-        hour = addHoursToHourString(hour, 1);
+    globalThis.addEventListener('DOMContentLoaded', ()=>{
+        console.log('Document content loaded');
+        app.update();
+    });
+    function insertZeros(hourlyDownloads) {
+        const hours = Object.keys(hourlyDownloads);
+        if (hours.length < 2) return hourlyDownloads;
+        const maxHour = hours.at(-1);
+        let hour = hours[0];
+        const rt = {};
+        while(hour <= maxHour){
+            rt[hour] = hourlyDownloads[hour] ?? 0;
+            hour = addHoursToHourString(hour, 1);
+        }
+        return rt;
     }
-    return rt;
+    function computeShowSlug(title) {
+        return (title ?? 'untitled').toLowerCase().replaceAll(/[^a-z0-9]+/g, ' ').replaceAll(/\s+/g, ' ').trim().replaceAll(' ', '-');
+    }
 }
-function computeShowSlug(title) {
-    return (title ?? 'untitled').toLowerCase().replaceAll(/[^a-z0-9]+/g, ' ').replaceAll(/\s+/g, ' ').trim().replaceAll(' ', '-');
+function initStats() {
+    console.log('initStats!');
 }
+const { pathname } = document.location;
+if (pathname.startsWith('/show/')) await initShow();
+if (pathname === '/stats') initStats();
