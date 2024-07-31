@@ -1,11 +1,10 @@
-import { importText, sortBy } from '../deps.ts';
+import { importText } from '../deps.ts';
 import { computeCloudflareAnalyticsSnippet } from './html.ts';
 import { computeHtml } from './html.ts';
 import { computeNonProdHeader } from './instances.ts';
 import { newMethodNotAllowedResponse, newRssResponse } from '../responses.ts';
 import { FeedItem, computeBasicHtml, computeRss, tryParseFeedRequest } from './feed.ts';
 import { RpcClient } from '../rpc_model.ts';
-import { DoNames } from '../do_names.ts';
 const statusHtm = await importText(import.meta.url, '../static/status.htm');
 const outputCss = await importText(import.meta.url, '../static/output.css');
 
@@ -13,7 +12,7 @@ export function tryParseStatusRequest(opts: { method: string, pathname: string, 
     return tryParseFeedRequest({ ...opts, expectedPath: 'status' });
 }
 
-export async function computeStatusResponse({ method, type } : StatusRequest, { instance, origin, productionOrigin, cfAnalyticsToken, rpcClient }: { instance: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, rpcClient: RpcClient }): Promise<Response> {
+export function computeStatusResponse({ method, type } : StatusRequest, { instance, origin, productionOrigin, cfAnalyticsToken }: { instance: string, origin: string, productionOrigin: string, cfAnalyticsToken: string | undefined, rpcClient: RpcClient }): Response {
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
     const titleSuffix = instance === 'prod' ? '' : ` (${instance})`;
@@ -29,7 +28,7 @@ export async function computeStatusResponse({ method, type } : StatusRequest, { 
         nonProdHeader: computeNonProdHeader(instance, productionOrigin),
         cfAnalyticsSnippet: computeCloudflareAnalyticsSnippet(cfAnalyticsToken),
         basicHtml: computeBasicHtml({ items, origin }),
-        coloMonitorBasicHtml: await computeColoMonitorBasicHtml(rpcClient),
+        coloMonitorBasicHtml: '(no backlog, everything up to date)',
         origin,
     });
 
@@ -61,25 +60,3 @@ const ITEMS: FeedItem[] = [
         ]
     },
 ];
-
-async function computeColoMonitorBasicHtml(rpcClient: RpcClient): Promise<string> {
-    const { status } = await rpcClient.getColoStatus({ }, DoNames.combinedRedirectLog );
-    const sorted = sortBy(Object.values(status), v => -v.behindSeconds).filter(v => v.behindSeconds > 60);
-    if (sorted.length === 0) return '(no backlog, everything up to date)'
-    const detail = [ `<ul>` ];
-    for (const { colo, behindSeconds } of sorted) {
-        detail.push(`<li>${colo}: ${formatSecondsBehind(behindSeconds)}</li>`)
-    }
-    detail.push(`</ul>`);
-    return detail.join('');
-}
-
-function formatSecondsBehind(seconds: number): string {
-    if (seconds < 60) return seconds + ' seconds behind';
-    const minutes = seconds / 60;
-    if (minutes < 60) return minutes.toFixed(2) + ' minutes behind';
-    const hours = minutes / 60;
-    if (hours < 24) return hours.toFixed(2) + ' hours behind';
-    const days = hours / 24;
-    return days.toFixed(2) + ' days behind';
-}

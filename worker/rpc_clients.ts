@@ -1,6 +1,6 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
 import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, QueryHitsIndexRequest } from './rpc_model.ts';
-import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetColoStatusRequest, GetColoStatusResponse, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
     registerDO(request: Unkinded<RegisterDORequest>, target: string): Promise<OkResponse> {
@@ -77,10 +77,6 @@ export class StubRpcClient implements RpcClient {
 
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response> {
         throw new Error(`StubRpcClient: adminGetMetrics(${JSON.stringify({ request, target })}) not implemented`);
-    }
-
-    getColoStatus(request: Unkinded<GetColoStatusRequest>, target: string): Promise<GetColoStatusResponse> {
-        throw new Error(`StubRpcClient: getColoStatus(${JSON.stringify({ request, target })}) not implemented`);
     }
 
 }

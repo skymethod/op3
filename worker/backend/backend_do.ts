@@ -272,8 +272,6 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.combinedRedirectLog) {
                         return newRpcResponse(await getOrLoadCombinedRedirectLogController().queryPackedRedirectLogs(obj));
-                    } else if (obj.kind === 'get-colo-status' && durableObjectName === DoNames.combinedRedirectLog) {
-                        return newRpcResponse(await getOrLoadCombinedRedirectLogController().getColoStatus(obj));
                     } else if (obj.kind === 'log-raw-redirects-batch' && durableObjectName === DoNames.hitsServer) {
                         return newRpcResponse({ kind: 'log-raw-redirects-batch', ...await getOrLoadHitsController().logRawRedirectsBatch(obj) });
                     } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.hitsServer) {

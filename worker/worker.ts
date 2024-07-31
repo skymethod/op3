@@ -300,7 +300,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
     const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
-    { const r = tryParseStatusRequest({ method, pathname, headers }); if (r) return await computeStatusResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken, rpcClient }); }
+    { const r = tryParseStatusRequest({ method, pathname, headers }); if (r) return computeStatusResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken, rpcClient }); }
 
     const background: Background = work => {
         context.waitUntil((async () => {

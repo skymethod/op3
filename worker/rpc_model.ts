@@ -23,7 +23,6 @@ export type RpcRequest =
     | RedirectLogsNotificationRequest
     | RegisterDORequest 
     | ResolveApiTokenRequest
-    | GetColoStatusRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -47,7 +46,6 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'register-do' 
         || obj.kind === 'resolve-api-token'
-        || obj.kind === 'get-colo-status'
     );
 }
 
@@ -333,27 +331,6 @@ export function isExternalNotification(obj: unknown): obj is ExternalNotificatio
         ;
 }
 
-export interface GetColoStatusRequest {
-    readonly kind: 'get-colo-status';
-}
-
-export interface GetColoStatusResponse {
-    readonly kind: 'get-colo-status';
-    readonly status: Record<string, ColoStatus>; // key = colo
-}
-
-export interface ColoStatus {
-    readonly colo: string;
-    readonly behindSeconds: number;
-}
-
-export function isColoStatus(obj: unknown): obj is ColoStatus {
-    return isStringRecord(obj)
-        && typeof obj.colo === 'string'
-        && typeof obj.behindSeconds === 'number'
-        ;
-}
-
 //
 
 export type RpcResponse = 
@@ -365,7 +342,6 @@ export type RpcResponse =
     | PackedRedirectLogsResponse
     | ResolveApiTokenResponse
     | ApiKeyResponse
-    | GetColoStatusResponse
     | LogRawRedirectsBatchResponse
     ;
 
@@ -379,7 +355,6 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'packed-redirect-logs'
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
-        || obj.kind === 'get-colo-status'
         || obj.kind === 'log-raw-redirects-batch'
     );
 }
@@ -544,7 +519,6 @@ export interface RpcClient {
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse>;
-    getColoStatus(request: Unkinded<GetColoStatusRequest>, target: string): Promise<GetColoStatusResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
