@@ -302,7 +302,7 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
     if (!hasPermission(permissions, 'admin-metrics')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    return await rpcClient.adminGetMetrics({}, DoNames.combinedRedirectLog);
+    return await rpcClient.adminGetMetrics({}, DoNames.hitsServer);
 }
 
 async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

@@ -14,6 +14,7 @@ import { computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { DoNames } from '../do_names.ts';
 import { computeServerUrl } from '../client_params.ts';
+import { newTextResponse } from '../responses.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -223,6 +224,45 @@ export class HitsController {
         }
         const sortKeys = await queryHitsIndexFromStorage(request, storage);
         return new Response(sortKeys.map(v => `${v}\n`).join('')); // stream if allowing larger limits in the future
+    }
+
+    async getMetrics(): Promise<Response> {
+        await Promise.resolve();
+
+        const lines: string[] = [];
+        const time = Date.now();
+        {
+            const id = 'hitc_known_server_urls_count';
+            lines.push(`# HELP ${id} knownServerUrls.length`, `# TYPE ${id} gauge`);
+            lines.push(`${id} ${this.knownServerUrls.length} ${time}`);
+            lines.push('');
+        }
+
+        {
+            const id = 'hitc_minutes_count';
+            lines.push(`# HELP ${id} recentMinuteTimestamps.length`, `# TYPE ${id} gauge`);
+            lines.push(`${id} ${this.recentMinuteTimestamps.length} ${time}`);
+            lines.push('');
+        }
+
+        const sortedTimestamps = [...this.recentMinuteTimestamps].sort();
+        const maxTimestampAgeMillis = sortedTimestamps.length > 0 ? (time - new Date(timestampToInstant(sortedTimestamps[sortedTimestamps.length - 1])).getTime()) : 0;
+        {
+            const id = 'hitc_max_timestamp_age_seconds';
+            lines.push(`# HELP ${id} how far behind is the newest minutestamp`, `# TYPE ${id} gauge`);
+            lines.push(`${id} ${Math.round(maxTimestampAgeMillis / 1000)} ${time}`);
+            lines.push('');
+        }
+
+        const minTimestampAgeMillis = sortedTimestamps.length > 0 ? (time - new Date(timestampToInstant(sortedTimestamps[0])).getTime()) : 0;
+        {
+            const id = 'hitc_min_timestamp_age_seconds';
+            lines.push(`# HELP ${id} how far behind is the oldest minutestamp`, `# TYPE ${id} gauge`);
+            lines.push(`${id} ${Math.round(minTimestampAgeMillis / 1000)} ${time}`);
+            lines.push('');
+        }
+
+        return newTextResponse(lines.join('\n'));
     }
 
     //

@@ -258,7 +258,7 @@ export class BackendDO {
                         const { first, last, count, millis } = await getOrLoadCombinedRedirectLogController().rebuildIndex(obj);
                         return newRpcResponse({ kind: 'admin-rebuild-index', first, last, count, millis });
                     } else if (obj.kind === 'admin-get-metrics') {
-                        return getOrLoadCombinedRedirectLogController().getMetrics();
+                        return getOrLoadHitsController().getMetrics();
                     } else if (obj.kind === 'resolve-api-token') {
                         return newRpcResponse(await getOrLoadApiAuthController().resolveApiToken(obj));
                     } else if (obj.kind === 'modify-api-key') {
