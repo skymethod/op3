@@ -101,6 +101,11 @@ export class ShowController {
 
         const { operationKind, targetPath, parameters = {} } = req;
 
+        if (operationKind === 'select' && targetPath === '/show/storage') {
+            const map = await storage.list(computeListOpts('', parameters));
+            const results = [ ...map ];
+            return { results };
+        }
         if (operationKind === 'select' && targetPath === '/show/feeds') {
             const map = await storage.list(computeListOpts('sc.fr0.', parameters));
             const results = [...map.values()].filter(isFeedRecord);
