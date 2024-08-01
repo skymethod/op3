@@ -30,17 +30,17 @@ export async function computeIndexRecords(record: Record<string, string>, timest
 
 export type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
 
-export async function trimIndexRecords({ maxIterations, go, type }: { maxIterations: number, go: boolean, type?: string }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
+export async function trimIndexRecords({ maxIterations, go, type, now = Date.now() }: { maxIterations: number, go: boolean, type?: string, now?: number }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
     if (type !== undefined && type !== 'month' && type !== 'day') throw new Error(`Bad type: ${type}`);
-    const windowStart = computeIndexWindowStartInstant();
+    const windowStart = computeIndexWindowStartInstant(now);
     const windowStartTimestamp = computeTimestamp(windowStart);
-    const windowStartTimestampMonth = windowStartTimestamp.substring(0, 4);
     const windowStartTimestampDay = windowStartTimestamp.substring(0, 6);
+    const monthEndSuffix = computeMonthEndSuffix(now);
     
     const rt: Record<string, DeletionInfo> = {};
 
     const trimIndex = async (indexId: IndexId, type: 'day' | 'month') => {
-        const end = `hits.i0.${indexId}.${type === 'month' ? windowStartTimestampMonth : windowStartTimestampDay}`;
+        const end = `hits.i0.${indexId}.${type === 'month' ? monthEndSuffix : windowStartTimestampDay}`;
         const info: DeletionInfo = { end, iterations: 0, listed: 0, deleted: 0 };
         rt[IndexId[indexId]] = info;
         const limit = 128; // max delete
@@ -61,6 +61,23 @@ export async function trimIndexRecords({ maxIterations, go, type }: { maxIterati
     if (type === undefined || type === 'day') await trimIndex(IndexId.DayUrl, 'day');
 
     return rt;
+}
+
+export function computeMonthEndSuffix(time = Date.now()): string {
+    const computeWindowStartMonth = (date: string) => computeIndexWindowStartInstant(new Date(`${date}T00:00:00.000Z`).getTime()).substring(0, 7);
+    const computeTimestampMonth = (month: string) => computeTimestamp(`${month}-01T00:00:00.000Z`).substring(0, 4);
+    const today = new Date(time).toISOString().substring(0, 10);
+   
+    const todaysWindowStartMonth = computeWindowStartMonth(today);
+    let daysToWork = 1;
+    while (computeWindowStartMonth(addDaysToDateString(today, daysToWork + 1 - 1)) === todaysWindowStartMonth) {
+        daysToWork++;
+    }
+    if (daysToWork === 1) return computeTimestampMonth(todaysWindowStartMonth);
+
+    const progress = (31 - daysToWork) / 31;
+    const byteHex = Math.ceil(progress * 0xff).toString(16).padStart(2, '0');
+    return `${computeTimestampMonth(addMonthsToMonthString(todaysWindowStartMonth, -1))}.${byteHex}`;
 }
 
 export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {

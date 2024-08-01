@@ -229,9 +229,9 @@ export function isValidSortKey(sortKey: string): boolean {
     return !!m && isValidTimestamp(m[1]);
 }
 
-export function computeIndexWindowStartInstant(): string {
+export function computeIndexWindowStartInstant(now = Date.now()): string {
     // allow for querying 90 full days
-    const today = new Date().toISOString().substring(0, 10);
+    const today = new Date(now).toISOString().substring(0, 10);
     const startDate = addDaysToDateString(today, -91);
     return maxString(`${startDate}T00:00:00.000Z`, minIndexInstant);
 }
