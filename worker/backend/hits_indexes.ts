@@ -80,14 +80,14 @@ export function computeMonthEndSuffix(time = Date.now()): string {
     return `${computeTimestampMonth(addMonthsToMonthString(todaysWindowStartMonth, -1))}.${byteHex}`;
 }
 
-export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage): Promise<string[]> {
+export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndexRequest>, storage: DurableObjectStorage, now = Date.now()): Promise<string[]> {
     const { limit, descending, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith } = request;
     if (typeof rawIpAddress === 'string') throw new Error(`Unable to query for a raw ip address, they are not stored`);
     const rt: string[] = [];
     if (limit <= 0) return rt;
 
-    const now = new Date().toISOString();
-    const windowStart = computeIndexWindowStartInstant();
+    const nowInstant = new Date(now).toISOString();
+    const windowStart = computeIndexWindowStartInstant(now);
     const windowStartTimestamp = computeTimestamp(windowStart);
 
     if (typeof hashedIpAddress === 'string') {
@@ -95,7 +95,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
         const maxListCalls = 6; // window is only 90 days so this is more than enough
         if (descending) {
             // start at end month (or current) and work backward
-            let month = minString(now, endTimeExclusive ?? now).substring(0, 7);
+            let month = minString(nowInstant, endTimeExclusive ?? nowInstant).substring(0, 7);
             let listCalls = 0;
             while (month >= windowStartMonth) {
                 const monthstamp = computeTimestamp(`${month}-01T00:00:00.000Z`).substring(0, 4);
@@ -117,8 +117,8 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
             return rt;
         } else {
             // start at start month (or window start) and work forward
-            const currentMonth = now.substring(0, 7);
-            let month = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartMonth).substring(0, 7);
+            const currentMonth = nowInstant.substring(0, 7);
+            let month = maxString(windowStartMonth, startTimeInclusive ?? startTimeExclusive ?? windowStartMonth).substring(0, 7);
             let listCalls = 0;
             while (month <= currentMonth) {
                 const monthstamp = computeTimestamp(`${month}-01T00:00:00.000Z`).substring(0, 4);
@@ -145,7 +145,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
         const maxListCalls = 10;
         if (descending) {
             // start at end date (or current) and work backward
-            let date = minString(now, endTimeExclusive ?? now).substring(0, 10);
+            let date = minString(nowInstant, endTimeExclusive ?? nowInstant).substring(0, 10);
             let listCalls = 0;
             while (date >= windowStartDate) {
                 const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
@@ -168,8 +168,8 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
             return rt;
         } else {
             // start at start date (or window start) and work forward
-            const currentDate = now.substring(0, 10);
-            let date = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
+            const currentDate = nowInstant.substring(0, 10);
+            let date = maxString(windowStartDate, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
             let listCalls = 0;
             while (date <= currentDate) {
                 const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
@@ -200,7 +200,7 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
         const endTimestamp = endTimeExclusive ? computeTimestamp(endTimeExclusive) : undefined;
         if (descending) {
             // start at end date (or current) and work backward
-            let date = minString(now, endTimeExclusive ?? now).substring(0, 10);
+            let date = minString(nowInstant, endTimeExclusive ?? nowInstant).substring(0, 10);
             let listCalls = 0;
             while (date >= windowStartDate) {
                 const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);
@@ -224,8 +224,8 @@ export async function queryHitsIndexFromStorage(request: Unkinded<QueryHitsIndex
             return rt;
         } else {
             // start at start date (or window start) and work forward
-            const currentDate = now.substring(0, 10);
-            let date = maxString(now, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
+            const currentDate = nowInstant.substring(0, 10);
+            let date = maxString(windowStartDate, startTimeInclusive ?? startTimeExclusive ?? windowStartDate).substring(0, 10);
             let listCalls = 0;
             while (date <= currentDate) {
                 const datestamp = computeTimestamp(`${date}T00:00:00.000Z`).substring(0, 6);

@@ -1,6 +1,34 @@
 import { DurableObjectStorageListOptions, DurableObjectStorageReadOptions, DurableObjectStorageValue } from '../deps.ts';
 import { assertEquals, InMemoryDurableObjectStorage } from '../tests/deps.ts';
-import { computeMonthEndSuffix, trimIndexRecords } from './hits_indexes.ts';
+import { computeTimestamp } from '../timestamp.ts';
+import { generateUuid } from '../uuid.ts';
+import { computeRecordInfo } from './hits_common.ts';
+import { computeIndexRecords, computeMonthEndSuffix, queryHitsIndexFromStorage, trimIndexRecords } from './hits_indexes.ts';
+
+Deno.test({
+    name: 'queryHitsIndexFromStorage',
+    fn: async () => {
+        const now = new Date('2024-08-03T23:07:04.937Z').getTime();
+        const storage = new TestStorage();
+
+        const hashedIpAddress = 'a97a03cf1a863b356f8ac2fdc117577a66251fe3';
+        const url = 'https://example.com/path/to/file.mp3';
+        const record: Record<string, string> = {
+            timestamp: computeTimestamp('2024-07-08T07:04:59.476Z'),
+            uuid: generateUuid(),
+            hashedIpAddress: `1:${hashedIpAddress}`,
+            url,
+        };
+        const { sortKey, timestamp } = computeRecordInfo(record);
+
+        const outIndexRecords: Record<string, string> = {};
+        await computeIndexRecords(record, timestamp, sortKey, outIndexRecords);
+        await storage.put(outIndexRecords);
+
+        assertEquals(await queryHitsIndexFromStorage({ limit: 1, hashedIpAddress, descending: false }, storage, now), [ sortKey ]);
+        assertEquals(await queryHitsIndexFromStorage({ limit: 1, url, descending: false, startTimeInclusive: '2024-07-08T00:00:00.000Z' }, storage, now), [ sortKey ]);
+    }
+});
 
 Deno.test({
     name: 'computeMonthEndSuffix',
