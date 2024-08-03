@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@dfebcd6d24eedf68db6a65f7535d91a8cbefbff3 (2024-06-30T18:15:28Z)
+// from user-agents-v2@7d81b902e41c2bc89743f86a4d5be7ec90035ea6 (2024-08-03T18:15:16Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -136,7 +136,11 @@ const botTests = {
     'newspaper/0.3.0': { type: 'bot', name: `Newspaper` },
     'OgScrper': { type: 'bot', name: `OgScrper` },
     'op3-fetcher/1.0 (https://op3.dev)': { type: 'bot', name: `OP3 Fetcher` },
+    'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)': { type: 'bot', name: `OpenAI GPTBot` },
+    'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.0; +https://openai.com/gptbot)': { type: 'bot', name: `OpenAI GPTBot` },
     'Overcast/1.0 Podcast Sync': { type: 'bot', name: `Overcast feed parser` },
+    'Overcast/1.0 Podcast Sync (+http://overcast.fm/)': { type: 'bot', name: `Overcast feed parser` },
+    'Overcast/1.0 Podcast Sync (1 subscribers; feed-id=1234567; +http://overcast.fm/)': { type: 'bot', name: `Overcast feed parser` },
     'Mozilla/5.0 (compatible; PaperLiBot/2.1; https://support.paper.li/entries/20023257-what-is-paper-li)': { type: 'bot', name: `PaperLi` },
     'Mozilla/5.0 (Linux; Android 7.0;) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; PetalBot; https://aspiegel.com/petalbot)': { type: 'bot', name: `PetalBot` },
     'PlayerFM/1.0 Podcast Sync (0 subscribers; url=https://player.fm/series/series-2567872)': { type: 'bot', name: `PlayerFM Podcast Sync` },
@@ -305,6 +309,8 @@ const appTests = {
     'ARD%20Audiothek/93 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'app', name: `ARD Audiothek` },
     'ARD Audiothek iOS Version 2.6.11, Build 90': { type: 'app', name: `ARD Audiothek` },
     'ARD-Audiothek/31': { type: 'app', name: `ARD Audiothek` },
+    'arteradio/1.1.1 Android/12': { type: 'app', name: `Arte Radio` },
+    'arteradio/1.1.1 iOS/12': { type: 'app', name: `Arte Radio` },
     'Arvocast/3752 CFNetwork/1404.0.5 Darwin/22.3.0': { type: 'app', name: `Arvocast` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Askoyvaringen Hermes/90.0.0 _app_': { type: 'app', name: `Askoyvaringen iOS app` },
     'Audacious/3.10.1 neon/0.30.2': { type: 'app', name: `Audacious` },
@@ -721,7 +727,7 @@ const appTests = {
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },
-    'Overcast ( http://overcast.fm/; Apple Watch podcast app)': { type: 'app', name: `Overcast` },
+    'Overcast (+http://overcast.fm/; Apple Watch podcast app)': { type: 'app', name: `Overcast` },
     'Overcast/792 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Overcast` },
     'Podcast Overhaul/4.1.1 iOS/16.1.1 +https://www.podcastoverhaul.com/': { type: 'app', name: `Overhaul` },
     'Palco MP3/3.13.18 (Linux;Android 11) ExoPlayerLib/2.11.0': { type: 'app', name: `Palco MP3` },
