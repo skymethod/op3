@@ -3,6 +3,7 @@ import { Blobs } from '../backend/blobs.ts';
 import { Configuration } from '../configuration.ts';
 import { encodeXml, importText } from '../deps.ts';
 import { packError } from '../errors.ts';
+import { Limiter } from '../limiter.ts';
 import { SHOW_UUID_REDIRECTS } from '../redirects.ts';
 import { newJsonResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
@@ -45,10 +46,12 @@ type Opts = {
     configuration: Configuration,
     assetBlobs: Blobs | undefined, 
     roAssetBlobs: Blobs | undefined, 
+    limiter: Limiter | undefined,
+    rawIpAddress: string | undefined,
 };
 
 export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise<Response> {
-    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs } = opts;
+    const { searchParams, instance, hostname, origin, productionOrigin, cfAnalyticsToken, previewTokens, rpcClient, roRpcClient, statsBlobs, roStatsBlobs, configuration, assetBlobs, roAssetBlobs, limiter, rawIpAddress } = opts;
     const { id, type, acceptLanguage } = req;
 
     const times: Record<string, number> = {};
@@ -60,6 +63,8 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
 
     let showUuidFromPodcastGuid: string | undefined;
     if (type === 'podcast-guid') {
+        const { success } = limiter && rawIpAddress ? await limiter.isAllowed(`show:podcast-guid:ip:${rawIpAddress}`) : { success: true };
+        if (!success) return new Response('slow down', { status: 429 });
         showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams }));
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
