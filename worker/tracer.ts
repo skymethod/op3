@@ -122,9 +122,11 @@ export interface WorkerRequest {
     readonly search: string;
     readonly country: string;
     readonly method: string;
+    readonly userAgent?: string;
     readonly millis: number;
     readonly status: number;
     readonly contentType: string;
+    readonly asn?: number;
 }
 
 export interface DurableObjectFetchRequest {

@@ -40,6 +40,7 @@ import { computeFaviconSvgResponse } from './routes/favicons.ts';
 import { makeBaselimeFromWorkerContext } from './baselime.ts';
 import { makeCloudflareLimiter } from './limiter.ts';
 import { computeRawRedirect } from './backend/raw_redirects.ts';
+import { tryParseInt } from './check.ts';
 
 export default {
     
@@ -71,12 +72,13 @@ export default {
             // request/response metrics
             writeTraceEvent(() => {
                 const millis = Date.now() - requestTime;
-                const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
+                const { colo = 'XXX', country = 'XX', asn = '0' } = computeOther(request) ?? {};
                 const { method } = request;
                 const { status } = response;
                 const { pathname, search } = new URL(request.url);
                 const contentType = response.headers.get('content-type') ?? '<unspecified>';
-                return { kind: 'worker-request', colo, pathname, search, country, method, contentType, millis, status };
+                const userAgent = request.headers.get('user-agent') ?? undefined;
+                return { kind: 'worker-request', colo, pathname, search, country, method, userAgent, contentType, millis, status, asn: tryParseInt(asn) };
             });
 
             return response;
