@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@7d81b902e41c2bc89743f86a4d5be7ec90035ea6 (2024-08-03T18:15:16Z)
+// from user-agents-v2@f67d89dfe562873141ed083fa84269258469c247 (2024-08-07T19:33:29Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -121,6 +121,7 @@ const botTests = {
     'ShareSheetUI/1 CFNetwork/1474 Darwin/23.0.0': { type: 'bot', name: `MacOS share menu` },
     'MauiBot (crawler.feedback dc@gmail.com)': { type: 'bot', name: `MauiBot` },
     'http.rb/5.0.4 (Mastodon/3.5.3; +https://mastodon.xyz/) Bot': { type: 'bot', name: `Mastodon Bot` },
+    'Metacast/1.0 Crawler +https://metacast.app': { type: 'bot', name: `Metacast Crawler` },
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534 (KHTML, like Gecko) BingPreview/1.0b': { type: 'bot', name: `Microsoft Bingbot` },
     'Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)': { type: 'bot', name: `Microsoft Bingbot` },
     'Mozilla/4.0 (compatible; ms-office; MSOffice 16)': { type: 'bot', name: `Microsoft Office` },
@@ -678,8 +679,8 @@ const appTests = {
     'Menucast/1.4 CFNetwork/720.1.1 Darwin/14.0.0 (x86_64)': { type: 'app', name: `Menucast` },
     'Message+/2.4.7 CFNetwork/811.5.4 Darwin/16.7.0 (x86_64)': { type: 'app', name: `Message+` },
     'Messenger/168725151 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Messenger` },
-    'Metacast/189 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `Metacast` },
-    'Metacast': { type: 'app', name: `Metacast` },
+    'Metacast/0.73.5 (ios)': { type: 'app', name: `Metacast` },
+    'Metacast/1.2.0 (android)': { type: 'app', name: `Metacast` },
     'Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.16130; Pro)': { type: 'app', name: `Microsoft Outlook` },
     'Outlook-Android/2.0': { type: 'app', name: `Microsoft Outlook` },
     'microsoft;xbox_one;1fc2d01aa9074dde950e8d3dc0eb1729;;tpapi;3.167.55': { type: 'app', name: `Microsoft Xbox` },

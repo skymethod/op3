@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@7d81b902e41c2bc89743f86a4d5be7ec90035ea6 (2024-08-03T18:15:16Z)
+// from user-agents-v2@f67d89dfe562873141ed083fa84269258469c247 (2024-08-07T19:33:29Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -98,6 +98,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^ShareSheetUI\//.test(userAgent)) return { name: `MacOS share menu`, type: 'bot' };
     if (/^MauiBot/.test(userAgent)) return { name: `MauiBot`, type: 'bot' };
     if (/rb\/.*Mastodon\//.test(userAgent)) return { name: `Mastodon Bot`, type: 'bot' };
+    if (/^Metacast\/.* Crawler/.test(userAgent)) return { name: `Metacast Crawler`, type: 'bot' };
     if (/(BingPreview\/|adidxbot\/|[bB]ingbot\/)/.test(userAgent)) return { name: `Microsoft Bingbot`, type: 'bot' };
     if (/ms-office; MSOffice/.test(userAgent)) return { name: `Microsoft Office`, type: 'bot' };
     if (/^MixcloudPodcastImporter\//.test(userAgent)) return { name: `Mixcloud Podcast Importer`, type: 'bot' };
@@ -485,7 +486,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Menucast\//.test(userAgent)) return { name: `Menucast`, type: 'app' };
     if (/^Message\+\//.test(userAgent)) return { name: `Message+`, type: 'app' };
     if (/^Messenger\//.test(userAgent)) return { name: `Messenger`, type: 'app' };
-    if (/^Metacast(\/.*)?$/.test(userAgent)) return { name: `Metacast`, type: 'app' };
+    if (/^Metacast\//.test(userAgent)) return { name: `Metacast`, type: 'app' };
     if (/^Outlook-Android\/|^Microsoft Office\/.*?Microsoft Outlook/.test(userAgent)) return { name: `Microsoft Outlook`, type: 'app' };
     if (/^microsoft;xbox_/.test(userAgent)) return { name: `Microsoft Xbox`, type: 'app' };
     if (/^Mimir(-macOS|-iOS)?\//.test(userAgent)) return { name: `Mimir`, type: 'app' };
