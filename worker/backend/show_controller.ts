@@ -7,7 +7,7 @@ import { fetchOp3RedirectUrls, hasOp3Reference, isRedirectFetchingRequired } fro
 import { computeUserAgent } from '../outbound.ts';
 import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
-import { computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
+import { addHours, computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
@@ -32,6 +32,7 @@ export class ShowController {
     private readonly statsBlobs: Blobs;
     private readonly rpcClient: RpcClient;
     private readonly backups = new Backups();
+    private readonly podcastGuidCallState: PodcastGuidCallState = {};
 
     constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
         this.storage = storage;
@@ -144,11 +145,16 @@ export class ShowController {
         }
 
         if (operationKind === 'select' && targetPath === '/show/show-uuids') {
-            const { podcastGuid } = parameters;
+            const { podcastGuid, rawIpAddress } = parameters;
             if (podcastGuid) {
+                if (typeof rawIpAddress === 'string') incrementPodcastGuidLookup({ rawIpAddress, podcastGuid, state: this.podcastGuidCallState });
                 const result = await storage.get(computePodcastGuidToShowUuidIndexKey({ podcastGuid }));
                 return { results: typeof result === 'string' && isValidUuid(result) ? [ result ] : [] };
             }
+        }
+
+        if (operationKind === 'select' && targetPath === '/show/show-uuids-call-state') {
+            return { results: [ this.podcastGuidCallState ] };
         }
 
         if (operationKind === 'select' && targetPath === '/show/work') {
@@ -1488,6 +1494,20 @@ async function rebuildMatchUrlToFeedItemIndex({ indexType, storage, go }: { inde
     }
 
     return { badKeys: badKeys.length, badValueKeys: badValueKeys.length, good, go };
+}
+
+type PodcastGuidCallState = Record<string, { podcastGuid: string, time: string }[]>;
+
+function incrementPodcastGuidLookup({ podcastGuid, rawIpAddress, state }: { podcastGuid: string, rawIpAddress: string, state: PodcastGuidCallState }) {
+    const records = state[rawIpAddress] ?? [];
+    state[rawIpAddress] = records;
+    const now = new Date();
+    records.unshift({ podcastGuid, time: now.toISOString() });
+    while (records.length > 500) records.pop();
+
+    const removeBefore = addHours(now, -2).toISOString();
+    const oldKeys = Object.entries(state).filter(v => v[1][0].time < removeBefore).map(v => v[0]);
+    oldKeys.forEach(v => delete state[v]);
 }
 
 enum IndexType {

@@ -182,11 +182,11 @@ export async function computeShowSummaryStatsResponse({ showUuid: showUuidInput,
     return newJsonResponse(res);
 }
 
-export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcClient, roRpcClient, searchParams }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams }): Promise<string | undefined> {
+export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcClient, roRpcClient, searchParams, rawIpAddress }: { rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams, rawIpAddress?: string }): Promise<string | undefined> {
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
-    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid } }, DoNames.showServer);
+    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid, ...(typeof rawIpAddress === 'string' ? { rawIpAddress } : {}) } }, DoNames.showServer);
     return results.filter(isString).filter(isValidUuid).at(0);
 }
 

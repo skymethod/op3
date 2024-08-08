@@ -65,7 +65,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     if (type === 'podcast-guid') {
         const { success } = limiter && rawIpAddress ? await limiter.isAllowed(`show:podcast-guid:ip:${rawIpAddress}`) : { success: true };
         if (!success) return new Response('slow down', { status: 429 });
-        showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams }));
+        showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams, rawIpAddress }));
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
     const showUuid = showUuidFromPodcastGuid ?? id;
