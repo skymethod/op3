@@ -167,6 +167,7 @@ function isRetryableR2(e: Error): boolean {
     if (msg.includes('Unexpected status 429') && msg.includes('Reduce your rate')) return true; // Error: Unexpected status 429, code=ServiceUnavailable, message=Reduce your rate of simultaneous reads on the same object.
     if (msg.includes('Unexpected status 500')) return true; // Error: Unexpected status 500, code=InternalError, message=We encountered an internal error. Please try again.
     if (msg.includes('Unexpected status 522')) return true; // Error: Unexpected status 522
+    if (/: error sending request for url (.*?)\n/.test(msg)) return true; // TypeError: error sending request for url (https://asdf.asdf.r2.cloudflarestorage.com/asdf)\n
 
     return false;
 }
