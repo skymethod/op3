@@ -64,8 +64,13 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
     let showUuidFromPodcastGuid: string | undefined;
     if (type === 'podcast-guid') {
         const { success } = limiter && rawIpAddress ? await limiter.isAllowed(`show:podcast-guid:ip:${rawIpAddress}`) : { success: true };
-        if (!success) return new Response('slow down', { status: 429 });
-        showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams, rawIpAddress }));
+        const msg = `slow down. you know, OP3 has an API: https://op3.dev/api/docs#tag/shows/operation/viewShowInformation`
+        if (!success) return new Response(msg, { status: 429 });
+        try {
+            showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams, rawIpAddress }));
+        } catch (e) {
+            if (`${e.stack || e}`.includes('blocked'))  return new Response(msg, { status: 429 });
+        }
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }
     const showUuid = showUuidFromPodcastGuid ?? id;

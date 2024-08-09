@@ -147,14 +147,26 @@ export class ShowController {
         if (operationKind === 'select' && targetPath === '/show/show-uuids') {
             const { podcastGuid, rawIpAddress } = parameters;
             if (podcastGuid) {
-                if (typeof rawIpAddress === 'string') incrementPodcastGuidLookup({ rawIpAddress, podcastGuid, state: this.podcastGuidCallState });
+                const state = this.podcastGuidCallState;
+                if (typeof rawIpAddress === 'string' && state[rawIpAddress] && state[rawIpAddress].blocked) throw new Error('blocked');
                 const result = await storage.get(computePodcastGuidToShowUuidIndexKey({ podcastGuid }));
-                return { results: typeof result === 'string' && isValidUuid(result) ? [ result ] : [] };
+                const results = typeof result === 'string' && isValidUuid(result) ? [ result ] : [];
+                if (typeof rawIpAddress === 'string') incrementPodcastGuidLookup({ rawIpAddress, podcastGuid, found: results.length > 0, state });
+                return { results };
             }
         }
 
-        if (operationKind === 'select' && targetPath === '/show/show-uuids-call-state') {
-            return { results: [ this.podcastGuidCallState ] };
+        if (targetPath === '/show/podcast-guid-call-state') {
+            const state = this.podcastGuidCallState;
+            if (operationKind === 'select') {
+                return { results: [ state ] };
+            }
+            if (operationKind === 'update') {
+                const { block, unblock } = parameters;
+                if (typeof block === 'string' && state[block]) state[block].blocked = true;
+                if (typeof unblock === 'string' && state[unblock]) state[unblock].blocked = undefined;
+                return { results: [ state ] };
+            }
         }
 
         if (operationKind === 'select' && targetPath === '/show/work') {
@@ -1496,17 +1508,17 @@ async function rebuildMatchUrlToFeedItemIndex({ indexType, storage, go }: { inde
     return { badKeys: badKeys.length, badValueKeys: badValueKeys.length, good, go };
 }
 
-type PodcastGuidCallState = Record<string, { podcastGuid: string, time: string }[]>;
+export type PodcastGuidCallState = Record<string, { blocked?: boolean, calls: { podcastGuid: string, found?: boolean, time: string }[] }>;
 
-function incrementPodcastGuidLookup({ podcastGuid, rawIpAddress, state }: { podcastGuid: string, rawIpAddress: string, state: PodcastGuidCallState }) {
-    const records = state[rawIpAddress] ?? [];
-    state[rawIpAddress] = records;
+function incrementPodcastGuidLookup({ podcastGuid, found, rawIpAddress, state }: { podcastGuid: string, found: boolean, rawIpAddress: string, state: PodcastGuidCallState }) {
+    const record = state[rawIpAddress] ?? { calls: [] };
+    state[rawIpAddress] = record;
     const now = new Date();
-    records.unshift({ podcastGuid, time: now.toISOString() });
-    while (records.length > 500) records.pop();
+    record.calls.unshift({ podcastGuid, time: now.toISOString(), found: found || undefined });
+    while (record.calls.length > 500) record.calls.pop();
 
     const removeBefore = addHours(now, -2).toISOString();
-    const oldKeys = Object.entries(state).filter(v => v[1][0].time < removeBefore).map(v => v[0]);
+    const oldKeys = Object.entries(state).filter(v => v[1].calls[0].time < removeBefore).map(v => v[0]);
     oldKeys.forEach(v => delete state[v]);
 }
 
