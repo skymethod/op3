@@ -186,7 +186,8 @@ export async function lookupShowUuidForPodcastGuid(podcastGuid: string, { rpcCli
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
-    const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid, ...(typeof rawIpAddress === 'string' ? { rawIpAddress } : {}) } }, DoNames.showServer);
+    const { results = [], message } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: '/show/show-uuids', parameters: { podcastGuid, ...(typeof rawIpAddress === 'string' ? { rawIpAddress } : {}) } }, DoNames.showServer);
+    if (typeof message === 'string') throw new Error(message);
     return results.filter(isString).filter(isValidUuid).at(0);
 }
 

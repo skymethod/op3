@@ -148,7 +148,7 @@ export class ShowController {
             const { podcastGuid, rawIpAddress } = parameters;
             if (podcastGuid) {
                 const state = this.podcastGuidCallState;
-                if (typeof rawIpAddress === 'string' && state[rawIpAddress] && state[rawIpAddress].blocked) throw new Error('blocked');
+                if (typeof rawIpAddress === 'string' && state[rawIpAddress] && state[rawIpAddress].blocked) return { message: 'blocked' };
                 const result = await storage.get(computePodcastGuidToShowUuidIndexKey({ podcastGuid }));
                 const results = typeof result === 'string' && isValidUuid(result) ? [ result ] : [];
                 if (typeof rawIpAddress === 'string') incrementPodcastGuidLookup({ rawIpAddress, podcastGuid, found: results.length > 0, state });
