@@ -1520,6 +1520,19 @@ function incrementPodcastGuidLookup({ podcastGuid, found, rawIpAddress, state }:
     const removeBefore = addHours(now, -2).toISOString();
     const oldKeys = Object.entries(state).filter(v => v[1].calls[0].time < removeBefore).map(v => v[0]);
     oldKeys.forEach(v => delete state[v]);
+
+    let newest: string | undefined;
+    const pgs = new Set<string>();
+    for (const { time, found, podcastGuid } of record.calls) {
+        if (found) continue;
+        if (newest === undefined) newest = time;
+        pgs.add(podcastGuid);
+        if (pgs.size >= 10) {
+            const diff = (new Date(newest).getTime() - new Date(time).getTime()) / 1000;
+            if (diff <= 60) record.blocked = true;
+            break;
+        }
+    }
 }
 
 enum IndexType {
