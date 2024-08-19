@@ -9,7 +9,7 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmPayload, ExternalNotificationRequest, RpcClient, Unkinded } from '../rpc_model.ts';
 import { addHours, computeStartOfYearTimestamp, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
-import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeMatchUrl } from '../urls.ts';
+import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeIncomingUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
 import { Backups } from './backups.ts';
 import { Blobs } from './blobs.ts';
@@ -978,11 +978,12 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
                 for (const relevantUrl of Object.values(relevantUrls)) {
                     const destinationUrl = computeChainDestinationUrl(relevantUrl);
                     if (destinationUrl) {
-                        const matchUrl = tryComputeMatchUrl(destinationUrl);
+                        const incomingDestinationUrl = tryComputeIncomingUrl(destinationUrl) ?? destinationUrl;
+                        const matchUrl = tryComputeMatchUrl(incomingDestinationUrl);
                         if (matchUrl) {
                             newIndexRecords[computeMatchUrlToFeedItemIndexKey(matchUrl, feedRecordId, feedItemRecordId)] = { feedItemRecordKey };
                             if (matchUrl.includes('?')) {
-                                const querylessMatchUrl = tryComputeMatchUrl(destinationUrl, { queryless: true });
+                                const querylessMatchUrl = tryComputeMatchUrl(incomingDestinationUrl, { queryless: true });
                                 if (querylessMatchUrl) {
                                     newIndexRecords[computeQuerylessMatchUrlToFeedItemIndexKey(querylessMatchUrl, feedRecordId, feedItemRecordId)] = { feedItemRecordKey };
                                 }

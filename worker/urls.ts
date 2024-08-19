@@ -1,4 +1,4 @@
-
+import { tryParseUrl } from './check.ts';
 
 export function tryCleanUrl(url: string): string | undefined {
     try {
@@ -47,4 +47,10 @@ export function computeMatchUrl(url: string, opts: { queryless?: boolean } = {})
     const m = /^https?:\/\/(.+?)$/.exec(rt);
     if (!m) throw new Error(`Unable to compute match url for: ${url}`);
     return m[1];
+}
+
+export function tryComputeIncomingUrl(url: string): string | undefined {
+    // "https://example.com/path/to/a file.mp3" -> https://example.com/path/to/a%20file.mp3
+    const u = tryParseUrl(url);
+    return u?.toString();
 }

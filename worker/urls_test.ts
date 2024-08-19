@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from './tests/deps.ts';
-import { cleanUrl, computeMatchUrl } from './urls.ts';
+import { cleanUrl, computeMatchUrl, tryComputeIncomingUrl } from './urls.ts';
 
 Deno.test({
     name: 'cleanUrl',
@@ -60,6 +60,30 @@ Deno.test({
         ];
         for (const input of bad) {
             assertThrows(() => cleanUrl(input));
+        }
+    }
+});
+
+Deno.test({
+    name: 'tryComputeIncomingUrl',
+    fn: () => {
+        const good = {
+            'HTTPS://a.com': 'https://a.com/',
+            'https://a.com/path/to/file.mp3': 'https://a.com/path/to/file.mp3',
+            'https://a.com/a file.mp3': 'https://a.com/a%20file.mp3',
+            'https://a.com/ä.mp3': 'https://a.com/%C3%A4.mp3',
+        }
+        for (const [ input, expected ] of Object.entries(good)) {
+            assertEquals(tryComputeIncomingUrl(input), expected);
+        }
+
+        const bad = [
+            'a.com',
+            'a',
+            '',
+        ];
+        for (const input of bad) {
+            assertEquals(tryComputeIncomingUrl(input), undefined);
         }
     }
 });
