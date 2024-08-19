@@ -24,11 +24,12 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@f67d89dfe562873141ed083fa84269258469c247 (2024-08-07T19:33:29Z)
+// from user-agents-v2@934856ef6c3a5d7a2ff4b3d05219cd916fc9dfdb (2024-08-19T15:01:52Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
     'AIS VirtualListener': { type: 'bot', name: `Adswizz` },
+    'agma/1.0': { type: 'bot', name: `ma Podcast (agma) Bot` },
     'Mozilla/5.0 (compatible; AhrefsBot/7.0; http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
     'Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
     'AirableBot-Podcast/1.0 (+https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
@@ -161,6 +162,7 @@ const botTests = {
     'Adswizz-podscribe/1.0': { type: 'bot', name: `Podscribe` },
     'Podscribe/1.1': { type: 'bot', name: `Podscribe` },
     'Mozilla/5.0 (compatible; PodUptime/1.0; +https://poduptime.com)': { type: 'bot', name: `PodUptime` },
+    'Mozilla/5.0 (compatible; PodUptimeBot/1.0; +https://poduptime.com; rid:5c02fc9b-2660-4d3e-a352-de1a1aabdc0a)': { type: 'bot', name: `PodUptime` },
     'PodvineBot/4.0.1 (www.podvine.com)': { type: 'bot', name: `PodvineBot` },
     'PostRank/2.0 (postrank.com; 1 subscribers)': { type: 'bot', name: `PostRank Bot` },
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
@@ -191,6 +193,7 @@ const botTests = {
     'Triton Digital Podcast Sync': { type: 'bot', name: `Triton Digital Podcast Sync` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
+    'Mozilla/5.0+(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)': { type: 'bot', name: `UptimeRobot` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },
     'Mozilla/5.0 (compatible; TTD-Content; +https://www.thetradedesk.com/general/ttd-content)': { type: 'bot', name: `theTradeDesk Content Web Scraper` },
     'veritone/engine-toolkit-3.0': { type: 'bot', name: `Veritone Engine Toolkit` },
@@ -897,6 +900,8 @@ const appTests = {
     'podcast/ CFNetwork/1107 Darwin/19.0.0': { type: 'app', name: `The Podcast App` },
     'podcast/878 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `The Podcast App` },
     'PodcastApp/22.10.30 CFNetwork/1333.0.4 Darwin/21.5.0': { type: 'app', name: `The Podcast App` },
+    'TwipeMobileApp PLATFORM=iOS VERSION=5.4.7.0 ENV=PROD isPhone': { type: 'app', name: `Twipe Mobile App` },
+    'TwipeMobileApp PLATFORM=Android VERSION=5.4.7.0 ENV=PROD isTablet': { type: 'app', name: `Twipe Mobile App` },
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Thunderbird/102.4.1': { type: 'app', name: `Mozilla Thunderbird` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 musical_ly_17.5.0 JsSdk/2.0 NetType/WIFI Channel/App Store ByteLocale/nl Region/NL ByteFullLocale/nl-NL WKWebView/1': { type: 'app', name: `TikTok` },
     'TREBLE/1.0': { type: 'app', name: `Treble` },

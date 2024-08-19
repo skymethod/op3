@@ -19,13 +19,14 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@f67d89dfe562873141ed083fa84269258469c247 (2024-08-07T19:33:29Z)
+// from user-agents-v2@934856ef6c3a5d7a2ff4b3d05219cd916fc9dfdb (2024-08-19T15:01:52Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
     // bots
     if (/AAABot/.test(userAgent)) return { name: `AAABot - unknown bot`, type: 'bot' };
     if (/^AIS VirtualListener/.test(userAgent)) return { name: `Adswizz`, type: 'bot' };
+    if (/^agma\//.test(userAgent)) return { name: `ma Podcast (agma) Bot`, type: 'bot' };
     if (/AhrefsBot\//.test(userAgent)) return { name: `AhrefsBot`, type: 'bot' };
     if (/AirableBot-Podcast\//.test(userAgent)) return { name: `AirableBot`, type: 'bot' };
     if (/^AmazonNewsContentService/.test(userAgent)) return { name: `Alexa Flash Briefing cache`, type: 'bot' };
@@ -134,7 +135,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^pdrl\.fm /.test(userAgent)) return { name: `Podroll Analyzer`, type: 'bot' };
     if (/^PodscanBot\//.test(userAgent)) return { name: `Podscan Bot`, type: 'bot' };
     if (/(^Adswizz-podscribe\/|^Podscribe\/)/.test(userAgent)) return { name: `Podscribe`, type: 'bot' };
-    if (/PodUptime\/\d/.test(userAgent)) return { name: `PodUptime`, type: 'bot' };
+    if (/(PodUptime|PodUptimeBot)\/\d/.test(userAgent)) return { name: `PodUptime`, type: 'bot' };
     if (/^Podverse\/Feed Parser/.test(userAgent)) return { name: `Podverse Feed Parser`, type: 'bot' };
     if (/^PodvineBot\//.test(userAgent)) return { name: `PodvineBot`, type: 'bot' };
     if (/^PostRank\//.test(userAgent)) return { name: `PostRank Bot`, type: 'bot' };
@@ -170,6 +171,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Twitterbot/.test(userAgent)) return { name: `Twitterbot`, type: 'bot' };
     if (/^Typhoeus/.test(userAgent)) return { name: `Typhoeus`, type: 'bot' };
     if (/^UCast\//.test(userAgent)) return { name: `UCast`, type: 'bot' };
+    if (/UptimeRobot\/\d/.test(userAgent)) return { name: `UptimeRobot`, type: 'bot' };
     if (/^TelegramBot /.test(userAgent)) return { name: `TelegramBot`, type: 'bot' };
     if (/TTD-Content/.test(userAgent)) return { name: `theTradeDesk Content Web Scraper`, type: 'bot' };
     if (/^veritone\/engine-toolkit/.test(userAgent)) return { name: `Veritone Engine Toolkit`, type: 'bot' };
@@ -613,6 +615,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^The God Minute\//.test(userAgent)) return { name: `The God Minute`, type: 'app' };
     if (/(^lamarr-iOS|^TheEconomist-Lamarr-ios|^TheEconomist-Lamarr-iOS|^lamarr-android|^TheEconomist-Lamarr-android)/.test(userAgent)) return { name: `The Economist`, type: 'app' };
     if (/^ThePodcastApp|iOS.*The Podcast App\/|com\.evolve\.podcast\/|^podcast\/\d* |^PodcastApp\/\d/.test(userAgent)) return { name: `The Podcast App`, type: 'app' };
+    if (/^TwipeMobileApp/.test(userAgent)) return { name: `Twipe Mobile App`, type: 'app' };
     if (/ Thunderbird\//.test(userAgent)) return { name: `Mozilla Thunderbird`, type: 'app' };
     if (/musical_ly/.test(userAgent)) return { name: `TikTok`, type: 'app' };
     if (/^TREBLE\//.test(userAgent)) return { name: `Treble`, type: 'app' };
