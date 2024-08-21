@@ -1,4 +1,4 @@
-export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload';
+export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'bot-ip' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload';
 
 export function computeBotType({ agentType, agentName = '', deviceType, referrerName, tags = '', date }: { agentType: string, agentName?: string, deviceType?: string, referrerName?: string, tags?: string, date: string }): BotType | undefined {
     if (agentType === 'bot') return 'bot'; // easy
@@ -15,6 +15,9 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
     // 2024-03-11: Observed two other embedded player widgets requesting the entire file before user playback (preload="metadata")
     if (agentType === 'browser' && agentName === 'Podfriend' && tags.includes('web-widget')) return 'web-widget-preload';
     if (agentType === 'browser' && agentName === 'JustCast' && tags.includes('web-widget') && date < '2024-03-19') return 'web-widget-preload'; // 2024-03-19: fixed!
+
+    // 2024-08-21: Found ips with evidence of automated/bot-like requests
+    if (tags.includes('bot-ip')) return 'bot-ip';
 }
 
 export function isWebWidgetHostname(hostname: string): boolean {
