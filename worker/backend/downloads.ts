@@ -104,7 +104,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
                 tags = (tags ? `${tags},x-forwarded-for` : 'x-forwarded-for');
                 countryCode = continentCode = regionCode = regionName = timezone = metroCode = ''; // geo atts no longer represent the listener
             }
-            if (hashedIpAddress === 'c1cf85ed0bcb71afdc52ce52ad54cba30cf05a7e') tags = (tags ? `${tags},bot-ip` : 'bot-ip');
+            if (hashedIpAddress && botIps.has(hashedIpAddress)) tags = (tags ? `${tags},bot-ip` : 'bot-ip');
 
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
@@ -120,6 +120,11 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 
     return { hour, maxQueries, querySize, maxHits, queries, hits, downloads: Object.keys(downloads).length, millis: Date.now() - start, contentLength };
 }
+
+const botIps = new Set([
+    'c1cf85ed0bcb71afdc52ce52ad54cba30cf05a7e', // 2024-08-21 for 2024-08-19
+    '055339109b8a6d1c0f508fb491fec8ca54526748', // 2024-08-21 for 2024-08-19
+]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
 type ComputeHourlyShowColumnsOpts = { 
