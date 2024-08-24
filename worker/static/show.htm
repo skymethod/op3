@@ -311,6 +311,27 @@ const strings = {
                 </template>
             </sl-card>
 
+            <!-- top af regions -->
+            <sl-card id="top-af-regions-card" class="card-basic flex justify-center">
+                <div slot="header" class="flex items-center justify-between w-72">
+                    <div class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_african_regions:'Top African regions'}</div>
+                    <sl-icon-button id="top-af-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                </div>
+            
+                <div class="flex items-center mb-4 justify-center">
+                    <sl-icon-button name="caret-left-fill" label="${s:previous:''}" id="top-af-regions-month-previous"></sl-icon-button>
+                    <span id="top-af-regions-month" class="whitespace-nowrap">October 2022</span>
+                    <sl-icon-button name="caret-right-fill" label="{s:next:''}" id="top-af-regions-month-next"></sl-icon-button>
+                </div>
+            
+                <dl id="top-af-regions" class="grid grid-cols-[1.5rem_1fr_3.5rem] text-xs md:text-sm overflow-y-scroll overflow-x-hidden h-80 pr-4 auto-rows-max" lang="en"></dl>
+                <template id="top-af-regions-row">
+                    <span class="leading-relaxed"></span>
+                    <dt class="leading-relaxed truncate max-w-[12rem]">AU Region</dt>
+                    <dd class="font-mono text-right leading-relaxed">50.00</dd>
+                </template>
+            </sl-card>
+
             <!-- top as regions -->
             <sl-card id="top-as-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">

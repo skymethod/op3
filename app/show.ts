@@ -17,6 +17,7 @@ import { makeTopEuRegions } from './top_eu_regions.ts';
 import { makeTopAuRegions } from './top_au_regions.ts';
 import { makeTopCaRegions } from './top_ca_regions.ts';
 import { makeTopAsRegions } from './top_as_regions.ts';
+import { makeTopAfRegions } from './top_af_regions.ts';
 import { makeTopLatamRegions } from './top_latam_regions.ts';
 import { makeListens } from './listens.ts';
 
@@ -143,6 +144,7 @@ export async function initShow() {
         makeTopAuRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
         makeTopAsRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
         makeTopLatamRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
+        makeTopAfRegions({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings, lang });
         makeFooter({ mostRecentDate, strings, lang });
 
         const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;

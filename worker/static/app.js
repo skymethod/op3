@@ -10345,6 +10345,35 @@ function computeRegionName2(regionCountry) {
     const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     return region;
 }
+const makeTopAfRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
+    const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'afRegion');
+    const { computeEmoji, computeUrl } = regionCountryFunctions();
+    return makeTopBox({
+        type: 'af-regions',
+        showSlug,
+        exportId: 'top-af-regions-export',
+        previousId: 'top-af-regions-month-previous',
+        nextId: 'top-af-regions-month-next',
+        monthId: 'top-af-regions-month',
+        listId: 'top-af-regions',
+        templateId: 'top-af-regions-row',
+        cardId: 'top-af-regions-card',
+        monthlyDownloads,
+        downloadsPerMonth,
+        tsvHeaderNames: [
+            'afRegion'
+        ],
+        computeEmoji,
+        computeName: computeRegionName3,
+        computeUrl,
+        strings: strings1,
+        lang
+    });
+};
+function computeRegionName3(regionCountry) {
+    const region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
+    return region;
+}
 const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPerMonth, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'latamRegion');
     const { computeEmoji, computeUrl } = regionCountryFunctions();
@@ -10364,13 +10393,13 @@ const makeTopLatamRegions = ({ showSlug, monthlyDimensionDownloads, downloadsPer
             'latamRegion'
         ],
         computeEmoji,
-        computeName: computeRegionName3,
+        computeName: computeRegionName4,
         computeUrl,
         strings: strings1,
         lang
     });
 };
-function computeRegionName3(regionCountry) {
+function computeRegionName4(regionCountry) {
     let region = regionCountry.substring(0, regionCountry.length - ', XX'.length).trim();
     let m = /^(Departamento del? |Region del? |Provincia del? |Provincia )(.*)$/.exec(region);
     if (m) region = m[2];
@@ -10729,6 +10758,13 @@ async function initShow() {
             lang
         });
         makeTopLatamRegions({
+            showSlug,
+            monthlyDimensionDownloads,
+            downloadsPerMonth,
+            strings,
+            lang
+        });
+        makeTopAfRegions({
             showSlug,
             monthlyDimensionDownloads,
             downloadsPerMonth,

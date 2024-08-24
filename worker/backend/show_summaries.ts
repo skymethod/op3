@@ -195,6 +195,7 @@ export async function computeShowSummaryForDate({ showUuid, date, statsBlobs }: 
         if (countryCode === 'AU' || countryCode === 'NZ') incrementDimension('auRegion', `${regionName}, ${countryCode}`); // australasia
         if (countryCode === 'CA') incrementDimension('caRegion', `${regionName}`);
         if ((continentCode === 'NA' || continentCode === 'SA') && countryCode !== 'US' && countryCode !== 'CA') incrementDimension('latamRegion', `${regionName}, ${countryCode}`);
+        if (continentCode === 'AF') incrementDimension('afRegion', `${regionName}, ${countryCode}`);
         if (agentType === 'app') {
             incrementDimension('appName', agentName);
         } else if (agentType === 'browser') {
