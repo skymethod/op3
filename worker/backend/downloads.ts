@@ -124,6 +124,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
 const botIps = new Set([
     'c1cf85ed0bcb71afdc52ce52ad54cba30cf05a7e', // 2024-08-21 for 2024-08-19
     '055339109b8a6d1c0f508fb491fec8ca54526748', // 2024-08-21 for 2024-08-19
+    '9d966be7e654e5404f0588652bfab78b58dfe3d4', // 2024-08-26 for 2024-08-25
 ]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
