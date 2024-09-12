@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@934856ef6c3a5d7a2ff4b3d05219cd916fc9dfdb (2024-08-19T15:01:52Z)
+// from user-agents-v2@fcea8b5e6f27343e448f778d4a01e63e230ee893 (2024-09-12T15:25:37Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -928,6 +928,8 @@ const appTests = {
     'VictorReader_4-4-2': { type: 'app', name: `VictorReader` },
     'VLC/3.0.8 LibVLC/3.0.8': { type: 'app', name: `VLC media player` },
     'Voiz FM/10.1.0 (Linux;Android 8.1.0) ExoPlayerLib/2.9.3': { type: 'app', name: `Voiz FM` },
+    'Wavlake/0.0.2 iPhone 11/35 https://wavlake.com': { type: 'app', name: `Wavlake` },
+    'Wavlake/0.0.1 Android 18/34 https://wavlake.com': { type: 'app', name: `Wavlake` },
     'WinampMPEG/2.7': { type: 'app', name: `Winamp` },
     'WeCast/3.050 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `WeCast` },
     'WhatsApp/0.3.5374 N': { type: 'app', name: `WhatsApp` },
@@ -1140,6 +1142,8 @@ const deviceTests = {
 };
 
 const referrerTests = {
+    'https://asdf.alitu.com/': { type: 'referrer', name: `Alitu Web Player` },
+    'https://www.alitu.com/': { type: 'referrer', name: `Alitu Web Player` },
     'https://music.amazon.com/': { type: 'referrer', name: `Amazon Music` },
     'https://music.amazon.com.mx/': { type: 'referrer', name: `Amazon Music` },
     'https://music.amazon.co.jp/podcasts/548537b2-c07d-4e28-8b90-ba5aeb2b3e49/-Picture-Books-English': { type: 'referrer', name: `Amazon Music` },

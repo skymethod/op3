@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@934856ef6c3a5d7a2ff4b3d05219cd916fc9dfdb (2024-08-19T15:01:52Z)
+// from user-agents-v2@fcea8b5e6f27343e448f778d4a01e63e230ee893 (2024-09-12T15:25:37Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -633,6 +633,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^VLC\/\d/.test(userAgent)) return { name: `VLC media player`, type: 'app' };
     if (/^Vodacast/.test(userAgent)) return { name: `Vodacast`, type: 'app' };
     if (/^Voiz FM\//.test(userAgent)) return { name: `Voiz FM`, type: 'app' };
+    if (/^Wavlake\//.test(userAgent)) return { name: `Wavlake`, type: 'app' };
     if (/^Winamp/.test(userAgent)) return { name: `Winamp`, type: 'app' };
     if (/^WeCast\//.test(userAgent)) return { name: `WeCast`, type: 'app' };
     if (/^WhatsApp\//.test(userAgent)) return { name: `WhatsApp`, type: 'app' };
@@ -743,6 +744,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
 }
 
 export function findUserAgentReferrerEntity(referer: string): Entity | undefined {
+    if (/:\/\/[^.\/]+\.alitu\.com\//.test(referer)) return { name: `Alitu Web Player`, type: 'referrer', category: 'host' };
     if (/^https:\/\/music\.amazon\./.test(referer)) return { name: `Amazon Music`, type: 'referrer', category: 'app' };
     if (/^https:\/\/(embed\.)?podcasts\.apple\.com/.test(referer)) return { name: `Apple Podcasts`, type: 'referrer', category: 'app' };
     if (/:\/\/www\.audible(\.com|\.co\.uk)\//.test(referer)) return { name: `Audible`, type: 'referrer', category: 'app' };
