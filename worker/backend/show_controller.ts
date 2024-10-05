@@ -1221,7 +1221,7 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     let show = record;
     const upsertRecords: Record<string, DurableObjectStorageValue> = {};
     let deleteIndexKey: string | undefined;
-    const { title, podcastGuid: feedPodcastGuid, link, itunesAuthor, piFeed } = feedRecord;
+    const { title, podcastGuid: feedPodcastGuid, link, itunesAuthor, piFeed, medium } = feedRecord;
     const podcastGuid = feedPodcastGuid ?? piFeed?.podcastGuid;
     if (show.title !== title) {
         messages.push(`show.title ${show.title} -> ${title}`);
@@ -1246,6 +1246,11 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
         show = { ...show, podcastGuid };
         upsertRecords[showKey] = show;
         upsertRecords[computePodcastGuidToShowUuidIndexKey({ podcastGuid })] = showUuid;
+    }
+    if (show.medium !== medium) {
+        messages.push(`show.medium ${show.medium} -> ${medium}`);
+        show = { ...show, medium };
+        upsertRecords[showKey] = show;
     }
     if (Object.keys(upsertRecords).length > 0 || deleteIndexKey) {
         await storage.transaction(async tx => {

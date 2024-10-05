@@ -96,3 +96,7 @@ export function isString(obj: unknown): obj is string {
 export function undefinedIfBlank(v: string): string | undefined {
     return v === '' ? undefined : v;
 }
+
+export function isOptionalString(obj: unknown): obj is string | undefined {
+    return obj === undefined || typeof obj === 'string';
+}

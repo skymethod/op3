@@ -1,4 +1,4 @@
-import { isString, isStringRecord } from '../check.ts';
+import { isOptionalString, isString, isStringRecord } from '../check.ts';
 import { ErrorInterface, isErrorInterface } from '../errors.ts';
 import { ItunesCategory } from '../feed_parser.ts';
 
@@ -198,15 +198,17 @@ export interface ShowRecord {
     readonly title?: string;
     readonly link?: string;
     readonly itunesAuthor?: string;
+    readonly medium?: string;
 }
 
 export function isShowRecord(obj: unknown): obj is ShowRecord {
     return isStringRecord(obj)
         && typeof obj.uuid === 'string'
-        && (obj.podcastGuid === undefined || typeof obj.podcastGuid === 'string')
-        && (obj.title === undefined || typeof obj.title === 'string')
-        && (obj.link === undefined || typeof obj.link === 'string')
-        && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
+        && isOptionalString(obj.podcastGuid)
+        && isOptionalString(obj.title)
+        && isOptionalString(obj.link)
+        && isOptionalString(obj.itunesAuthor)
+        && isOptionalString(obj.medium)
         ;
 }
 
