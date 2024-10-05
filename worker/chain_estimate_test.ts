@@ -402,6 +402,12 @@ Deno.test({
             { kind: 'prefix', prefix: 'podcards', url: 'https://pdcds.co/asdf1234za/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/tracking.swap.fm/track/1az6ABCD491az6ABCD49/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/tracking.swap.fm/track/1az6ABCD491az6ABCD49/a.com/path/to/episode.mp3' },
+            { kind: 'prefix', prefix: 'swapfm', url: 'https://tracking.swap.fm/track/1az6ABCD491az6ABCD49/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
         
     }
 });

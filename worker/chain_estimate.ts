@@ -276,11 +276,12 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://swap.fm/track/12345ABCDEabcde12345/a.com/path/to/episode.mp3
+    // https://tracking.swap.fm/track/12345ABCDEabcde12345/a.com/path/to/episode.mp3
     // http redirects to https
     // no suffix protocol support
-    m = /^https?:\/\/swap\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
+    m = /^https?:\/\/(tracking\.)?swap\.fm\/track\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
-        const [ _, suffix ] = m;
+        const [ _, __, suffix ] = m;
         const targetUrl = `https://${suffix}`;
         return [ { kind: 'prefix', prefix: 'swapfm', url }, ...computeChainEstimate(targetUrl) ];
     }
