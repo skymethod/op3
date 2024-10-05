@@ -6,6 +6,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
     let feedLink: string | undefined;
     let feedPodcastGuid: string | undefined;
+    let feedPodcastMedium: string | undefined;
     let feedGenerator: string | undefined;
     let feedItunesAuthor: string | undefined;
     let feedItunesCategories: ([ string ] | [ string, string ])[] | undefined;
@@ -149,6 +150,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/link') feedLink = text;
             if (xpath === '/rss/channel/generator') feedGenerator = text;
             if (xpath === '/rss/channel/podcast:guid' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) feedPodcastGuid = undefinedIfBlank(text);
+            if (xpath === '/rss/channel/podcast:medium' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) feedPodcastMedium = undefinedIfBlank(text);
             if (xpath === '/rss/channel/itunes:author' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesAuthor = text;
             if (xpath === '/rss/channel/itunes:type' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesType = text;
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
@@ -190,7 +192,7 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
     };
     parseXml(feedContents, callback);
     if (feedItunesCategories && !feedItunesCategories.every(isItunesCategory)) throw new Error(`Invalid itunesCategories: ${JSON.stringify(feedItunesCategories)}`);
-    return { title: feedTitle, link: feedLink, podcastGuid: feedPodcastGuid, generator: feedGenerator, itunesAuthor: feedItunesAuthor, itunesType: feedItunesType, itunesCategories: feedItunesCategories, value: feedValue, items };
+    return { title: feedTitle, link: feedLink, podcastGuid: feedPodcastGuid, medium: feedPodcastMedium, generator: feedGenerator, itunesAuthor: feedItunesAuthor, itunesType: feedItunesType, itunesCategories: feedItunesCategories, value: feedValue, items };
 }
 
 //
@@ -226,6 +228,7 @@ export interface Feed {
     readonly link?: string;
     readonly podcastGuid?: string;
     readonly generator?: string;
+    readonly medium?: string;
     readonly itunesAuthor?: string;
     readonly itunesType?: string;
     readonly itunesCategories?: ItunesCategory[];

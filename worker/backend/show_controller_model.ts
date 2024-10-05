@@ -53,6 +53,7 @@ export interface FeedRecord {
     readonly itunesAuthor?: string;
     readonly itunesType?: string;
     readonly itunesCategories?: ItunesCategory[];
+    readonly medium?: string;
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -79,6 +80,7 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         // && (obj.itunesAuthor === undefined || typeof obj.itunesAuthor === 'string')
         // && (obj.itunesType === undefined || typeof obj.itunesType === 'string')
         // && (obj.itunesCategories === undefined || Array.isArray(obj.itunesCategories) && obj.itunesCategories.every(isItunesCategory))
+        && (obj.medium === undefined || typeof obj.medium === 'string')
         ;
 }
 

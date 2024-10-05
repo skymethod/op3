@@ -904,6 +904,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             || feedRecord.itunesAuthor !== feed.itunesAuthor
             || feedRecord.itunesType !== feed.itunesType
             || !equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)
+            || feedRecord.medium !== feed.medium
         ) {
         const update: FeedRecord = { ...feedRecord,
             title: feed.title,
@@ -913,6 +914,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
             itunesAuthor: feed.itunesAuthor,
             itunesType: feed.itunesType,
             itunesCategories: feed.itunesCategories,
+            medium: feed.medium,
             updated: new Date().toISOString(),
         };
         await storage.put(computeFeedRecordKey(feedRecordId), update);
@@ -923,6 +925,7 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         if (feedRecord.itunesAuthor !== feed.itunesAuthor) rt.push(`updated itunesAuthor from ${feedRecord.itunesAuthor} -> ${feed.itunesAuthor}`);
         if (feedRecord.itunesType !== feed.itunesType) rt.push(`updated itunesType from ${feedRecord.itunesType} -> ${feed.itunesType}`);
         if (!equalItunesCategories(feedRecord.itunesCategories, feed.itunesCategories)) rt.push(`updated itunesCategories from ${stringifyItunesCategories(feedRecord.itunesCategories)} -> ${stringifyItunesCategories(feed.itunesCategories)}`);
+        if (feedRecord.medium !== feed.medium) rt.push(`updated medium from ${feedRecord.medium} -> ${feed.medium}`);
         feedRecord = update;
     }
 
