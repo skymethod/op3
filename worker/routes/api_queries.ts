@@ -109,7 +109,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const targetStatsBlobs = searchParams.has('ro') ? roStatsBlobs : statsBlobs;
         if (!targetStatsBlobs) throw new Error(`Need statsBlobs`);
 
-        const { deviceNameParam, userAgent } = Object.fromEntries(searchParams);
+        const { deviceName: deviceNameParam, userAgent } = Object.fromEntries(searchParams);
         if (typeof deviceNameParam === 'string' && typeof userAgent === 'string') return newJsonResponse({ error: `Cannot specify both 'deviceName' and 'userAgent'` }, 400);
 
         const inferredDeviceName = userAgent ? computeUserAgentEntityResult(userAgent)?.device?.name : undefined;
