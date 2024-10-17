@@ -270,8 +270,15 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
         await jobQueue.send(rpcRequest);
         return newJsonResponse({ message: `Enqueued in ${Date.now() - start}ms` });
     } else {
-        const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient, statsBlobs);
-        return newJsonResponse({ results, message });
+        try {
+            const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient, statsBlobs);
+            return newJsonResponse({ results, message });
+        } catch (e) {
+            if (parameters?.expectStorageTimeout === 'true' && `${e.stack || e}`.includes('storage operation exceeded timeout')) {
+                return newJsonResponse({ message: 'storage operation exceeded timeout' });
+            }
+            throw e;
+        }
     }
 }
 
