@@ -1,3 +1,4 @@
+import { tryParseInt } from './check.ts';
 import { isDurableObjectFetchErrorRetryable } from './cloudflare_errors.ts';
 import { DurableObjectNamespace } from './deps.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest } from './rpc_model.ts';
@@ -79,7 +80,7 @@ export class CloudflareRpcClient implements RpcClient {
     //
 
     async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target));
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters));
     }
 
     async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
@@ -92,8 +93,9 @@ export class CloudflareRpcClient implements RpcClient {
 
     //
 
-    private computeOpts(target: string): { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number } {
-        const { backendNamespace, maxRetries } = this;
+    private computeOpts(target: string, parameters?: Record<string, string>): { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number } {
+        const { backendNamespace } = this;
+        const maxRetries = tryParseInt(parameters?.maxRetries) ?? this.maxRetries;
         return { doName: target, backendNamespace, maxRetries };
     }
 
