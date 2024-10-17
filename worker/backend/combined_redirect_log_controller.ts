@@ -246,6 +246,19 @@ export class CombinedRedirectLogController {
                 return { results };
             }
         }
+        if (operationKind === 'update' && targetPath === '/crl/clear') {
+            const { go } = parameters;
+            if (go === 'true') {
+                await this.storage.deleteAll();
+                const results = [ { deleteAllDone: true } ];
+                return { results };
+            } else {
+                const first = await this.storage.list({ limit: 1, noCache: true });
+                const last = await this.storage.list({ limit: 1, noCache: true, reverse: true });
+                const results = [ { ...first, ...last } ];
+                return { results };
+            }
+        }
 
         throw new Error(`Unsupported crl-related query`);
     }
