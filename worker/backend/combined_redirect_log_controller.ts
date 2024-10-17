@@ -253,8 +253,8 @@ export class CombinedRedirectLogController {
                 const results = [ { deleteAllDone: true } ];
                 return { results };
             } else {
-                const first = await this.storage.list({ limit: 1, noCache: true });
-                const last = await this.storage.list({ limit: 1, noCache: true, reverse: true });
+                const first = Object.fromEntries(await this.storage.list({ limit: 1, noCache: true }));
+                const last = Object.fromEntries(await this.storage.list({ limit: 1, noCache: true, reverse: true }));
                 const results = [ { ...first, ...last } ];
                 return { results };
             }
