@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@e2b50e5629a3b4af221d3c5cdf602309fbb7ff45 (2024-10-08T21:52:50Z)
+// from user-agents-v2@32b4578ca14c306dd6a822a556f9fe563607cc10 (2024-10-30T17:42:35Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -131,6 +131,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podgrab$/.test(userAgent)) return { name: `Podgrab`, type: 'bot' };
     if (/PodhoundBeta/.test(userAgent)) return { name: `Podhound`, type: 'bot' };
     if (/^Podio\//.test(userAgent)) return { name: `Podio Bot`, type: 'bot' };
+    if (/^Podmonbot\//.test(userAgent)) return { name: `Podmon Bot`, type: 'bot' };
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };
     if (/(podnods-crawler|podnods)/.test(userAgent)) return { name: `Podnods Bot`, type: 'bot' };
     if (/^Podplay-Podcast-Sync\//.test(userAgent)) return { name: `Podplay Podcast Sync`, type: 'bot' };
@@ -549,6 +550,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
     if (/^Podgrab /.test(userAgent)) return { name: `Podgrab`, type: 'app' };
     if (/^Podhero|^Swoot[\/ ]/.test(userAgent)) return { name: `Podhero`, type: 'app' };
+    if (/^Podhome App/.test(userAgent)) return { name: `Podhome`, type: 'app' };
     if (/^Podimo\//.test(userAgent)) return { name: `Podimo`, type: 'app' };
     if (/^Podium\/\d/.test(userAgent)) return { name: `Podium Podcast`, type: 'app' };
     if (/.*PodKast$/.test(userAgent)) return { name: `PodKast app`, type: 'app' };

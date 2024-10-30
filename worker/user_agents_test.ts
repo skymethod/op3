@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@e2b50e5629a3b4af221d3c5cdf602309fbb7ff45 (2024-10-08T21:52:50Z)
+// from user-agents-v2@32b4578ca14c306dd6a822a556f9fe563607cc10 (2024-10-30T17:42:35Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -157,6 +157,7 @@ const botTests = {
     'Podgrab': { type: 'bot', name: `Podgrab` },
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
+    'Podmonbot/1.0': { type: 'bot', name: `Podmon Bot` },
     'Podplay-Podcast-Sync/1.0 (+https://podplay.com/articles/contact)': { type: 'bot', name: `Podplay Podcast Sync` },
     'pdrl.fm Analyzer / 1.0.0': { type: 'bot', name: `Podroll Analyzer` },
     'PodscanBot/1.1.0 Ubuntu/22.04 (Linux) +https://podscan.fm': { type: 'bot', name: `Podscan Bot` },
@@ -788,6 +789,8 @@ const appTests = {
     'Podgrab - docker': { type: 'app', name: `Podgrab` },
     'Podhero%20Alpha/4373 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `Podhero` },
     'Swoot Agent 1.0': { type: 'app', name: `Podhero` },
+    'Podhome App/1.0 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `Podhome` },
+    'Podhome App/1.0 (Linux; Android 10; SM-G960F Build/QP1A.190711.020) ExoPlayerLib/2.10.4': { type: 'app', name: `Podhome` },
     'Podimo/1.11.3 build 121/iOS 13.3': { type: 'app', name: `Podimo` },
     'Podimo/1.11.3 build 91/Android 28': { type: 'app', name: `Podimo` },
     'Podium/2.5.4 iOS_iPhone 15.0 Build 11': { type: 'app', name: `Podium Podcast` },
