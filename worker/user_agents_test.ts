@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@32b4578ca14c306dd6a822a556f9fe563607cc10 (2024-10-30T17:42:35Z)
+// from user-agents-v2@284e4b88c37c177928c2a8106c5068d010b2d7df (2024-11-06T19:18:20Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -643,6 +643,7 @@ const appTests = {
     'Jam/1.11.1 iOS/16.2 (www.listentojam.com)': { type: 'app', name: `Jam` },
     'Jam/1.11.1 Android/12 (www.listentojam.com)': { type: 'app', name: `Jam` },
     'Jamit': { type: 'app', name: `Jamit` },
+    'JamxFeeds/1.0.3': { type: 'app', name: `JamxFeeds` },
     'Jimcast/1.0 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `Jimcast` },
     'com.jio.media.jiobeats/7.3.1 (Linux;Android 8.1.0) ExoPlayerLib/2.11.4': { type: 'app', name: `JioSaavn` },
     'Saavn Player': { type: 'app', name: `JioSaavn` },
