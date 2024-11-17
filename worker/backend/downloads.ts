@@ -140,6 +140,13 @@ const botIps = new Set([
     '2ab919bc715bd9982e07f0ea2a3b855847470dc0', // 2024-10-25 for 2024-10-24
     'c7fddc49f137f524f231bb5843fc227750839d34', // 2024-10-28 for 2024-10-26to27
     '10e1df51c6209d866006f706e88e97f4ced49517', // 2024-11-07 for 2024-11-05to06
+    '436cda5cb7f9d0af522ee0537666bca1995cd242', // 2024-11-17 for 2024-11-14to16
+    '69f31bd6f01cda7039eb8296ffacccf6c5f36591', // 2024-11-17 for 2024-11-14to16
+    '845a8c7592953d9be57a8bb62db8aa083b85e329', // 2024-11-17 for 2024-11-14to16
+    'dba29deb0809737e2f0ed34e603ac24dd0c73422', // 2024-11-17 for 2024-11-14to16
+    'ee4e164b4ab2273dfa7f4ab3567879cf31c1c687', // 2024-11-17 for 2024-11-14to16
+    'ef15dd9fce83d94c6bd2732610690be35fe74045', // 2024-11-17 for 2024-11-14to16
+    'f7018c4219b6789b69106d216bba0d59fb1b8183', // 2024-11-17 for 2024-11-14to16
 ]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
