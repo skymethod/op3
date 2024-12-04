@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@284e4b88c37c177928c2a8106c5068d010b2d7df (2024-11-06T19:18:20Z)
+// from user-agents-v2@8b6b59f88aee3dd94c97ed975c0fb79ceb5873e9 (2024-12-04T21:08:21Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -151,6 +151,7 @@ const botTests = {
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
     'PodcastStandard/0.1.0 (+https://podcast-standard.org)': { type: 'bot', name: `Podcast de facto Standard` },
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
+    'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
@@ -191,10 +192,12 @@ const botTests = {
     'SubstackContentFetch/1.0 (https://substack.com/)': { type: 'bot', name: `Substack Content Fetcher` },
     'SupportingCast/1.0': { type: 'bot', name: `SupportingCast` },
     'SupportingCast': { type: 'bot', name: `SupportingCast` },
+    'Taddy Podcast API (https://taddy.org/developers)': { type: 'bot', name: `Taddy Podcast API` },
     'Timpibot/0.8 ( http://www.timpi.io)': { type: 'bot', name: `Timpi search crawler` },
     'Tiny Tiny RSS/22.12-c30b24d09 (Unsupported) (https://tt-rss.org/)': { type: 'bot', name: `Tiny Tiny RSS` },
     'Transistor.fm/1.0': { type: 'bot', name: `Transistor` },
     'Triton Digital Podcast Sync': { type: 'bot', name: `Triton Digital Podcast Sync` },
+    'Turnitin (https://bit.ly/2UvnfoQ)': { type: 'bot', name: `TurnitinBot` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'Mozilla/5.0+(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)': { type: 'bot', name: `UptimeRobot` },
@@ -324,6 +327,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Askoyvaringen Hermes/90.0.0 _app_': { type: 'app', name: `Askoyvaringen iOS app` },
     'Audacious/3.10.1 neon/0.30.2': { type: 'app', name: `Audacious` },
     'Radio.com/12.2.0 (com.cbsradio.cbsradioplayer; build:1; iOS 14.6.0) Alamofire/4.8.1': { type: 'app', name: `Audacy` },
+    'Audacy 16.11.0 / Android': { type: 'app', name: `Audacy` },
     'com.audials/9.52.0-0+gb3764950b-1058878988 (Linux;Android 11) AndroidXMedia3/1.1.1': { type: 'app', name: `Audials` },
     'com.audials.paid/9.54.2-0+gd5b7eebd0-1117772855 (Linux;Android 14) AndroidXMedia3/1.2.0': { type: 'app', name: `Audials` },
     'Audio/105 CFNetwork/548.1.4 Darwin/11.0.0': { type: 'app', name: `Audio` },
