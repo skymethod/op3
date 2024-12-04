@@ -1315,6 +1315,11 @@ a.svg:hover {
     margin-bottom: 0.75rem;
   }
 
+  .md\:my-2 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
   .md\:block {
     display: block;
   }
