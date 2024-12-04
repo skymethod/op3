@@ -296,6 +296,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podcards', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://prefix.up.audio/s/a.com/path/to/episode.mp3
+    // http redirects to https
+    // no suffix protocol support
+    m = /^https?:\/\/prefix\.up\.audio\/s\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'unitedpodcasters', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -342,6 +352,7 @@ export interface ChainItem {
         | 'podtrac'
         | 'spotify'
         | 'swapfm'
+        | 'unitedpodcasters'
         | 'veritonic'
         | 'voxalyze'
         | 'vpixl'
