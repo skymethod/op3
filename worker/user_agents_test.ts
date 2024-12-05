@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8b6b59f88aee3dd94c97ed975c0fb79ceb5873e9 (2024-12-04T21:08:21Z)
+// from user-agents-v2@9adc0970add5b898dc401ce766c212967b2535cc (2024-12-05T18:36:52Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -152,6 +152,7 @@ const botTests = {
     'PodcastStandard/0.1.0 (+https://podcast-standard.org)': { type: 'bot', name: `Podcast de facto Standard` },
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
+    'Podcastics': { type: 'bot', name: `Podcastics` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
