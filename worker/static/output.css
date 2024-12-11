@@ -107,7 +107,7 @@
 }
 
 /*
-! tailwindcss v3.4.15 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -767,10 +767,6 @@ a.svg:hover {
   margin-top: 0.5rem;
 }
 
-.mt-3 {
-  margin-top: 0.75rem;
-}
-
 .mt-4 {
   margin-top: 1rem;
 }
@@ -1308,11 +1304,6 @@ a.svg:hover {
   .md\:my-0 {
     margin-top: 0px;
     margin-bottom: 0px;
-  }
-
-  .md\:my-3 {
-    margin-top: 0.75rem;
-    margin-bottom: 0.75rem;
   }
 
   .md\:my-2 {
