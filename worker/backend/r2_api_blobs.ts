@@ -80,7 +80,7 @@ export class R2ApiBlobs implements Blobs {
 
     async head(key: string): Promise<{ etag: string } | undefined> {
         const { bucket, origin, region, context } = this.opts;
-        const res = await headObject({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context);
+        const res = await headObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2-api-blobs-head');
         if (!res) return undefined;
         const etag = computeUnquotedEtag(res.headers);
         return etag ? { etag } : undefined;
