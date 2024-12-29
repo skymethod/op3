@@ -1,6 +1,7 @@
 import { Callback, parseXml } from './xml_parser.ts';
 import { tryParsePubdate } from './pubdates.ts';
 import { tryParseUrl, undefinedIfBlank } from './check.ts';
+import { decodeXml } from './deps.ts';
 
 export function parseFeed(feedContents: BufferSource | string): Feed {
     let feedTitle: string | undefined;
@@ -154,8 +155,8 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
             if (xpath === '/rss/channel/itunes:author' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesAuthor = text;
             if (xpath === '/rss/channel/itunes:type' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) feedItunesType = text;
             if (xpath === '/rss/channel/item/guid') itemGuid = text;
-            if (xpath === '/rss/channel/item/title') itemTitle = text;
-            if (xpath === '/rss/channel/item/pubDate') pubdate = text;
+            if (xpath === '/rss/channel/item/title') itemTitle = decodeXml(text);
+            if (xpath === '/rss/channel/item/pubDate') pubdate = decodeXml(text);
             if (xpath === '/rss/channel/item/itunes:duration' && ITUNES_NAMESPACE_URI === (findNamespaceUri('itunes') ?? '')) itunesDuration = text;
             if (xpath === '/rss/channel/item/podcast:transcript' && PODCAST_NAMESPACE_URIS.has(findNamespaceUri('podcast') ?? '')) {
                 if (transcripts?.length === 1 && transcripts.at(0)?.url === 'WORKAROUND') {
