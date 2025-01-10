@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@9adc0970add5b898dc401ce766c212967b2535cc (2024-12-05T18:36:52Z)
+// from user-agents-v2@2d4052b9e20b61c5616b23b9f6ff805fee92d4fa (2025-01-06T13:31:25Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -444,7 +444,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^iFeedTouch\//.test(userAgent)) return { name: `iFeedTouch`, type: 'app' };
     if (/Iframely\//.test(userAgent)) return { name: `Iframely`, type: 'app' };
     if (/^IFTTT\//.test(userAgent)) return { name: `IFTTT`, type: 'app' };
-    if (/^iHeartRadio\/|^iHeartPodcasts\//.test(userAgent)) return { name: `iHeartRadio`, type: 'app' };
+    if (/^iHeartRadio\/|^iHeartPodcasts\/|^iHeart\//.test(userAgent)) return { name: `iHeartRadio`, type: 'app' };
     if (/^iHorror\//.test(userAgent)) return { name: `iHorror`, type: 'app' };
     if (/^InCast\//.test(userAgent)) return { name: `InCast`, type: 'app' };
     if (/^Instacast Instacast\/|^Instacast\//.test(userAgent)) return { name: `Instacast`, type: 'app' };

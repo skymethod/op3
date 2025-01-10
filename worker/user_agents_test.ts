@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@9adc0970add5b898dc401ce766c212967b2535cc (2024-12-05T18:36:52Z)
+// from user-agents-v2@2d4052b9e20b61c5616b23b9f6ff805fee92d4fa (2025-01-06T13:31:25Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -624,6 +624,9 @@ const appTests = {
     'iHeartRadio/9.20.0 (iPad; iOS 13.4.1; iPad6,12)': { type: 'app', name: `iHeartRadio` },
     'iHeartRadio/9.7.0 (iPod touch; iOS 12.4.5; iPod7,1)': { type: 'app', name: `iHeartRadio` },
     'iHeartPodcasts/1.1.0 (Android 10; SM-A505FN Build/QP1A.190711.020)': { type: 'app', name: `iHeartRadio` },
+    'iHeart/10.47.0 (iOS/18.1; Phone; en-US; AppStore; Apple/iPhone13,2)': { type: 'app', name: `iHeartRadio` },
+    'iHeart/10.47.0 (Linux; U; Android 14; V2130 Build/UP1A.231005.007)': { type: 'app', name: `iHeartRadio` },
+    'iHeart/10.47.0 (Windows NT 10.0; Win64; x64; MSAppHost/3.0)': { type: 'app', name: `iHeartRadio` },
     'iHorror/1.2.6 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `iHorror` },
     'InCast/3443 CFNetwork/711.0.6 Darwin/14.0.0': { type: 'app', name: `InCast` },
     'Instacast Instacast/4.5.4 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Instacast` },
