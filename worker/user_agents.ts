@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@2d4052b9e20b61c5616b23b9f6ff805fee92d4fa (2025-01-06T13:31:25Z)
+// from user-agents-v2@40f2b0533d2e198e5a69b85a562039cf51b55199 (2025-01-10T17:02:24Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -155,6 +155,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^RSStT/.test(userAgent)) return { name: `RSS to Telegram`, type: 'bot' };
     if (/^RSSRadio \(/.test(userAgent)) return { name: `RSSRadio`, type: 'bot' };
     if (/^Mechanize|[ -]Mechanize\//.test(userAgent)) return { name: `Ruby Mechanize`, type: 'bot' };
+    if (/^runpod-python\//.test(userAgent)) return { name: `RunPod`, type: 'bot' };
     if (/^Screaming Frog /.test(userAgent)) return { name: `Screaming Frog SEO Spider`, type: 'bot' };
     if (/^SearchAtlas.*Crawler/.test(userAgent)) return { name: `SearchAtlas.com SEO Crawler`, type: 'bot' };
     if (/SemrushBot\/|^SEMrushBot$/.test(userAgent)) return { name: `SEMrushBot`, type: 'bot' };
@@ -519,6 +520,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Music%20Download\//.test(userAgent)) return { name: `Music Download App`, type: 'app' };
     if (/^myTuner Radio app\/|^myTuner%20Radio%20app\/|^mytuner_podcasts_androidplayer\/|^MyTuner-|^myTuner$|^myTuneriOS%20Free\//.test(userAgent)) return { name: `MyTuner`, type: 'app' };
     if (/^NetNewsWire/.test(userAgent)) return { name: `NetNewsWire`, type: 'app' };
+    if (/^Neuecast\//.test(userAgent)) return { name: `Neuecast`, type: 'app' };
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
     if (/^Newsly/.test(userAgent)) return { name: `Newsly`, type: 'app' };
     if (/^Noice\//.test(userAgent)) return { name: `Noice`, type: 'app' };
@@ -579,6 +581,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
     if (/^pypodder$/.test(userAgent)) return { name: `Pypodder`, type: 'app' };
+    if (/^Queue\/\d/.test(userAgent)) return { name: `Queue`, type: 'app' };
     if (/^Podcast Provider.*?Radio Downloader/.test(userAgent)) return { name: `Radio Downloader`, type: 'app' };
     if (/^Radio thmanyah /.test(userAgent)) return { name: `Radio thmanyah`, type: 'app' };
     if (/^(radio\.[a-z]{2,3}|GetPodcast)[ \/]\d/.test(userAgent)) return { name: `radio.de`, type: 'app' };
@@ -700,6 +703,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^hackney\/\d/.test(userAgent)) return { name: `hackney (elixir)`, type: 'library', category: 'bot' };
     if (/^HTTP-Tiny\//.test(userAgent)) return { name: `HTTP:Tiny`, type: 'library', category: 'bot' };
     if (/^http\.rb\/[\d.]+/.test(userAgent)) return { name: `http.rb`, type: 'library', category: 'bot' };
+    if (/^net\/http-easy.*racket/.test(userAgent)) return { name: `net/http-easy (racket)`, type: 'library', category: 'bot' };
     if (/^just_audio\//.test(userAgent)) return { name: `Just Audio`, type: 'library' };
     if (/KaiOS Downloader/.test(userAgent)) return { name: `KaiOS Downloader`, type: 'library' };
     if (/^libsoup\//.test(userAgent)) return { name: `libsoup`, type: 'library' };

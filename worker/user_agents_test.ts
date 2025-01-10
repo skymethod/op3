@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2d4052b9e20b61c5616b23b9f6ff805fee92d4fa (2025-01-06T13:31:25Z)
+// from user-agents-v2@40f2b0533d2e198e5a69b85a562039cf51b55199 (2025-01-10T17:02:24Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -180,6 +180,7 @@ const botTests = {
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
     'Mozilla/5.0 (compatible; Mechanize/2.7.4)': { type: 'bot', name: `Ruby Mechanize` },
     'WWW-Mechanize/1.72': { type: 'bot', name: `Ruby Mechanize` },
+    'runpod-python/0.0.0 (https://runpod.io; support@runpod.io)': { type: 'bot', name: `RunPod` },
     'Screaming Frog SEO Spider/5.1': { type: 'bot', name: `Screaming Frog SEO Spider` },
     'SearchAtlas.com SEO Crawler': { type: 'bot', name: `SearchAtlas.com SEO Crawler` },
     'Mozilla/5.0 (compatible; SemrushBot/6~bl; http://www.semrush.com/bot.html)': { type: 'bot', name: `SEMrushBot` },
@@ -734,6 +735,8 @@ const appTests = {
     'myTuner': { type: 'app', name: `MyTuner` },
     'myTuneriOS%20Free/120 CFNetwork/1402.0.8 Darwin/22.2.0': { type: 'app', name: `MyTuner` },
     'NetNewsWire (RSS Reader; https://netnewswire.com/)': { type: 'app', name: `NetNewsWire` },
+    'Neuecast/1.2.1 (iOS; 18.2)': { type: 'app', name: `Neuecast` },
+    'Neuecast/1.2.2 (iOS; 18.1.1)': { type: 'app', name: `Neuecast` },
     'Newsboat/2.29.0 (Linux x86_64)': { type: 'app', name: `Newsboat` },
     'Newsly': { type: 'app', name: `Newsly` },
     'Noice/3.38.1 (Apple; iOS 17.4.1) AVQueuePlayer/0': { type: 'app', name: `Noice` },
@@ -830,6 +833,7 @@ const appTests = {
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
     'pypodder': { type: 'app', name: `Pypodder` },
+    'Queue/1.9.1 (1) (iOS)': { type: 'app', name: `Queue` },
     'Podcast Provider 0.34-9e9009e7 for Radio Downloader 0.34-9e9009e7': { type: 'app', name: `Radio Downloader` },
     'Radio thmanyah (iOS 17.2.1)': { type: 'app', name: `Radio thmanyah` },
     'Radio thmanyah (Android 12;Pixel 6a)': { type: 'app', name: `Radio thmanyah` },
@@ -1044,6 +1048,7 @@ const libraryTests = {
     'hackney/1.18.1': { type: 'library', name: `hackney (elixir)` },
     'HTTP-Tiny/0.076': { type: 'library', name: `HTTP:Tiny` },
     'http.rb/5.1.0': { type: 'library', name: `http.rb` },
+    'net/http-easy (macosx; racket[CS] 8.15.0.7; 0.8.2)': { type: 'library', name: `net/http-easy (racket)` },
     'just_audio/3.6.2 (Linux;Android 9) ExoPlayerLib/2.13.1': { type: 'library', name: `Just Audio` },
     'just_audio/1.0.68 (Linux;Android 12) ExoPlayerLib/2.18.7': { type: 'library', name: `Just Audio` },
     'KaiOS Downloader': { type: 'library', name: `KaiOS Downloader` },
