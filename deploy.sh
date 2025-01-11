@@ -11,7 +11,7 @@ fi
 
 # install deno
 DENO_VERSION="v1.46.3"
-DENOFLARE_VERSION="96ad1ceeb97f6506b394c71332fe99bd72d1d073"
+DENOFLARE_VERSION="674af1a29c14ad9fae49f0839891de97fafee5f0"
 curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=./deno-$DENO_VERSION sh -s $DENO_VERSION
 
 # exit early if already deployed
