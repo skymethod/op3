@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { check, isStringRecord } from './check.ts';
+import { check, isString, isStringRecord } from './check.ts';
 import { isValidUuid } from './uuid.ts';
 
 export type RpcRequest = 
@@ -62,6 +62,23 @@ export interface RawRedirect {
     readonly ulid?: string;
     readonly xpsId?: string;
     readonly other?: Readonly<Record<string, string>>;
+}
+
+export function isRawRedirect(obj: unknown): obj is RawRedirect {
+    return isStringRecord(obj)
+        && typeof obj.uuid === 'string'
+        && typeof obj.time === 'number'
+        && typeof obj.rawIpAddress === 'string'
+        && (obj.ipSource === undefined || typeof obj.ipSource === 'string')
+        && typeof obj.method === 'string'
+        && typeof obj.url === 'string'
+        && (obj.userAgent === undefined || typeof obj.userAgent === 'string')
+        && (obj.referer === undefined || typeof obj.referer === 'string')
+        && (obj.range === undefined || typeof obj.range === 'string')
+        && (obj.ulid === undefined || typeof obj.ulid === 'string')
+        && (obj.xpsId === undefined || typeof obj.xpsId === 'string')
+        && (obj.other === undefined || isStringRecord(obj.other))
+    ;
 }
 
 export interface LogRawRedirectsRequest {

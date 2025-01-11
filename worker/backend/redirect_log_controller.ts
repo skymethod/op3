@@ -2,7 +2,7 @@ import { check, tryParseInt } from '../check.ts';
 import { DurableObjectStorage, chunk, Queue, distinct } from '../deps.ts';
 import { DoNames } from '../do_names.ts';
 import { tryParseRedirectLogRequest } from '../routes/admin_api.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmPayload, PackedRedirectLogs, RawRedirect, RpcClient, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmPayload, isRawRedirect, PackedRedirectLogs, RawRedirect, RpcClient, Unkinded } from '../rpc_model.ts';
 import { addHours, computeTimestamp, timestampToInstant } from '../timestamp.ts';
 import { consoleError, writeTraceEvent } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
@@ -153,6 +153,15 @@ export class RedirectLogController {
                     await this.storage.delete(key);
                 }
                 const results = [ isUpdate ? { resent: timestampIds } : { deleted: timestampIds } ];
+                return { results };
+            }
+            if (operationKind === 'update' && subpath === '/dlq' && this.queue2) {
+                const { body } = parameters;
+                if (typeof body !== 'string') throw new Error(`Expected 'body' parameter`);
+                const rawRedirects = JSON.parse(body);
+                if (!(Array.isArray(rawRedirects) && rawRedirects.every(isRawRedirect) && rawRedirects.length > 0)) throw new Error(`Unexpected 'body' parameter`);
+                await sendWithRetries(this.queue2, rawRedirects, { tag: 'queue2.resend', contentType: 'json' });
+                const results = [ { resent: rawRedirects.length } ];
                 return { results };
             }
         }
