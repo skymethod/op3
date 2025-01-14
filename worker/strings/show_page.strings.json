@@ -142,8 +142,8 @@
   "next": {
     "string": "Next"
   },
-  "episode_pacing": {
-    "string": "Episode pacing"
+  "episode_downloads": {
+    "string": "Episode downloads"
   },
   "3_day": {
     "string": "3-day"
@@ -153,6 +153,9 @@
   },
   "30_day": {
     "string": "30-day"
+  },
+  "all_time": {
+    "string": "all-time"
   },
   "newer_episodes": {
     "string": "Newer episodes"
@@ -177,6 +180,9 @@
   },
   "top_eu_regions": {
     "string": "Top E.U. regions"
+  },
+  "top_african_regions": {
+    "string": "Top African regions"
   },
   "top_asian_regions": {
     "string": "Top Asian regions"
