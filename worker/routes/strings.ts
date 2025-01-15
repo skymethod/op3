@@ -130,6 +130,7 @@ export const supportedLanguageLabels: Record<string, string> = {
     fr: 'Français',
     nl: 'Nederlands',
     de: 'Deutsch',
+    it: 'Italiano',
     'en-gb': 'English (British)',
 };
 

@@ -127,6 +127,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         langLabelFr: supportedLanguageLabels['fr'],
         langLabelNl: supportedLanguageLabels['nl'],
         langLabelDe: supportedLanguageLabels['de'],
+        langLabelIt: supportedLanguageLabels['it'],
         langLabelEnGb: supportedLanguageLabels['en-gb'],
     }, showPageTranslations, lang);
 

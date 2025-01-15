@@ -8371,6 +8371,7 @@ const supportedLanguageLabels = {
     fr: 'Français',
     nl: 'Nederlands',
     de: 'Deutsch',
+    it: 'Italiano',
     'en-gb': 'English (British)'
 };
 Object.keys(supportedLanguageLabels);
