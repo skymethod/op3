@@ -4,307 +4,351 @@
     "nl": "Opzet",
     "es": "Configuración",
     "de": "Konfiguration",
-    "en-gb": "Setup"
+    "en-gb": "Setup",
+    "it": "Setup"
   },
   "search_prompt_message": {
     "fr": "Trouvez votre podcast, nous vérifierons votre configuration",
     "nl": "Vind je podcast, we zullen je setup controleren.",
     "es": "Encuentra tu podcast, comprobaremos tu configuración",
     "de": "Finde deine Podcast, wir überprüfen deine Konfiguration",
-    "en-gb": "Find your podcast, we'll check your setup"
+    "en-gb": "Find your podcast, we'll check your setup",
+    "it": "Cerca il tuo podcast, controlleremo il tuo setup"
   },
   "search_finding_message": {
     "fr": "Recherche des podcasts...",
     "nl": "Op zoek naar podcasts...",
     "es": "Buscando podcasts...",
     "de": "Suche Podcasts...",
-    "en-gb": "Finding podcasts..."
+    "en-gb": "Finding podcasts...",
+    "it": "Cercando i podcast..."
   },
   "search_failed_message": {
     "fr": "La recherche a échoué",
     "nl": "Zoeken mislukt",
     "es": "Búsqueda fallida",
     "de": "Suche fehlgeschlagen",
-    "en-gb": "Search failed"
+    "en-gb": "Search failed",
+    "it": "Ricerca fallita"
   },
   "analyze_started_message": {
     "fr": "Analyse du podcast...",
     "nl": "Podcast wordt geanalyseerd...",
     "es": "Analizando podcast...",
     "de": "Analysiere Podcast...",
-    "en-gb": "Analysing podcast..."
+    "en-gb": "Analysing podcast...",
+    "it": "Analizzando il podcast..."
   },
   "analyze_finished_message": {
     "fr": "Analyse du podcast terminée",
     "nl": "Analyse van de podcast is voltooid",
     "es": "Finalizado el análisis del podcast",
     "de": "Podcast-Analyse abgeschlossen",
-    "en-gb": "Finished analysing podcast"
+    "en-gb": "Finished analysing podcast",
+    "it": "Analisi terminata"
   },
   "analyze_failed_message": {
     "fr": "L'analyse du podcast a échoué",
     "nl": "Podcastanalyse is mislukt",
     "es": "Análisis de podcast fallido",
     "de": "Podcast-Analyse fehlgeschlagen",
-    "en-gb": "Podcast analysis failed"
+    "en-gb": "Podcast analysis failed",
+    "it": "Analisi fallita"
   },
   "analyze_failed_default_error_message": {
     "fr": "Échec",
     "nl": "Mislukt",
     "es": "Falló",
     "de": "Fehlgeschlagen",
-    "en-gb": "Failed"
+    "en-gb": "Failed",
+    "it": "Fallito"
   },
   "feed_summary_analyzing": {
     "fr": "Analyse en cours...",
     "nl": "Analyseer...",
     "es": "Analizando...",
     "de": "Analysiere...",
-    "en-gb": "Analysing..."
+    "en-gb": "Analysing...",
+    "it": "Analisi..."
   },
   "zero_episodes": {
     "fr": "Aucun épisode",
     "nl": "Geen afleveringen",
     "es": "No hay episodios",
     "de": "Keine Episoden",
-    "en-gb": "No episodes"
+    "en-gb": "No episodes",
+    "it": "Non ci sono episodi"
   },
   "one_episode": {
     "fr": "Un épisode",
     "nl": "Één aflevering",
     "es": "Un episodio",
     "de": "Eine Episode",
-    "en-gb": "One episode"
+    "en-gb": "One episode",
+    "it": "Un episodio"
   },
   "multiple_episodes": {
     "fr": "%d épisodes",
     "nl": "%d afleveringen",
     "es": "%d episodios",
     "de": "%d Episoden",
-    "en-gb": "%d episodes"
+    "en-gb": "%d episodes",
+    "it": "%d episodi"
   },
   "less_than_24_hrs_ago": {
     "fr": "il y a moins de 24 heures",
     "nl": "minder dan 24 uur geleden",
     "es": "hace menos de 24 horas",
     "de": "weniger als vor 24 Stunden",
-    "en-gb": "less than 24 hrs ago"
+    "en-gb": "less than 24 hrs ago",
+    "it": "meno di 24 ore fa"
   },
   "latest_as_prefix_to_relative_time": {
     "fr": "dernier",
     "nl": "laatste",
     "es": "último",
     "de": "letzte",
-    "en-gb": "latest"
+    "en-gb": "latest",
+    "it": "più recente"
   },
   "found_zero_podcasts": {
     "fr": "Aucun podcast trouvé",
     "nl": "Er zijn geen podcasts gevonden",
     "es": "No se encontraron podcasts",
     "de": "Keine Podcasts gefunden",
-    "en-gb": "Found no podcasts"
+    "en-gb": "Found no podcasts",
+    "it": "Nessun podcast trovato"
   },
   "found_one_podcast": {
     "fr": "Un épisode trouvé",
     "nl": "Er is één aflevering gevonden",
     "es": "Un episodio encontrado",
     "de": "Eine Episode gefunden",
-    "en-gb": "Found one episode"
+    "en-gb": "Found one episode",
+    "it": "Trovato un episodio"
   },
   "found_multiple_podcasts": {
     "fr": "%d podcasts trouvés",
     "nl": "%d podcasts gevonden",
     "es": "Encontrados %d podcasts",
     "de": "%d Podcasts gefunden",
-    "en-gb": "Found %d podcasts"
+    "en-gb": "Found %d podcasts",
+    "it": "Trovati %d podcast"
   },
   "heading": {
     "fr": "Vérifiez votre configuration OP3",
     "nl": "Controleer uw OP3-instellingen",
     "es": "Verifique su configuración de OP3",
     "de": "Überprüfe deine OP3-Einstellungen",
-    "en-gb": "Check your OP3 setup"
+    "en-gb": "Check your OP3 setup",
+    "it": "Controlla il tuo setup OP3"
   },
   "search_placeholder": {
     "fr": "Nom du podcast ou URL du flux RSS",
     "nl": "Podcastnaam of RSS-feed-URL",
     "es": "Nombre del podcast o URL del feed RSS",
     "de": "Podcast-Name oder RSS-Feed URL",
-    "en-gb": "Podcast name or rss feed url"
+    "en-gb": "Podcast name or rss feed url",
+    "it": "Nome del podcast o feed RSS"
   },
   "rss_feed_suffix": {
     "fr": "flux RSS",
     "nl": "RSS-feed",
     "es": "feed RSS",
     "de": "RSS-Feed",
-    "en-gb": "rss feed"
+    "en-gb": "rss feed",
+    "it": "Feed RSS"
   },
   "prefix_not_found_warning": {
     "fr": "Préfixe OP3 non détecté",
     "nl": "OP3-voorvoegsel niet gevonden",
     "es": "prefijo OP3 no encontrado",
     "de": "OP3-Prefix nicht gefunden",
-    "en-gb": "OP3 prefix not found"
+    "en-gb": "OP3 prefix not found",
+    "it": "Prefisso OP3 non trovato"
   },
   "prefix_found_on_all_episodes": {
     "fr": "Préfixe OP3 détecté sur tous les épisodes",
     "nl": "OP3-voorvoegsel gevonden op alle afleveringen",
     "es": "prefijo OP3 encontrado en todos los episodios",
     "de": "OP3-Prefix in allen Episoden gefunden",
-    "en-gb": "OP3 prefix found on all episodes"
+    "en-gb": "OP3 prefix found on all episodes",
+    "it": "Prefisso OP3 trovato su tutti gli episodi"
   },
   "prefix_found_on_some_episodes": {
     "fr": "Préfixe OP3 détecté sur <span id=\"fp-found-episodes-span\">n épisodes</span>",
     "nl": "OP3-voorvoegsel gevonden op <span id=\"fp-found-episodes-span\">%d afleveringen</span>",
     "es": "prefijo OP3 encontrado en <span id=\"fp-found-episodes-span\">n episodios</span>",
     "de": "OP3-Prefix in <span id=\"fp-found-episodes-span\">n Episoden</span> gefunden",
-    "en-gb": "OP3 prefix found on <span id=\"fp-found-episodes-span\">n episodes</span>"
+    "en-gb": "OP3 prefix found on <span id=\"fp-found-episodes-span\">n episodes</span>",
+    "it": "Prefisso OP3 trovato su <span id=\"fp-found-episodes-span\">alcuni episodi</span>"
   },
   "prefix_found_on_some_episodes_prompt": {
     "fr": "Vouliez-vous l'ajouter à chaque épisode ?",
     "nl": "Wil je het toevoegen aan elke aflevering?",
     "es": "¿Quería agregarlo a cada episodio?",
     "de": "Möchtest du es zu allen Episoden hinzufügen?",
-    "en-gb": "Did you want to add it to every episode?"
+    "en-gb": "Did you want to add it to every episode?",
+    "it": "Vuoi aggiungerlo a tutti gli episodi?"
   },
   "podcast_guid": {
     "fr": "Podcast Guid",
     "nl": "Podcast Guid",
     "es": "Podcast GUID",
     "de": "Podcast-Guid",
-    "en-gb": "Podcast Guid"
+    "en-gb": "Podcast Guid",
+    "it": "Podcast Guid"
   },
   "stats_page_line_1": {
     "fr": "Voulez-vous voir les statistiques de ce podcast ?",
     "nl": "Wilt u de statistiekenpagina van deze podcast bekijken?",
     "es": "¿Quiere ver la página de estadísticas de este podcast?",
     "de": "Möchtest du die Statistiken des Podcasts sehen?",
-    "en-gb": "Want to see this podcast's show stats page?"
+    "en-gb": "Want to see this podcast's show stats page?",
+    "it": "Vuoi vedere la pagina con le statistiche di questo podcast?"
   },
   "stats_page_line_2": {
     "fr": "Une fois que OP3 aura scruté quelques jours de téléchargements, ce sera disponible <a id=\"show-page-link\" href=\"#\">ici</a>",
     "nl": "Zodra OP3 een paar dagen downloads heeft waargenomen, zal het <a id=\"show-page-link\" href=\"#\">hier</a> beschikbaar zijn.",
     "es": "Una vez que OP3 haya observado unos días de descargas, estará disponible <a id=\"show-page-link\" href=\"#\">aquí</a>",
     "de": "Sobald OP3 einige Tage die Downloads beobachtet hat, werden sie <a id=\"show-page-link\" href=\"#\">hier</a> verfügbar",
-    "en-gb": "Once OP3 has observed a few days of downloads, it will be available <a id=\"show-page-link\" href=\"#\">here</a>"
+    "en-gb": "Once OP3 has observed a few days of downloads, it will be available <a id=\"show-page-link\" href=\"#\">here</a>",
+    "it": "Appena OP3 avrà misurato i download per qualche giorno, sarà disponibile <a id=\"show-page-link\" href=\"#\">qui</a>"
   },
   "instructions_heading": {
     "fr": "Instructions",
     "nl": "Instructies",
     "es": "Instrucciones",
     "de": "Anleitung",
-    "en-gb": "Instructions"
+    "en-gb": "Instructions",
+    "it": "Istruzioni"
   },
   "instructions_box_line_1": {
     "fr": "OP3 fonctionne comme n'importe quel autre <a href=\"https://soundsprofitable.com/update/prefix-analytics\">service d'analyse de podcast avec préfixe</a>, mais de manière plus simple ! <b>Aucune connexion ou inscription</b> n'est nécessaire. Les podcasteurices ou les hébergeurs de podcasts peuvent préfixer",
     "nl": "OP3 werkt net als elke andere <a href=\"https://soundsprofitable.com/update/prefix-analytics\">podcast-prefix-analyse-service</a>, maar dan eenvoudiger! <b>Geen login of aanmelding vereist</b>. Podcasters of podcast-hostingbedrijven kunnen voorvoegsels toevoegen",
     "es": "OP3 funciona como cualquier otro <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servicio de análisis de prefijos de podcast</a>, ¡pero más simple!  <b>No se necesita iniciar sesión ni registrarse.</b>  Los podcasters o las empresas de alojamiento pueden anteponer",
     "de": "OP3 funktioniert wie jeder andere <a href=\"https://soundsprofitable.com/update/prefix-analytics\">Podcast-Präfix-Analysedienst</a>, nur einfacher! <b>Keine Anmeldung oder Registrierung erforderlich.</b> Podcaster oder Podcast-Hosting-Unternehmen können das Präfix",
-    "en-gb": "OP3 works like any other podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend"
+    "en-gb": "OP3 works like any other podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend",
+    "it": "OP3 funziona come tutti gli altri <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servizi di misurazione con prefisso</a>, ma è più semplice!  <b>Non serve registrarsi.</b> I podcaster o le aziende di hosting possono aggiungere"
   },
   "instructions_box_line_2": {
     "fr": "le lien vers l'épisode pour commencer à mesurer les téléchargements.",
     "nl": "aan podcast-episode-URL's in hun feed om deel te nemen en te beginnen met het meten van downloads.",
     "es": "a las URL de los episodios en su feed para participar y empezar a medir las descargas.",
     "de": "an die Podcast-Episoden-URLs in ihrem Feed voranstellen, um teilzunehmen und Downloads zu messen.",
-    "en-gb": "to podcast episode urls in their feed to participate and start measuring downloads."
+    "en-gb": "to podcast episode urls in their feed to participate and start measuring downloads.",
+    "it": "agli url degli episodi per partecipare ed iniziare a misurare i download."
   },
   "instructions_box_line_3": {
     "fr": "(Pas besoin de supprimer les préfixes existants, ils peuvent être cumulés)",
     "nl": "(Geen noodzaak om bestaande voorvoegsels te verwijderen, er kunnen er meer dan één zijn)",
     "es": "(No es necesario eliminar los prefijos existentes, puede haber más de uno)",
     "de": "(Vorhandene Präfixe müssen nicht entfernt werden, es kann mehr als eines geben)",
-    "en-gb": "(No need to remove existing prefixes, there can be more than one)"
+    "en-gb": "(No need to remove existing prefixes, there can be more than one)",
+    "it": "(Non serve rimuovere prefissi esistenti, ce ne può essere più di uno)"
   },
   "instructions_box_line_4": {
     "fr": "Certains hébergeurs de podcasts (comme <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) vous permettent d'ajouter un préfixe personnalisé dans l'espace configuration de votre podcast, et d'autres (comme <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> et <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) le rendent aussi simple que cocher une case !",
     "nl": "Sommige podcasthostingbedrijven (zoals <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) stellen u in staat om een aangepast voorvoegsel toe te voegen in het dashboard van uw podcast, en sommige (zoals <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> en <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) maken het zo eenvoudig als het aanvinken van een vakje!",
     "es": "Algunas compañías de alojamiento (como <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) le permiten agregar un prefijo personalizado en el panel de control de su podcast, ¡y algunas (como  <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> o <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) lo hacen tan fácil como marcar una casilla!",
     "de": "Bei einigen Podcast-Hosting-Anbietern (wie<a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\"> Megaphone</a>) kannst du im Dashboard deines Podcasts ein benutzerdefiniertes Präfix hinzufügen, und bei anderen (wie <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> und <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) musst du lediglich ein Kästchen markieren!",
-    "en-gb": "Some podcast hosting companies (like <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, and some (like <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> and <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) make it as easy as checking a box!"
+    "en-gb": "Some podcast hosting companies (like <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) enable you to add a custom prefix in your podcast's dashboard, and some (like <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> and <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) make it as easy as checking a box!",
+    "it": "Alcune piattaforme di hosting (ad esempio <a href=\"http://support.megaphone.fm/en/articles/2845162-custom-prefixes\">Megaphone</a>) ti permettono di aggiungere un prefisso personalizzato nella dashboard del tuo podcast, con altre (ad esempio <a href=\"https://transistor.fm/changelog/open-prefix/\">Transistor</a> e <a href=\"https://blog.castopod.org/value-your-analytics-data-with-op3-an-open-source-and-trusted-third-party/\">Castopod</a>) basta spuntare una casella!"
   },
   "instructions_box_line_5": {
     "fr": "Si votre hébergeur de podcasts n'a pas prévu de champ dans votre espace de configuration pour activer un préfixe personnalisé, la plupart l'ajouteront si vous envoyez un e-mail au support.",
     "nl": "Als uw podcasthostingbedrijf geen plek heeft in het dashboard om een aangepast voorvoegsel in te schakelen, zullen de meeste het toevoegen als u support een e-mail stuurt.",
     "es": "Si su empresa de alojamiento de podcasts no dispone de un espacio en el panel de control para habilitar un prefijo personalizado, la mayoría lo añadirá si envía un correo electrónico al servicio de asistencia.",
     "de": "Wenn dein Podcast-Hosting-Unternehmen im Dashboard keine Möglichkeit hat, ein benutzerdefiniertes Präfix zu aktivieren, fügen die meisten es hinzu, wenn du eine E-Mail an den Support schickst.",
-    "en-gb": "If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support."
+    "en-gb": "If your podcast hosting company doesn't have a spot in the dashboard to enable a custom prefix, most will add it if you email support.",
+    "it": "Se la tua piattaforma di hosting non ha una funzionalità per aggiungere un prefisso personalizzato, probabilmente sarà sufficiente inviare una mail al supporto."
   },
   "examples_heading": {
     "fr": "Exemples",
     "nl": "Voorbeelden",
     "es": "Ejemplos",
     "de": "Beispiele",
-    "en-gb": "Examples"
+    "en-gb": "Examples",
+    "it": "Esempi"
   },
   "typical_prefix_summary": {
     "fr": "Préfixe standard",
     "nl": "Typisch voorvoegsel",
     "es": "Prefijo típico",
     "de": "Typische Prefixe",
-    "en-gb": "Typical prefix"
+    "en-gb": "Typical prefix",
+    "it": "Tipico prefisso"
   },
   "examples_from": {
     "fr": "Avant",
     "nl": "Voor",
     "es": "De",
     "de": "Von",
-    "en-gb": "From"
+    "en-gb": "From",
+    "it": "Da"
   },
   "examples_to": {
     "fr": "Après",
     "nl": "Na",
     "es": "A",
     "de": "An",
-    "en-gb": "To"
+    "en-gb": "To",
+    "it": "A"
   },
   "target_http_enclosure_summary": {
     "fr": "Lien non sécurisé en HTTP",
     "nl": "Onbeveiligde link in http",
     "es": "Cuando el destino multimedia es HTTP",
     "de": "Ziel-HTTP-Enclosure",
-    "en-gb": "Target HTTP enclosure"
+    "en-gb": "Target HTTP enclosure",
+    "it": "Utilizzo di HTTP enclosure"
   },
   "target_http_enclosure_instructions": {
     "fr": "Inclure le lien complet après le préfixe n'est nécessaire que lorsque le lien initial est en <code>http</code>.",
     "nl": "Het volledige protocol na het voorvoegsel toevoegen is alleen nodig als het doel <code>http</code> is.",
     "es": "Incluir el protocolo completo tras el prefijo solo es necesario cuando el objetivo es <code>http</code>.",
     "de": "Die Angabe des vollständigen Protokolls nach dem Präfix ist nur erforderlich, wenn das Ziel <code>http</code> ist.",
-    "en-gb": "Including the full protocol after the prefix is only necessary when the target is <code>http</code>."
+    "en-gb": "Including the full protocol after the prefix is only necessary when the target is <code>http</code>.",
+    "it": "E' necessario includere il protocollo completo dopo il prefisso solo quando è <code>http</code>."
   },
   "optional_prefix_arguments_summary": {
     "fr": "Paramètres facultatifs du préfixe",
     "nl": "Optionele voorvoegselargumenten",
     "es": "Argumentos del prefijo opcionales",
     "de": "Optionale Prefix-Argumente",
-    "en-gb": "Optional prefix arguments"
+    "en-gb": "Optional prefix arguments",
+    "it": "Parametri opzionali"
   },
   "optional_prefix_arguments_line_1": {
     "fr": "Vous pouvez passer des paramètres facultatifs au préfixe sous forme de paires <code>nom=valeur</code> séparées par des virgules entre le <code>e</code> et le <code>/</code>.",
     "nl": "Je kunt optionele parameters doorgeven aan de prefix in de vorm van <code>naam=value</code>, gescheiden door komma's tussen de <code>e</code> en de <code>/</code>.",
     "es": "Pase argumentos opcionales al prefijo como pares <code>nombre=valor</code> delimitados por comas entre <code>e</code> y <code>/</code>.",
     "de": "Übergib dem Präfix optionale Argumente als kommagetrennte <code>name=Wert</code>-Paare zwischen dem <code>e</code> und dem <code>/</code>.",
-    "en-gb": "Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>."
+    "en-gb": "Pass optional arguments to the prefix as comma-delimited <code>name=value</code> pairs between the <code>e</code> and the <code>/</code>.",
+    "it": "Fornisci parametri opzionali al prefisso utilizzando coppie <code>nome=valore</code> separate da virgola tra la <code>e</code> e lo <code>/</code>."
   },
   "optional_prefix_arguments_line_2": {
     "fr": "OP3 prend actuellement en charge un seul paramètre optionnel nommé <code>pg</code>, vous permettant de spécifier l'identifiant <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">GUID de votre podcast</a>.",
     "nl": "OP3 ondersteunt momenteel één optionele parameter genaamd <code>pg</code>, waarmee je de <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">GUID van je podcast</a> kunt opgeven.",
     "es": "OP3 actualmente admite un parámetro opcional llamado <code>pg</code>, que le permite especificar el <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">GUID de su Podcast</a>.",
     "de": "OP3 unterstützt derzeit einen optionalen Parameter namens <code>pg</code>, mit dem du deine <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">Podcast-GUID</a> angeben kannst.",
-    "en-gb": "OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">Podcast GUID</a>."
+    "en-gb": "OP3 currently supports one optional parameter named <code>pg</code>, allowing you to specify your <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">Podcast GUID</a>.",
+    "it": "OP3 supporta un parametro opzionale chiamato <code>pg</code>, che ti permette di specificare il tuo <a href=\"https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#guid\">Podcast GUID</a>."
   },
   "optional_prefix_arguments_line_3": {
     "fr": "Bien que facultatif, cela nous aide à attribuer plus rapidement l'URL de l'épisode à un podcast, et accélère donc la récupération de vos statistiques. Vous pouvez rechercher votre identifiant de podcast en utilisant le formulaire ci-dessus.",
     "nl": "Hoewel optioneel, zal dit ons helpen om de URL van de aflevering sneller toe te wijzen aan een podcast. U kunt uw Podcast GUID opzoeken met behulp van het bovenstaande formulier.",
     "es": "Aunque opcional, esto nos ayudará a atribuir más rápidamente la URL del episodio a un podcast. Puede buscar su GUID de podcast utilizando el formulario de arriba.",
     "de": "Dies ist zwar optional, hilft uns aber, die Episodenurl einem Podcast schneller zuzuordnen. du kannst deine Podcast-GUID über das obige Formular abrufen.",
-    "en-gb": "While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above."
+    "en-gb": "While optional, this will help us more quickly attribute the episode url to a podcast.  You can look up your Podcast GUID using the form above.",
+    "it": "Nonostante sia opzionale, ci aiuterà a attribuire più semplicemente l'url di un episodio al suo podcast di riferimento. Puoi cercare il Podcast GUID utilizzando il form qui sopra."
   },
   "home_link_label": {
     "fr": "Accueil",
     "nl": "Startpagina",
     "es": "Inicio",
     "de": "Startseite",
-    "en-gb": "Home"
+    "en-gb": "Home",
+    "it": "Home"
   }
 }
