@@ -5,7 +5,7 @@
     "es": "Configuración",
     "de": "Konfiguration",
     "en-gb": "Setup",
-    "it": "Setup"
+    "it": "Configurazione"
   },
   "search_prompt_message": {
     "fr": "Trouvez votre podcast, nous vérifierons votre configuration",
@@ -13,7 +13,7 @@
     "es": "Encuentra tu podcast, comprobaremos tu configuración",
     "de": "Finde deine Podcast, wir überprüfen deine Konfiguration",
     "en-gb": "Find your podcast, we'll check your setup",
-    "it": "Cerca il tuo podcast, controlleremo il tuo setup"
+    "it": "Cerca il tuo podcast, controlleremo la tua configurazione"
   },
   "search_finding_message": {
     "fr": "Recherche des podcasts...",
@@ -141,7 +141,7 @@
     "es": "Verifique su configuración de OP3",
     "de": "Überprüfe deine OP3-Einstellungen",
     "en-gb": "Check your OP3 setup",
-    "it": "Controlla il tuo setup OP3"
+    "it": "Controlla la tua configurazione di OP3"
   },
   "search_placeholder": {
     "fr": "Nom du podcast ou URL du flux RSS",
@@ -229,7 +229,7 @@
     "es": "OP3 funciona como cualquier otro <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servicio de análisis de prefijos de podcast</a>, ¡pero más simple!  <b>No se necesita iniciar sesión ni registrarse.</b>  Los podcasters o las empresas de alojamiento pueden anteponer",
     "de": "OP3 funktioniert wie jeder andere <a href=\"https://soundsprofitable.com/update/prefix-analytics\">Podcast-Präfix-Analysedienst</a>, nur einfacher! <b>Keine Anmeldung oder Registrierung erforderlich.</b> Podcaster oder Podcast-Hosting-Unternehmen können das Präfix",
     "en-gb": "OP3 works like any other podcast <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefix analytics service</a>, except simpler!  <b>No login or signup needed.</b>  Podcasters or podcast hosting companies can prepend",
-    "it": "OP3 funziona come tutti gli altri <a href=\"https://soundsprofitable.com/update/prefix-analytics\">servizi di misurazione con prefisso</a>, ma è più semplice!  <b>Non serve registrarsi.</b> I podcaster o le aziende di hosting possono aggiungere"
+    "it": "OP3 funziona come tutti gli altri <a href=\"https://soundsprofitable.com/update/prefix-analytics\">prefissi di misurazione</a>, ma è più semplice!  <b>Non serve registrarsi.</b> I podcaster o le aziende di hosting possono aggiungere"
   },
   "instructions_box_line_2": {
     "fr": "le lien vers l'épisode pour commencer à mesurer les téléchargements.",

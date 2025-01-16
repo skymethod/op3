@@ -5,7 +5,7 @@
     "es": "Exportar detalle de las descargas",
     "de": "Download-Details exportieren",
     "en-gb": "Export download details",
-    "it": "Esporta dettagli download"
+    "it": "Esporta download dettagliati"
   },
   "daily_downloads": {
     "fr": "Téléchargements par jour",
@@ -445,7 +445,7 @@
     "es": "Principales países",
     "de": "Top Länder",
     "en-gb": "Top countries",
-    "it": "Top Nazioni"
+    "it": "Paesi"
   },
   "top_us_metros": {
     "fr": "Top régions des USA",
@@ -453,7 +453,7 @@
     "es": "Principales ciudades de EE. UU.",
     "de": "Top US-Metros",
     "en-gb": "Top US metros",
-    "it": "Top aree Stati Uniti"
+    "it": "Aree Stati Uniti"
   },
   "top_canadian_regions": {
     "fr": "Top régions du Canada",
@@ -461,7 +461,7 @@
     "es": "Principales regiones de Canadá",
     "de": "Top Kanada-Regionen",
     "en-gb": "Top Canadian regions",
-    "it": "Top regioni Canadesi"
+    "it": "Regioni Canadesi"
   },
   "top_latin_american_regions": {
     "fr": "Top régions d'Amérique latine",
@@ -469,7 +469,7 @@
     "es": "Top regiones de América Latina",
     "de": "Top Lateinamerika-Regionen",
     "en-gb": "Top Latin American regions",
-    "it": "Top regioni America Latina"
+    "it": "Regioni America Latina"
   },
   "top_eu_regions": {
     "fr": "Top régions de l'UE",
@@ -477,7 +477,7 @@
     "es": "Principales regiones de la UE",
     "de": "Top EU-Regionen",
     "en-gb": "Top EU regions",
-    "it": "Top regioni Europee"
+    "it": "Regioni Europee"
   },
   "top_african_regions": {
     "fr": "Principales régions africaines",
@@ -485,7 +485,7 @@
     "es": "Principales regiones africanas",
     "de": "Top afrikanische Regionen",
     "en-gb": "Top African regions",
-    "it": "Top regioni Africane"
+    "it": "Regioni Africane"
   },
   "top_asian_regions": {
     "fr": "Top régions d'Asie",
@@ -493,7 +493,7 @@
     "es": "Principales regiones asiáticas",
     "de": "Top Asien-Regionen",
     "en-gb": "Top Asian regions",
-    "it": "Top regioni Asiatiche"
+    "it": "Regioni Asiatiche"
   },
   "top_australasian_regions": {
     "fr": "Top régions d'Australasie",
@@ -501,7 +501,7 @@
     "es": "Top de regiones de Australasia",
     "de": "Top Australasien-Regionen",
     "en-gb": "Top Australasian regions",
-    "it": "Top regioni Oceania"
+    "it": "Regioni Australasiane"
   },
   "top_apps": {
     "fr": "Top applications",
@@ -509,7 +509,7 @@
     "es": "Aplicaciones principales",
     "de": "Top Apps",
     "en-gb": "Top apps",
-    "it": "Top applicazioni"
+    "it": "Applicazioni"
   },
   "top_devices": {
     "fr": "Top appareils",
@@ -517,7 +517,7 @@
     "es": "Dispositivos principales",
     "de": "Top Geräte",
     "en-gb": "Top devices",
-    "it": "Top dispositivi"
+    "it": "Dispositivi"
   },
   "top_device_types": {
     "fr": "Top types d'appareils",
@@ -525,7 +525,7 @@
     "es": "Principales tipos de dispositivos",
     "de": "Top Geräte-Typen",
     "en-gb": "Top device types",
-    "it": "Top tipologie dispositivi"
+    "it": "Tipologie dispositivi"
   },
   "top_browsers_and_referrers": {
     "fr": "Top navigateurs et sources",
@@ -533,7 +533,7 @@
     "es": "Top navegadores y referrers",
     "de": "Top Browser und Referrer",
     "en-gb": "Top browsers & referrers",
-    "it": "Top browser & referrer"
+    "it": "Browser & referrer"
   },
   "cancel": {
     "fr": "Annuler",
