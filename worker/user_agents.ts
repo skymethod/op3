@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@40f2b0533d2e198e5a69b85a562039cf51b55199 (2025-01-10T17:02:24Z)
+// from user-agents-v2@23fb7f60a1166bc5aaa0fff70ccc7d33be8828fd (2025-01-27T17:22:50Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -126,6 +126,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podcast%20Archiver\//.test(userAgent)) return { name: `Podcast Archiver`, type: 'bot' };
     if (/^podcast-archiver\/v\d/.test(userAgent)) return { name: `Podcast Archiver (janw)`, type: 'bot' };
     if (/^Podcastics$/.test(userAgent)) return { name: `Podcastics`, type: 'bot' };
+    if (/^Podcatcher Bot 1.0/.test(userAgent)) return { name: `Podcatcher Bot`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
     if (/PodderBot\//.test(userAgent)) return { name: `PodderBot`, type: 'bot' };
@@ -196,6 +197,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/YandexBot\//.test(userAgent)) return { name: `YandexBot`, type: 'bot' };
     if (/^Zapier$/.test(userAgent)) return { name: `Zapier`, type: 'bot' };
     if (/^Zencastr\//.test(userAgent)) return { name: `Zencast`, type: 'bot' };
+    if (/^podwordsbot\//.test(userAgent)) return { name: `podwords`, type: 'bot' };
 
     // apps
     if (/Abandon\//.test(userAgent)) return { name: `Abandon`, type: 'app' };
@@ -547,6 +549,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podcast Player\//.test(userAgent)) return { name: `Podcast Player`, type: 'app' };
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
+    if (/^Podcatcher \d/.test(userAgent)) return { name: `Podcatcher`, type: 'app' };
     if (/^Podchaser |^Podchaser-Parser/.test(userAgent)) return { name: `Podchaser`, type: 'app' };
     if (/^Podcini\/\d/.test(userAgent)) return { name: `Podcini`, type: 'app' };
     if (/^Podclipper\//.test(userAgent)) return { name: `Podclipper`, type: 'app' };

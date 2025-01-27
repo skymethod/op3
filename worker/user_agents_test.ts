@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@40f2b0533d2e198e5a69b85a562039cf51b55199 (2025-01-10T17:02:24Z)
+// from user-agents-v2@23fb7f60a1166bc5aaa0fff70ccc7d33be8828fd (2025-01-27T17:22:50Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -153,6 +153,8 @@ const botTests = {
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
     'Podcastics': { type: 'bot', name: `Podcastics` },
+    'Podcatcher Bot 1.0': { type: 'bot', name: `Podcatcher Bot` },
+    'Podcatcher Bot 1.0 (1 subscribers; +https://podcatcher.net)': { type: 'bot', name: `Podcatcher Bot` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
@@ -215,6 +217,7 @@ const botTests = {
     'Crawler Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)': { type: 'bot', name: `Yahoo Crawler` },
     'Zapier': { type: 'bot', name: `Zapier` },
     'Zencastr/2.0': { type: 'bot', name: `Zencast` },
+    'podwordsbot/0.0.1 podwords': { type: 'bot', name: `podwords` },
 };
 
 const appTests = {
@@ -789,6 +792,8 @@ const appTests = {
     'PodcastRepublic/18.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)': { type: 'app', name: `Podcast Republic` },
     'Podcastly/1.4.1 (samsung; CPU OS android 11; en_us)': { type: 'app', name: `Podcastly` },
     'Podcastly': { type: 'app', name: `Podcastly` },
+    'Podcatcher 1.3': { type: 'app', name: `Podcatcher` },
+    'Podcatcher 1.3 (+https://podcatcher.net)': { type: 'app', name: `Podcatcher` },
     'Podchaser (https://podchaser.com)': { type: 'app', name: `Podchaser` },
     'Podchaser-Parser': { type: 'app', name: `Podchaser` },
     'Podcini/4.6.2': { type: 'app', name: `Podcini` },
