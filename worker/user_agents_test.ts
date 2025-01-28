@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@23fb7f60a1166bc5aaa0fff70ccc7d33be8828fd (2025-01-27T17:22:50Z)
+// from user-agents-v2@2048e5cde99a43fbece1542954dbefcfcb0800f4 (2025-01-28T17:45:46Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -109,6 +109,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; HubSpot Crawler; +https://www.hubspot.com)': { type: 'bot', name: `HubSpot Crawler` },
     'Mozilla/5.0 (compatible; special_archiver; Archive-It; http://archive-it.org/files/site-owners-special.html)': { type: 'bot', name: `Internet Archive` },
     'ia_archiver-web.archive.org': { type: 'bot', name: `Internet Archive` },
+    'iono/feed_importer': { type: 'bot', name: `iono.fm feed importer` },
     'SharingUIService/1 CFNetwork/1467.1 Darwin/23.0.0': { type: 'bot', name: `iOS share menu` },
     'SharingUIService/1 CFNetwork/1490.0.4 Darwin/23.2.0': { type: 'bot', name: `iOS share menu` },
     'IPFS Podcasting Node/0.6n (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
@@ -682,6 +683,15 @@ const appTests = {
     'lesindesradios': { type: 'app', name: `Les Indés Radios` },
     'lesindesradios/9.1.0 (Linux;Android 8.0.0) ExoPlayerLib/2.9.2': { type: 'app', name: `Les Indés Radios` },
     'lesindesradios/9.1.0 (Linux;Android 11) ExoPlayerLib/2.9.2': { type: 'app', name: `Les Indés Radios` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.211 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.128 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.34 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.2.1 Chrome/38.0.2125.122 Safari/537.36 WebAppManager': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/538.2 (KHTML, like Gecko) Large Screen WebAppManager Safari/538.2': { type: 'app', name: `LG webOS TV` },
+    'Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.41 (KHTML, like Gecko) Large Screen WebAppManager Safari/537.41': { type: 'app', name: `LG webOS TV` },
     'LifeEssentials/1.0 CFNetwork/758.0.2 Darwin/15.0.0': { type: 'app', name: `LifeEssentials` },
     'LifeEssentialsApp/2.1.0 CFNetwork/758.5.3 Darwin/15.6.0': { type: 'app', name: `LifeEssentials` },
     'Life%20Essentials/1.0 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `LifeEssentials` },
@@ -772,6 +782,7 @@ const appTests = {
     'Mozilla/5.0 (iPad; CPU OS 12_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/1908.1': { type: 'app', name: `Pandora` },
     'Parler Staging/542 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Parler` },
     'PeaCast/0.7': { type: 'app', name: `PeaCast` },
+    'phonostar-Player/4.08': { type: 'app', name: `phonostar Radio-App` },
     'Playapod/2.4.11': { type: 'app', name: `Playapod` },
     'PlaydioCast/272 CFNetwork/1496.0.7 Darwin/23.5.0': { type: 'app', name: `PlaydioCast Podcast Radio` },
     'Player%20FM/588 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `Player FM` },

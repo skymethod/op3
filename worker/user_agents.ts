@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@23fb7f60a1166bc5aaa0fff70ccc7d33be8828fd (2025-01-27T17:22:50Z)
+// from user-agents-v2@2048e5cde99a43fbece1542954dbefcfcb0800f4 (2025-01-28T17:45:46Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -87,6 +87,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Headliner\/.*\+https:\/\/headliner\.app$/.test(userAgent)) return { name: `Headliner`, type: 'bot' };
     if (/HubSpot Crawler/.test(userAgent)) return { name: `HubSpot Crawler`, type: 'bot' };
     if (/Archive-It;|web\.archive\.org/.test(userAgent)) return { name: `Internet Archive`, type: 'bot' };
+    if (/^iono\/feed_importer/.test(userAgent)) return { name: `iono.fm feed importer`, type: 'bot' };
     if (/^SharingUIService\//.test(userAgent)) return { name: `iOS share menu`, type: 'bot' };
     if (/^IPFS Podcasting Node\//.test(userAgent)) return { name: `IPFS Podcasting Node`, type: 'bot' };
     if (/^Jaunt\//.test(userAgent)) return { name: `Jaunt`, type: 'bot' };
@@ -484,6 +485,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Leaf\//.test(userAgent)) return { name: `Leaf`, type: 'app' };
     if (/(^lesindesradios$|^lesindesradios\/)/.test(userAgent)) return { name: `Les Indés Radios`, type: 'app' };
     if (/LG Player/.test(userAgent)) return { name: `LG Player`, type: 'app' };
+    if (/Web0S; Linux\/SmartTV.*WebAppManager/.test(userAgent)) return { name: `LG webOS TV`, type: 'app' };
     if (/^Life(%20)?Essentials(App)?\//.test(userAgent)) return { name: `LifeEssentials`, type: 'app' };
     if (/^lifegateburleson\//.test(userAgent)) return { name: `lifegateburleson`, type: 'app' };
     if (/^life-radio-konsole-app-android/.test(userAgent)) return { name: `Life Radio`, type: 'app' };
@@ -537,6 +539,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
     if (/^Parler( Staging)?\//.test(userAgent)) return { name: `Parler`, type: 'app' };
     if (/^PeaCast\//.test(userAgent)) return { name: `PeaCast`, type: 'app' };
+    if (/^phonostar-Player\/\d/.test(userAgent)) return { name: `phonostar Radio-App`, type: 'app' };
     if (/^Playapod/.test(userAgent)) return { name: `Playapod`, type: 'app' };
     if (/^PlaydioCast\//.test(userAgent)) return { name: `PlaydioCast Podcast Radio`, type: 'app' };
     if (/^Player FM|^Player%20FM|^Alpha%20PlayerFM\//.test(userAgent)) return { name: `Player FM`, type: 'app' };
