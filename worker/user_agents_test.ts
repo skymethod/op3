@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@7d34cb6c129e465696d9e2dafa21e046e6267793 (2025-02-01T18:44:32Z)
+// from user-agents-v2@c88baee638eba3c5c14331029f38eb610b0875e1 (2025-02-01T23:08:45Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -197,6 +197,7 @@ const botTests = {
     'Simplecast': { type: 'bot', name: `Simplecast` },
     'Slackbot 1.0 ( https://api.slack.com/robots)': { type: 'bot', name: `Slack Bot` },
     'Snap URL Preview Service; bot; snapchat; https://developers.snap.com/robots': { type: 'bot', name: `Snapchat Bot` },
+    'SoundMadeSeen/1.0 +https://soundmadeseen.com': { type: 'bot', name: `SoundMadeSeen` },
     'Speechmatics-API/2.0': { type: 'bot', name: `Speechmatics ASR` },
     'Spotify/1.0': { type: 'bot', name: `Spotify cache service` },
     'SubstackContentFetch/1.0 (https://substack.com/)': { type: 'bot', name: `Substack Content Fetcher` },
@@ -679,6 +680,7 @@ const appTests = {
     'KaoticRadio.com/1.56.67.564 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `KaoticRadio.com` },
     'Kasts/22.09; Syndication': { type: 'app', name: `Kasts` },
     'kasts LibVLC': { type: 'app', name: `Kasts` },
+    'KERAPublicRadioApp/6.2.17 (iPhone14,5; iOS 18.1.1)': { type: 'app', name: `KERA Public Media App` },
     'Kids%20Listen/55 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Kids Listen` },
     'Kids Listen/55 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Kids Listen` },
     'KidspodMobileClient/111 CFNetwork/1465.2 Darwin/23.0.0': { type: 'app', name: `KidsPod` },
@@ -819,6 +821,7 @@ const appTests = {
     'PodcastRepublic/18.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)': { type: 'app', name: `Podcast Republic` },
     'Podcastly/1.4.1 (samsung; CPU OS android 11; en_us)': { type: 'app', name: `Podcastly` },
     'Podcastly': { type: 'app', name: `Podcastly` },
+    'Podcast%20Saver/27 CFNetwork/1498.700.2 Darwin/23.6.0': { type: 'app', name: `Podcast Saver` },
     'Podcatcher 1.3': { type: 'app', name: `Podcatcher` },
     'Podcatcher 1.3 (+https://podcatcher.net)': { type: 'app', name: `Podcatcher` },
     'Podchaser (https://podchaser.com)': { type: 'app', name: `Podchaser` },
@@ -863,6 +866,7 @@ const appTests = {
     'Podyssey': { type: 'app', name: `Podyssey` },
     'Pratilipi FM/6.3.2 (Linux;Android 14) AndroidXMedia3/1.2.1': { type: 'app', name: `Pratilipi FM` },
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
+    'com.podflitzer.android/1.8.1 (Linux;Android 10) AndroidXMedia3/1.4.1': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
     'pypodder': { type: 'app', name: `Pypodder` },
@@ -1125,9 +1129,12 @@ const browserTests = {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36 OPR/72.0.3815.186': { type: 'browser', name: `Opera` },
     'Mozilla/5.0 (iPad; CPU OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 OPT/3.2.13': { type: 'browser', name: `Opera` },
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299': { type: 'browser', name: `Edge` },
+    'Mozilla/5.0 (X11) AppleWebKit/62.41 (KHTML, like Gecko) Edge/17.10859 Safari/452.6': { type: 'browser', name: `Edge` },
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36': { type: 'browser', name: `Chrome` },
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36': { type: 'browser', name: `Chrome` },
     'Chrome/103.0.5060.63 CFNetwork/1390 Darwin/22.0.0': { type: 'browser', name: `Chrome` },
+    'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36': { type: 'browser', name: `Chrome` },
+    'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36': { type: 'browser', name: `Chrome` },
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0': { type: 'browser', name: `Firefox` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/100 Mobile/15E148 Version/15.0': { type: 'browser', name: `Firefox` },
     'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)': { type: 'browser', name: `Internet Explorer` },
@@ -1137,12 +1144,17 @@ const browserTests = {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15': { type: 'browser', name: `Safari` },
     'MobileSafari/604.1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'browser', name: `Safari` },
     'Safari/18614.4.6.1.6 CFNetwork/1404.0.5 Darwin/22.3.0': { type: 'browser', name: `Safari` },
+    'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15': { type: 'browser', name: `Safari` },
+    'Mozilla/5.0 (BB10; Touch) AppleWebKit/537.35+ (KHTML, like Gecko) Version/10.3.3.3216 Mobile Safari/537.35+': { type: 'browser', name: `Safari` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148': { type: 'browser', name: `iOS WebView` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148': { type: 'browser', name: `iOS WebView` },
     'Mozilla/5.0 (iPad; CPU OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E1480': { type: 'browser', name: `iOS WebView` },
     'Mozilla/5.0 (iPod touch; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148': { type: 'browser', name: `iOS WebView` },
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)': { type: 'browser', name: `Apple WebKit` },
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)': { type: 'browser', name: `Apple WebKit` },
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)': { type: 'browser', name: `Generic WebKit` },
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)': { type: 'browser', name: `Generic WebKit` },
+    'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)': { type: 'browser', name: `Generic WebKit` },
+    'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko)': { type: 'browser', name: `Generic WebKit` },
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)': { type: 'browser', name: `Generic WebKit` },
 };
 
 const deviceTests = {

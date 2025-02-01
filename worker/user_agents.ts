@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@7d34cb6c129e465696d9e2dafa21e046e6267793 (2025-02-01T18:44:32Z)
+// from user-agents-v2@c88baee638eba3c5c14331029f38eb610b0875e1 (2025-02-01T23:08:45Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -169,6 +169,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Simplecast$/.test(userAgent)) return { name: `Simplecast`, type: 'bot' };
     if (/^Slackbot 1\.0/.test(userAgent)) return { name: `Slack Bot`, type: 'bot' };
     if (/:\/\/developers\.snap\.com\/robots/.test(userAgent)) return { name: `Snapchat Bot`, type: 'bot' };
+    if (/^SoundMadeSeen\/\d/.test(userAgent)) return { name: `SoundMadeSeen`, type: 'bot' };
     if (/^SoundOn\/[\d.]+\s+\(bot/.test(userAgent)) return { name: `SoundOn Bot`, type: 'bot' };
     if (/^Speechmatics-API\//.test(userAgent)) return { name: `Speechmatics ASR`, type: 'bot' };
     if (/^Spotify\/1\.0$/.test(userAgent)) return { name: `Spotify cache service`, type: 'bot' };
@@ -483,6 +484,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^KakaoTalk\//.test(userAgent)) return { name: `KakaoTalk`, type: 'app' };
     if (/^KaoticRadio\.com\//.test(userAgent)) return { name: `KaoticRadio.com`, type: 'app' };
     if (/^Kasts\/|^kasts /.test(userAgent)) return { name: `Kasts`, type: 'app' };
+    if (/^KERAPublicRadioApp\/\d/.test(userAgent)) return { name: `KERA Public Media App`, type: 'app' };
     if (/^Kids(%20| )Listen\//.test(userAgent)) return { name: `Kids Listen`, type: 'app' };
     if (/^KidspodMobileClient\//.test(userAgent)) return { name: `KidsPod`, type: 'app' };
     if (/^KKBOX\//.test(userAgent)) return { name: `KKBOX`, type: 'app' };
@@ -563,6 +565,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podcast Player\//.test(userAgent)) return { name: `Podcast Player`, type: 'app' };
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
+    if (/^Podcast%20Saver\/\d/.test(userAgent)) return { name: `Podcast Saver`, type: 'app' };
     if (/^Podcatcher \d/.test(userAgent)) return { name: `Podcatcher`, type: 'app' };
     if (/^Podchaser |^Podchaser-Parser/.test(userAgent)) return { name: `Podchaser`, type: 'app' };
     if (/^Podcini\/\d/.test(userAgent)) return { name: `Podcini`, type: 'app' };
@@ -596,7 +599,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^[Pp]odverse\//.test(userAgent)) return { name: `Podverse`, type: 'app' };
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/^Pratilipi FM\/\d/.test(userAgent)) return { name: `Pratilipi FM`, type: 'app' };
-    if (/Pro[Cc]ast/.test(userAgent)) return { name: `ProCast`, type: 'app' };
+    if (/^Pro[Cc]ast\/\d|^com\.podflitzer\.android\/\d/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
     if (/^pypodder$/.test(userAgent)) return { name: `Pypodder`, type: 'app' };
     if (/^Queue\/\d/.test(userAgent)) return { name: `Queue`, type: 'app' };
@@ -756,15 +759,15 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     // browsers
     if (/.+[Bb]rave/.test(userAgent)) return { name: `Brave`, type: 'browser' };
     if (/Opera\/|Macintosh.*OPR\/|Windows.*OPR\/|Mobile\/.* OPT\//.test(userAgent)) return { name: `Opera`, type: 'browser' };
-    if (/(Xbox.+Edg?\/|Android.+EdgA\/|iPhone.+EdgiOS\/|Macintosh.+MacEdgeClient\/|Windows Phone.+Edge?\/|Windows.+Edge?\/)/.test(userAgent)) return { name: `Edge`, type: 'browser' };
-    if (/^.*Android.*Chrome\/|CrOS.*Chrome\/|Linux.*Chrome\/|Mac OS X.*Chrome\/|Windows.*Chrome\/|iPad.*CriOS\/|iPhone.*CriOS\/|^Chrome\/\d.*CFNetwork/.test(userAgent)) return { name: `Chrome`, type: 'browser' };
+    if (/(Xbox.+Edg?\/|Android.+EdgA\/|iPhone.+EdgiOS\/|Macintosh.+MacEdgeClient\/|Windows Phone.+Edge?\/|Windows.+Edge?\/|X11.+Edge?\/)/.test(userAgent)) return { name: `Edge`, type: 'browser' };
+    if (/^.*Android.*Chrome\/|CrOS.*Chrome\/|Linux.*Chrome\/|Mac OS X.*Chrome\/|Windows.*Chrome\/|iPad.*CriOS\/|iPhone.*CriOS\/|^Chrome\/\d.*CFNetwork|X11.*Chrome\//.test(userAgent)) return { name: `Chrome`, type: 'browser' };
     if (/Firefox\/|(Android|iPhone|iPad).*Focus\/| FxiOS\//.test(userAgent)) return { name: `Firefox`, type: 'browser' };
     if (/MSIE | Trident\//.test(userAgent)) return { name: `Internet Explorer`, type: 'browser' };
     if (/^NCSA Mosaic\//.test(userAgent)) return { name: `NCSA Mosaic`, type: 'browser' };
     if (/^DuckDuckGo/.test(userAgent)) return { name: `DuckDuckGo`, type: 'browser' };
-    if (/Macintosh.*AppleWebKit.*Safari\/|Windows.*AppleWebKit.*Safari\/|iPhone.*AppleWebKit.*Safari\/|iPad.*AppleWebKit.*Safari\/|^MobileSafari\/|^Safari\//.test(userAgent)) return { name: `Safari`, type: 'browser' };
+    if (/(Macintosh|Windows|iPhone|iPad|X11|BB10).*AppleWebKit.*Safari\/|^MobileSafari\/|^Safari\//.test(userAgent)) return { name: `Safari`, type: 'browser' };
     if (/Mozilla\/5\.0 \([A-Za-z ]+; CPU( iPhone)? OS [\d_]+ like Mac OS X\) AppleWebKit\/[\d.]+ \(KHTML, like Gecko\) Mobile\/[0-9A-Z]{6,}/.test(userAgent)) return { name: `iOS WebView`, type: 'browser' };
-    if (/^Mozilla\/5.0 \((Macintosh|iPhone); .*\) AppleWebKit\/[\d+\.]+ \(KHTML, like Gecko\)$/.test(userAgent)) return { name: `Apple WebKit`, type: 'browser' };
+    if (/^Mozilla\/5.0 \((Macintosh|iPhone|Windows).*\) AppleWebKit\/[\d+\.]+ \(KHTML, like Gecko\)$/.test(userAgent)) return { name: `Generic WebKit`, type: 'browser' };
 }
 
 export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined {
