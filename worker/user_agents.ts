@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@0e21152dfe5fd03b95bc62b50a16937d39b71e5f (2025-02-03T18:06:05Z)
+// from user-agents-v2@5efe1d4efc55d91a789dbbd7d47e6b16f6bda9e2 (2025-02-06T01:03:22Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -40,6 +40,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Applebot\//.test(userAgent)) return { name: `Applebot`, type: 'bot' };
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
+    if (/^audioBoomBot\/\d/.test(userAgent)) return { name: `Audioboom bot`, type: 'bot' };
     if (/^Audiomack Podcast Processor\//.test(userAgent)) return { name: `Audiomack`, type: 'bot' };
     if (/^AudioWaveBot\/1\.0/.test(userAgent)) return { name: `AudioWave feed parser`, type: 'bot' };
     if (/^AwarioSmartBot\//.test(userAgent)) return { name: `AwarioSmartBot`, type: 'bot' };
@@ -53,11 +54,13 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^BullhornCrawler\//.test(userAgent)) return { name: `Bullhorn Crawler`, type: 'bot' };
     if (/^Buzzsprout Importer/.test(userAgent)) return { name: `Buzzsprout Importer`, type: 'bot' };
     if (/Bytespider/.test(userAgent)) return { name: `Bytespider.*bytedance`, type: 'bot' };
+    if (/^CaptivateBot\//.test(userAgent)) return { name: `Captivate bot`, type: 'bot' };
     if (/^CastFeedValidator\//.test(userAgent)) return { name: `CastFeedValidator`, type: 'bot' };
     if (/Castopod\/\d/.test(userAgent)) return { name: `Castopod`, type: 'bot' };
     if (/^Trackable\//.test(userAgent)) return { name: `Chartable`, type: 'bot' };
     if (/^clark-crawler2/.test(userAgent)) return { name: `Clark-Crawler, unknown`, type: 'bot' };
     if (/ClaudeBot\//.test(userAgent)) return { name: `Claudebot`, type: 'bot' };
+    if (/https:\/\/www\.comscore\.com/.test(userAgent)) return { name: `Comscore Crawler`, type: 'bot' };
     if (/^Podcast-CriticalMention\//.test(userAgent)) return { name: `Critical Mention`, type: 'bot' };
     if (/^curl|^libcurl\/|^PycURL\/| curl\//.test(userAgent)) return { name: `curl`, type: 'bot' };
     if (/DataForSeoBot\//.test(userAgent)) return { name: `DataforSEO`, type: 'bot' };
@@ -125,6 +128,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PandoraRSSCrawler/.test(userAgent)) return { name: `Pandora RSS crawler`, type: 'bot' };
     if (/PaperLiBot\//.test(userAgent)) return { name: `PaperLi`, type: 'bot' };
     if (/PetalBot/.test(userAgent)) return { name: `PetalBot`, type: 'bot' };
+    if (/^Pinecast\/Importer/.test(userAgent)) return { name: `Pinecast Importer`, type: 'bot' };
     if (/^Pingdom/.test(userAgent)) return { name: `Pingdom`, type: 'bot' };
     if (/PlayerFM\/.* Podcast Sync/.test(userAgent)) return { name: `PlayerFM Podcast Sync`, type: 'bot' };
     if (/^Podbean Importer/.test(userAgent)) return { name: `Podbean Importer`, type: 'bot' };
@@ -254,6 +258,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/AppleNews\//.test(userAgent)) return { name: `Apple News`, type: 'app' };
     if (/^Podcasts\/.*|^Balados\/|^Podcasti\/|^Podcastit\/|^Podcasturi\/|^Podcasty\/|^Podcast’ler\/|^Podcast%E2%80%99ler\/|^Podkaster\/|^Podcaster\/.*\(.*\)|^Podcastok\/|^Подкасти\/|^Подкасты\/|^פודקאסטים\/|^البودكاست\/|^पॉडकास्ट\/|^พ็อดคาสท์\/|^播客\/|^팟캐스트\/|ポッドキャスト\/|^%D8%A7%D9%84%D8%A8%D9%88%D8%AF%D9%83%D8%A7%D8%B3%D8%AA\/|^%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D1%8B\/|^%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D0%B8\/|^Podcastok\/|^%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98%D7%99%D7%9D\/|^%ED%8C%9F%EC%BA%90%EC%8A%A4%ED%8A%B8\/|^%D8%A7%D9%95%D8%B3%D9%85%D8%B9%D9%84%D9%8A\/|^Podcaster\/\d|^%E6%92%AD%E5%AE%A2\/|^%E3%83%9D%E3%83%83%E3%83%89%E3%82%AD%E3%83%A3%E3%82%B9%E3%83%88\/|^Podcast\/|^%E0%B8%9E%E0%B9%87%E0%B8%AD%E0%B8%94%E0%B8%84%E0%B8%B2%E0%B8%AA%E0%B8%97%E0%B9%8C\/\d|%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D1%82%D0%B0%D1%80\/\d|^%E0%A4%AA%E0%A5%89%E0%A4%A1%E0%A4%95%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%9F\/\d/.test(userAgent)) return { name: `Apple Podcasts`, type: 'app' };
     if (/^Recordatorios\//.test(userAgent)) return { name: `Apple Reminders`, type: 'app' };
+    if (/^Arabian%20Business\/\d/.test(userAgent)) return { name: `Arabian Business`, type: 'app' };
     if (/^ARD Audiothek|^ARD%20Audiothek\/|^ARD-Audiothek/.test(userAgent)) return { name: `ARD Audiothek`, type: 'app' };
     if (/^arteradio\//.test(userAgent)) return { name: `Arte Radio`, type: 'app' };
     if (/^Arvocast\//.test(userAgent)) return { name: `Arvocast`, type: 'app' };
@@ -266,6 +271,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Android_AudioNow/.test(userAgent)) return { name: `Audio Now`, type: 'app' };
     if (/^audiobookshelf/.test(userAgent)) return { name: `audiobookshelf`, type: 'app' };
     if (/(^AudioWave\/1|^AudioWave iOS)/.test(userAgent)) return { name: `AudioWave`, type: 'app' };
+    if (/Audirv%C4%81na%20Studio\/\d/.test(userAgent)) return { name: `Audirvāna Studio`, type: 'app' };
     if (/^Aural\//.test(userAgent)) return { name: `Aural`, type: 'app' };
     if (/^Aurora\//.test(userAgent)) return { name: `Aurora`, type: 'app' };
     if (/^Autopod\//.test(userAgent)) return { name: `Autopod`, type: 'app' };
@@ -274,6 +280,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AVPlay\//.test(userAgent)) return { name: `AVPlay`, type: 'app' };
     if (/^Awasu\//.test(userAgent)) return { name: `Awasu`, type: 'app' };
     if (/^Azul\//.test(userAgent)) return { name: `Azul`, type: 'app' };
+    if (/^Babbel\/\d/.test(userAgent)) return { name: `Babbel`, type: 'app' };
     if (/^BaladoQuebec\//.test(userAgent)) return { name: `BaladoQuebec`, type: 'app' };
     if (/^Banter\/|^banter-beta\//.test(userAgent)) return { name: `Banter`, type: 'app' };
     if (/^Barabbas Road Church\//.test(userAgent)) return { name: `Barabbas Road Church`, type: 'app' };
@@ -282,6 +289,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/BBCiPlayerRadio\//.test(userAgent)) return { name: `BBC iPlayer Radio`, type: 'app' };
     if (/BBC%20Sounds\//.test(userAgent)) return { name: `BBC Sounds`, type: 'app' };
     if (/^Bear\//.test(userAgent)) return { name: `Bear`, type: 'app' };
+    if (/^BehindTheKnife\/\d/.test(userAgent)) return { name: `Behind the Knife`, type: 'app' };
     if (/Android BT Hermes\//.test(userAgent)) return { name: `Bergens Tidende Android app`, type: 'app' };
     if (/iOS BT Hermes\//.test(userAgent)) return { name: `Bergens Tidende iOS app`, type: 'app' };
     if (/; BeyondPod/.test(userAgent)) return { name: `BeyondPod`, type: 'app' };
@@ -295,7 +303,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Bookmobile\//.test(userAgent)) return { name: `Bookmobile`, type: 'app' };
     if (/^Bookself\//.test(userAgent)) return { name: `Bookself`, type: 'app' };
     if (/^Boom\//.test(userAgent)) return { name: `Boom`, type: 'app' };
-    if (/^Boomplay\//.test(userAgent)) return { name: `Boomplay`, type: 'app' };
+    if (/^Boomplay( Lite)?\/\d/.test(userAgent)) return { name: `Boomplay`, type: 'app' };
     if (/^Bose\//.test(userAgent)) return { name: `Bose SoundTouch`, type: 'app' };
     if (/^bPod$/.test(userAgent)) return { name: `bPod`, type: 'app' };
     if (/^Breaker\//.test(userAgent)) return { name: `Breaker`, type: 'app' };
@@ -322,6 +330,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Casts\//.test(userAgent)) return { name: `Casts`, type: 'app' };
     if (/^CCGF\//.test(userAgent)) return { name: `CCGF`, type: 'app' };
     if (/^CEBrowser\//.test(userAgent)) return { name: `CEBrowser`, type: 'app' };
+    if (/^cz\.ceskeappky\.podcasty/.test(userAgent)) return { name: `České Podcasty`, type: 'app' };
     if (/^CFC\//.test(userAgent)) return { name: `CFC`, type: 'app' };
     if (/^CHCLeaders\//.test(userAgent)) return { name: `CHCLeaders`, type: 'app' };
     if (/^Childress\//.test(userAgent)) return { name: `Childress`, type: 'app' };
@@ -339,6 +348,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^CoolerFM\//.test(userAgent)) return { name: `Cooler`, type: 'app' };
     if (/^Copied\//.test(userAgent)) return { name: `Copied`, type: 'app' };
     if (/^CoreDataPlayerSample\//.test(userAgent)) return { name: `CoreDataPlayerSample`, type: 'app' };
+    if (/^Corriere della Sera\/\d/.test(userAgent)) return { name: `Corriere della Sera`, type: 'app' };
     if (/^Cosmicast\//.test(userAgent)) return { name: `Cosmicast`, type: 'app' };
     if (/CPod\//.test(userAgent)) return { name: `CPod`, type: 'app' };
     if (/^Crosspoint City Church\//.test(userAgent)) return { name: `Crosspoint City Church`, type: 'app' };
@@ -461,6 +471,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^HyperCatcher/.test(userAgent)) return { name: `HyperCatcher`, type: 'app' };
     if (/^iBuilder\//.test(userAgent)) return { name: `iBuilder`, type: 'app' };
     if (/^i[Cc]atcher|\(iCatcher/.test(userAgent)) return { name: `iCatcher`, type: 'app' };
+    if (/^com\.IDEngineering\.[A-Za-z0-9.]+/.test(userAgent)) return { name: `IDEngineering`, type: 'app' };
     if (/^iDL\//.test(userAgent)) return { name: `iDL`, type: 'app' };
     if (/IDownloaderApps4StarsFree\/|^IDownloaderFree_Apps4Stars\/|^iDownloader/.test(userAgent)) return { name: `iDownloader`, type: 'app' };
     if (/^iDownloadsAppPlus\//.test(userAgent)) return { name: `iDownloadsAppPlus`, type: 'app' };
@@ -473,12 +484,14 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Instacast Instacast\/|^Instacast\//.test(userAgent)) return { name: `Instacast`, type: 'app' };
     if (/^InstacastPlus\/\d/.test(userAgent)) return { name: `InstacastPlus`, type: 'app' };
     if (/^Instagram\/|Mobile\/.* Instagram/.test(userAgent)) return { name: `Instagram`, type: 'app' };
+    if (/^Internazionale App for (Android|iOS)\//.test(userAgent)) return { name: `Internazionale`, type: 'app' };
     if (/^iOnGreenville\//.test(userAgent)) return { name: `iOnGreenville`, type: 'app' };
     if (/^IOSAudiobooks\//.test(userAgent)) return { name: `IOSAudiobooks`, type: 'app' };
     if (/^IPF\//.test(userAgent)) return { name: `IPF`, type: 'app' };
     if (/^iPlay\//.test(userAgent)) return { name: `iPlay`, type: 'app' };
     if (/^isitgood\//.test(userAgent)) return { name: `isitgood`, type: 'app' };
     if (/^iTunesU?[\/-]/.test(userAgent)) return { name: `iTunes`, type: 'app' };
+    if (/^com\.itv\.itvnewsapp\/\d/.test(userAgent)) return { name: `ITV News`, type: 'app' };
     if (/^[iI][Vv]oox/.test(userAgent)) return { name: `iVoox`, type: 'app' };
     if (/^iWeb\//.test(userAgent)) return { name: `iWeb`, type: 'app' };
     if (/^Jabbercast\//.test(userAgent)) return { name: `Jabbercast`, type: 'app' };
@@ -546,6 +559,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Music%20Download\//.test(userAgent)) return { name: `Music Download App`, type: 'app' };
     if (/^MusiPro\/\d/.test(userAgent)) return { name: `MusiPro`, type: 'app' };
     if (/^myTuner Radio app\/|^myTuner%20Radio%20app\/|^mytuner_podcasts_androidplayer\/|^MyTuner-|^my[tT]uner$|^myTuneriOS%20Free\/|^myTuner( |%20)Podcasts\/\d|^myTuneriOS Free\/\d|^myTuneriOS\/\d/.test(userAgent)) return { name: `MyTuner`, type: 'app' };
+    if (/^(com.waveline.nabd|Nabd)\/\d/.test(userAgent)) return { name: `Nabd Pulse`, type: 'app' };
     if (/^NetNewsWire/.test(userAgent)) return { name: `NetNewsWire`, type: 'app' };
     if (/^Neuecast\//.test(userAgent)) return { name: `Neuecast`, type: 'app' };
     if (/^Newsboat\//.test(userAgent)) return { name: `Newsboat`, type: 'app' };
@@ -556,7 +570,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
     if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
-    if (/^Overcast\/|^Overcast.*Apple Watch/.test(userAgent)) return { name: `Overcast`, type: 'app' };
+    if (/^Overcast\/|^Overcast.*Apple Watch|^Overcast Player /.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
     if (/^Palco MP3/.test(userAgent)) return { name: `Palco MP3`, type: 'app' };
     if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
@@ -621,6 +635,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^RadioPublic\/android-|^RadioPublic Android|RadioPublic iOS|RadioPublic.+CFNetwork|^RadioPublic\/iOS|^RadioPublicDraper\//.test(userAgent)) return { name: `RadioPublic`, type: 'app' };
     if (/^Radios%20M%C3%A9xico\/\d/.test(userAgent)) return { name: `Radios México`, type: 'app' };
     if (/^Reeder\//.test(userAgent)) return { name: `Reeder`, type: 'app' };
+    if (/^Relevant Radio\//.test(userAgent)) return { name: `Relevant Radio`, type: 'app' };
     if (/(^Repod\/.+iOS|^Repod\/.+Android)/.test(userAgent)) return { name: `Repod`, type: 'app' };
     if (/^Roka Stereo\//.test(userAgent)) return { name: `Roka Stereo`, type: 'app' };
     if (/^Roku\//.test(userAgent)) return { name: `Roku`, type: 'app' };
@@ -646,7 +661,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Android Sportbladet Hermes\//.test(userAgent)) return { name: `Sportbladet Android app`, type: 'app' };
     if (/iOS Sportbladet Hermes\//.test(userAgent)) return { name: `Sportbladet iOS app`, type: 'app' };
     if (/^Spotify\/.+Linux|Macintosh.+Spotify\/|^Spotify\/.+OSX|Windows.+Spotify\/|^Spotify\/.+Win32|^Spotify\/.+Android|^Spotify\/.+iOS|^Spotify\/.+Polestar|^Spotify\/.+Volvo|^spotify_|^Spotify-Lite|^Spotify\/\d/.test(userAgent)) return { name: `Spotify`, type: 'app' };
-    if (/(^Spreaker for Android|Spreaker\/)/.test(userAgent)) return { name: `Spreaker`, type: 'app' };
+    if (/^Spreaker for Android|^Spreaker Custom App for (Android|iOS)|Spreaker\/|^Spreaker \d/.test(userAgent)) return { name: `Spreaker`, type: 'app' };
     if (/^Sprewell\//.test(userAgent)) return { name: `Sprewell`, type: 'app' };
     if (/Android SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad Android app`, type: 'app' };
     if (/iOS SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad iOS app`, type: 'app' };
@@ -655,6 +670,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Storiyoh\//.test(userAgent)) return { name: `Storiyoh`, type: 'app' };
     if (/^Storybutton\//.test(userAgent)) return { name: `Storybutton`, type: 'app' };
     if (/^StoryShots\//.test(userAgent)) return { name: `StoryShots`, type: 'app' };
+    if (/^Storytel\/\d/.test(userAgent)) return { name: `Storytel`, type: 'app' };
     if (/iOS Strilen Hermes\//.test(userAgent)) return { name: `Strilen iOS app`, type: 'app' };
     if (/^Subcast/.test(userAgent)) return { name: `Subcast`, type: 'app' };
     if (/^Substack\//.test(userAgent)) return { name: `Substack`, type: 'app' };
@@ -720,6 +736,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^AppleCoreMedia\/1/.test(userAgent)) return { name: `AppleCoreMedia`, type: 'library' };
     if (/^aria2\//.test(userAgent)) return { name: `aria2`, type: 'library', category: 'bot' };
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
+    if (/^assets_audio_player/.test(userAgent)) return { name: `assets_audio_player (flutter)`, type: 'library' };
     if (/^AHC\/\d+\.\d+/.test(userAgent)) return { name: `Async Http Client (java)`, type: 'library', category: 'bot' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
     if (/^Bubble$/.test(userAgent)) return { name: `Bubble (no-code)`, type: 'library' };
@@ -767,6 +784,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^(Python-urllib|python-urllib3)\//.test(userAgent)) return { name: `urllib (python)`, type: 'library', category: 'bot' };
     if (/ ExoPlayerLib\//.test(userAgent)) return { name: `ExoPlayer (Android)`, type: 'library' };
     if (/^ExoPlayer(Demo|Plugin)?\/[\d\.]+ \(Linux;Android [\d.]+\) AndroidXMedia3\/\d+\.\d+\.\d+$/.test(userAgent)) return { name: `Jetpack Media3 (Android)`, type: 'library' };
+    if (/^ExoMedia \d.*Android/.test(userAgent)) return { name: `ExoMedia`, type: 'library' };
     if (/^ESP32 HTTP Client\//.test(userAgent)) return { name: `ESP32 HTTP Client`, type: 'library' };
 
     // browsers
@@ -778,7 +796,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/MSIE | Trident\//.test(userAgent)) return { name: `Internet Explorer`, type: 'browser' };
     if (/^NCSA Mosaic\//.test(userAgent)) return { name: `NCSA Mosaic`, type: 'browser' };
     if (/^DuckDuckGo/.test(userAgent)) return { name: `DuckDuckGo`, type: 'browser' };
-    if (/(Macintosh|Windows|iPhone|iPad|X11|BB10|SMART-TV).*AppleWebKit.*Safari\/|^MobileSafari\/|^Safari\//.test(userAgent)) return { name: `Safari`, type: 'browser' };
+    if (/(Macintosh|Windows|iPhone|iPad|X11|BB10|SMART-TV|Linux).*AppleWebKit.*Safari\/|^MobileSafari\/|^Safari\//.test(userAgent)) return { name: `Safari`, type: 'browser' };
     if (/Mozilla\/5\.0 \([A-Za-z ]+; CPU( iPhone)? OS [\d_]+ like Mac OS X\) AppleWebKit\/[\d.]+ \(KHTML, like Gecko\) Mobile\/[0-9A-Z]{6,}/.test(userAgent)) return { name: `iOS WebView`, type: 'browser' };
     if (/^Mozilla\/5.0 \((Macintosh|iPhone|iPad|Windows|iPod).*\) AppleWebKit\/[\d+\.]+ \(KHTML, like Gecko\)$/.test(userAgent)) return { name: `Generic WebKit`, type: 'browser' };
 }
