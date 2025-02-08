@@ -65,7 +65,7 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, queue2 } = this.env;
+            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, queue2, instance } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
             const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
@@ -127,7 +127,8 @@ export class BackendDO {
                             if (blobsBucket === undefined) throw new Error(`'blobsBucket' is required to init ShowController`);
                             const feedBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'feed/' });
                             const statsBlobs = new R2BucketBlobs({ bucket: blobsBucket, prefix: 'stats/' });
-                            this.showController = new ShowController({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient });
+                            const allowStorageImport = instance === 'ci'; // only allow show storage import on the CI instance, for testing
+                            this.showController = new ShowController({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient, allowStorageImport });
                         }
                         return this.showController;
                     }

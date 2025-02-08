@@ -1,5 +1,5 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
-import { check, checkMatches, isString, isStringRecord, isValidGuid, isValidHttpUrl, tryParseInt } from '../check.ts';
+import { check, checkMatches, isString, isStringRecord, isValidGuid, isValidHttpUrl, tryParseInt, tryParseJson } from '../check.ts';
 import { isValidSha256Hex } from '../crypto.ts';
 import { Bytes, chunk, distinct, DurableObjectStorage, DurableObjectStorageValue, sortBy } from '../deps.ts';
 import { equalItunesCategories, Item, parseFeed, stringifyItunesCategories } from '../feed_parser.ts';
@@ -33,8 +33,9 @@ export class ShowController {
     private readonly rpcClient: RpcClient;
     private readonly backups = new Backups();
     private readonly podcastGuidCallState: PodcastGuidCallState = {};
+    private readonly allowStorageImport: boolean;
 
-    constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient }) {
+    constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient, allowStorageImport }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient, allowStorageImport: boolean }) {
         this.storage = storage;
         this.durableObjectName = durableObjectName;
         this.podcastIndexClient = podcastIndexClient;
@@ -42,6 +43,7 @@ export class ShowController {
         this.feedBlobs = feedBlobs;
         this.statsBlobs = statsBlobs;
         this.rpcClient = rpcClient;
+        this.allowStorageImport = allowStorageImport;
         this.notifications = new ShowControllerNotifications(storage, origin);
         this.notifications.callbacks = {
             onPodcastGuids: async podcastGuids => {
@@ -96,7 +98,7 @@ export class ShowController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>, backupBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
-        const { notifications, storage, origin, feedBlobs } = this;
+        const { notifications, storage, origin, feedBlobs, allowStorageImport } = this;
         const res = await notifications.adminExecuteDataQuery(req);
         if (res) return res;
 
@@ -142,6 +144,14 @@ export class ShowController {
             const map = await storage.list(computeListOpts(computeShowKeyPrefix(), parameters));
             const results = [...map.values()].filter(isShowRecord);
             return { results };
+        }
+        if (operationKind === 'update' && targetPath === '/show/shows' && allowStorageImport) {
+            const { json } = parameters;
+            const record = tryParseJson(typeof json === 'string' ? json : '');
+            if (!isShowRecord(record)) throw new Error(`Invalid input json (expected show record): ${JSON.stringify(json)}`);
+            const { uuid } = record;
+            await storage.put(computeShowKey(uuid), record);
+            return { results: [ record ] };
         }
 
         if (operationKind === 'select' && targetPath === '/show/show-uuids') {

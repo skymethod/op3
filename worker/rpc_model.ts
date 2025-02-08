@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { check, isString, isStringRecord } from './check.ts';
+import { check, isStringRecord } from './check.ts';
 import { isValidUuid } from './uuid.ts';
 
 export type RpcRequest = 
