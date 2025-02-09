@@ -374,6 +374,17 @@ export class ShowController {
                         if (pubdateInstant) keysToDelete.push(computeShowEpisodesByPubdateIndexKey({ pubdateInstant, showUuid, episodeId }));
                         const deleted = await storage.delete(keysToDelete);
                         return { results: [ { showUuid, episodeId, deleted, episode } ] };
+                    } else if (operationKind === 'update' && allowStorageImport) {
+                        const records = Object.entries(parameters).filter(v => /^episode\d+$/.test(v[0])).map(v => v[1]).map(v => {
+                            const record = tryParseJson(typeof v === 'string' ? v : '');
+                            if (!isEpisodeRecord(record) || record.showUuid !== showUuid) throw new Error(JSON.stringify(record));
+                            return record;
+                        });
+                        for (const batch of chunk(records, 128)) {
+                            const entries = Object.fromEntries(batch.map(v => [ computeEpisodeKey(v), v ]));
+                            await storage.put(entries);
+                        }
+                        return { results: [ { put: records.length } ] };
                     }
                 } else {
                     if (operationKind === 'select') {
