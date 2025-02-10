@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@5efe1d4efc55d91a789dbbd7d47e6b16f6bda9e2 (2025-02-06T01:03:22Z)
+// from user-agents-v2@0551bb7b3491d484ad3456cf0aa5a715123326ae (2025-02-10T16:50:27Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
