@@ -26,6 +26,7 @@ const strings = {
     twelve_hourly_downloads: "${s:twelve_hourly_downloads:'12-hourly Downloads'}",
     six_hourly_downloads: "${s:six_hourly_downloads:'6-hourly Downloads'}",
     hourly_downloads: "${s:hourly_downloads:'Hourly Downloads'}",
+    conf_graph_downloads: "${s:conf_graph_downloads:'Config downloads graph'}",
     in_month: "${s:in_month:'in %s'}",
     so_far: "${s:so_far:'so far'}",
     day_n: "${s:day_n:'Day %d'}",
@@ -120,7 +121,7 @@ const strings = {
             <sl-icon-button name="caret-left-fill" label="${s:older_downloads:'Older downloads'}" title="${s:older_downloads:''}" id="downloads-graph-previous"></sl-icon-button>
             <span id="downloads-graph-granularity" class="whitespace-nowrap">${s:hourly_downloads:''}</span>
             <sl-dropdown class="flex justify-center">
-                <sl-icon-button name="sliders" slot="trigger" size="small"></sl-icon-button>
+                <sl-icon-button name="sliders" slot="trigger" size="small" label="${s:conf_graph_downloads:''}"></sl-icon-button>
                 <sl-menu id="downloads-graph-options">
                     <sl-menu-item value="daily" checked type="checkbox">${s:daily:'Daily'}</sl-menu-item>
                     <!-- <sl-menu-item value="twelve-hourly">12-Hourly</sl-menu-item> -->
