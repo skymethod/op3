@@ -43,6 +43,7 @@ const strings = {
     tz_is_equal_to_utc: "${s:tz_is_equal_to_utc:'%s is equal to %s'}",
     tz_is_behind_utc: "${s:tz_is_behind_utc:'%s is %s behind %s'}",
     tz_is_ahead_of_utc: "${s:tz_is_ahead_of_utc:'%s is %s ahead of %s'}",
+    open_in_new_window: "${s:open_in_new_window:'opens in a new window'}",
 };
 /*${appJs}*/
     </script>
@@ -114,7 +115,7 @@ const strings = {
             </sl-card>
         </div>
 
-        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600 text-sm md:text-base localized" href="/download-calculation" target="_blank">${s:how_op3_calculates_downloads:'How OP3 calculates downloads'} →</a></div>
+        <div class="flex justify-center items-center mt-8"><a class="text-neutral-600 text-sm md:text-base localized" href="/download-calculation" target="_blank">${s:how_op3_calculates_downloads:'How OP3 calculates downloads'} →<sl-visually-hidden>${s:open_in_new_window:''}</sl-visually-hidden></a></div>
 
         <!-- downloads graph -->
         <div class="flex justify-center items-center mt-16 leading-none text-sm md:text-base">
@@ -147,11 +148,11 @@ const strings = {
                     <p><span id="listens-25" class="font-bold">xx%</span> ${s:of_listeners_listen_to:'of listeners listen to at least'} <span class="font-bold">25%</span> ${s:of_an_episode:'of an episode'}</p>
                     <p><span id="listens-50" class="font-bold">xx%</span> ${s:of_listeners_listen_to:''} <span class="font-bold">${s:half:'half'}</span></p>
                     <p><span id="listens-90" class="font-bold">xx%</span> ${s:of_listeners_listen_to:''} <span class="font-bold">90%</span></p>
-                    <template id="listens-from-app"><span>n</span> ${s:from:'from'} <a href="#" class="text-neutral-600 app-name" target="_blank">app</a></template>
+                    <template id="listens-from-app"><span>n</span> ${s:from:'from'} <a href="#" class="text-neutral-600 app-name" target="_blank">app<sl-visually-hidden>${s:open_in_new_window:''}</sl-visually-hidden></a></template>
                     <div id="listens-based-on" class="text-neutral-600 mt-4 text-sm leading-relaxed">${s:based_on:'Based on'} <span id="listens-count">nn</span> ${s:anonymized_playback_sessions:'anonymized playback sessions'}: </div>
                 </sl-card>
             </div>
-            <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">${s:how_op3_calculates_listen_time:'How OP3 calculates client-side listen time'} →</a></div>
+            <div class="flex justify-center items-center mt-8 text-sm md:text-base"><a class="text-neutral-600" href="/listen-time-calculation" target="_blank">${s:how_op3_calculates_listen_time:'How OP3 calculates client-side listen time'} →<sl-visually-hidden>${s:open_in_new_window:''}</sl-visually-hidden></a></div>
             <div>
                 <canvas id="listens-graph" class="max-h-64 cursor-pointer hidden mt-8"></canvas>
             </div>
