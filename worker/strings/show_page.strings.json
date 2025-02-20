@@ -94,8 +94,14 @@
   "how_op3_calculates_downloads": {
     "string": "How OP3 calculates downloads"
   },
+  "open_in_new_window": {
+    "string": "opens in a new window"
+  },
   "older_downloads": {
     "string": "Older downloads"
+  },
+  "conf_graph_downloads": {
+    "string": "Configure downloads graph"
   },
   "daily": {
     "string": "Daily"
@@ -165,6 +171,9 @@
   },
   "export": {
     "string": "Export"
+  },
+  "detailed_stats_sections": {
+    "string": "Detailed stats sections"
   },
   "top_countries": {
     "string": "Top countries"
