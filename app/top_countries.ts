@@ -1,4 +1,5 @@
-import { computeCountryName, computeMonthlyDownloads, makeTopBox, regionCountryFunctions } from './top_box.ts';
+import { computeMonthlyDownloads, makeTopBox, regionCountryFunctions } from './top_box.ts';
+import { computeCountryName } from './util.ts';
 
 type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, strings: Record<string, string>, lang: string | undefined };
 

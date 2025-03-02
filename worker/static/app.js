@@ -8936,6 +8936,23 @@ function getTimeOnlyFormat(lang) {
             timeZone: 'UTC'
         }));
 }
+function tryComputeRegionNameInEnglish(countryCode) {
+    try {
+        return regionNamesInEnglish.of(countryCode);
+    } catch (e) {
+        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+    }
+}
+function computeCountryName(countryCode) {
+    if (countryCode === 'T1') return 'Tor traffic';
+    if (countryCode === 'XX') return 'Unknown';
+    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined) ?? countryCode;
+}
+const regionNamesInEnglish = new Intl.DisplayNames([
+    'en'
+], {
+    type: 'region'
+});
 function getOrCacheByLocale(map, lang, valueFn) {
     const locale = lang ?? 'en-US';
     return getOrCache(map, locale, ()=>valueFn(locale));
@@ -10059,23 +10076,6 @@ function computeMonthlyDownloads(monthlyDimensionDownloads, dimension) {
     });
     return monthlyDownloads;
 }
-function tryComputeRegionNameInEnglish(countryCode) {
-    try {
-        return regionNamesInEnglish.of(countryCode);
-    } catch (e) {
-        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
-    }
-}
-function computeCountryName(countryCode) {
-    if (countryCode === 'T1') return 'Tor traffic';
-    if (countryCode === 'XX') return 'Unknown';
-    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined) ?? countryCode;
-}
-const regionNamesInEnglish = new Intl.DisplayNames([
-    'en'
-], {
-    type: 'region'
-});
 const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = computeMonthlyDownloads(monthlyDimensionDownloads, 'countryCode');
     const { computeEmoji, computeUrl } = regionCountryFunctions();

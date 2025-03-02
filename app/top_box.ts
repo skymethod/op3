@@ -1,6 +1,6 @@
 import { sortBy, pluralize } from './deps.ts';
 import { element, removeAllChildren, SlIconButton } from './elements.ts';
-import { computeMonthName, download } from './util.ts';
+import { computeMonthName, download, tryComputeRegionNameInEnglish } from './util.ts';
 
 type Opts = {
     type: string,
@@ -195,21 +195,4 @@ export function computeMonthlyDownloads(monthlyDimensionDownloads: Record<string
     return monthlyDownloads;
 }
 
-export function tryComputeRegionNameInEnglish(countryCode: string): string | undefined {
-    try {
-        return regionNamesInEnglish.of(countryCode);
-    } catch (e) {
-        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
-    }
-}
-
-export function computeCountryName(countryCode: string): string {
-    if (countryCode === 'T1') return 'Tor traffic';
-    if (countryCode === 'XX') return 'Unknown';
-    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined ) ?? countryCode;
-}
-
-//
-
-const regionNamesInEnglish = new Intl.DisplayNames([ 'en' ], { type: 'region' });
 

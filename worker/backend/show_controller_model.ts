@@ -54,6 +54,7 @@ export interface FeedRecord {
     readonly itunesType?: string;
     readonly itunesCategories?: ItunesCategory[];
     readonly medium?: string;
+    readonly itemFilters?: string[]; // only include items with enclosures meeting the filter e.g. /example.com/path/prefix/
 }
 
 export function isFeedRecord(obj: unknown): obj is FeedRecord {
@@ -81,6 +82,7 @@ export function isFeedRecord(obj: unknown): obj is FeedRecord {
         // && (obj.itunesType === undefined || typeof obj.itunesType === 'string')
         // && (obj.itunesCategories === undefined || Array.isArray(obj.itunesCategories) && obj.itunesCategories.every(isItunesCategory))
         && (obj.medium === undefined || typeof obj.medium === 'string')
+        && (obj.itemFilters === undefined || Array.isArray(obj.itemFilters) && obj.itemFilters.every(v => typeof v === 'string'))
         ;
 }
 

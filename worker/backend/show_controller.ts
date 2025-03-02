@@ -292,7 +292,7 @@ export class ShowController {
                     return { results: [ result ] };
                 } else if (operationKind === 'update') {
                     if (!isFeedRecord(result)) return { message: `Feed record not found` };
-                    const { action, disable = '', force = '', 'refetch-media-urls': refetchMediaUrls } = parameters;
+                    const { action, disable = '', force = '', 'refetch-media-urls': refetchMediaUrls, filter } = parameters;
                     if (action === 'update-feed' || action === 'update-feed-and-index-items') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
@@ -300,7 +300,7 @@ export class ShowController {
                         if (action === 'update-feed-and-index-items' && updated && fetchStatus === 200) {
                             const forceResave = force.includes('resave');
                             const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave, origin, refetchMediaUrls });
-                            return { message: [message, indexItemsMessage ].join(', ') };
+                            return { message: [ message, indexItemsMessage ].join(', ') };
                         } else {
                             return { message };
                         }
@@ -315,6 +315,29 @@ export class ShowController {
                     } else if (action === 'remove-show-uuid') {
                         const showUuid = await removeShowUuid(result, storage);
                         return { message: `Removed ${showUuid} from ${result.url}` };
+                    } else if (action === 'add-item-filter' || action === 'remove-item-filter') {
+                        if (!(typeof filter === 'string' && /^[a-z./]+$/.test(filter))) throw new Error(`Unsupported item filter: ${filter}`);
+                        const feedRecordKey = computeFeedRecordKey(result.id);
+                        let message = 'No change to item filters';
+                        const updated = await storage.transaction(async tx => {
+                            const existing = await tx.get(feedRecordKey);
+                            if (!isFeedRecord(existing)) return undefined; // deleted?
+                            const existingFilters = result.itemFilters ?? [];
+                            let newFilters: string[] | undefined;
+                            if (action === 'add-item-filter' && !existingFilters.includes(filter)) {
+                                newFilters = [ ...existingFilters, filter ];
+                                message = 'Added item filter';
+                            } else if (action === 'remove-item-filter' && existingFilters.includes(filter)) {
+                                newFilters = existingFilters.filter(v => v !== filter);
+                                message = 'Removed item filter';
+                            }
+                            if (newFilters === undefined) return undefined;
+                            let update = existing;
+                            update = { ...existing, itemFilters: newFilters, updated: new Date().toISOString() };
+                            await tx.put(feedRecordKey, update);
+                            return update;
+                        });
+                        return { message, results: [ updated ] };
                     }
                     return { message: 'Unknown update action' };
                 }

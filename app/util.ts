@@ -64,7 +64,23 @@ export function getTimeOnlyFormat(lang: string | undefined): Intl.DateTimeFormat
     return getOrCacheByLocale(timeOnlyFormatsByLocale, lang, locale => new Intl.DateTimeFormat(locale, { hour: 'numeric', hour12: true, timeZone: 'UTC' }));
 }
 
+export function tryComputeRegionNameInEnglish(countryCode: string): string | undefined {
+    try {
+        return regionNamesInEnglish.of(countryCode);
+    } catch (e) {
+        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+    }
+}
+
+export function computeCountryName(countryCode: string): string {
+    if (countryCode === 'T1') return 'Tor traffic';
+    if (countryCode === 'XX') return 'Unknown';
+    return (countryCode.length === 2 ? tryComputeRegionNameInEnglish(countryCode) : undefined ) ?? countryCode;
+}
+
 //
+
+const regionNamesInEnglish = new Intl.DisplayNames([ 'en' ], { type: 'region' });
 
 function getOrCacheByLocale<V>(map: Map<string, V>, lang: string | undefined, valueFn: (locale: string) => V): V {
     const locale = lang ?? 'en-US';
