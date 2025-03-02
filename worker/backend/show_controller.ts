@@ -1070,7 +1070,8 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
         const show = await setShowAttributesFromFeed(feedRecord, storage, rt);
 
         const podcastGuid = show?.podcastGuid;
-        await ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage, rt });
+        const { itemFilters } = feedRecord;
+        await ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, itemFilters, storage, rt });
     }
 
     return rt.join(', ');
@@ -1114,12 +1115,13 @@ async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, st
     return { indexRecordKeysToDelete: indexRecordKeysToDelete.length, indexRecordsDeleted, feedItemRecordKeysToDelete: feedItemRecordKeysToDelete.length, feedItemRecordsDeleted, go };
 }
 
-async function ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage, rt }: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined, storage: DurableObjectStorage, rt: string[] }) {
-    const { inserts, updates, index1Writes, index2Writes } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, storage });
+async function ensureShowEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, itemFilters, storage, rt }: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined, itemFilters: string[] | undefined, storage: DurableObjectStorage, rt: string[] }) {
+    const { inserts, updates, index1Writes, index2Writes, ignored } = await ensureEpisodesExistForAllFeedItems({ feedRecordId, showUuid, podcastGuid, itemFilters, storage });
     if (inserts > 0) rt.push(`${inserts} ep inserts`);
     if (updates > 0) rt.push(`${updates} ep updates`);
     if (index1Writes > 0) rt.push(`${index1Writes} ep index writes`);
     if (index2Writes > 0) rt.push(`${index2Writes} ep-by-pubdate index writes`);
+    if (ignored > 0) rt.push(`${ignored} items ignored`);
 }
 
 function needsAnotherFetch(record: MediaUrlIndexRecord, refetch: string | undefined): boolean {
@@ -1238,7 +1240,8 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
     // save initial podcastguid -> showuuid index record
     if (podcastGuid) await storage.put(computePodcastGuidToShowUuidIndexKey({ podcastGuid }), showUuid);
 
-    await ensureShowEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, podcastGuid, storage, rt });
+    const { itemFilters } = feedRecord;
+    await ensureShowEpisodesExistForAllFeedItems({ feedRecordId: feedRecord.id, showUuid, podcastGuid, itemFilters, storage, rt });
 
     return rt.join(', ');
 }
@@ -1305,13 +1308,14 @@ async function setShowAttributesFromFeed(feedRecord: FeedRecord, storage: Durabl
     return show;
 }
 
-async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined,  storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number, index1Writes: number, index2Writes: number }> {
-    const { feedRecordId, showUuid, podcastGuid, storage } = opts;
+async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, showUuid: string, podcastGuid: string | undefined, itemFilters: string[] | undefined, storage: DurableObjectStorage }): Promise<{ inserts: number, updates: number, index1Writes: number, index2Writes: number, ignored: number }> {
+    const { feedRecordId, showUuid, podcastGuid, itemFilters = [], storage } = opts;
     const map = await storage.list({ prefix: computeFeedItemRecordKeyPrefix(feedRecordId) });
     let inserts = 0;
     let updates = 0;
     let index1Writes = 0;
     let index2Writes = 0;
+    let ignored = 0;
     const index1Records: Record<string, Record<string, unknown>> = {};
     const index2Records: Record<string, ShowEpisodesByPubdateIndexRecord> = {};
     const epRecords: Record<string, EpisodeRecord> = {};
@@ -1326,7 +1330,15 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
             const episodeId = episodeIds[i];
             const episodeKey = episodeKeys[i];
             const existing = map.get(episodeKey);
-            const { title, pubdate, pubdateInstant, hasTranscripts } = feedItem;
+            const { title, pubdate, pubdateInstant, hasTranscripts, relevantUrls } = feedItem;
+            if (itemFilters.length > 0) {
+                const urls = Object.values(relevantUrls);
+                const meetsFilter = itemFilters.some(filter => urls.some(url => url.includes(filter)));
+                if (!meetsFilter) {
+                    ignored++;
+                    continue;
+                }
+            }
             if (isEpisodeRecord(existing)) {
                 const firstSeenInstant = [ feedItem.firstSeenInstant, existing.firstSeenInstant ].filter(isString).sort()[0];
                 const lastSeenInstant = [ feedItem.lastSeenInstant, existing.lastSeenInstant ].filter(isString).sort().reverse()[0];
@@ -1352,7 +1364,7 @@ async function ensureEpisodesExistForAllFeedItems(opts: { feedRecordId: string, 
     for (const batch of chunk([...Object.entries(epRecords), ...Object.entries(index1Records), ...Object.entries(index2Records)], 128)) {
         await storage.put(Object.fromEntries(batch));
     }
-    return { inserts, updates, index1Writes, index2Writes };
+    return { inserts, updates, index1Writes, index2Writes, ignored };
 }
 
 type LookupShowMetrics = { messages: string[], storageListCalls: number, indexRecordsScanned: number, feedItemGetCalls: number, feedGetCalls: number, episodeGetCalls: number };
