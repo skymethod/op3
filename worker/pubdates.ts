@@ -13,6 +13,9 @@ export function parsePubdate(pubdate: string): string /*instant*/ {
     // Sun, 30 Sep 2018 00:00,00 +0000
     // Wed, 06 Sep 2023 17:37,53 +0000
     // Fri, 01 Sep 2023 19:15:00, GMT+3
+    // 2024-11-21
+
+    if (/^\d{4}-(0[1-9]|1[012])-\d{2}$/.test(pubdate)) pubdate = `${pubdate}T00:00:00.000Z`;
 
     if (!/[a-z+/:]+/i.test(pubdate)) throw new Error(`Unsupported pubdate: ${pubdate}`);
 
