@@ -39,6 +39,7 @@ Deno.test({
             'Wed, 20 May 2020 04:33:00 +0000': '2020-05-20T04:33:00.000Z',
             '2024-11-21': '2024-11-21T00:00:00.000Z',
             '2020-01-01': '2020-01-01T00:00:00.000Z',
+            '2020-10-9': '2020-10-09T00:00:00.000Z',
         };
         for (const [ input, expected ] of Object.entries(good)) {
             assertEquals(parsePubdate(input), expected);
