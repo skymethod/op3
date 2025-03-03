@@ -63,10 +63,10 @@ const strings = {
                 <div id="seven-day-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:charlimit=10:'as of'} <span id="seven-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:download_sparkline_info:days=7:'Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=7:'Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value.'}<br><br>${s:download_definition_info:'In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:download_sparkline_info:days=7:''}. ${s:download_definition_info:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=7:''}<br><br>${s:download_definition_info:'In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.'}</div>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -76,10 +76,10 @@ const strings = {
                 <div class="text-sm">${s:downloads_in_last_n_days:days=30:'downloads in last %d days'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:''} <span id="thirty-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:download_sparkline_info:days=30:''}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
                         <div class="text-xs" slot="content">${s:download_sparkline_info:days=30:''}<br><br>${s:download_definition_info:''}</div>
-                        <sl-icon name="info-circle" label="Info;${s:download_sparkline_info:days=30:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -90,10 +90,10 @@ const strings = {
                 <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
                 <div id="downloads-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:monthly_downloads_info:'Downloads for this podcast in a given month.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:monthly_downloads_info:'Downloads for this podcast in a given month.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:monthly_downloads_info:''" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:monthly_downloads_info:''}</div>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -104,10 +104,10 @@ const strings = {
                 <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
                 <div id="audience-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:audience_info:'Unique listeners (IP hash) for this podcast in a given month.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:audience_info:'Unique listeners (IP hash) for this podcast in a given month.'}<br><br>${s:audience_definition_info:'OP3 rotates listener IP hashes every month for privacy reasons.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:audience_info:''}. ${s:audience_definition_info:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:audience_info:''}<br><br>${s:audience_definition_info:'OP3 rotates listener IP hashes every month for privacy reasons.'}</div>
+                        <sl-icon name="info-circle"  class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
