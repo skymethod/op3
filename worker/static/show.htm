@@ -63,10 +63,10 @@ const strings = {
                 <div id="seven-day-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:charlimit=10:'as of'} <span id="seven-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="seven-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:download_sparkline_info:days=7:'Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=7:'Total number of downloads for this podcast in the last %d days, and a graph showing the recent history of this value.'}<br><br>${s:download_definition_info:'In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:download_sparkline_info:days=7:''}. ${s:download_definition_info:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:download_sparkline_info:days=7:''}<br><br>${s:download_definition_info:'In OP3, a download is defined as a unique GET request per IP hash within a 24-hr period (UTC day) from a non-bot user agent.'}</div>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -76,10 +76,10 @@ const strings = {
                 <div class="text-sm">${s:downloads_in_last_n_days:days=30:'downloads in last %d days'}</div>
                 <div class="text-sm opacity-50 mt-[.1rem]">${s:as_of:''} <span id="thirty-day-downloads-asof">xxx</span></div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="thirty-day-downloads-sparkline" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:download_sparkline_info:days=30:''}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
                         <div class="text-xs" slot="content">${s:download_sparkline_info:days=30:''}<br><br>${s:download_definition_info:''}</div>
-                        <sl-icon name="info-circle" label="Info;${s:download_sparkline_info:days=30:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -90,10 +90,10 @@ const strings = {
                 <div class="text-sm opacity-50 mt-[.1rem]" id="downloads-period">in the last month</div>
                 <div id="downloads-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="downloads-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:monthly_downloads_info:'Downloads for this podcast in a given month.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:monthly_downloads_info:'Downloads for this podcast in a given month.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:monthly_downloads_info:''" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:monthly_downloads_info:''}</div>
+                        <sl-icon name="info-circle" class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -104,10 +104,10 @@ const strings = {
                 <div class="text-sm opacity-50 mt-[.1rem]" id="audience-period">in the last month</div>
                 <div id="audience-spacer-line" class="hidden text-sm">&nbsp;</div>
                 <div class="flex items-end mt-4 justify-between">
-                    <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow"></canvas>
+                    <canvas id="audience-minigraph" class="max-h-[1.5rem] max-w-[11rem] opacity-75 cursor-pointer grow" role="img" aria-label="${s:audience_info:'Unique listeners (IP hash) for this podcast in a given month.'}"></canvas>
                     <sl-tooltip style="--sl-tooltip-arrow-size: 0;">
-                        <div class="text-xs" slot="content">${s:audience_info:'Unique listeners (IP hash) for this podcast in a given month.'}<br><br>${s:audience_definition_info:'OP3 rotates listener IP hashes every month for privacy reasons.'}</div>
-                        <sl-icon name="info-circle" label="Info;${s:audience_info:''}. ${s:audience_definition_info:''}" class="cursor-pointer opacity-50"></sl-icon>
+                        <div class="text-xs" slot="content">${s:audience_info:''}<br><br>${s:audience_definition_info:'OP3 rotates listener IP hashes every month for privacy reasons.'}</div>
+                        <sl-icon name="info-circle"  class="cursor-pointer opacity-50"></sl-icon>
                     </sl-tooltip>
                 </div>
             </sl-card>
@@ -178,10 +178,10 @@ const strings = {
             <dl id="episode-pacing-legend" class="grid grid-cols-[3rem_1fr_0_0_0_auto] md:grid-cols-[3rem_1fr_auto_auto_auto_auto] gap-x-2 cursor-pointer text-xs md:text-sm">
                 <dt></dt>
                 <dd></dd>
-                <div id="epl-3-day" class="text-right text-xs opacity-50 mr-2 mb-1 invisible md:visible">${s:3_day:'3-day'}</div>
-                <div id="epl-7-day" class="text-right text-xs opacity-50 mr-2 invisible md:visible">${s:7_day:'7-day'}</div>
-                <div id="epl-30-day" class="text-right text-xs opacity-50 mr-2 invisible md:visible">${s:30_day:'30-day'}</div>
-                <div id="epl-all-time" class="text-right text-xs opacity-50 mr-2">${s:all_time:'all-time'}</div>
+                <div id="epl-3-day" class="text-right text-xs opacity-50 mr-2 mb-1 invisible md:visible" aria-hidden="true">${s:3_day:'3-day'}</div>
+                <div id="epl-7-day" class="text-right text-xs opacity-50 mr-2 invisible md:visible" aria-hidden="true">${s:7_day:'7-day'}</div>
+                <div id="epl-30-day" class="text-right text-xs opacity-50 mr-2 invisible md:visible" aria-hidden="true">${s:30_day:'30-day'}</div>
+                <div id="epl-all-time" class="text-right text-xs opacity-50 mr-2" aria-hidden="true">${s:all_time:'all-time'}</div>
 
                 <div id="episode-pacing-nav" class="flex items-center justify-center gap-2 mt-4 mb-8 col-span-6">
                     <sl-icon-button class="invisible" name="download"></sl-icon-button>
@@ -190,7 +190,7 @@ const strings = {
                     <span id="episode-pacing-nav-caption">Page 1 of n</span>
                     <sl-icon-button name="caret-right-fill" label="${s:older_episodes:'Older episodes'}" title="${s:older_episodes:''}" id="episode-pacing-next"></sl-icon-button>
                     <div class="grow"></div>
-                    <sl-icon-button id="episode-pacing-export" name="download" label="${s:export:'Export'}" title="${s:export:''}" class="invisible"></sl-icon-button>
+                    <sl-icon-button id="episode-pacing-export" name="download" label="${s:export:'Export'} ${s:episode_downloads:''}" title="${s:export:''}" class="invisible"></sl-icon-button>
                 </div>
             </dl>
             <template id="episode-pacing-legend-item">
@@ -210,7 +210,7 @@ const strings = {
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_countries:'Top countries'}</h3>
-                    <sl-icon-button id="top-countries-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-countries-export" name="download" label="${s:export:''} ${s:top_countries:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -231,7 +231,7 @@ const strings = {
             <sl-card id="top-metros-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_us_metros:'Top U.S. metros'}</h3>
-                    <sl-icon-button id="top-metros-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-metros-export" name="download" label="${s:export:''} ${s:top_us_metros:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -252,7 +252,7 @@ const strings = {
             <sl-card id="top-ca-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_canadian_regions:'Top Canadian regions'}</h3>
-                    <sl-icon-button id="top-ca-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-ca-regions-export" name="download" label="${s:export:''} ${s:top_canadian_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -273,7 +273,7 @@ const strings = {
             <sl-card id="top-latam-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_latin_american_regions:'Top Latin American regions'}</h3>
-                    <sl-icon-button id="top-latam-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-latam-regions-export" name="download" label="${s:export:''} ${s:top_latin_american_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -294,7 +294,7 @@ const strings = {
             <sl-card id="top-eu-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_eu_regions:'Top E.U. regions'}</h3>
-                    <sl-icon-button id="top-eu-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-eu-regions-export" name="download" label="${s:export:''} ${s:top_eu_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -315,7 +315,7 @@ const strings = {
             <sl-card id="top-af-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_african_regions:'Top African regions'}</h3>
-                    <sl-icon-button id="top-af-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-af-regions-export" name="download" label="${s:export:''} ${s:top_african_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -336,7 +336,7 @@ const strings = {
             <sl-card id="top-as-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_asian_regions:'Top Asian regions'}</h3>
-                    <sl-icon-button id="top-as-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-as-regions-export" name="download" label="${s:export:''} ${s:top_asian_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -357,7 +357,7 @@ const strings = {
             <sl-card id="top-au-regions-card" class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="globe-americas" class="mr-2"></sl-icon>${s:top_australasian_regions:'Top Australasian regions'}</h3>
-                    <sl-icon-button id="top-au-regions-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-au-regions-export" name="download" label="${s:export:''} ${s:top_australasian_regions:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -378,7 +378,7 @@ const strings = {
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between truncate w-72">
                     <div class="flex items-center"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_apps:'Top apps'}</div>
-                    <sl-icon-button id="top-apps-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-apps-export" name="download" label="${s:export:''} ${s:top_apps:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -399,7 +399,7 @@ const strings = {
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_devices:'Top devices'}</h3>
-                    <sl-icon-button id="top-devices-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-devices-export" name="download" label="${s:export:''} ${s:top_devices:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -420,7 +420,7 @@ const strings = {
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_device_types:'Top device types'}</h3>
-                    <sl-icon-button id="top-device-types-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-device-types-export" name="download" label="${s:export:''} ${s:top_device_types:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
@@ -441,7 +441,7 @@ const strings = {
             <sl-card class="card-basic flex justify-center">
                 <div slot="header" class="flex items-center justify-between w-72">
                     <h3 class="flex items-center truncate"><sl-icon name="music-player" class="mr-2"></sl-icon>${s:top_browsers_and_referrers:'Top browsers & referrers'}</h3>
-                    <sl-icon-button id="top-browser-downloads-export" name="download" label="${s:export:''}" title="${s:export:''}"></sl-icon-button>
+                    <sl-icon-button id="top-browser-downloads-export" name="download" label="${s:export:''} ${s:top_browsers_and_referrers:''}" title="${s:export:''}"></sl-icon-button>
                 </div>
             
                 <div class="flex items-center mb-4 justify-center">
