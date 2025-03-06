@@ -150,6 +150,20 @@ const botIps = new Set([
     '828e9645e4c49afea1c4a2a7e275c25f605d9d11', // 2024-12-05 for 2024-12-04
     '03c97f1f3af500762e85c4e0f9bffb11761f92bc', // 2025-02-10 for 2025-02-09
     '3fdb18a6d0fcc76289fe583b5ed7e0ce08c0f29a', // 2025-02-18 for 2025-02-17
+    '7a161434362a72de547e647e2fa18e8b20215bf2',
+    '1068c6c67d930e32b1cc7b1fbe003b042e157c97',
+    'f3ecf1a0c1eb5c5dec292496b7a92dc23c42e653',
+    '168bbd7dcea6742ab2c4daf7962a2b3b64bb4f18',
+    'ae2121fda7ca5aee0949243fc5440c3dc0496f2f',
+    '5e2a10c2cebe01d1d86a47bbf2dd719f6bf60c17',
+    '0e55b387431541ce4c3404ad30aaedb1490937c6',
+    '168e43b87c94fe15dc5da293ab8f4a838ed2c8de',
+    'a1e7b9efe2bc09c0db4598ce579eb96bd30c9d99',
+    'bc1400d11e1258fdcdfb53119c77a24151ca5735',
+    '32f5ccf16fc6fd88dc790e3c59c202edf45129bc',
+    '5a8ce5c15b702fb94c8684d273ffb51d3c0383c4',
+    '44a1ffa89090b97a0078e017abc5b8d6a32fa745',
+    '98af81e2e365569258f917870de7441a3c77c16d', // 2025-03-06 for 2025-02-20+
 ]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
