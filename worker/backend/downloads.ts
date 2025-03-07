@@ -164,6 +164,7 @@ const botIps = new Set([
     '5a8ce5c15b702fb94c8684d273ffb51d3c0383c4',
     '44a1ffa89090b97a0078e017abc5b8d6a32fa745',
     '98af81e2e365569258f917870de7441a3c77c16d', // 2025-03-06 for 2025-02-20+
+    'b50557114b28ff0a5305e9c9964d1bba7f4bfaf7', // 2025-03-07 for 2025-03-06
 ]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
