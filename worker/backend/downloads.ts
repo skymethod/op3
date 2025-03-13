@@ -168,6 +168,12 @@ const botIps = new Set([
     '3cbce14d54b3eadad8b7ac748a0b66d04fb3d11c', // 2025-03-08 for 2025-03-07
     'ccbc06f31bfbb2de31fc13af2cca028ef76d3c4c', // 2025-03-09 for 2025-03-08
     '71f934c1654432344b1258ba7736edf87926cebb', // 2025-03-10 for 2025-03-09
+    '6e14e49bfe04ce3552c480edfc94b3c4c37d082e', // 2025-03-13 for 2025-03-10
+    '7d87debb8d1d457e91072434663cdfe12e8b76ca', // 2025-03-13 for 2025-03-10
+    '6e14e49bfe04ce3552c480edfc94b3c4c37d082e', // 2025-03-13 for 2025-03-11
+    'c55b7a990c6d86845c8401eee4fd25ec2136349b', // 2025-03-13 for 2025-03-11
+    'c55b7a990c6d86845c8401eee4fd25ec2136349b', // 2025-03-13 for 2025-03-12
+    'f3664a0dd9517dff6fbc1f7bf4b63318e2d6cac6', // 2025-03-13 for 2025-03-12
 ]);
 
 // phase 2: process a day's worth of hourly download blobs, compute final downloads and assign to zero or one shows, save as 24 associated column blobs (partitioned)
