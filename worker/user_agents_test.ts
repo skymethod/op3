@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@b6e6cef4149dba396fe3d13118f25264976c9bad (2025-02-14T22:44:16Z)
+// from user-agents-v2@f6583e42d6d4452397aba7910d12d5c5d16e762c (2025-03-17T12:35:50Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -67,10 +67,12 @@ const botTests = {
     'Blubrry Podcasting/1.0': { type: 'bot', name: `Blubrry Crawler` },
     'Blubrry PowerPress/11.9.19': { type: 'bot', name: `Blubrry Crawler` },
     'Mozilla/5.0 (compatible; bne.es_bot; https://www.bne.es/es/colecciones/archivo-web-espanola/aviso-webmasters) Firefox/129.0.1': { type: 'bot', name: `BNE Crawler` },
+    'Buck/2.4.2; (+https://app.hypefactors.com/media-monitoring/about.html)': { type: 'bot', name: `Buck Media Monitoring` },
     'BullhornCrawler/unknown-version(+http://bullhorn.fm/)': { type: 'bot', name: `Bullhorn Crawler` },
     'Buzzsprout Importer': { type: 'bot', name: `Buzzsprout Importer` },
     'Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)': { type: 'bot', name: `Bytespider.*bytedance` },
     'CaptivateBot/PodcastImporter 1.0': { type: 'bot', name: `Captivate bot` },
+    'Cartesia.ai': { type: 'bot', name: `Cartesia.ai bot` },
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
@@ -126,6 +128,7 @@ const botTests = {
     'IPFS Podcasting Node/0.6n (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
     'IPFS Podcasting Node/0.7p,u,s (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
     'Jaunt/1.5': { type: 'bot', name: `Jaunt` },
+    'Jamit/1.0': { type: 'bot', name: `Jamit bot` },
     'Mozilla/5.0 (compatible; LAC_IAHarvester/3.3.0; +https://library-archives.canada.ca/eng/services/government-canada/web-social-media-preservation-program/Pages/web-archive.aspx)': { type: 'bot', name: `Library and Archives Canada` },
     'Libsyn4-Download': { type: 'bot', name: `Libsyn` },
     'LWP::Simple/6.34 libwww-perl/6.34': { type: 'bot', name: `libwww-perl` },
@@ -215,6 +218,8 @@ const botTests = {
     'Snap URL Preview Service; bot; snapchat; https://developers.snap.com/robots': { type: 'bot', name: `Snapchat Bot` },
     'SoundMadeSeen/1.0 +https://soundmadeseen.com': { type: 'bot', name: `SoundMadeSeen` },
     'Speechmatics-API/2.0': { type: 'bot', name: `Speechmatics ASR` },
+    'To be transcribed with Speech is Cheap (https://speechischeap.com)': { type: 'bot', name: `Speech is Cheap` },
+    'speechischeap.com': { type: 'bot', name: `Speech is Cheap` },
     'Spotify/1.0': { type: 'bot', name: `Spotify cache service` },
     'SubstackContentFetch/1.0 (https://substack.com/)': { type: 'bot', name: `Substack Content Fetcher` },
     'SupportingCast/1.0': { type: 'bot', name: `SupportingCast` },
@@ -771,6 +776,7 @@ const appTests = {
     'Meadowbrook Church/4.10.2 CFNetwork/978.0.7 Darwin/18.6.0': { type: 'app', name: `Meadowbrook Church` },
     'Mediatap/342 CFNetwork/672.1.13 Darwin/14.0.0': { type: 'app', name: `Mediatap` },
     'Megaphone.fm': { type: 'app', name: `Megaphone` },
+    'MegaSeg/6.3.2b11': { type: 'app', name: `MegaSeg` },
     'Menucast/1.4 CFNetwork/720.1.1 Darwin/14.0.0 (x86_64)': { type: 'app', name: `Menucast` },
     'Message+/2.4.7 CFNetwork/811.5.4 Darwin/16.7.0 (x86_64)': { type: 'app', name: `Message+` },
     'Messenger/168725151 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Messenger` },
@@ -842,6 +848,7 @@ const appTests = {
     'Overcast/792 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Overcast` },
     'Overcast Player 66271': { type: 'app', name: `Overcast` },
     'Podcast Overhaul/4.1.1 iOS/16.1.1 +https://www.podcastoverhaul.com/': { type: 'app', name: `Overhaul` },
+    'Overhaul FM/2.0 SM-P615/13 +https://overhaul.fm': { type: 'app', name: `Overhaul` },
     'Palco MP3/3.13.18 (Linux;Android 11) ExoPlayerLib/2.11.0': { type: 'app', name: `Palco MP3` },
     'Pandora/2009.2 Android/7.1.1 gteslteatt (ExoPlayerLib1.5.14.1)': { type: 'app', name: `Pandora` },
     'Pandora/2179 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `Pandora` },
@@ -962,6 +969,8 @@ const appTests = {
     'SachNoi.app/1 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `SachNoi` },
     'SachNoiApp/2 CFNetwork/1128.0.1 Darwin/19.6.0': { type: 'app', name: `SachNoi` },
     'sp-agent': { type: 'app', name: `Samsung Podcasts` },
+    'Seekr/1.6.0.748-debug Dalvik/2.1.0 (Linux; U; Android 14; SM-S928W Build/UP1A.231005.007)': { type: 'app', name: `Seekr` },
+    'Seekr/1077 CFNetwork/3826.400.120 Darwin/24.3.0': { type: 'app', name: `Seekr` },
     'ServeStream Dynamo/1.0': { type: 'app', name: `ServeStream` },
     'ServeStream': { type: 'app', name: `ServeStream` },
     'SiriusXM/1608138304 CFNetwork/1206 Darwin/20.1.0': { type: 'app', name: `SiriusXM` },
@@ -1014,6 +1023,7 @@ const appTests = {
     'Sybel': { type: 'app', name: `Sybel` },
     'SYOK/965 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `SYOK` },
     'my.com.astro.player': { type: 'app', name: `SYOK` },
+    'Tatori/96 CFNetwork/3826.400.120 Darwin/24.3.0': { type: 'app', name: `Tatori` },
     'TED POD-2.0.2': { type: 'app', name: `TED` },
     'TED/2941 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `TED` },
     'TED Android; Version 3.3.3; OPPO R15 9': { type: 'app', name: `TED` },
@@ -1054,6 +1064,7 @@ const appTests = {
     'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Twitter for iPhone/7.50': { type: 'app', name: `Twitter` },
     'Tweetbot/53300 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Tweetbot` },
     'Ubook Player': { type: 'app', name: `Ubook Player` },
+    'Upcast/1.0 (+https://getupcast.app/; iOS podcast app)': { type: 'app', name: `Upcast` },
     'BTWebClient/1870(43938)': { type: 'app', name: `uTorrent` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Vestnytt Hermes/90.0.0 _app_': { type: 'app', name: `Vestnytt iOS app` },
     'Android VG Hermes/1000094692 app vg_app_ VG/Snarvei/1000094692 VG-App': { type: 'app', name: `VG Android app` },
