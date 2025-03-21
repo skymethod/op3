@@ -25,7 +25,7 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
         const { colo, error, country, uuids } = event;
         return { blobs: [ kind, colo, trim(error), country, trim(uuids.join(',')) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'valid-redirect' || kind === 'invalid-redirect' || kind === 'banned-redirect') {
-        const { colo, country, hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion, errors, asn = 0, apVersion = 0, cfVersion = 0, dwVersion = 0, timeUuid = null, botType = null, hashedIpAddress = null, hashedIpAddressForDownload = null, 
+        const { colo, country, hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion, ipAddressKnown, errors, asn = 0, apVersion = 0, cfVersion = 0, dwVersion = 0, timeUuid = null, botType = null, hashedIpAddress = null, hashedIpAddressForDownload = null, 
             audienceIdDownloadId = null, audienceIdDownloadId2 = null, deviceTypeDeviceName = null, regionCodeRegionName = null, timezone = null, metroCode = null } = event;
         let { url, destinationHostname, userAgent, referer, agentTypeAgentName = null, referrerTypeReferrerName = null } = event;
         if (typeof referer === 'string' && typeof referrerTypeReferrerName === 'string' && referrerTypeReferrerName.length > (6 + 1 + 1024)) {
@@ -41,6 +41,7 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
         destinationHostname = trim(destinationHostname);
         userAgent = trim(userAgent);
         referer = trim(referer);
+        const ipAddressKnownCode = ipAddressKnown === 'crosszone' ? 1 : 0;
         // if (kind !== undefined) return { blobs: [ kind, colo, trim(url), country, trim(destinationHostname), trim(userAgent), trim(referer), trim(ipAddressShape) ], doubles: [ 1, bits, ipAddressVersion ], indexes: [ kind ] }; // version 1
         const makeEvent = (): AnalyticsEngineEvent => ({ blobs: [ 
             kind, colo, url, country, destinationHostname,
@@ -49,7 +50,7 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
             deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode,
         ], doubles: [
             2, bits, ipAddressVersion, errorCount, asn,
-            apVersion, cfVersion, dwVersion,
+            apVersion, cfVersion, dwVersion, ipAddressKnownCode,
         ], indexes: [ kind ] }); // version 2
         const rt = makeEvent();
         const size = computeBlobsSize(rt.blobs);

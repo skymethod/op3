@@ -25,6 +25,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     const hasXForwardedFor = headers.has('x-forwarded-for');
     const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
     const ipAddressVersion = /^n{1,3}\.n{1,3}\.n{1,3}\.n{1,3}$/.test(ipAddressShape) ? 4 : ipAddressShape.includes(':') ? 6 : 0;
+    const ipAddressKnown = rawIpAddress === '2a06:98c0:3600::103' ? 'crosszone' : undefined; // https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip
 
     const errors: string[] = [];
     function trySync<T>(error: string, fn: () => T): T | undefined {
@@ -127,7 +128,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
 
     return {
         kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect',
-        colo, url, country, destinationHostname, userAgent: userAgent ?? '<missing>', referer : referer ?? '<missing>', hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion,
+        colo, url, country, destinationHostname, userAgent: userAgent ?? '<missing>', referer : referer ?? '<missing>', hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion, ipAddressKnown,
         errors, asn, apVersion, cfVersion, dwVersion, timeUuid, botType, hashedIpAddress, hashedIpAddressForDownload, audienceIdDownloadId, audienceIdDownloadId2, agentTypeAgentName,
         deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode,
      };
