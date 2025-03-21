@@ -316,6 +316,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'pfxes', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://pp.example.com/protect/example/a.com/path/to/episode.mp3
+    // http supported
+    // no suffix protocol support
+    m = /^https?:\/\/pp\.[a-z0-9.-]+\/protect\/[^/]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'ppprotect', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -361,6 +371,7 @@ export interface ChainItem {
         | 'podscribe'
         | 'podsights'
         | 'podtrac'
+        | 'ppprotect'
         | 'spotify'
         | 'swapfm'
         | 'unitedpodcasters'
