@@ -17,7 +17,7 @@ import { computeReleasesResponse, tryParseReleasesRequest } from './routes/relea
 import { compute404Response } from './routes/404.ts';
 import { newMethodNotAllowedResponse } from './responses.ts';
 import { computeRobotsTxtResponse, computeSitemapXmlResponse } from './routes/robots.ts';
-import { consoleError, consoleWarn, writeTraceEvent } from './tracer.ts';
+import { consoleError, consoleInfo, consoleWarn, writeTraceEvent } from './tracer.ts';
 import { initCloudflareTracer, setWorkerInfo } from './cloudflare_tracer.ts';
 import { computeCostsResponse } from './routes/costs.ts';
 import { computeApiKeysResponse } from './routes/api_keys.ts';
@@ -252,7 +252,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 return { kind: 'error-saving-redirect', colo, error: `${e.stack || e}`, country, uuids: rawRedirects.map(v => v.uuid) };
             });
         } finally {
-            writeTraceEvent(await computeRedirectTraceEvent({ request, redirectRequest, validRawRedirect, rawIpAddress, banned, cache, kvNamespace }));
+            const event = await computeRedirectTraceEvent({ request, redirectRequest, validRawRedirect, rawIpAddress, banned, cache, kvNamespace });
+            writeTraceEvent(event);
+            if (event.ipAddressKnown === 'crosszone') consoleInfo('crosszone', [...request.headers].map(v => v.join(': ')).join(', '));
         }
     })());
     if (banned) {
