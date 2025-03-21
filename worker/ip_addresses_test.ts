@@ -64,5 +64,7 @@ Deno.test({
         assertEquals(computeListenerIpAddress({ rawIpAddress: '1.2.3.4', xForwardedFor: '2.3.4.5', asn: 123, userAgent: 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0' }), { listenerIpAddress: '1.2.3.4', usedXForwardedFor: false });
         assertEquals(computeListenerIpAddress({ rawIpAddress: '1.2.3.4', xForwardedFor: '2.3.4.5', asn: 174, userAgent: 'Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0' }), { listenerIpAddress: '2.3.4.5', usedXForwardedFor: true });
         assertEquals(computeListenerIpAddress({ rawIpAddress: '1.2.3.4', xForwardedFor: '2.3.4.5', asn: 174, userAgent: 'Mozilla/5.0 (Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0' }), { listenerIpAddress: '1.2.3.4', usedXForwardedFor: false });
+        assertEquals(computeListenerIpAddress({ rawIpAddress: '2a06:98c0:3600::103', xForwardedFor: '2.3.4.5', asn: 123, userAgent: 'User Agent/1.0' }), { listenerIpAddress: '2a06:98c0:3600::103', usedXForwardedFor: false });
+        assertEquals(computeListenerIpAddress({ rawIpAddress: '2a06:98c0:3600::103', xForwardedFor: '2.3.4.5', asn: 123, userAgent: 'User Agent/1.0 [client-ip-hash:123123123123]' }), { listenerIpAddress: '2.3.4.5', usedXForwardedFor: true });
     }
 });

@@ -40,9 +40,14 @@ export function computeListenerIpAddress({ rawIpAddress, xForwardedFor, asn, use
         if (/cloud phone;.*podlp/i.test(userAgent) && asn === 174) { // 2024-06-16: Mozilla/5.0 (Cloud Phone; Nokia 110 4G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36 Puffin/12.1.1.46653FP PodLP/1.0
             return { listenerIpAddress: xForwardedFor, usedXForwardedFor: true };
         }
+        if (rawIpAddress === CROSSZONE_IP && userAgent.includes('client-ip-hash:')) { // 2025-03-21: found worker-based proxying redirect, munges user-agent "Foo" -> "Foo [client-ip-hash:=<64-hexchar-hash>]"
+            return { listenerIpAddress: xForwardedFor, usedXForwardedFor: true };
+        }
     }
     return { listenerIpAddress: rawIpAddress, usedXForwardedFor: false };
 }
+
+export const CROSSZONE_IP = '2a06:98c0:3600::103'; // https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip
 
 //
 

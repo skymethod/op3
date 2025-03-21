@@ -8,7 +8,7 @@ import { getCachedString } from './cloudflare_configuration.ts';
 import { computeOther } from './cloudflare_request.ts';
 import { hmac, importHmacKey } from './crypto.ts';
 import { Bytes, CfCache, KVNamespace } from './deps.ts';
-import { computeIpAddressForDownload } from './ip_addresses.ts';
+import { computeIpAddressForDownload, CROSSZONE_IP } from './ip_addresses.ts';
 import { RedirectRequest } from './routes/redirect_episode.ts';
 import { RawRedirect } from './rpc_model.ts';
 import { BannedRedirect, InvalidRedirect, ValidRedirect } from './tracer.ts';
@@ -25,7 +25,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     const hasXForwardedFor = headers.has('x-forwarded-for');
     const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
     const ipAddressVersion = /^n{1,3}\.n{1,3}\.n{1,3}\.n{1,3}$/.test(ipAddressShape) ? 4 : ipAddressShape.includes(':') ? 6 : 0;
-    const ipAddressKnown = rawIpAddress === '2a06:98c0:3600::103' ? 'crosszone' : undefined; // https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip
+    const ipAddressKnown = rawIpAddress === CROSSZONE_IP ? 'crosszone' : undefined; 
 
     const errors: string[] = [];
     function trySync<T>(error: string, fn: () => T): T | undefined {
