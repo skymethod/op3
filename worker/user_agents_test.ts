@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@f6583e42d6d4452397aba7910d12d5c5d16e762c (2025-03-17T12:35:50Z)
+// from user-agents-v2@e78d59f7f30186b81b0a3919d84a0fd6884d6d3a (2025-03-19T16:31:39Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -929,6 +929,10 @@ const appTests = {
     'pypodder': { type: 'app', name: `Pypodder` },
     'Queue/1.9.1 (1) (iOS)': { type: 'app', name: `Queue` },
     'Podcast Provider 0.34-9e9009e7 for Radio Downloader 0.34-9e9009e7': { type: 'app', name: `Radio Downloader` },
+    'AppRF/9.9.1_250221.1453 iPhone13,2 iOS/18.3.1 CFNetwork/9.9.1 Darwin/24.3.0': { type: 'app', name: `Radio France` },
+    'com.radiofrance.radio.radiofrance.android/9.10.0-android(83646)/Android 14/mobile/SM-A156B': { type: 'app', name: `Radio France` },
+    'Radio France/9.10.0 TransistorKit/5.0.1 iOS/18.3.1 iPhone13,1': { type: 'app', name: `Radio France` },
+    'RadioFrance/9.10.0 RFPlayer/1.63.0 AndroidXMedia3/1.5.1 Dalvik/2.1.0 (Linux; U; Android 14; sdk_gphone64_arm64 Build/UE1A.230829.036.A4)': { type: 'app', name: `Radio France` },
     'Radio thmanyah (iOS 17.2.1)': { type: 'app', name: `Radio thmanyah` },
     'Radio thmanyah (Android 12;Pixel 6a)': { type: 'app', name: `Radio thmanyah` },
     'radio.fr 5.6.22 (iPhone; iPhone OS 16.4; fr_FR)': { type: 'app', name: `radio.de` },

@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@f6583e42d6d4452397aba7910d12d5c5d16e762c (2025-03-17T12:35:50Z)
+// from user-agents-v2@e78d59f7f30186b81b0a3919d84a0fd6884d6d3a (2025-03-19T16:31:39Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -635,6 +635,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^pypodder$/.test(userAgent)) return { name: `Pypodder`, type: 'app' };
     if (/^Queue\/\d/.test(userAgent)) return { name: `Queue`, type: 'app' };
     if (/^Podcast Provider.*?Radio Downloader/.test(userAgent)) return { name: `Radio Downloader`, type: 'app' };
+    if (/^AppRF\/\d|^com\.radiofrance\.radio\.radiofrance\.android\/|^RadioFrance\/\d|^Radio France\/\d/.test(userAgent)) return { name: `Radio France`, type: 'app' };
     if (/^Radio thmanyah /.test(userAgent)) return { name: `Radio thmanyah`, type: 'app' };
     if (/^(radio\.[a-z]{2,3}|GetPodcast)[ \/]\d/.test(userAgent)) return { name: `radio.de`, type: 'app' };
     if (/^Radioline%202\/|^Radioline$/.test(userAgent)) return { name: `Radioline`, type: 'app' };
