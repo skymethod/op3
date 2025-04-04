@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@e78d59f7f30186b81b0a3919d84a0fd6884d6d3a (2025-03-19T16:31:39Z)
+// from user-agents-v2@dd7e497524306eae8f2f58e732a18e8b1df44d44 (2025-04-04T21:22:16Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -204,6 +204,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^UCast\//.test(userAgent)) return { name: `UCast`, type: 'bot' };
     if (/UptimeRobot\/\d/.test(userAgent)) return { name: `UptimeRobot`, type: 'bot' };
     if (/^TelegramBot /.test(userAgent)) return { name: `TelegramBot`, type: 'bot' };
+    if (/^Transmission\/\d/.test(userAgent)) return { name: `Transmission`, type: 'bot' };
     if (/TTD-Content/.test(userAgent)) return { name: `theTradeDesk Content Web Scraper`, type: 'bot' };
     if (/^veritone\/engine-toolkit/.test(userAgent)) return { name: `Veritone Engine Toolkit`, type: 'bot' };
     if (/VurblBot/.test(userAgent)) return { name: `Vurbl`, type: 'bot' };

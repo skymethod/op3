@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@e78d59f7f30186b81b0a3919d84a0fd6884d6d3a (2025-03-19T16:31:39Z)
+// from user-agents-v2@dd7e497524306eae8f2f58e732a18e8b1df44d44 (2025-04-04T21:22:16Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -235,6 +235,7 @@ const botTests = {
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'Mozilla/5.0+(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)': { type: 'bot', name: `UptimeRobot` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },
+    'Transmission/2.77': { type: 'bot', name: `Transmission` },
     'Mozilla/5.0 (compatible; TTD-Content; +https://www.thetradedesk.com/general/ttd-content)': { type: 'bot', name: `theTradeDesk Content Web Scraper` },
     'veritone/engine-toolkit-3.0': { type: 'bot', name: `Veritone Engine Toolkit` },
     'Mozilla/5.0 https://vurbl.com VurblBot/1.0': { type: 'bot', name: `Vurbl` },
