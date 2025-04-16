@@ -197,7 +197,11 @@ export async function lookupShowUuidForFeedUrl(feedUrl: string, { rpcClient, roR
 
     const { results = [] } = await targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/feeds/${feedUrl}`, parameters: { } }, DoNames.showServer);
     const feed = results.filter(isFeedRecord).at(0);
-    return feed?.showUuid;
+    if (feed?.showUuid) return feed.showUuid;
+
+    if (feed?.piFeed?.podcastGuid) {
+        return await lookupShowUuidForPodcastGuid(feed.piFeed.podcastGuid, { rpcClient, roRpcClient, searchParams });
+    }
 }
 
 export function computeStatsPageUrl({ showUuid, origin }: { showUuid: string, origin: string }): string {
