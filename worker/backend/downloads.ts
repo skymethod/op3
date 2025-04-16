@@ -390,7 +390,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
             parts = res.parts;
             etag = res.etag;
         } catch (e) {
-            throw new Error(`v6, partSize: ${partSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${e.stack || e}`);
+            throw new Error(`v6, partSize: ${partSize}, multiputParts: ${(multiputParts ?? []).join(', ')}, e=${(e as Error).stack || e}`);
         }
     } else {
         const { contentLength, etag: combinedEtag } = await write(chunks, v => statsBlobs.put(computeDailyKey(date, partition), v));

@@ -46,7 +46,7 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
             try {
                 return computeIpAddressForDownload(rawIpAddress);
             } catch (e) {
-                consoleWarn(`${callerTag}-pack-raw-redirect`, `Error in computeIpAddressForDownload: ${e.stack || e}`);
+                consoleWarn(`${callerTag}-pack-raw-redirect`, `Error in computeIpAddressForDownload: ${(e as Error).stack || e}`);
                 return rawIpAddress;
             }
         })(); 

@@ -32,7 +32,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
         try {
             return fn();
         } catch (e) {
-            console.warn(`${e.stack || e}`);
+            console.warn(`${(e as Error).stack || e}`);
             errors.push(error);
         }
     };
@@ -40,7 +40,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
         try {
             return await fn();
         } catch (e) {
-            console.warn(`${e.stack || e}`);
+            console.warn(`${(e as Error).stack || e}`);
             errors.push(error);
         }
     };

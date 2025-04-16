@@ -2536,7 +2536,7 @@ function on(i, t) {
     return e || e === void 0 && t.stack !== void 0;
 }
 function ya(i, t, e) {
-    return `${i.id}.${t.id}.${e.stack || e.type}`;
+    return `${i.id}.${t.id}.${(e as Error).stack || e.type}`;
 }
 function va(i) {
     let { min: t, max: e, minDefined: s, maxDefined: n } = i.getUserBounds();
@@ -8940,7 +8940,7 @@ function tryComputeRegionNameInEnglish(countryCode) {
     try {
         return regionNamesInEnglish.of(countryCode);
     } catch (e) {
-        console.warn(`tryComputeRegionNameInEnglish: ${e.stack || e} for ${countryCode}`);
+        console.warn(`tryComputeRegionNameInEnglish: ${(e as Error).stack || e} for ${countryCode}`);
     }
 }
 function computeCountryName(countryCode) {
@@ -10645,7 +10645,7 @@ const makeFooter = ({ mostRecentDate = new Date().toISOString().substring(0, 10)
             ]
         ]);
     } catch (e) {
-        console.warn(`Error displaying current time zone: ${e.stack || e}`);
+        console.warn(`Error displaying current time zone: ${(e as Error).stack || e}`);
         timezoneDiv.style.visibility = 'hidden';
     }
     function update() {}

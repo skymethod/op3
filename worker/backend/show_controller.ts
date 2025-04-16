@@ -775,7 +775,7 @@ async function lookupPodcastGuid(podcastGuid: string, storage: DurableObjectStor
     try {
         piFeed = await getPodcastIndexFeed('podcastGuid', podcastGuid, client);
     } catch (e) {
-        consoleWarn('sc-lookup-podcast-guid', `Error calling getPodcastByGuid: ${e.stack || e}`);
+        consoleWarn('sc-lookup-podcast-guid', `Error calling getPodcastByGuid: ${(e as Error).stack || e}`);
         await storage.put(computePodcastGuidIndexKey(podcastGuid), { podcastGuid, state: 'error' });
         return;
     }
@@ -811,7 +811,7 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
     try {
         piFeed = await getPodcastIndexFeed('feedUrl', feedUrl, client);
     } catch (e) {
-        consoleWarn('sc-lookup-podcast-feed', `Error calling getPodcastByFeedUrl: ${e.stack || e}`);
+        consoleWarn('sc-lookup-podcast-feed', `Error calling getPodcastByFeedUrl: ${(e as Error).stack || e}`);
         return;
     }
     if (piFeed === undefined) {
@@ -1137,7 +1137,7 @@ async function computeNewMediaUrlIndexRecord(url: string, userAgent: string, ref
         const responseInstant = new Date().toISOString();
         return { url, updateInstant: responseInstant, responseInstant, redirectUrls, responseHeaders, refetch };
     } catch (e) {
-        const error = `${e.stack || e}`;
+        const error = `${(e as Error).stack || e}`;
         return { url, updateInstant: new Date().toISOString(), error, refetch };
     }
 }

@@ -136,7 +136,7 @@ export class HitsController {
                 }
             } catch (e) {
                 // no big deal, we'll see them again
-                consoleWarn('hits-notifier', `HitsController: Failed to send notification: ${e.stack || e}`);
+                consoleWarn('hits-notifier', `HitsController: Failed to send notification: ${(e as Error).stack || e}`);
             }
         }
 
@@ -343,7 +343,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        consoleError('hits-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        consoleError('hits-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${(e as Error).stack || e}`);
     }
     return new AttNums();
 }
@@ -356,7 +356,7 @@ async function loadState(storage: DurableObjectStorage): Promise<State> {
             if (isValidState(record)) return record;
             throw new Error('Invalid');
         } catch (e) {
-            consoleError('hits-loading-state', `Error loading State from record ${JSON.stringify(record)}: ${e.stack || e}`);
+            consoleError('hits-loading-state', `Error loading State from record ${JSON.stringify(record)}: ${(e as Error).stack || e}`);
         }
     }
     return { maxMinuteFiles: defaultMaxMinuteFiles };

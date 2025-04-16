@@ -19,7 +19,7 @@ export class CodedError extends Error implements ErrorInterface {
         this.code = code;
     }
 
-    get cause(): ErrorInterface | undefined {
+    override get cause(): ErrorInterface | undefined {
         return isErrorInterface(super.cause) ? super.cause : undefined;
     }
 }

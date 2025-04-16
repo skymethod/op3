@@ -283,14 +283,14 @@ export class BackendDO {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }
                 } catch (e) {
-                    const message = `${e.stack || e}`;
+                    const message = `${(e as Error).stack || e}`;
                     consoleError('backend-do-rpc', `Unhandled error in rpc call: ${message}`);
                     return newRpcResponse({ kind: 'error', message });
                 }
             }
             return new Response('not found', { status: 404 });
         } catch (e) {
-            const msg = `Unhandled error in BackendDO.fetch: ${e.stack || e}`;
+            const msg = `Unhandled error in BackendDO.fetch: ${(e as Error).stack || e}`;
             consoleError('backend-do-fetch', msg);
             return new Response(msg, { status: 500 });
         }
@@ -323,8 +323,8 @@ export class BackendDO {
         } catch (e) {
             const { debugWebhookUrl, origin, instance } = this.env;
             const durableObjectName = info?.name;
-            if (debugWebhookUrl && origin) await tryPostDebug({ debugWebhookUrl, origin, instance, data: { kind: 'backend-do-alarm-unhandled', durableObjectName, error: `${e.stack || e}`} });
-            consoleError('backend-do-alarm-unhandled', `BackendDO: Unhandled error in alarm: ${e.stack || e}`);
+            if (debugWebhookUrl && origin) await tryPostDebug({ debugWebhookUrl, origin, instance, data: { kind: 'backend-do-alarm-unhandled', durableObjectName, error: `${(e as Error).stack || e}`} });
+            consoleError('backend-do-alarm-unhandled', `BackendDO: Unhandled error in alarm: ${(e as Error).stack || e}`);
             throw e; // trigger a retry
         }
     }
@@ -375,7 +375,7 @@ export class BackendDO {
                 await rpcClient.registerDO({ info }, DoNames.registry);
                 console.log(`ensureInitialized: registered`);
             } catch (e) {
-                consoleWarn('backend-do-register', `Error registering do: ${e.stack || e}`);
+                consoleWarn('backend-do-register', `Error registering do: ${(e as Error).stack || e}`);
                 // not the end of the world, info is saved, we'll try again next time
             }
         })()
@@ -407,7 +407,7 @@ async function loadDOInfo(storage: DurableObjectStorage): Promise<DOInfo | undef
     try {
         if (checkDOInfo(obj)) return obj;
     } catch (e) {
-        consoleError('backend-do-loading-do-info', `Error loading do info: ${e.stack || e}`);
+        consoleError('backend-do-loading-do-info', `Error loading do info: ${(e as Error).stack || e}`);
     }
     return undefined;
 }

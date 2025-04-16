@@ -97,7 +97,7 @@ export class ReadonlyRemoteDataRpcClient extends StubRpcClient {
         return new ReadonlyRemoteDataRpcClient({ origin, token });
     }
 
-    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, _target: string): Promise<AdminDataResponse> {
+    override async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, _target: string): Promise<AdminDataResponse> {
         const { operationKind } = request;
         if (operationKind !== 'select') throw new Error(`ReadonlyRemoteDataRpcClient only permits 'select' operations`);
         const { origin, token } = this;
@@ -111,7 +111,7 @@ export class ReadonlyRemoteDataRpcClient extends StubRpcClient {
         return { kind: 'admin-data', ...rt };
     }
 
-    async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
+    override async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>, target: string): Promise<Response> {
         const { origin, token } = this;
         const url = `${origin}/api/1/admin/rpc`;
         const body = JSON.stringify({ request: { ...request, kind: 'query-hits-index' }, target });
@@ -134,7 +134,7 @@ export class RemoteRpcClient extends StubRpcClient {
         this.token = token;
     }
 
-    async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
+    override async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>, target: string): Promise<PackedRedirectLogsResponse> {
         return await this.executeRpc({ kind: 'query-packed-redirect-logs', ...request }, target);
     }
 

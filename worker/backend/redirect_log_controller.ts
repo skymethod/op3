@@ -212,7 +212,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        consoleError('rlc-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        consoleError('rlc-loading-attnums', `Error loading AttNums from record ${JSON.stringify(record)}: ${(e as Error).stack || e}`);
     }
     return new AttNums();
 }
@@ -230,7 +230,7 @@ async function deleteImportedRecords(latestStartAfterTimestampId: string, limit:
         try {
             await storage.delete(batch);
         } catch (e) {
-            error = `${e.stack || e}`;
+            error = `${(e as Error).stack || e}`;
             break;
         }
         deleted += batch.length;

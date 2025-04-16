@@ -10,13 +10,13 @@ export function writeTraceEvent(event: TraceEvent | (() => TraceEvent)) {
         ev = typeof event === 'function' ? event() : event;
     } catch (e) {
         // tracing should never throw
-        ev = { kind: 'error-computing-trace-event', error: `${e.stack || e}` };
+        ev = { kind: 'error-computing-trace-event', error: `${(e as Error).stack || e}` };
     }
     try {
         _tracer(ev);
     } catch (e) {
         // tracing should never throw
-        console.warn(`writeTraceEvent: Error writing ${ev.kind} event to tracer: ${e.stack || e}`);
+        console.warn(`writeTraceEvent: Error writing ${ev.kind} event to tracer: ${(e as Error).stack || e}`);
     }
 }
 

@@ -1,5 +1,5 @@
 export function isDurableObjectFetchErrorRetryable(e: Error): boolean {
-    const error = `${e.stack || e}`;
+    const error = `${(e as Error).stack || e}`;
     if (error.includes('Network connection lost')) return true; // Error: Network connection lost.
     if (error.includes('The Durable Object\'s code has been updated')) return true; // TypeError: The Durable Object's code has been updated, this version can no longer access storage.
     if (error.includes('Response closed due to connection limit')) return true; // Error: Response closed due to connection limit

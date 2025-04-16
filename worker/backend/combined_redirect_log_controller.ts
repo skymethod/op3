@@ -405,7 +405,7 @@ export class CombinedRedirectLogController {
                 });
             }
         } catch (e) {
-            consoleError('crlc-send-url-not', `CombinedRedirectLogController: Error sending pending url notifications: ${e.stack || e}`);
+            consoleError('crlc-send-url-not', `CombinedRedirectLogController: Error sending pending url notifications: ${(e as Error).stack || e}`);
         }
     }
 }
@@ -440,7 +440,7 @@ async function loadAttNums(storage: DurableObjectStorage): Promise<AttNums> {
     try {
         if (record !== undefined) return AttNums.fromJson(record);
     } catch (e) {
-        consoleError('crlc-loading-attnums', `CombinedRedirectLogController: Error loading AttNums from record ${JSON.stringify(record)}: ${e.stack || e}`);
+        consoleError('crlc-loading-attnums', `CombinedRedirectLogController: Error loading AttNums from record ${JSON.stringify(record)}: ${(e as Error).stack || e}`);
     }
     return new AttNums();
 }
@@ -487,7 +487,7 @@ async function processSource(state: SourceState, rpcClient: RpcClient, attNums: 
         //             continue;
         //         }
         //     } catch (e) {
-        //         const msg = `${e.stack || e}`.substring(0, 1024);
+        //         const msg = `${(e as Error).stack || e}`.substring(0, 1024);
         //         writeTraceEvent({ kind: 'generic', type: 'abusive-ip-ignore-failed', strings: [ uuid, timestamp, msg ] });
         //         continue;
         //     }

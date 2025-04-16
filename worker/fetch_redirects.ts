@@ -9,7 +9,7 @@ export async function hasOp3InRedirectChain(url: string, { userAgent }: { userAg
         const last = records.at(-1);
         return last && hasOp3Reference(new Headers(last.responseHeaders).get('location') ?? '')
     } catch (e) {
-        console.warn(`hasOp3InRedirectChain: Error starting from ${url}: ${e.stack || e}`);
+        console.warn(`hasOp3InRedirectChain: Error starting from ${url}: ${(e as Error).stack || e}`);
     }
 }
 

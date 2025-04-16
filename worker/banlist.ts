@@ -33,7 +33,7 @@ export class Banlist {
             if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace, cache);
             return this.bannedHostnames.has(targetHostname);
         } catch (e) {
-            consoleWarn('banlist', `Unexpected error inside banlist.isBanned(${targetUrl}): ${e.stack || e}`);
+            consoleWarn('banlist', `Unexpected error inside banlist.isBanned(${targetUrl}): ${(e as Error).stack || e}`);
             return false;
         }
     }

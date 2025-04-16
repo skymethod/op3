@@ -42,7 +42,7 @@ export async function getCachedString(key: string, namespace: KVNamespace, cache
 //
 
 function isRetryable(e: Error): boolean {
-    const error = `${e.stack || e}`;
+    const error = `${(e as Error).stack || e}`;
     if (error.includes('500 Internal Server Error')) return true; // Error: KV GET failed: 500 Internal Server Error
     if (error.includes('503 Service Temporarily Unavailable')) return true; // Error: KV GET failed: 503 Service Temporarily Unavailable
     if (error.includes('Network connection lost')) return true; // Error: Network connection lost.

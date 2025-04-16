@@ -65,7 +65,7 @@ export default {
             try {
                 response = await computeResponse(request, colo, env, context);
             } catch (e) {
-                consoleError('worker-compute-response', `Unhandled error computing response: ${e.stack || e}`);
+                consoleError('worker-compute-response', `Unhandled error computing response: ${(e as Error).stack || e}`);
                 response = new Response('failed', { status: 500 });
             }
             
@@ -83,7 +83,7 @@ export default {
 
             return response;
         } catch (e) {
-            consoleError('worker-unhandled', `Unhandled error in worker fetch: ${e.stack || e}`);
+            consoleError('worker-unhandled', `Unhandled error in worker fetch: ${(e as Error).stack || e}`);
             return new Response('failed', { status: 500 });
         }
     },
@@ -168,7 +168,7 @@ export default {
                 });
             }
         } catch (e) {
-            consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${e.stack || e}`);
+            consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${(e as Error).stack || e}`);
             throw e; // Queues will retry for us
         }
     },
@@ -228,14 +228,14 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                             // save to DO for retrying later, try to avoid Queues altogether here in case the entire system is down
                             try {
                                 await rpcClient.logRawRedirects({ rawRedirects, saveForLater: true }, doName);
-                                consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${e.stack || e}`);
+                                consoleWarn('worker-sending-redirects-message', `Saved for later (colo=${colo}) queue2.send error: ${(e as Error).stack || e}`);
                             } catch (e2) {
-                                throw new Error(`Error saving for later (colo=${colo}): ${e2.message} queue2.send error: ${e.stack || e}`);
+                                throw new Error(`Error saving for later (colo=${colo}): ${(e2 as Error).message} queue2.send error: ${(e as Error).stack || e}`);
                             }
                         }
                     }
                 } catch (e) {
-                    consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${e.stack || e}`);
+                    consoleError('worker-sending-redirects-message', `Error sending raw redirects message: ${(e as Error).stack || e}`);
                 }
 
                 // send raw redirects the old way, until the turndown time
@@ -244,12 +244,12 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 }
             }
         } catch (e) {
-            consoleError('worker-sending-redirects', `Error sending raw redirects: ${e.stack || e}`);
+            consoleError('worker-sending-redirects', `Error sending raw redirects: ${(e as Error).stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
             pendingRawRedirects.push(...rawRedirects);
             writeTraceEvent(() => {
                 const { colo = 'XXX', country = 'XX' } = computeOther(request) ?? {};
-                return { kind: 'error-saving-redirect', colo, error: `${e.stack || e}`, country, uuids: rawRedirects.map(v => v.uuid) };
+                return { kind: 'error-saving-redirect', colo, error: `${(e as Error).stack || e}`, country, uuids: rawRedirects.map(v => v.uuid) };
             });
         } finally {
             const event = await computeRedirectTraceEvent({ request, redirectRequest, validRawRedirect, rawIpAddress, banned, cache, kvNamespace });
@@ -311,7 +311,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
             try {
                 await work();
             } catch (e) {
-                consoleError('background', `Error in background: ${e.stack || e}`);
+                consoleError('background', `Error in background: ${(e as Error).stack || e}`);
             }
         })());
     };

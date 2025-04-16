@@ -69,7 +69,7 @@ export async function computeShowResponse(req: ShowRequest, opts: Opts): Promise
         try {
             showUuidFromPodcastGuid = await timed(times, 'lookup-show-uuid', () => lookupShowUuidForPodcastGuid(id, { rpcClient, roRpcClient, searchParams, rawIpAddress }));
         } catch (e) {
-            if (`${e.stack || e}`.includes('blocked'))  return new Response(msg, { status: 429 });
+            if (`${(e as Error).stack || e}`.includes('blocked'))  return new Response(msg, { status: 429 });
         }
         if (!showUuidFromPodcastGuid) return compute404(`Unknown podcastGuid: ${id}`);
     }

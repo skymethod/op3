@@ -134,7 +134,7 @@ class R2Multiput implements Multiput {
             const { etag } = await r2(() => { attempts++; return upload.complete(parts); });
             return { parts: parts.length, etag };
         } catch (e) {
-            throw new Error(`attempts:${attempts}, ${this.debug.join(', ')} e=${e.stack || e}`);
+            throw new Error(`attempts:${attempts}, ${this.debug.join(', ')} e=${(e as Error).stack || e}`);
         }
     }
 
@@ -146,7 +146,7 @@ class R2Multiput implements Multiput {
 }
 
 export function isRetryableErrorFromR2(e: Error): boolean {
-    const error = `${e.stack || e}`;
+    const error = `${(e as Error).stack || e}`;
     if (error.includes('(10001)')) return true; // Error: get: We encountered an internal error. Please try again. (10001)
     if (error.includes('(10048)')) return true; // Error: completeMultipartUpload: There was a problem with the multipart upload. (10048)
     if (error.includes('(10054)')) return true; // Error: get: Client Disconnect (10054)

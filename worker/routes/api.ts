@@ -105,7 +105,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             if (e instanceof StatusError) {
                 return newJsonResponse({ error: e.message }, e.status);
             } else {
-                const error = `${e.stack || e}`;
+                const error = `${(e as Error).stack || e}`;
                 consoleError('api-call', `Error in api call: ${error}`);
                 return newJsonResponse({ error }, 500);
             }
@@ -274,7 +274,7 @@ async function computeAdminDataResponse(method: string, bodyProvider: JsonProvid
             const { results, message } = await routeAdminDataRequest({ operationKind, targetPath, dryRun, parameters }, rpcClient, statsBlobs);
             return newJsonResponse({ results, message });
         } catch (e) {
-            if (parameters?.expectStorageTimeout === 'true' && `${e.stack || e}`.includes('storage operation exceeded timeout')) {
+            if (parameters?.expectStorageTimeout === 'true' && `${(e as Error).stack || e}`.includes('storage operation exceeded timeout')) {
                 return newJsonResponse({ message: 'storage operation exceeded timeout' });
             }
             throw e;
