@@ -130,7 +130,7 @@ export class Backups {
                     }
                     const partBytes = concat(chunks);
                     if (partBytes.length !== partSize) throw new Error(`Unexpected partBytes: ${partBytes.length}, expected ${partSize}`);
-                    const { etag } = await multiput.putPart(partBytes);
+                    const { etag } = await multiput.putPart(partBytes.buffer as ArrayBuffer);
                     backup.bytes += partBytes.length;
                     backup.remainder = remainder;
                     backup.partEtags.push(etag);

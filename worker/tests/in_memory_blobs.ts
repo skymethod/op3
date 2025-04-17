@@ -130,7 +130,7 @@ class InMemoryMultiput implements Multiput {
 async function toByteArray(body: string | ArrayBuffer | ReadableStream<Uint8Array>): Promise<Uint8Array> {
     return typeof body === 'string' ? new TextEncoder().encode(body)
         : body instanceof ArrayBuffer ? new Uint8Array(body)
-        : new Uint8Array(await new Response(body).arrayBuffer())
+        : new Uint8Array(await new Response(body).arrayBuffer());
 }
 
 async function computeEtag(arr: Uint8Array): Promise<string> {

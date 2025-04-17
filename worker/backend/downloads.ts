@@ -291,7 +291,7 @@ export async function computeDailyDownloads({ date, mode, showUuids, multipartMo
     const multiputCurrentChunks = async () => {
         if (multipartMode === 'bytes') {
             const payload = concatByteArrays(...chunks);
-            await multiput!.putPart(payload);
+            await multiput!.putPart(payload.buffer as ArrayBuffer);
         } else if (multipartMode === 'stream') {
             await write(chunks, v => multiput!.putPart(v));
         } else {
