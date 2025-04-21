@@ -111,7 +111,7 @@ const app = (() => {
     const [ showPagePreviewAlert, showPageLink, feedPanel, fpImg, fpImgPlaceholder, fpTitleDiv, fpAuthorDiv, fpFeedAnchor, fpFeedHostSpan, fpSummaryDiv, fpFoundNoneDiv, fpFoundAllDiv, fpFoundSomeDiv, fpFoundEpisodesSpan, fpSuggestionsList, fpPodcastGuidSpan ] = 
         [ 'show-page-preview', 'show-page-link', 'feed-panel', 'fp-img', 'fp-img-placeholder', 'fp-title-div', 'fp-author-div', 'fp-feed-anchor', 'fp-feed-host-span', 'fp-summary-div', 'fp-found-none-div', 'fp-found-all-div', 'fp-found-some-div', 'fp-found-episodes-span', 'fp-suggestions-list', 'fp-podcast-guid' ].map(v => document.getElementById(v));
 
-    const langParam = new URL(document.location.href).searchParams.get('lang') ?? undefined;
+    const { lang: langParam, ro: roParam } = Object.fromEntries(new URL(document.location.href).searchParams);
 
     const reset = () => {
         searchResults = [];
@@ -164,7 +164,7 @@ const app = (() => {
     async function analyzeFeed() {
         await makeApiCall({ 
             beforeMessage: strings.analyze_started_message,
-            pathname: '/api/1/feeds/analyze',
+            pathname: `/api/1/feeds/analyze${roParam === 'true' ? '?ro=true' : ''}`,
             body: { feed: feed.url, id: feed.id, sessionToken },
             callback: obj => {
                 console.log(obj);
