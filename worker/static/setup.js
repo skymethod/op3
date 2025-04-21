@@ -268,7 +268,7 @@ const app = (() => {
             feedPanel.feed = feed;
             feedPanel.feedAnalysis = feedAnalysis;
             feedPanel.feedAnalysisError = feedAnalysisError;
-            const u = new URL(`${document.location.origin}/show/${feedAnalysis && feedAnalysis.guid ? feedAnalysis.guid : ''}`);
+            const u = new URL(`${document.location.origin}/show/${(feedAnalysis && feedAnalysis.showUuid) || (feedAnalysis && feedAnalysis.guid) || ''}`);
             if (langParam) u.searchParams.set('lang', langParam);
             showPageLink.href = u.toString();
         }

@@ -17,7 +17,7 @@ import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesFo
 import { Blobs } from '../backend/blobs.ts';
 import { computeApiQueryDownloadsResponse } from './api_query_downloads.ts';
 import { tryParseComputeShowDailyDownloadsRequest, computeShowDailyDownloads } from '../backend/downloads.ts';
-import { computeShowsResponse, computeShowStatsResponse, computeShowSummaryStatsResponse } from './api_shows.ts';
+import { computeShowsResponse, computeShowStatsResponse, computeShowSummaryStatsResponse, lookupShowUuidForFeedUrl } from './api_shows.ts';
 import { Configuration } from '../configuration.ts';
 import { computeQueriesResponse } from './api_queries.ts';
 import { computeQueryHitsResponse } from './api_query_hits.ts';
@@ -92,7 +92,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
             if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
             if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
-            if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, background); 
+            if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, roRpcClient, searchParams, background); 
             if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
             { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
             { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
@@ -377,17 +377,23 @@ async function computeFeedsSearchResponse(method: string, origin: string, bodyPr
     return newJsonResponse({ feeds });
 }
 
-async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, background: Background): Promise<Response> {
+async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams, background: Background): Promise<Response> {
     const { obj, client } = await feedsCommon(method, origin, bodyProvider, podcastIndexCredentials);
     const { feed, id } = obj;
     if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
     if (typeof id !== 'number') throw new StatusError(`Bad id: ${JSON.stringify(id)}`);
 
-    const [ getResponseResult, analysisResult ] = await Promise.allSettled([client.getPodcastByFeedId(id), computeFeedAnalysis(feed, { userAgent: computeUserAgent({ origin })})]);
+    const [ getResponseResult, analysisResult, showUuidResult ] = await Promise.allSettled([ 
+        client.getPodcastByFeedId(id),
+        computeFeedAnalysis(feed, { userAgent: computeUserAgent({ origin }) }),
+        lookupShowUuidForFeedUrl(feed, { searchParams, rpcClient, roRpcClient })
+    ]);
     if (getResponseResult.status === 'rejected') throw new StatusError(`Failed to lookup guid for id ${id}: ${getResponseResult.reason}`);
     if (analysisResult.status === 'rejected') throw new StatusError(`Failed to analyze feed: ${analysisResult.reason.message}`);
+    if (showUuidResult.status === 'rejected') throw new StatusError(`Failed to lookup show: ${showUuidResult.reason.message}`);
     const getResponse = getResponseResult.value;
     const analysis = analysisResult.value;
+    const showUuid = showUuidResult.value;
     if (analysis.itemsWithOp3Enclosures > 0) {
         const time = new Date().toISOString();
         const feedInfo = { received: time, feedUrl: feed, feedPodcastId: id, foundTime: time, source: 'fa', sourceReference: time, items: [] };
@@ -395,7 +401,7 @@ async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyP
     }
     const { feed: gotFeed } = getResponse;
     const guid = !Array.isArray(gotFeed) ? gotFeed.podcastGuid : undefined;
-    const rt: Record<string, unknown> = { ...analysis, guid };
+    const rt: Record<string, unknown> = { ...analysis, guid, showUuid };
     return newJsonResponse(rt);
 }
 
