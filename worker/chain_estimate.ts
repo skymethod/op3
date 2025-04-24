@@ -317,9 +317,10 @@ export function computeChainEstimate(url: string): ChainEstimate {
     }
 
     // https://pp.example.com/protect/example/a.com/path/to/episode.mp3
+    // https://pp1.example.com/protect/example/a.com/path/to/episode.mp3
     // http supported
     // no suffix protocol support
-    m = /^https?:\/\/pp\.[a-z0-9.-]+\/protect\/[^/]+\/(.*?)$/.exec(url);
+    m = /^https?:\/\/pp\d*\.[a-z0-9.-]+\/protect\/[^/]+\/(.*?)$/.exec(url);
     if (m) {
         const [ _, suffix ] = m;
         const targetUrl = `https://${suffix}`;

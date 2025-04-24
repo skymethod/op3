@@ -428,6 +428,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'ppprotect', url: 'https://pp.example.com/protect/example/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://pp1.example.com/protect/example/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'ppprotect', url: 'https://pp1.example.com/protect/example/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
