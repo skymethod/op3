@@ -61,8 +61,12 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
     const putAudienceWithRetries = () => executeWithRetries(putAudience, { tag: 'putAudience', maxRetries: 2, isRetryable: isRetryableErrorFromR2 });
 
     const putAudienceSummary = async () => {
-        const audienceSummaryPartKey = computeAudienceSummaryKey(audienceSummary);
-        await statsBlobs.put(audienceSummaryPartKey, JSON.stringify(audienceSummary));
+        try {
+            const audienceSummaryPartKey = computeAudienceSummaryKey(audienceSummary);
+            await statsBlobs.put(audienceSummaryPartKey, JSON.stringify(audienceSummary));
+        } catch (e) {
+            throw new Error(`Error putting ${month} audience summary for ${showUuid}: ${(e as Error).stack || e}`);
+        }
     }
 
     await Promise.all([ putAudienceWithRetries(), putAudienceSummary() ]);
