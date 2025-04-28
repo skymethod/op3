@@ -65,7 +65,7 @@ export async function recomputeAudienceForMonth({ showUuid, month, statsBlobs, p
             const audienceSummaryPartKey = computeAudienceSummaryKey(audienceSummary);
             await statsBlobs.put(audienceSummaryPartKey, JSON.stringify(audienceSummary));
         } catch (e) {
-            throw new Error(`Error putting ${month} audience summary for ${showUuid}: ${(e as Error).stack || e}`);
+            throw new Error(`Error putting ${month} ${part} audience summary for ${showUuid}: ${(e as Error).stack || e}`);
         }
     }
 
