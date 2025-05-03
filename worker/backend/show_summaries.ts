@@ -286,10 +286,9 @@ function computeSortedRecord<T>(record: Record<string, T>): Record<string, T> {
 }
 
 function computeSorted<T>(obj: T): T {
-    return Array.isArray(obj) ? obj.map(v => computeSorted(v))
+    return (Array.isArray(obj) ? obj.map(v => computeSorted(v))
         : isStringRecord(obj) ? computeSortedRecord(obj)
-        // deno-lint-ignore no-explicit-any
-        : obj as any;
+        : obj) as T;
 }
 
 function tryComputeNewOverall({ overall, summary }: { overall?: ShowSummary, summary: ShowSummary }): ShowSummary | undefined {
