@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@dd7e497524306eae8f2f58e732a18e8b1df44d44 (2025-04-04T21:22:16Z)
+// from user-agents-v2@e0453c9a573e45c4c85f9aeb26adcb857a6d16ba (2025-05-20T15:09:35Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -1483,6 +1483,9 @@ const referrerTests = {
     'https://www.podfriend.com/': { type: 'referrer', name: `Podfriend` },
     'https://podgrabber.com/': { type: 'referrer', name: `PodGrabber` },
     'https://pod.link/': { type: 'referrer', name: `PodLink` },
+    'https://www.podmatch.com/': { type: 'referrer', name: `PodMatch` },
+    'https://podmatch.com': { type: 'referrer', name: `PodMatch` },
+    'https://podmatch.com/hostdetail/123456': { type: 'referrer', name: `PodMatch` },
     'https://podmust.com/': { type: 'referrer', name: `Podmust` },
     'https://www.podplay.com/': { type: 'referrer', name: `Podplay` },
     'https://podtail.com/': { type: 'referrer', name: `Podtail` },

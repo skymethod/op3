@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@dd7e497524306eae8f2f58e732a18e8b1df44d44 (2025-04-04T21:22:16Z)
+// from user-agents-v2@e0453c9a573e45c4c85f9aeb26adcb857a6d16ba (2025-05-20T15:09:35Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -887,6 +887,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/:\/\/[^.\/]+\.podfriend\.com\//.test(referer)) return { name: `Podfriend`, type: 'referrer', category: 'app' };
     if (/:\/\/podgrabber\.com\//.test(referer)) return { name: `PodGrabber`, type: 'referrer', category: 'app' };
     if (/\/\/pod\.link\//.test(referer)) return { name: `PodLink`, type: 'referrer', category: 'app' };
+    if (/^https:\/\/(www\.)?podmatch\.com/.test(referer)) return { name: `PodMatch`, type: 'referrer', category: 'app' };
     if (/:\/\/podmust\.com\//.test(referer)) return { name: `Podmust`, type: 'referrer', category: 'app' };
     if (/podplay\.com/.test(referer)) return { name: `Podplay`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podtail\.com\//.test(referer)) return { name: `Podtail`, type: 'referrer', category: 'app' };
