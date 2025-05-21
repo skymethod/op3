@@ -345,7 +345,7 @@
     <div class="max-w-2xl mx-auto mt-8 text-center px-8">
         <a href="/privacy">${s:privacy_policy_link_label:'Privacy Policy'}</a> · <a href="/terms">${s:terms_of_service_link_label:'Terms of Service'}</a> · <a href="/costs">${s:costs_link_label:'Costs'}</a><br><a href="/releases">${s:releases_link_label:'Releases'}</a> · <a href="/status">${s:status_link_label:'Status'}</a> · <a href="mailto:john@op3.dev">${s:email_link_label:'Email'}</a> · <a href="https://github.com/skymethod/op3#sponsors">${s:sponsor_link_label:'Sponsor'}</a>
     </div>
-    <div class="max-w-2xl mx-auto mt-8 text-center text-sm md:text-base md:px-8 text-neutral-600">${s:version:'Version'} <a class="text-neutral-600 hover:text-neutral-600" href="https://github.com/skymethod/op3/blob/${deploySha}/.github/workflows/deploy-on-push.yml">${deploySha}</a><br>${s:deployed:'Deployed'} ${deployTime}</div>
+    <div class="max-w-2xl mx-auto mt-8 text-center text-sm md:text-base md:px-8 text-neutral-600">${s:version:'Version'} <a class="text-neutral-600 hover:text-neutral-600" href="https://github.com/skymethod/op3/commits/${deploySha}">${deploySha}</a><br>${s:deployed:'Deployed'} ${deployTime}</div>
     ${languageSelection}
     ${cfAnalyticsSnippet}
 </body>
