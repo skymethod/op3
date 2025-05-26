@@ -42,6 +42,15 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2025-05-26',
+        description: 'Micro.blog invoice',
+        cost: 5.41,
+        detail: [
+            { description: 'micro.blog 1 month', cost: 5.00 },
+            { description: 'Sales Tax', cost: 0.41 },
+        ]
+    },
+    {
         date: '2025-05-10',
         description: 'Cloudflare invoice',
         cost: 413.53,
