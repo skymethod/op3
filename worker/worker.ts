@@ -274,7 +274,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, colo: string | undefined, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace, baselimeEventsUrl, baselimeApiKey, limiter1 } = env;
+    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace, baselimeEventsUrl, baselimeApiKey, limiter1, xfetcher } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams, protocol } = new URL(request.url);
     const { method, headers } = request;
@@ -329,7 +329,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     const { blobs: hitsBlobs, roBlobs: roHitsBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'hits/' });
     const { blobs: backupBlobs, roBlobs: roBackupBlobs } = initBlobs({ blobsBucket, roBlobsBucket, prefix: 'backup/' });
     const baselime = baselimeEventsUrl && baselimeApiKey ? makeBaselimeFromWorkerContext(context, { baselimeEventsUrl, baselimeApiKey }) : undefined;
-    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo, deploySha, deployTime }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter });
+    const apiRequest = tryParseApiRequest({ instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider: () => request.json(), colo, deploySha, deployTime }); if (apiRequest) return await computeApiResponse(apiRequest, { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter, xfetcher });
 
     // redirect /foo/ to /foo (canonical)
     if (method === 'GET' && pathname.endsWith('/')) return new Response(undefined, { status: 302, headers: { location: pathname.substring(0, pathname.length - 1) } });

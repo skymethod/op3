@@ -43,6 +43,7 @@ jobs:
           KV_NAMESPACE: a5f6ff554a6d4719aba41cbac9c7cfb5 # kv-ci
           QUEUE1_NAME: queue1-ci
           QUEUE2_NAME: queue2-ci
+          XFETCHER: ${{ secrets.XFETCHER }}
   deploy-staging:
     runs-on: ubuntu-22.04
     env:
@@ -69,6 +70,7 @@ jobs:
           KV_NAMESPACE: 50f5df200d254590afb02b9a8166d204 # kv-staging
           QUEUE1_NAME: queue1-staging
           QUEUE2_NAME: queue2-staging
+          XFETCHER: ${{ secrets.XFETCHER }}
   deploy-prod:
     runs-on: ubuntu-22.04
     env:
@@ -95,3 +97,4 @@ jobs:
           KV_NAMESPACE: 39ea09ad9de24e8d9b4d4f88df061408 # kv-prod
           QUEUE1_NAME: queue1-prod
           QUEUE2_NAME: queue2-prod
+          XFETCHER: ${{ secrets.XFETCHER }}

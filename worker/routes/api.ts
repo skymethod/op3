@@ -24,6 +24,7 @@ import { computeQueryHitsResponse } from './api_query_hits.ts';
 import { Baselime } from '../baselime.ts';
 import { generateUuid } from '../uuid.ts';
 import { Limiter } from '../limiter.ts';
+import { tryMakeXfetcher } from '../xfetcher.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined, deploySha: string | undefined, deployTime: string | undefined }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo, deploySha, deployTime } = opts;
@@ -41,10 +42,10 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined };
+type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined, xfetcher: string | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime, userAgent } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter, xfetcher } = opts;
 
     const start = Date.now();
     const namespace = `op3-${instance}-api-${method.toLowerCase()}${computeNamespaceSuffix(path)}`;
@@ -92,7 +93,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }
             if (path === '/notifications') return await computeNotificationsResponse(permissions, method, bodyProvider, rpcClient); 
             if (path === '/feeds/search') return await computeFeedsSearchResponse(method, origin, bodyProvider, podcastIndexCredentials); 
-            if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, roRpcClient, searchParams, background); 
+            if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, roRpcClient, searchParams, background, xfetcher); 
             if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
             { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
             { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
@@ -377,7 +378,7 @@ async function computeFeedsSearchResponse(method: string, origin: string, bodyPr
     return newJsonResponse({ feeds });
 }
 
-async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams, background: Background): Promise<Response> {
+async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyProvider: JsonProvider, podcastIndexCredentials: string | undefined, rpcClient: RpcClient, roRpcClient: RpcClient | undefined, searchParams: URLSearchParams, background: Background, xfetcher: string | undefined): Promise<Response> {
     const { obj, client } = await feedsCommon(method, origin, bodyProvider, podcastIndexCredentials);
     const { feed, id } = obj;
     if (typeof feed !== 'string') throw new StatusError(`Bad feed: ${JSON.stringify(feed)}`);
@@ -385,7 +386,7 @@ async function computeFeedsAnalyzeResponse(method: string, origin: string, bodyP
 
     const [ getResponseResult, analysisResult, showUuidResult ] = await Promise.allSettled([ 
         client.getPodcastByFeedId(id),
-        computeFeedAnalysis(feed, { userAgent: computeUserAgent({ origin }) }),
+        computeFeedAnalysis(feed, { userAgent: computeUserAgent({ origin }), xfetcher: tryMakeXfetcher(xfetcher) }),
         lookupShowUuidForFeedUrl(feed, { searchParams, rpcClient, roRpcClient })
     ]);
     if (getResponseResult.status === 'rejected') throw new StatusError(`Failed to lookup guid for id ${id}: ${getResponseResult.reason}`);

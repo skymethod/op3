@@ -29,4 +29,5 @@ export interface WorkerEnv {
     readonly baselimeEventsUrl?: string;
     readonly baselimeApiKey?: string;
     readonly limiter1?: Ratelimiter;
+    readonly xfetcher?: string;
 }

@@ -1,10 +1,11 @@
 import { XMLParser } from './deps.ts';
 import { hasOp3InRedirectChain, hasOp3Reference, isRedirectFetchingRequired } from './fetch_redirects.ts';
 import { parsePubdate } from './pubdates.ts';
+import { isXfetchCandidate, Xfetcher, XResponse} from './xfetcher.ts';
 
-export async function computeFeedAnalysis(feed: string, opts: { userAgent: string }): Promise<FeedAnalysis> {
-    const { userAgent } = opts;
-    const res = await fetchAndHandleRedirects(feed, { headers: { 'user-agent': userAgent } });
+export async function computeFeedAnalysis(feed: string, opts: { userAgent: string, xfetcher?: Xfetcher }): Promise<FeedAnalysis> {
+    const { userAgent, xfetcher } = opts;
+    const res = await fetchAndHandleRedirects(feed, { headers: { 'user-agent': userAgent }, xfetcher });
     let items = 0;
     let itemsWithEnclosures = 0;
     let itemsWithOp3Enclosures = 0;
@@ -84,15 +85,19 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
 
 //
 
-async function fetchAndHandleRedirects(url: string, { headers }: { headers: Record<string, string> }): Promise<Response> {
-    const rt: Response[] = [];
+async function fetchAndHandleRedirects(url: string, { headers, xfetcher }: { headers: Record<string, string>, xfetcher: Xfetcher | undefined }): Promise<Response | XResponse> {
+    const rt: (Response | XResponse)[] = [];
     const urls = new Set<string>();
-    const resToString = (res: Response) => [ res.url, res.status, [...res.headers].map(v => v.join(': ')).join(',') ].join(', ');
+    const resToString = (res: Response | XResponse) => [ res.url, res.status, [...res.headers].map(v => v.join(': ')).join(',') ].join(', ');
     while (rt.length < 10) {
         if (urls.has(url)) throw new Error(`Circular redirect: ${rt.map(resToString).join(', ')}`);
         urls.add(url);
-        const res = await fetch(url, { headers, redirect: 'manual' });
+        let res: Response | XResponse = await fetch(url, { headers, redirect: 'manual' });
         rt.push(res);
+        if (xfetcher && isXfetchCandidate(res as Response)) {
+            res = await xfetcher(url, { headers: new Headers(headers), redirect: 'manual' });
+            rt.push(res);
+        }
         if ([ 301, 302, 307, 308 ].includes(res.status)) {
             const location = res.headers.get('location');
             if (typeof location === 'string') {
