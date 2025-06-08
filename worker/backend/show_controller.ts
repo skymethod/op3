@@ -11,6 +11,7 @@ import { addHours, computeStartOfYearTimestamp, computeTimestamp, timestampToIns
 import { consoleInfo, consoleWarn, writeTraceEvent } from '../tracer.ts';
 import { cleanUrl, computeMatchUrl, tryCleanUrl, tryComputeIncomingUrl, tryComputeMatchUrl } from '../urls.ts';
 import { generateUuid, isValidUuid } from '../uuid.ts';
+import { tryMakeXfetcher } from '../xfetcher.ts';
 import { Backups } from './backups.ts';
 import { Blobs } from './blobs.ts';
 import { computeDailyDownloads, computeHourlyDownloads, computeHourlyShowColumns, parseComputeShowDailyDownloadsRequest } from './downloads.ts';
@@ -34,8 +35,9 @@ export class ShowController {
     private readonly backups = new Backups();
     private readonly podcastGuidCallState: PodcastGuidCallState = {};
     private readonly allowStorageImport: boolean;
+    private readonly xfetcher?: string;
 
-    constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient, allowStorageImport }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient, allowStorageImport: boolean }) {
+    constructor({ storage, durableObjectName, podcastIndexClient, origin, feedBlobs, statsBlobs, rpcClient, allowStorageImport, xfetcher }: { storage: DurableObjectStorage, durableObjectName: string, podcastIndexClient: PodcastIndexClient, origin: string, feedBlobs: Blobs, statsBlobs: Blobs, rpcClient: RpcClient, allowStorageImport: boolean, xfetcher: string | undefined }) {
         this.storage = storage;
         this.durableObjectName = durableObjectName;
         this.podcastIndexClient = podcastIndexClient;
@@ -44,6 +46,7 @@ export class ShowController {
         this.statsBlobs = statsBlobs;
         this.rpcClient = rpcClient;
         this.allowStorageImport = allowStorageImport;
+        this.xfetcher = xfetcher;
         this.notifications = new ShowControllerNotifications(storage, origin);
         this.notifications.callbacks = {
             onPodcastGuids: async podcastGuids => {
@@ -98,7 +101,7 @@ export class ShowController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>, backupBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined): Promise<Unkinded<AdminDataResponse>> {
-        const { notifications, storage, origin, feedBlobs, allowStorageImport } = this;
+        const { notifications, storage, origin, feedBlobs, allowStorageImport, xfetcher } = this;
         const res = await notifications.adminExecuteDataQuery(req);
         if (res) return res;
 
@@ -296,7 +299,7 @@ export class ShowController {
                     if (action === 'update-feed' || action === 'update-feed-and-index-items') {
                         const disableConditional = disable.includes('conditional');
                         const disableGzip = disable.includes('gzip');
-                        const { message, updated, fetchStatus } = await updateFeed(result, { storage, origin, blobs: feedBlobs, disableConditional, disableGzip });
+                        const { message, updated, fetchStatus } = await updateFeed(result, { storage, origin, blobs: feedBlobs, xfetcher, disableConditional, disableGzip });
                         if (action === 'update-feed-and-index-items' && updated && fetchStatus === 200) {
                             const forceResave = force.includes('resave');
                             const indexItemsMessage = await indexItems(updated, { storage, blobs: feedBlobs, forceResave, origin, refetchMediaUrls });
@@ -521,7 +524,7 @@ export class ShowController {
             const fetchInfo = await computeFetchInfo(url, headers, 'tmp', { put: (key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string) => {
                 blobs[key] = new Bytes(new Uint8Array(body as ArrayBuffer)).utf8();
                 return Promise.resolve({ etag: '' });
-            } });
+            } }, tryMakeXfetcher(xfetcher));
             return { results: [ { url, headers: [...headers].map(v => v.join(': ')), fetchInfo, blobs } ] };
         }
 
@@ -838,8 +841,8 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
     // TODO enqueue update-feed if necessary
 }
 
-async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, disableConditional?: boolean, disableGzip?: boolean }): Promise<{ message: string, updated?: FeedRecord, fetchStatus?: number }> {
-    const { storage, origin, blobs, disableConditional = false, disableGzip = false } = opts;
+async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage: DurableObjectStorage, origin: string, blobs: Blobs, xfetcher: string | undefined, disableConditional?: boolean, disableGzip?: boolean }): Promise<{ message: string, updated?: FeedRecord, fetchStatus?: number }> {
+    const { storage, origin, blobs, xfetcher, disableConditional = false, disableGzip = false } = opts;
     const feedRecord = await loadFeedRecord(feedUrlOrRecord, storage);
     const { url: feedUrl } = feedRecord;
 
@@ -868,7 +871,7 @@ async function updateFeed(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     }
     const fetchUrl = `${feedUrl}${feedUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`; // cache buster query param
     const blobKeyBase = (await Bytes.ofUtf8(fetchUrl).sha256()).hex();
-    const fetchInfo = await computeFetchInfo(feedUrl, headers, blobKeyBase, blobs);
+    const fetchInfo = await computeFetchInfo(feedUrl, headers, blobKeyBase, blobs, tryMakeXfetcher(xfetcher));
     const feedRecordKey = computeFeedRecordKey(feedRecord.id);
     const updated = await storage.transaction(async tx => {
         const existing = await tx.get(feedRecordKey);

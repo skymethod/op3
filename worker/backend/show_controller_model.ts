@@ -115,12 +115,14 @@ export function isFetchInfo(obj: unknown): obj is FetchInfo {
 export interface ResponseInfo {
     readonly url: string;
     readonly status: number;
+    readonly fetcher?: string;
 }
 
 export function isResponseInfo(obj: unknown): obj is ResponseInfo {
     return isStringRecord(obj)
         && typeof obj.url === 'string'
         && typeof obj.status === 'number'
+        && (obj.fetcher === undefined || typeof obj.fetcher === 'string')
         ;
 }
 

@@ -1,6 +1,7 @@
 import { packError } from '../errors.ts';
 import { ErrorInterface } from '../errors.ts';
 import { computeTimestamp } from '../timestamp.ts';
+import { isXfetchCandidate, Xfetcher, XResponse } from '../xfetcher.ts';
 import { FetchInfo, ResponseInfo } from './show_controller_model.ts';
 
 export function tryParseBlobKey(body: string): string | undefined {
@@ -10,12 +11,12 @@ export function tryParseBlobKey(body: string): string | undefined {
 
 type BlobsPut = (key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string) => Promise<{ etag: string }>;
 
-export async function computeFetchInfo(url: string, headers: Headers, blobKeyBase: string, blobs: { put: BlobsPut}): Promise<FetchInfo> {
+export async function computeFetchInfo(url: string, headers: Headers, blobKeyBase: string, blobs: { put: BlobsPut }, xfetcher: Xfetcher | undefined ): Promise<FetchInfo> {
     if (blobKeyBase.includes('.')) throw new Error(`Bad blobKeyBase: ${blobKeyBase}`);
 
     const requestInstant = new Date().toISOString();
     let error: ErrorInterface | undefined;
-    let res: Response;
+    let res: Response | XResponse;
     let buffer: ArrayBuffer;
     let body: string | undefined;
     let bodyLength: number | undefined;
@@ -33,6 +34,11 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
             responses = responses ?? [];
             const { url, status } = res;
             responses.push({ url, status });
+            if (xfetcher && isXfetchCandidate(res as Response)) {
+                res = await xfetcher(fetchUrl, { headers, redirect: 'manual' });
+                const { url, status } = res;
+                responses.push({ url, status, fetcher: 'xfetcher' });
+            }
             const location = res.headers.get('location');
             log.push(`${fetchUrl} ${url} ${status} ${[...res.headers].map(v => v.join(': ')).join(', ')}`);
             if (typeof location === 'string' && (status === 301 || status === 302 || status === 307 || status === 308)) {
