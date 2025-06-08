@@ -31,5 +31,5 @@ export function tryMakeXfetcher(str: string | undefined): Xfetcher | undefined {
 }
 
 export function isXfetchCandidate(res: Response): boolean {
-    return res.status === 200 && res.headers.get('sg-captcha') === 'challenge';
+    return res.status === 202 && res.headers.get('sg-captcha') === 'challenge';
 }
