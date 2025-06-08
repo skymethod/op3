@@ -18,10 +18,9 @@ export function tryMakeXfetcher(str: string | undefined): Xfetcher | undefined {
             u.searchParams.set('url', url);
             const headers = new Headers([ ...opts.headers ].filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ]));
             headers.set('authorization', auth);
-            const fetchUrl = u.toString();
-            const res = await fetch(fetchUrl, { headers });
+            const res = await fetch(u.toString(), { headers });
             const rt: XResponse = {
-                url: fetchUrl,
+                url,
                 status: res.status,
                 headers: new Headers([ ...res.headers ].filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ])),
                 text: async () => await res.text(),
