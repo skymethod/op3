@@ -312,6 +312,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'podroll', url: 'https://pdrl.fm/r/86c73b/6f0827/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://rss.pdrl.fm/41233c/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podroll', url: 'https://rss.pdrl.fm/41233c/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
         
         assertEquals(computeChainEstimate('https://op3.dev/e/chrt.fm/track/123ABC/https://verifi.podscribe.com/rss/p/https://a.pdcst.to/KyUg65GkT5REkp0z/a.com/path/to/episode.mp3'), [
             { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/chrt.fm/track/123ABC/https://verifi.podscribe.com/rss/p/https://a.pdcst.to/KyUg65GkT5REkp0z/a.com/path/to/episode.mp3' },

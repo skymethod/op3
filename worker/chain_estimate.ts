@@ -228,10 +228,11 @@ export function computeChainEstimate(url: string): ChainEstimate {
 
     // https://pdrl.fm/123abc/a.com/path/to/episode.mp3
     // https://pdrl.fm/r/86c73b/6f0827/a.com/path/to/episode.mp3
+    // https://rss.pdrl.fm/12345c/a.com/path/to/episode.mp3
     // http and https supported, suffix protocol trumps
-    m = /^(https?):\/\/pdrl\.fm\/(r\/[^/]+\/[^/]+|[^/]+)\/(https?:\/\/)?(.*?)$/.exec(url);
+    m = /^(https?):\/\/(rss\.)?pdrl\.fm\/(r\/[^/]+\/[^/]+|[^/]+)\/(https?:\/\/)?(.*?)$/.exec(url);
     if (m) {
-        const [ _, scheme, __, suffixProtocol, suffix ] = m;
+        const [ _, scheme, __, ___, suffixProtocol, suffix ] = m;
         const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
         return [ { kind: 'prefix', prefix: 'podroll', url }, ...computeChainEstimate(targetUrl) ];
     }
