@@ -1,7 +1,7 @@
 {
     "lock": false,
     "tasks": {
-        "serve": "deno run -A https://raw.denoflare.dev/skymethod/denoflare/674af1a29c14ad9fae49f0839891de97fafee5f0/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
+        "serve": "deno run -A https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/cli/cli.ts serve worker/worker.ts --watch-include ./worker/static --text-binding instance:local --do-namespace-binding backendNamespace:local:BackendDO:storage=webstorage:container=op3-local --secret-binding adminTokens:localadmintoken  --secret-binding previewTokens:localpreviewtoken",
         "tailwind": "npx tailwindcss --content ./worker/static/home.htm,./worker/static/terms.htm,./worker/static/privacy.htm,./worker/static/header.htm,./worker/static/releases.htm,./worker/static/status.htm,./worker/static/404.htm,./worker/static/costs.htm,./worker/routes/costs.ts,./worker/static/api_keys.htm,./worker/static/setup.htm,./worker/static/show.htm,./worker/static/download_calculation.htm,./worker/static/listen_time_calculation.htm,./worker/static/stats.htm -i ./worker/static/input.css -o ./worker/static/output.css --watch"
     },
     "fmt": {
