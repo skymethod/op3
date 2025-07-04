@@ -341,6 +341,11 @@ export class ShowController {
                             return update;
                         });
                         return { message, results: [ updated ] };
+                    } else if (action === 'update-pifeed') {
+                        const podcastGuid = result.piFeed?.podcastGuid ?? result.podcastGuid;
+                        if (typeof podcastGuid !== 'string') throw new Error(`Need a podcastGuid`);
+                        await enqueueWork([{ uuid: generateUuid(), kind: 'lookup-pg', podcastGuid, attempt: 1 }], storage, this.durableObjectName);
+                        return { message: `Enqueued work for ${podcastGuid}` };
                     }
                     return { message: 'Unknown update action' };
                 }
