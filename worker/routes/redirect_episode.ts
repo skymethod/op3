@@ -6,7 +6,13 @@ export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | u
     if (!m) return undefined;
     const [ _, _optPort, _optArgs, optPrefix, suffix ] = m;
     if (/^https?:\/\//.test(suffix)) return { kind: 'invalid' }; // /e/https://
-    if (!isValidSuffix(suffix))  return { kind: 'invalid' };
+    if (!isValidSuffix(suffix)) {
+        if (suffix && suffix.startsWith('pg=') && requestUrl && requestUrl.includes('://op3.dev/e/pg=')) {
+            // temporarily support found typo: https://op3.dev/e/pg=
+            return tryParseRedirectRequest(requestUrl.replace('://op3.dev/e/pg=', '://op3.dev/e,pg='));
+        }
+        return { kind: 'invalid' };
+    }
     let prefix = optPrefix ?? 'https://';
     if (!prefix.endsWith('//')) prefix += '/'; // /e/https:/
     const targetUrl = `${prefix}${suffix}`;

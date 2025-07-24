@@ -15,6 +15,7 @@ Deno.test({
             'https://example.org/e/us.example.com:8111/stream': 'https://us.example.com:8111/stream',
             'http://example.org:80/e/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3', // for now, we redirect to https in this case
             'https://example.org/e,pg=fe4fb16c-062a-4257-ba8d-9a9b923356c2/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3',
+            'https://op3.dev/e/pg=fe4fb16c-062a-4257-ba8d-9a9b923356c2/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3', // temporarily allowed
             'https://example.org/e,/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3',
         }
         for (const [ requestUrl, expectedTargetUrl ] of Object.entries(good)) {
