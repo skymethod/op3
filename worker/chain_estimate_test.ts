@@ -438,6 +438,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'ppprotect', url: 'https://pp1.example.com/protect/example/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://op3.dev/e/pg=bbda7016-db7b-4e3d-8bee-22c14bb71457/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'op3', url: 'https://op3.dev/e/pg=bbda7016-db7b-4e3d-8bee-22c14bb71457/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
