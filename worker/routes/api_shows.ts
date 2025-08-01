@@ -92,11 +92,20 @@ export async function computeShowsResponse(opts: ShowsOpts): Promise<Response> {
 
 type StatsOpts = { showUuid: string, method: string, searchParams: URLSearchParams, statsBlobs?: Blobs, roStatsBlobs?: Blobs, times?: Record<string, number>, configuration: Configuration };
 
-export async function computeShowStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
+export async function computeShowStatsResponse(opts: StatsOpts): Promise<Response> {
+    const { method } = opts;
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
+    return newJsonResponse(await computeShowStatsObj(opts));
+}
+
+export async function computeShowStatsObj({ showUuid: showUuidInput, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<ApiShowStatsResponse> {
     const { showUuid, targetStatsBlobs } = await computeStatsBlobsAndShowUuid({ showUuidInput, searchParams, statsBlobs, roStatsBlobs, configuration });
-    const overallParam = searchParams.get('overall') ?? undefined;
-    if (overallParam !== undefined) checkMatches('overall', overallParam, /^stub$/);
+    const [ overallParam, listensParam, audienceParam ] = [ 'overall', 'listens', 'audience' ].map(v => {
+        const param = searchParams.get(v) ?? undefined;
+        if (param !== undefined) checkMatches(v, param, /^stub$/);
+        return param;
+    });
+
     const latestMonth = searchParams.get('latestMonth') ?? new Date().toISOString().substring(0, 7);
     check('latestMonth', latestMonth, isValidMonth);
     const lookbackMonthsParam = searchParams.get('lookbackMonths') ?? '2';
@@ -109,8 +118,8 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
     const [ overall, monthsSummaries, monthsAudiences, listens ] = await timed(times, `get-overall+get-${monthsTag}-summary+get-${monthsTag}-audience+listens`, () => Promise.all([
         timed(times, 'get-overall', () => overallParam === 'stub' ? Promise.resolve(computeStubShowSummary(showUuid, 'overall')) : targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: 'overall' }), 'json')),
         timed(times, `get-${monthsTag}-summary`, async () => (await Promise.all(months.map(v => targetStatsBlobs.get(computeShowSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidShowSummary)),
-        timed(times, `get-${monthsTag}-audience`, async () => (await Promise.all(months.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidAudienceSummary)),
-        timed(times, `get-listens`, () => overallParam === 'stub' ? Promise.resolve(computeStubShowListenStats(showUuid)) : targetStatsBlobs.get(computeShowListenStatsKey({ showUuid }), 'json')),
+        timed(times, `get-${monthsTag}-audience`, async () => audienceParam === 'stub' ? Promise.resolve([ computeStubAudienceSummary(showUuid, 'overall') ]) : (await Promise.all(months.map(v => targetStatsBlobs.get(computeAudienceSummaryKey({ showUuid, period: v }), 'json')))).filter(isValidAudienceSummary)),
+        timed(times, `get-listens`, () => (overallParam === 'stub' || listensParam === 'stub') ? Promise.resolve(computeStubShowListenStats(showUuid)) : targetStatsBlobs.get(computeShowListenStatsKey({ showUuid }), 'json')),
     ]));
     let monthsAudiencesLarge: AudienceSummary[] | undefined;
     if (monthsAudiences.length === 0) {
@@ -151,7 +160,7 @@ export async function computeShowStatsResponse({ showUuid: showUuidInput, method
         episodeListens = Object.fromEntries(Object.values(listens.episodeListenStats).map(({ itemGuid, minuteMaps, appCounts }) => [ itemGuid, { minuteMaps, appCounts } ]));
         knownAppLinks = KNOWN_APP_LINKS;
     }
-    return newJsonResponse(computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks }));
+    return computeApiShowStatsResponse(showUuidInput, { showUuid, months, episodeFirstHours, hourlyDownloads, episodeHourlyDownloads, dailyFoundAudience, monthlyDimensionDownloads, episodeListens, knownAppLinks });
 }
 
 export async function computeShowSummaryStatsResponse({ showUuid: showUuidInput, method, searchParams, statsBlobs, roStatsBlobs, times = {}, configuration }: StatsOpts): Promise<Response> {
@@ -232,6 +241,12 @@ const computeStubShowSummary = (showUuid: string, period: string): ShowSummary =
 const computeStubShowListenStats = (showUuid: string): ShowListenStats => ({
     showUuid,
     episodeListenStats: {},
+});
+
+const computeStubAudienceSummary = (showUuid: string, period: string): AudienceSummary => ({
+    showUuid,
+    period,
+    dailyFoundAudience: {},
 });
 
 function cleanTitle(title: string | undefined): string | undefined {
