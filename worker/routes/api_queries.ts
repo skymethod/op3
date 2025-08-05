@@ -19,7 +19,7 @@ import { normalizeDevice } from './api_query_common.ts';
 import { computeShowStatsObj, lookupShowId } from './api_shows.ts';
 import { computeAppDownloads, computeRelativeSummary, insertZeros, RelativeSummary } from './api_shared.ts';
 import { DoNames } from '../do_names.ts';
-import { EpisodeRecord } from '../backend/show_controller_model.ts';
+import { EpisodeRecord, ShowRecord } from '../backend/show_controller_model.ts';
 
 type Opts = { name: string, method: string, searchParams: URLSearchParams, miscBlobs?: Blobs, roMiscBlobs?: Blobs, rpcClient: RpcClient, roRpcClient?: RpcClient, configuration: Configuration, statsBlobs?: Blobs, roStatsBlobs?: Blobs };
 
@@ -148,8 +148,12 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
     if (name === 'episode-download-counts') {
         const times: Record<string, number> = {};
 
-        const showUuid = searchParams.get('showUuid');
+        const { showUuid, limit: limitStr } = Object.fromEntries(searchParams);
         if (typeof showUuid !== 'string' || !isValidUuid(showUuid)) return newJsonResponse({ error: `Bad 'showUuid': ${showUuid}` }, 400);
+        const limitParam = tryParseInt(limitStr);
+        if (typeof limitStr === 'string' && ((limitParam ?? 0) < 1)) return newJsonResponse({ error: `Bad 'limit': ${limitStr}` }, 400);
+        const limit = limitParam ?? 8;
+
         const searchParamsInput = new URLSearchParams({
             listens: 'stub',
             audience: 'stub',
@@ -159,37 +163,43 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
         if (!targetRpcClient) throw new Error(`Need rpcClient`);
 
-        const [ showStatsObj, selectEpisodesRes ] = await Promise.all([
-            computeShowStatsObj({ configuration, method: 'GET', searchParams: searchParamsInput, showUuid, roStatsBlobs, statsBlobs, times }),
-            timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)), // TODO use ShowEpisodesByPubdateI
-        ]);
+        const [ showStatsObj, selectShowRes, selectEpisodesRes ] = await timed(times, 'compute-stats+select-show+select-episodes', () => Promise.all([
+            timed(times, 'compute-stats', () => computeShowStatsObj({ configuration, method: 'GET', searchParams: searchParamsInput, showUuid, roStatsBlobs, statsBlobs, times })),
+            timed(times, 'select-show', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}` }, DoNames.showServer)),
+            timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)), // TODO use ShowEpisodesByPubdate
+        ]));
 
-        const { episodeFirstHours } = showStatsObj;
-        const episodeHourlyDownloads = Object.fromEntries(Object.entries(showStatsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
-        const episodes = Object.fromEntries(((selectEpisodesRes.results ?? []) as EpisodeRecord[]).map(v => [ v.id, v ]));
-        const recentEpisodes = sortBy(Object.values(episodes), v => v.pubdateInstant ?? episodeFirstHours[v.id] ?? `000${v.id}`, { order: 'desc' }).slice(0, 8);
-        const recentEpisodesHourlyDownloads = Object.fromEntries(Object.entries(episodeHourlyDownloads).filter(v => recentEpisodes.some(v2 => v2.id === v[0])));
-        const episodeRelativeSummaries = Object.fromEntries(Object.entries(recentEpisodesHourlyDownloads).map(v => [ v[0], computeRelativeSummary(v[1]) ]));
+        const { results: showRecords = [] } = selectShowRes;
+        if (showRecords.length === 0) return newJsonResponse({ message: 'not found' }, 404);
+        const { title: showTitle, } = showRecords[0] as ShowRecord;
+
+        const { episodeFirstHours, episodeHourlyDownloads, months } = showStatsObj;
+        const earliestMonth = months.sort()[0];
+        if (!earliestMonth) return newJsonResponse({ message: 'no data found' }, 404);
 
         let minDownloadHour: string | undefined;
         let maxDownloadHour: string | undefined;
-        for (const episodeDownloads of Object.values(recentEpisodesHourlyDownloads)) {
-            for (const hr of Object.keys(episodeDownloads)) {
+
+        type EpisodeRow = { itemGuid: string, title: string, pubdate: string } | Pick<RelativeSummary, 'downloads3' | 'downloads7' | 'downloads30' | 'downloadsAll'>;
+
+        const rows: EpisodeRow[] = [];
+        for (const { id, itemGuid, title, pubdateInstant } of sortBy((selectEpisodesRes.results ?? []) as EpisodeRecord[], v => v.pubdateInstant ?? episodeFirstHours[v.id] ?? `000${v.id}`, { order: 'desc' })) {
+            if (rows.length >= limit) break;
+            const hourlyDownloads = episodeHourlyDownloads[id]; if (!hourlyDownloads) continue;
+            const firstHour = episodeFirstHours[id]; if (!firstHour) continue;
+            if (firstHour < earliestMonth) continue;
+            if (pubdateInstant === undefined || pubdateInstant < earliestMonth) continue;
+            for (const hr of Object.keys(hourlyDownloads)) {
                 if (maxDownloadHour === undefined || hr > maxDownloadHour) maxDownloadHour = hr;
                 if (minDownloadHour === undefined || hr < minDownloadHour) minDownloadHour = hr;
             }
+            const relativeSummary = computeRelativeSummary(insertZeros(hourlyDownloads));
+            const { downloads3, downloads7, downloads30, downloadsAll } = relativeSummary;
+            rows.push({ itemGuid, title, pubdate: pubdateInstant, downloads3, downloads7, downloads30, downloadsAll });
         }
-
-        type EpisodeRow = Pick<EpisodeRecord, 'id' | 'itemGuid' | 'title' | 'pubdateInstant' > | Pick<RelativeSummary, 'downloads3' | 'downloads7' | 'downloads30' | 'downloadsAll'>;
-
-        const rows: EpisodeRow[] = recentEpisodes.map(v => {
-            const { id, itemGuid, title, pubdateInstant } = v;
-            const { downloads3, downloads7, downloads30, downloadsAll } = episodeRelativeSummaries[id];
-            return { id, itemGuid, title, pubdateInstant, downloads3, downloads7, downloads30, downloadsAll };
-        });
-
+    
         const queryTime = Date.now() - start;
-        return newJsonResponse({ showUuid, minDownloadHour, maxDownloadHour, episodes: rows, queryTime, ...(debug ? { times } : {}) });
+        return newJsonResponse({ showUuid, showTitle, minDownloadHour, maxDownloadHour, episodes: rows, queryTime, ...(debug ? { times: removeZeroValues(times) } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);
@@ -204,4 +214,9 @@ function isValidFeedUrlBase64(feedUrlBase64: string): boolean {
     } catch {
         return false;
     }
+}
+
+function removeZeroValues(obj: Record<string, number>): Record<string, number> {
+    Object.entries(obj).forEach(([ key, value ]) => { if (value === 0) delete obj[key]; });
+    return obj;
 }
