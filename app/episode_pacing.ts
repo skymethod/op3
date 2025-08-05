@@ -1,4 +1,5 @@
 import { EpisodeInfo } from '../worker/routes/api_shows_model.ts';
+import { RelativeSummary, computeRelativeSummary } from '../worker/routes/api_shared.ts';
 import { addDaysToDateString } from '../worker/timestamp.ts';
 import { Chart, distinct, replacePlaceholders } from './deps.ts';
 import { element, SlIconButton } from './elements.ts';
@@ -194,27 +195,6 @@ function initLegend(chart: Chart, episodePacingLegendItemTemplate: HTMLTemplateE
         }
         episodePacingLegendElement.insertBefore(item, episodePacingNav);
     });
-}
-
-type RelativeSummary = { cumulative: Record<string, number>, downloads3?: number, downloads7?: number, downloads30?: number, downloadsAll: number };
-
-function computeRelativeSummary(hourlyDownloads: Record<string, number>): RelativeSummary {
-    const cumulative: Record<string, number> = {};
-    let downloads3: number | undefined;
-    let downloads7: number | undefined;
-    let downloads30: number | undefined;
-    let hourNum = 1;
-    let total = 0;
-    for (const [ _hour, downloads ] of Object.entries(hourlyDownloads)) {
-        total += downloads;
-        if (hourNum <= 24 * 30) { // chart max 30 days
-           cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
-        }
-        if (hourNum === 3 * 24) downloads3 = total;
-        if (hourNum === 7 * 24) downloads7 = total;
-        if (hourNum === 30 * 24) downloads30 = total;
-    }
-    return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
 }
 
 function drawPacingChart(canvas: HTMLCanvasElement, episodeRelativeSummaries: Record<string, RelativeSummary>, suggestedMax: number, episodeInfos: Record<string, EpisodeInfo>, shot: boolean, strings: Record<string, string>, lang: string | undefined): Chart {

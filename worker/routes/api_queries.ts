@@ -9,15 +9,17 @@ import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { incrementAll } from '../summaries.ts';
-import { addMonthsToMonthString } from '../timestamp.ts';
+import { addHoursToHourString, addMonthsToMonthString } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
 import { QUERY_RECENT_EPISODES_WITH_TRANSCRIPTS } from './api_contract.ts';
 import { isShowDownloadCountsResponse, isValidRecentEpisodes } from './api_queries_model.ts';
 import { normalizeDevice } from './api_query_common.ts';
-import { lookupShowId } from './api_shows.ts';
-import { computeAppDownloads } from './api_shows_shared.ts';
+import { computeShowStatsObj, lookupShowId } from './api_shows.ts';
+import { computeAppDownloads, computeRelativeSummary, insertZeros, RelativeSummary } from './api_shared.ts';
+import { DoNames } from '../do_names.ts';
+import { EpisodeRecord } from '../backend/show_controller_model.ts';
 
 type Opts = { name: string, method: string, searchParams: URLSearchParams, miscBlobs?: Blobs, roMiscBlobs?: Blobs, rpcClient: RpcClient, roRpcClient?: RpcClient, configuration: Configuration, statsBlobs?: Blobs, roStatsBlobs?: Blobs };
 
@@ -141,6 +143,53 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         const showDownloadCounts = Object.fromEntries(Object.entries(obj.showDownloadCounts).filter(v => showUuids.includes(v[0])));
         const queryTime = Date.now() - start;
         return newJsonResponse({ ...obj, showDownloadCounts, queryTime, ...(debug ? { times } : {}) });
+    }
+
+    if (name === 'episode-download-counts') {
+        const times: Record<string, number> = {};
+
+        const showUuid = searchParams.get('showUuid');
+        if (typeof showUuid !== 'string' || !isValidUuid(showUuid)) return newJsonResponse({ error: `Bad 'showUuid': ${showUuid}` }, 400);
+        const searchParamsInput = new URLSearchParams({
+            listens: 'stub',
+            audience: 'stub',
+        });
+        if (searchParams.has('ro')) searchParamsInput.set('ro', 'true');
+
+        const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
+        if (!targetRpcClient) throw new Error(`Need rpcClient`);
+
+        const [ showStatsObj, selectEpisodesRes ] = await Promise.all([
+            computeShowStatsObj({ configuration, method: 'GET', searchParams: searchParamsInput, showUuid, roStatsBlobs, statsBlobs, times }),
+            timed(times, 'select-episodes', () => targetRpcClient.adminExecuteDataQuery({ operationKind: 'select', targetPath: `/show/shows/${showUuid}/episodes` }, DoNames.showServer)), // TODO use ShowEpisodesByPubdateI
+        ]);
+
+        const { episodeFirstHours } = showStatsObj;
+        const episodeHourlyDownloads = Object.fromEntries(Object.entries(showStatsObj.episodeHourlyDownloads).map(v => [ v[0], insertZeros(v[1]) ]));
+        const episodes = Object.fromEntries(((selectEpisodesRes.results ?? []) as EpisodeRecord[]).map(v => [ v.id, v ]));
+        const recentEpisodes = sortBy(Object.values(episodes), v => v.pubdateInstant ?? episodeFirstHours[v.id] ?? `000${v.id}`, { order: 'desc' }).slice(0, 8);
+        const recentEpisodesHourlyDownloads = Object.fromEntries(Object.entries(episodeHourlyDownloads).filter(v => recentEpisodes.some(v2 => v2.id === v[0])));
+        const episodeRelativeSummaries = Object.fromEntries(Object.entries(recentEpisodesHourlyDownloads).map(v => [ v[0], computeRelativeSummary(v[1]) ]));
+
+        let minDownloadHour: string | undefined;
+        let maxDownloadHour: string | undefined;
+        for (const episodeDownloads of Object.values(recentEpisodesHourlyDownloads)) {
+            for (const hr of Object.keys(episodeDownloads)) {
+                if (maxDownloadHour === undefined || hr > maxDownloadHour) maxDownloadHour = hr;
+                if (minDownloadHour === undefined || hr < minDownloadHour) minDownloadHour = hr;
+            }
+        }
+
+        type EpisodeRow = Pick<EpisodeRecord, 'id' | 'itemGuid' | 'title' | 'pubdateInstant' > | Pick<RelativeSummary, 'downloads3' | 'downloads7' | 'downloads30' | 'downloadsAll'>;
+
+        const rows: EpisodeRow[] = recentEpisodes.map(v => {
+            const { id, itemGuid, title, pubdateInstant } = v;
+            const { downloads3, downloads7, downloads30, downloadsAll } = episodeRelativeSummaries[id];
+            return { id, itemGuid, title, pubdateInstant, downloads3, downloads7, downloads30, downloadsAll };
+        });
+
+        const queryTime = Date.now() - start;
+        return newJsonResponse({ showUuid, minDownloadHour, maxDownloadHour, episodes: rows, queryTime, ...(debug ? { times } : {}) });
     }
 
     return newJsonResponse({ error: 'not found' }, 404);

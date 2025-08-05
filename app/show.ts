@@ -1,4 +1,5 @@
 import { ApiShowsResponse, ApiShowStatsResponse } from '../worker/routes/api_shows_model.ts';
+import { insertZeros } from '../worker/routes/api_shared.ts';
 import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, TimeScale, Tooltip, sortBy } from './deps.ts';
 import { makeDownloadsGraph } from './downloads_graph.ts';
 import { element } from './elements.ts';
@@ -11,7 +12,7 @@ import { makeTopDevices } from './top_devices.ts';
 import { makeTopDeviceTypes } from './top_device_types.ts';
 import { makeTopBrowserDownloads } from './top_browser_downloads.ts';
 import { makeTopMetros } from './top_metros.ts';
-import { addHoursToHourString, addMonthsToMonthString } from '../worker/timestamp.ts';
+import { addMonthsToMonthString } from '../worker/timestamp.ts';
 import { makeFooter } from './footer.ts';
 import { makeTopEuRegions } from './top_eu_regions.ts';
 import { makeTopAuRegions } from './top_au_regions.ts';
@@ -175,19 +176,6 @@ export async function initShow() {
         console.log('Document content loaded');
         app.update();
     });
-
-    function insertZeros(hourlyDownloads: Record<string, number>): Record<string, number> {
-        const hours = Object.keys(hourlyDownloads)
-        if (hours.length < 2) return hourlyDownloads;
-        const maxHour = hours.at(-1)!;
-        let hour = hours[0];
-        const rt: Record<string, number>  = {};
-        while (hour <= maxHour) {
-            rt[hour] = hourlyDownloads[hour] ?? 0;
-            hour = addHoursToHourString(hour, 1);
-        }
-        return rt;
-    }
 
     function computeShowSlug(title: string | undefined): string {
         return (title ?? 'untitled').toLowerCase().replaceAll(/[^a-z0-9]+/g, ' ').replaceAll(/\s+/g, ' ').trim().replaceAll(' ', '-');

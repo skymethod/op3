@@ -1,5 +1,5 @@
 import { makeTopBox } from './top_box.ts';
-import { computeAppDownloads } from '../worker/routes/api_shows_shared.ts';
+import { computeAppDownloads } from '../worker/routes/api_shared.ts';
 
 type Opts = { showSlug: string, monthlyDimensionDownloads: Record<string, Record<string, Record<string, number>>>, strings: Record<string, string>, lang: string | undefined };
 

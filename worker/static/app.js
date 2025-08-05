@@ -2,6 +2,104 @@
 // deno-lint-ignore-file
 // This code was bundled using `deno bundle` and it's not recommended to edit it manually
 
+function checkMatches(name1, value, pattern) {
+    const m = pattern.exec(value);
+    if (!m) throw new Error(`Bad ${name1}: ${value}`);
+    return m;
+}
+function isValidHour(hour) {
+    return typeof hour === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([0-1][0-9]|2[0-3])$/.test(hour);
+}
+function isValidDate(date) {
+    return typeof date === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/.test(date);
+}
+function isValidMonth(month) {
+    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
+}
+function increment(summary, key, delta = 1) {
+    const existing = summary[key];
+    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
+}
+function incrementAll(summary, keysAndDeltas) {
+    for (const [key, delta] of Object.entries(keysAndDeltas)){
+        increment(summary, key, delta);
+    }
+    return summary;
+}
+function addDays(date, days) {
+    if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
+    const rt = new Date(date);
+    rt.setUTCDate(rt.getUTCDate() + days);
+    return rt;
+}
+function addDaysToDateString(date, days) {
+    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
+    return addDays(`${date}T00:00:00.000Z`, days).toISOString().substring(0, 10);
+}
+function addMonthsToMonthString(month, months) {
+    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
+    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
+    const rt = new Date(`${month}-01T00:00:00.000Z`);
+    rt.setUTCMonth(rt.getUTCMonth() + months);
+    return rt.toISOString().substring(0, 7);
+}
+function addHoursToHourString(hour, hours) {
+    if (!isValidHour(hour)) throw new Error(`Bad hour: ${hour}`);
+    if (!Number.isSafeInteger(hours)) throw new Error(`Bad hours: ${hours}`);
+    const rt = new Date(`${hour}:00:00.000Z`);
+    rt.setUTCHours(rt.getUTCHours() + hours);
+    return rt.toISOString().substring(0, 13);
+}
+function computeAppDownloads(dimensionDownloads) {
+    const rt = dimensionDownloads['appName'] ?? {};
+    const libs = dimensionDownloads['libraryName'] ?? {};
+    const appleCoreMedia = libs['AppleCoreMedia'];
+    if (appleCoreMedia) rt['Unknown Apple App'] = appleCoreMedia;
+    const referrers = dimensionDownloads['referrer'] ?? {};
+    for (const [referrer, downloads] of Object.entries(referrers)){
+        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
+        if (type === 'app') {
+            increment(rt, name1, downloads);
+        }
+    }
+    return rt;
+}
+function computeRelativeSummary(hourlyDownloads) {
+    const cumulative = {};
+    let downloads3;
+    let downloads7;
+    let downloads30;
+    let hourNum = 1;
+    let total = 0;
+    for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
+        total += downloads;
+        if (hourNum <= 24 * 30) {
+            cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
+        }
+        if (hourNum === 3 * 24) downloads3 = total;
+        if (hourNum === 7 * 24) downloads7 = total;
+        if (hourNum === 30 * 24) downloads30 = total;
+    }
+    return {
+        cumulative,
+        downloadsAll: total,
+        downloads3,
+        downloads7,
+        downloads30
+    };
+}
+function insertZeros(hourlyDownloads) {
+    const hours = Object.keys(hourlyDownloads);
+    if (hours.length < 2) return hourlyDownloads;
+    const maxHour = hours.at(-1);
+    let hour = hours[0];
+    const rt = {};
+    while(hour <= maxHour){
+        rt[hour] = hourlyDownloads[hour] ?? 0;
+        hour = addHoursToHourString(hour, 1);
+    }
+    return rt;
+}
 function l(n) {
     return n + .5 | 0;
 }
@@ -8798,54 +8896,6 @@ const supportedLanguageLabels = {
 };
 Object.keys(supportedLanguageLabels);
 const withCommas = new Intl.NumberFormat('en-US');
-function checkMatches(name1, value, pattern) {
-    const m = pattern.exec(value);
-    if (!m) throw new Error(`Bad ${name1}: ${value}`);
-    return m;
-}
-function isValidHour(hour) {
-    return typeof hour === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([0-1][0-9]|2[0-3])$/.test(hour);
-}
-function isValidDate(date) {
-    return typeof date === 'string' && /^2\d{3}-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/.test(date);
-}
-function isValidMonth(month) {
-    return /^2\d{3}-(0[1-9]|1[012])$/.test(month);
-}
-function increment(summary, key, delta = 1) {
-    const existing = summary[key];
-    summary[key] = (typeof existing === 'number' ? existing : 0) + delta;
-}
-function incrementAll(summary, keysAndDeltas) {
-    for (const [key, delta] of Object.entries(keysAndDeltas)){
-        increment(summary, key, delta);
-    }
-    return summary;
-}
-function addDays(date, days) {
-    if (!Number.isSafeInteger(days)) throw new Error(`Bad days: ${days}`);
-    const rt = new Date(date);
-    rt.setUTCDate(rt.getUTCDate() + days);
-    return rt;
-}
-function addDaysToDateString(date, days) {
-    if (!isValidDate(date)) throw new Error(`Bad date: ${date}`);
-    return addDays(`${date}T00:00:00.000Z`, days).toISOString().substring(0, 10);
-}
-function addMonthsToMonthString(month, months) {
-    if (!isValidMonth(month)) throw new Error(`Bad month: ${month}`);
-    if (!Number.isSafeInteger(months)) throw new Error(`Bad months: ${months}`);
-    const rt = new Date(`${month}-01T00:00:00.000Z`);
-    rt.setUTCMonth(rt.getUTCMonth() + months);
-    return rt.toISOString().substring(0, 7);
-}
-function addHoursToHourString(hour, hours) {
-    if (!isValidHour(hour)) throw new Error(`Bad hour: ${hour}`);
-    if (!Number.isSafeInteger(hours)) throw new Error(`Bad hours: ${hours}`);
-    const rt = new Date(`${hour}:00:00.000Z`);
-    rt.setUTCHours(rt.getUTCHours() + hours);
-    return rt.toISOString().substring(0, 13);
-}
 function element(id) {
     const rt = document.getElementById(id);
     if (!rt) throw new Error(`Element not found: ${id}`);
@@ -9362,30 +9412,6 @@ function initLegend(chart, episodePacingLegendItemTemplate, episodePacingLegendE
         };
         episodePacingLegendElement.insertBefore(item, episodePacingNav);
     });
-}
-function computeRelativeSummary(hourlyDownloads) {
-    const cumulative = {};
-    let downloads3;
-    let downloads7;
-    let downloads30;
-    let hourNum = 1;
-    let total = 0;
-    for (const [_hour, downloads] of Object.entries(hourlyDownloads)){
-        total += downloads;
-        if (hourNum <= 24 * 30) {
-            cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
-        }
-        if (hourNum === 3 * 24) downloads3 = total;
-        if (hourNum === 7 * 24) downloads7 = total;
-        if (hourNum === 30 * 24) downloads30 = total;
-    }
-    return {
-        cumulative,
-        downloadsAll: total,
-        downloads3,
-        downloads7,
-        downloads30
-    };
 }
 function drawPacingChart(canvas, episodeRelativeSummaries, suggestedMax, episodeInfos, shot, strings1, lang) {
     const allHours = distinct(Object.values(episodeRelativeSummaries).flatMap((v)=>Object.keys(v.cumulative)).sort());
@@ -10100,20 +10126,6 @@ const makeTopCountries = ({ showSlug, monthlyDimensionDownloads, strings: string
         lang
     });
 };
-function computeAppDownloads(dimensionDownloads) {
-    const rt = dimensionDownloads['appName'] ?? {};
-    const libs = dimensionDownloads['libraryName'] ?? {};
-    const appleCoreMedia = libs['AppleCoreMedia'];
-    if (appleCoreMedia) rt['Unknown Apple App'] = appleCoreMedia;
-    const referrers = dimensionDownloads['referrer'] ?? {};
-    for (const [referrer, downloads] of Object.entries(referrers)){
-        const [_, type, name1] = checkMatches('referrer', referrer, /^([a-z]+)\.(.*?)$/);
-        if (type === 'app') {
-            increment(rt, name1, downloads);
-        }
-    }
-    return rt;
-}
 const makeTopApps = ({ showSlug, monthlyDimensionDownloads, strings: strings1, lang })=>{
     const monthlyDownloads = Object.fromEntries(Object.entries(monthlyDimensionDownloads).map(([n, v])=>[
             n,
@@ -11228,18 +11240,6 @@ async function initShow() {
         console.log('Document content loaded');
         app.update();
     });
-    function insertZeros(hourlyDownloads) {
-        const hours = Object.keys(hourlyDownloads);
-        if (hours.length < 2) return hourlyDownloads;
-        const maxHour = hours.at(-1);
-        let hour = hours[0];
-        const rt = {};
-        while(hour <= maxHour){
-            rt[hour] = hourlyDownloads[hour] ?? 0;
-            hour = addHoursToHourString(hour, 1);
-        }
-        return rt;
-    }
     function computeShowSlug(title) {
         return (title ?? 'untitled').toLowerCase().replaceAll(/[^a-z0-9]+/g, ' ').replaceAll(/\s+/g, ' ').trim().replaceAll(' ', '-');
     }
