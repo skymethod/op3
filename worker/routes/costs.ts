@@ -42,6 +42,14 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2025-08-06',
+        description: 'Domains invoice',
+        cost: 47.98,
+        detail: [
+            { description: 'op3.st renew 1 year', cost: 47.98 },
+        ]
+    },
+    {
         date: '2025-07-26',
         description: 'Micro.blog invoice',
         cost: 5.41,
