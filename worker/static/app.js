@@ -66,6 +66,7 @@ function computeAppDownloads(dimensionDownloads) {
 }
 function computeRelativeSummary(hourlyDownloads) {
     const cumulative = {};
+    let downloads1;
     let downloads3;
     let downloads7;
     let downloads30;
@@ -76,6 +77,7 @@ function computeRelativeSummary(hourlyDownloads) {
         if (hourNum <= 24 * 30) {
             cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
         }
+        if (hourNum === 1 * 24) downloads1 = total;
         if (hourNum === 3 * 24) downloads3 = total;
         if (hourNum === 7 * 24) downloads7 = total;
         if (hourNum === 30 * 24) downloads30 = total;
@@ -83,6 +85,7 @@ function computeRelativeSummary(hourlyDownloads) {
     return {
         cumulative,
         downloadsAll: total,
+        downloads1,
         downloads3,
         downloads7,
         downloads30

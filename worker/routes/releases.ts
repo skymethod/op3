@@ -44,6 +44,14 @@ export interface ReleasesRequest {
 
 const RELEASES: FeedItem[] = [
     {
+        id: '2025-08-07',
+        time: '2025-08-07T14:55:00.00Z',
+        title: '2025-08-07: New API query: Episode downloads counts',
+        bulletPoints: [
+            ({ origin }) => `New API call to [query episode download counts](${origin}/api/docs#tag/queries/operation/queryEpisodeDownloadCounts) for a show that OP3 measures. Data similar to the table below the _Episode downloads_ chart on every OP3 show stats page.`,
+        ]
+    },
+    {
         id: '2024-06-06',
         time: '2024-06-06T14:35:00.00Z',
         title: '2024-06-06: German and British English translations',

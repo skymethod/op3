@@ -18,6 +18,7 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     let queryTopAppsForShowDescriptionSuffix = '';
     let queryTopAppsDescriptionSuffix = '';
     let queryShowDownloadCountsDescriptionSuffix = '';
+    let queryEpisodeDownloadCountsDescriptionSuffix = '';
 
     const previewToken = templateMode ? 'PREVIEW_TOKEN_TEMPLATE' : [...previewTokens].at(0);
     let demoShowUuid: string | undefined;
@@ -43,6 +44,9 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
 
             const exampleQueryShowDownloadCountsApiCall = `${origin}/api/1/queries/show-download-counts?showUuid=${demoShowUuid}&token=${previewToken}`;
             queryShowDownloadCountsDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryShowDownloadCountsApiCall}](${exampleQueryShowDownloadCountsApiCall})`;
+
+            const exampleQueryEpisodeDownloadCountsApiCall = `${origin}/api/1/queries/episode-download-counts?showUuid=${demoShowUuid}&token=${previewToken}`;
+            queryEpisodeDownloadCountsDescriptionSuffix = `\n\nFor example:\n\n\GET [${exampleQueryEpisodeDownloadCountsApiCall}](${exampleQueryEpisodeDownloadCountsApiCall})`;
         }
 
         viewShowDescriptionSuffix += `\n\n> **Public show stats pages**\n>\n>The canonical OP3 stats page for the show is returned in the \`statsPageUrl\` response field, but in general are available at \`${origin}/show/<show-uuid-or-podcast-guid>\``;
@@ -59,14 +63,14 @@ export async function computeApiDocsSwaggerResponse(opts: { instance: string, or
     const nonProdWarning = computeNonProdWarning(instance);
     if (nonProdWarning) descriptionSuffix += `\n\n# This is not production!\n\n**${nonProdWarning}**`;
     
-    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryHitsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix, queryShowDownloadCountsDescriptionSuffix);
+    const swagger = computeSwagger(origin, host, version, descriptionSuffix, queryHitsDescriptionSuffix, queryDownloadsDescriptionSuffix, viewShowDescriptionSuffix, queryRecentEpisodesWithTranscriptsDescriptionSuffix, queryTopAppsForShowDescriptionSuffix, queryTopAppsDescriptionSuffix, queryShowDownloadCountsDescriptionSuffix, queryEpisodeDownloadCountsDescriptionSuffix);
     const json = JSON.stringify(swagger, undefined, 2);
     return new Response(json, { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
 }
 
 //
 
-const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryHitsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string, queryShowDownloadCountsDescriptionSuffix: string) => (
+const computeSwagger = (origin: string, host: string, version: string, descriptionSuffix: string, queryHitsDescriptionSuffix: string, queryDownloadsDescriptionSuffix: string, viewShowDescriptionSuffix: string, queryRecentEpisodesWithTranscriptsDescriptionSuffix: string, queryTopAppsForShowDescriptionSuffix: string, queryTopAppsDescriptionSuffix: string, queryShowDownloadCountsDescriptionSuffix: string, queryEpisodeDownloadCountsDescriptionSuffix: string) => (
     {
         "swagger": "2.0",
         "info": {
@@ -602,6 +606,53 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                     ]
                 }
             },
+            "/queries/episode-download-counts": {
+                "get": {
+                    "tags": [
+                        "queries"
+                    ],
+                    "summary": "Query download counts for a show's recent episodes",
+                    "description": [
+                        `Get one/three/seven/thirty-day and all-time downloads for the most recent episodes of a given show.\n\nExcludes bots. Updated daily.\n\n`,
+                        `This information is very similar to the table below the _Episode downloads_ chart on every OP3 show stats page.`,
+                        queryEpisodeDownloadCountsDescriptionSuffix,
+                    ].join(''),
+                    "operationId": "queryEpisodeDownloadCounts",
+                    "produces": [
+                        "application/json",
+                    ],
+                    "parameters": [
+                        {
+                            "name": "token",
+                            "in": "query",
+                            "description": "Pass your bearer token either: \n - as an authorization header: `Authorization: Bearer mytoken`\n - or using this query param: `?token=mytoken`\n\nSee the [Authentication](#section/Authentication) section above for how to obtain a token.",
+                            "required": false,
+                            "type": "string",
+                        },
+                        {
+                            "name": "showUuid",
+                            "in": "query",
+                            "description": "Specify the show by OP3 show uuid.\n\nIf you don't have this, you can look it up for a given podcast using [View Show Information](#tag/shows/operation/viewShowInformation).",
+                            "required": true,
+                            "type": "string",
+                            "format": "32-character hex",
+                        },
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "successful operation",
+                            "schema": {
+                                "$ref": "#/definitions/QueryEpisodeDownloadCountsResponse"
+                            }
+                        }
+                    },
+                    "security": [
+                        {
+                            "bearer_token_or_token_query_param": []
+                        }
+                    ]
+                }
+            },
         },
         
         "securityDefinitions": {
@@ -966,6 +1017,83 @@ const computeSwagger = (origin: string, host: string, version: string, descripti
                 },
                 "required": [
                     "asof", "showDownloadCounts", "queryTime"
+                ]
+            },
+            "QueryEpisodeDownloadCountsResponse": {
+                "type": "object",
+                "properties": {
+                    "showUuid": {
+                        "type": "string",
+                        "description": "OP3 show uuid",
+                        "format": "32-character hex",
+                    },
+                    "showTitle": {
+                        "type": "string",
+                        "description": "Title of the show",
+                    },
+                    "minDownloadHour": {
+                        "type": "string",
+                        "description": "ISO hour of the oldest download included in the response results",
+                    },
+                    "maxDownloadHour": {
+                        "type": "string",
+                        "description": "ISO hour of the newest download included in the response results",
+                    },
+                    "episodes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/QueryEpisodeDownloadCountsResponse.Episode"
+                        },
+                        "description": "Recent episodes in reverse-chronological order (newest to oldest) along with their download counts"
+                    },
+                    "queryTime": {
+                        "type": "integer",
+                        "description": "Query server processing time, in milliseconds"
+                    }
+                },
+                "required": [
+                    "showUuid", "showTitle", "minDownloadHour", "maxDownloadHour", "episodes", "queryTime"
+                ]
+            },
+            "QueryEpisodeDownloadCountsResponse.Episode": {
+                "type": "object",
+                "properties": {
+                    "itemGuid": {
+                        "type": "string",
+                        "description": "The episode's item-level `<guid>` tag value",
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The episode's item-level `<title>` tag value",
+                    },
+                    "pubdate": {
+                        "type": "string",
+                        "description": "Publication time of the episode",
+                        "format": "ISO 8601 timestamp",
+                    },
+                    "downloads1": {
+                        "type": "integer",
+                        "description": "Cumulative number of downloads in an epsisode's first day (24 hours)",
+                    },
+                    "downloads3": {
+                        "type": "integer",
+                        "description": "Cumulative number of downloads in an epsisode's first three days (72 hours)",
+                    },
+                    "downloads7": {
+                        "type": "integer",
+                        "description": "Cumulative number of downloads in an epsisode's first seven days",
+                    },
+                    "downloads30": {
+                        "type": "integer",
+                        "description": "Cumulative number of downloads in an epsisode's first thirty days. This is the industry number advertisers often look at when determining the size of a show.",
+                    },
+                    "downloadsAll": {
+                        "type": "integer",
+                        "description": "Total number of downloads for the episode ('All-time' downloads).",
+                    },
+                },
+                "required": [
+                    "itemGuid", "title", "pubdate", "downloadsAll"
                 ]
             },
         }

@@ -19,10 +19,11 @@ export function computeAppDownloads(dimensionDownloads: Record<string, Record<st
     return rt;
 }
 
-export type RelativeSummary = { cumulative: Record<string, number>, downloads3?: number, downloads7?: number, downloads30?: number, downloadsAll: number };
+export type RelativeSummary = { cumulative: Record<string, number>, downloads1?: number, downloads3?: number, downloads7?: number, downloads30?: number, downloadsAll: number };
 
 export function computeRelativeSummary(hourlyDownloads: Record<string, number>): RelativeSummary {
     const cumulative: Record<string, number> = {};
+    let downloads1: number | undefined;
     let downloads3: number | undefined;
     let downloads7: number | undefined;
     let downloads30: number | undefined;
@@ -33,11 +34,12 @@ export function computeRelativeSummary(hourlyDownloads: Record<string, number>):
         if (hourNum <= 24 * 30) { // chart max 30 days
            cumulative[`h${(hourNum++).toString().padStart(4, '0')}`] = total;
         }
+        if (hourNum === 1 * 24) downloads1 = total;
         if (hourNum === 3 * 24) downloads3 = total;
         if (hourNum === 7 * 24) downloads7 = total;
         if (hourNum === 30 * 24) downloads30 = total;
     }
-    return { cumulative, downloadsAll: total, downloads3, downloads7, downloads30 };
+    return { cumulative, downloadsAll: total, downloads1, downloads3, downloads7, downloads30 };
 }
 
 export function insertZeros(hourlyDownloads: Record<string, number>): Record<string, number> {

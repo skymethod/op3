@@ -9,7 +9,7 @@ import { packError } from '../errors.ts';
 import { newJsonResponse, newMethodNotAllowedResponse } from '../responses.ts';
 import { RpcClient } from '../rpc_model.ts';
 import { incrementAll } from '../summaries.ts';
-import { addHoursToHourString, addMonthsToMonthString } from '../timestamp.ts';
+import { addMonthsToMonthString } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
 import { computeUserAgentEntityResult } from '../user_agents.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -180,7 +180,7 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
         let minDownloadHour: string | undefined;
         let maxDownloadHour: string | undefined;
 
-        type EpisodeRow = { itemGuid: string, title: string, pubdate: string } | Pick<RelativeSummary, 'downloads3' | 'downloads7' | 'downloads30' | 'downloadsAll'>;
+        type EpisodeRow = { itemGuid: string, title: string, pubdate: string } | Pick<RelativeSummary, 'downloads1' | 'downloads3' | 'downloads7' | 'downloads30' | 'downloadsAll'>;
 
         const rows: EpisodeRow[] = [];
         for (const { id, itemGuid, title, pubdateInstant } of sortBy((selectEpisodesRes.results ?? []) as EpisodeRecord[], v => v.pubdateInstant ?? episodeFirstHours[v.id] ?? `000${v.id}`, { order: 'desc' })) {
@@ -194,8 +194,8 @@ export async function computeQueriesResponse({ name, method, searchParams, miscB
                 if (minDownloadHour === undefined || hr < minDownloadHour) minDownloadHour = hr;
             }
             const relativeSummary = computeRelativeSummary(insertZeros(hourlyDownloads));
-            const { downloads3, downloads7, downloads30, downloadsAll } = relativeSummary;
-            rows.push({ itemGuid, title, pubdate: pubdateInstant, downloads3, downloads7, downloads30, downloadsAll });
+            const { downloads1, downloads3, downloads7, downloads30, downloadsAll } = relativeSummary;
+            rows.push({ itemGuid, title, pubdate: pubdateInstant, downloads1, downloads3, downloads7, downloads30, downloadsAll });
         }
     
         const queryTime = Date.now() - start;
