@@ -26,7 +26,7 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
         return { blobs: [ kind, colo, trim(error), country, trim(uuids.join(',')) ], doubles: [ 1 ], indexes: [ kind ] };
     } else if (kind === 'valid-redirect' || kind === 'invalid-redirect' || kind === 'banned-redirect') {
         const { colo, country, hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion, ipAddressKnown, errors, asn = 0, apVersion = 0, cfVersion = 0, dwVersion = 0, timeUuid = null, botType = null, hashedIpAddress = null, hashedIpAddressForDownload = null, 
-            audienceIdDownloadId = null, audienceIdDownloadId2 = null, deviceTypeDeviceName = null, regionCodeRegionName = null, timezone = null, metroCode = null } = event;
+            audienceIdDownloadId = null, audienceIdDownloadId2 = null, deviceTypeDeviceName = null, regionCodeRegionName = null, timezone = null, metroCode = null, cfWorker } = event;
         let { url, destinationHostname, userAgent, referer, agentTypeAgentName = null, referrerTypeReferrerName = null } = event;
         if (typeof referer === 'string' && typeof referrerTypeReferrerName === 'string' && referrerTypeReferrerName.length > (6 + 1 + 1024)) {
             referrerTypeReferrerName = referrerTypeReferrerName.substring(0, 6 + 1 + 1024);
@@ -39,6 +39,9 @@ export function computeAnalyticsEngineEvent(event: TraceEvent): AnalyticsEngineE
         const errorsOrIpAddressShape = errorCount > 0 ? errors.join(',') : trim(ipAddressShape);
         url = trim(url);
         destinationHostname = trim(destinationHostname);
+        if (ipAddressKnown === 'crosszone' && typeof cfWorker === 'string') {
+            userAgent = `${userAgent} (cf-worker/${cfWorker})`;
+        }
         userAgent = trim(userAgent);
         referer = trim(referer);
         const ipAddressKnownCode = ipAddressKnown === 'crosszone' ? 1 : 0;

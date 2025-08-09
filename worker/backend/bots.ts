@@ -1,4 +1,4 @@
-export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'bot-ip' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload';
+export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'bot-ip' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload' | 'crosszone';
 
 export function computeBotType({ agentType, agentName = '', deviceType, referrerName, tags = '', date }: { agentType: string, agentName?: string, deviceType?: string, referrerName?: string, tags?: string, date: string }): BotType | undefined {
     if (agentType === 'bot') return 'bot'; // easy
@@ -18,6 +18,9 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
     // 2024-08-21: Found ips with evidence of automated/bot-like requests
     if (tags.includes('bot-ip')) return 'bot-ip';
+
+    // 2025-08-09: Unknown crosszone requests - subrequests from other cf workers use the hardcoded crosszone ip (not the listener ip)
+    if (tags.includes('unknown-crosszone')) return 'crosszone';
 }
 
 export function isWebWidgetHostname(hostname: string): boolean {

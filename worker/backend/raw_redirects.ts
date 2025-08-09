@@ -1,4 +1,4 @@
-import { computeIpAddressForDownload, computeListenerIpAddress } from '../ip_addresses.ts';
+import { computeIpAddressForDownload, computeListenerIpAddress, CROSSZONE_IP } from '../ip_addresses.ts';
 import { RawRedirect } from '../rpc_model.ts';
 import { computeTimestamp } from '../timestamp.ts';
 import { consoleWarn } from '../tracer.ts';
@@ -85,6 +85,6 @@ export function computeRawRedirect(request: Request, opts: { time: number, metho
     const asnStr = (other ?? {}).asn;
     const asn = typeof asnStr === 'string' ? tryParseInt(asnStr) : undefined;
     const { listenerIpAddress = rawIpAddress, usedXForwardedFor } = computeListenerIpAddress({ rawIpAddress, xForwardedFor, asn, userAgent });
-    const ipSource = usedXForwardedFor ? 'x-forwarded-for' : undefined;
+    const ipSource = usedXForwardedFor ? 'x-forwarded-for' : rawIpAddress === CROSSZONE_IP ? 'unknown-crosszone' : undefined;
     return { uuid, time, rawIpAddress: listenerIpAddress, method, url, userAgent, referer, range, ulid, xpsId, ipSource, other };
 }

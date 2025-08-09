@@ -97,6 +97,7 @@ interface Redirect {
     readonly regionCodeRegionName?: string; // <regionCode>-<regionName>  // code: [0-9A-Z]{1,3}  maxname: Administrative-Territorial Units of the Left Bank of the Dniester
     readonly timezone?: string, // max: America/Argentina/Buenos_Aires
     readonly metroCode?: string, // [0-9]{3}
+    readonly cfWorker?: string, // https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-worker
 }
 
 export interface ValidRedirect extends Redirect {

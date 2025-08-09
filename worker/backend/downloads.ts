@@ -103,6 +103,8 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             if (ipSource === 'x-forwarded-for') {
                 tags = (tags ? `${tags},x-forwarded-for` : 'x-forwarded-for');
                 countryCode = continentCode = regionCode = regionName = timezone = metroCode = ''; // geo atts no longer represent the listener
+            } else if (ipSource === 'unknown-crosszone') {
+                tags = (tags ? `${tags},unknown-crosszone` : 'unknown-crosszone');
             }
             if (hashedIpAddress && isBotIpHash({ hashedIpAddress, asn, agentName, deviceName, destinationServerUrl, regionCode })) tags = (tags ? `${tags},bot-ip` : 'bot-ip');
 

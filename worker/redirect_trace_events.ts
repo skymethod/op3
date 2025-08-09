@@ -21,6 +21,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
     const destinationHostname = computeChainDestinationHostname(url) ?? '<unknown>';
     const userAgent = headers.get('user-agent') ?? undefined;
     const referer = headers.get('referer') ?? undefined;
+    const cfWorker = headers.get('cf-worker') ?? undefined;
     const hasForwarded = headers.has('forwarded');
     const hasXForwardedFor = headers.has('x-forwarded-for');
     const ipAddressShape = rawIpAddress === '<missing>' ? '' : rawIpAddress.replaceAll(/[a-z]/g, 'a').replaceAll(/[A-Z]/g, 'A').replaceAll(/\d/g, 'n');
@@ -130,7 +131,7 @@ export async function computeRedirectTraceEvent({ request, redirectRequest, vali
         kind: banned ? 'banned-redirect' : redirectRequest.kind === 'valid' ? 'valid-redirect' : 'invalid-redirect',
         colo, url, country, destinationHostname, userAgent: userAgent ?? '<missing>', referer : referer ?? '<missing>', hasForwarded, hasXForwardedFor, usedXForwardedFor, ipAddressShape, ipAddressVersion, ipAddressKnown,
         errors, asn, apVersion, cfVersion, dwVersion, timeUuid, botType, hashedIpAddress, hashedIpAddressForDownload, audienceIdDownloadId, audienceIdDownloadId2, agentTypeAgentName,
-        deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode,
+        deviceTypeDeviceName, referrerTypeReferrerName, regionCodeRegionName, timezone, metroCode, cfWorker,
      };
 }
 
