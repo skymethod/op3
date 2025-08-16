@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@40f382d480406d804f90b7b2d0660e0290e4bd64 (2025-07-24T16:33:22Z)
+// from user-agents-v2@802fde3531f73a7fc83bc6ceb468bcc411d2cd60 (2025-08-16T15:47:13Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -598,6 +598,9 @@ const appTests = {
     'GBEngine/1.2 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `GBEngine` },
     'GMB Show/1.2.0 (iPad; iOS 9.3.2; Scale/2.00)': { type: 'app', name: `GMB Show` },
     'Godcaster app 1.0': { type: 'app', name: `Godcaster` },
+    'GodcasterApp/android/v1.13.0': { type: 'app', name: `Godcaster` },
+    'GodcasterApp/v1.18.0 (ios)': { type: 'app', name: `Godcaster` },
+    'GodcasterApp/v1.22 (android)': { type: 'app', name: `Godcaster` },
     'Godster/2.0.6 (Linux;Android 9) ExoPlayerLib/2.8.3': { type: 'app', name: `Godster` },
     'GoldenPod/0.8.4 (GNU/Linux; podcatcher; Using LWP) libwwwperl': { type: 'app', name: `GoldenPod` },
     'GoLoud/1092 CFNetwork/978.0.7 Darwin/18.6.0': { type: 'app', name: `GoLoud` },
@@ -1110,6 +1113,8 @@ const appTests = {
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) ; iPhone/13.6 XING/8.15.2 ttt_webview_iosm': { type: 'app', name: `XING` },
     'Yandex.Music/2019-11-01.trunk.5885661': { type: 'app', name: `Yandex Music` },
     'Ya.Music/2022-10-06.trunk.10125214': { type: 'app', name: `Yandex Music` },
+    'Yoto/14665 CFNetwork/1.0 Darwin/18.5.0': { type: 'app', name: `Yoto` },
+    'Yoto/15035 CFNetwork/1335.0.3.4 Darwin/15.8.4': { type: 'app', name: `Yoto` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231105.002; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62251340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
