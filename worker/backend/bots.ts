@@ -116,4 +116,5 @@ const botIpHashes = new Set([
     '1acee9cfd3c20970fbd5f1d644a5238049fe82f6', // 2025-08-05 for 2025-08-04
     'd93736faf20dd53ce89d6e2ffd567cbd285ab730', // 2025-08-05 for 2025-08-04
     'ee7bfc14e5ebadfcac0ab403d4e2061aab2f53c1', // 2025-08-09 for 2025-08-08
+    'db2a64e741d755d040a5589571448dbdf000a6e7', // 2025-08-17 for 2025-08-15to16
 ]);
