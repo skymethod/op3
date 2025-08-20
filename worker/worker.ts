@@ -1,5 +1,5 @@
 import { computeOther, computeRawIpAddress, tryComputeColo } from './cloudflare_request.ts';
-import { CfCache, CfGlobalCaches, ModuleWorkerContext, QueueMessageBatch, R2Bucket } from './deps.ts';
+import { CfCache, CfGlobalCaches, ModuleWorkerContext, QueueMessageBatch, R2Bucket, Bytes } from './deps.ts';
 import { computeHomeResponse } from './routes/home.ts';
 import { computeInfoResponse } from './routes/info.ts';
 import { computeRedirectResponse, tryParseRedirectRequest } from './routes/redirect_episode.ts';
@@ -180,6 +180,8 @@ export default {
 
 //
 
+type HlsResult = { response: Response, sid?: string, pendingWork?: () => Promise<{ hash: string }> };
+
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
 
@@ -196,11 +198,11 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     const banned = redirectRequest.kind === 'valid' && await banlist?.isBanned(redirectRequest.targetUrl);
 
     // proxy hls playlist requests (if opted in)
-    let proxyResponse: Response | undefined;
-    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin) {
-        const { origin } = env;
+    let hlsResult: HlsResult | undefined;
+    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket) {
+        const { origin, blobsBucket } = env;
         const { method } = request;
-        proxyResponse = await tryComputeHlsResponse(redirectRequest.targetUrl, { method, origin });
+        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket });
     }
 
     // do the expensive work after quickly returning the redirect response
@@ -219,6 +221,8 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
+                if (hlsResult?.sid) other.sid = hlsResult.sid;
+                if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                 rawRedirects.push(rawRedirect);
@@ -272,9 +276,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
         console.log(`Non-podcast redirect url: ${request.url}`);
         return new Response('Non-podcast redirect url', { status: 400 });
     } else if (redirectRequest.kind === 'valid') {
-        if (proxyResponse) {
+        if (hlsResult) {
             console.log(`Proxied: ${request.method} ${redirectRequest.targetUrl}`);
-            return proxyResponse;
+            return hlsResult.response;
         } else {
             console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
             return computeRedirectResponse(redirectRequest);
@@ -285,41 +289,55 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function tryComputeHlsResponse(hlsUrl: string, { method, origin }: { method: string, origin: string }): Promise<Response | undefined> {
+async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket }: { method: string, origin: string, blobsBucket: R2Bucket }): Promise<HlsResult | undefined> {
     const u = tryParseUrl(hlsUrl);
     if (!u?.pathname.endsWith('.m3u8')) return undefined;
-    if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }); // cors pre-flight
+    if (method === 'OPTIONS') return { response: new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }) }; // cors pre-flight
     if (method !== 'GET' && method !== 'HEAD') return undefined; // only proxy read requests
     u.searchParams.set('_t', Date.now().toString());
     try {
         const times: Record<string, number> = {};
         const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
         if (!res.ok) return undefined; // unexpected response status, log these?
-        const { 'content-type': contentType } = Object.fromEntries(res.headers);
+        const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
         const sid = generateUuid();
-        const lines: string[] = [];
+        const oldLines: string[] = [];
+        const newLines: string[] = [];
         await timed(times, 'read', async () => {
             for await (const line of computeLinestream(res.body!)) {
+                oldLines.push(line);
                 const trimmed = line.trim();
                 if (trimmed.length > 0 && !trimmed.startsWith('#')) {
                     // uri line, transform!
                     const absUrl = new URL(trimmed, u).toString();
                     if (!absUrl.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
                     const transformedLine = `${origin}/e,hls=1,s=${sid}/${absUrl.substring('https://'.length)}`;
-                    lines.push(transformedLine);
+                    newLines.push(transformedLine);
                 } else {
-                    lines.push(line);
+                    newLines.push(line);
                 }
             }
         });
         const headers = new Headers(res.headers);
         headers.set('cache-control', 'private, no-cache');
         headers.set('access-control-allow-origin', '*');
-        headers.set('x-times', JSON.stringify(times)); // use Server-Timing ?
+        if (server) headers.set('x-server', server);
+        headers.set('x-times', JSON.stringify(times)); // TODO use Server-Timing ?
         headers.set('x-sid', sid);
-        return new Response(lines.join('\n'), { headers });
+        const pendingWork = async () => {
+            const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
+            const hash = (await originalBytes.sha1()).hex();
+            // TODO avoid repeated puts by caching known playlist hashes
+            try {
+                await blobsBucket.put(`hls/playlists/${hash}.txt`, originalBytes.array(), { onlyIf: new Headers({ 'if-match': '*' }) }); // put if not exists
+            } catch {
+                // better luck next time
+            }
+            return { hash };
+        }
+        return { response: new Response(newLines.join('\n'), { headers }), sid, pendingWork };
     } catch {
         // we tried, log these?
         return undefined;
