@@ -1,10 +1,11 @@
+import { tryParsePrefixArgumentsFromArgstring } from '../backend/prefix_arguments.ts';
 import { tryParseInt } from '../check.ts';
 
 export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | undefined {
     // parse path by hand instead of using URL.pathname, we need to be robust to any and all input
     const m = /^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?\/e(,.*?)?\/\/?(https?:\/\/?)?(.*?)$/.exec(requestUrl);
     if (!m) return undefined;
-    const [ _, _optPort, _optArgs, optPrefix, suffix ] = m;
+    const [ _, _optPort, optArgs, optPrefix, suffix ] = m;
     if (/^https?:\/\//.test(suffix)) return { kind: 'invalid' }; // /e/https://
     if (!isValidSuffix(suffix)) {
         if (suffix && suffix.startsWith('pg=') && requestUrl && requestUrl.includes('://op3.dev/e/pg=')) {
@@ -16,7 +17,8 @@ export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | u
     let prefix = optPrefix ?? 'https://';
     if (!prefix.endsWith('//')) prefix += '/'; // /e/https:/
     const targetUrl = `${prefix}${suffix}`;
-    return { kind: 'valid', targetUrl };
+    const prefixArgs = typeof optArgs === 'string' ? tryParsePrefixArgumentsFromArgstring(optArgs) : undefined;
+    return { kind: 'valid', targetUrl, ...(prefixArgs && { prefixArgs}) };
 }
 
 export function computeRedirectResponse(request: ValidRedirectRequest): Response {
@@ -45,6 +47,7 @@ export type RedirectRequest = ValidRedirectRequest | InvalidRedirectRequest;
 export interface ValidRedirectRequest {
     readonly kind: 'valid';
     readonly targetUrl: string;
+    readonly prefixArgs?: Record<string, string>;
 }
 
 export interface InvalidRedirectRequest {
