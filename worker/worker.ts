@@ -40,7 +40,10 @@ import { computeFaviconSvgResponse } from './routes/favicons.ts';
 import { makeBaselimeFromWorkerContext } from './baselime.ts';
 import { makeCloudflareLimiter } from './limiter.ts';
 import { computeRawRedirect } from './backend/raw_redirects.ts';
-import { tryParseInt } from './check.ts';
+import { tryParseInt, tryParseUrl } from './check.ts';
+import { computeUserAgent } from './outbound.ts';
+import { computeLinestream } from './streams.ts';
+import { timed } from './async.ts';
 
 export default {
     
@@ -192,6 +195,14 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     // a trivial in-memory lookup for a running worker, falls back to colo cache api (fast) or kv (fast-ish) in the worst case
     const banned = redirectRequest.kind === 'valid' && await banlist?.isBanned(redirectRequest.targetUrl);
 
+    // proxy hls playlist requests (if opted in)
+    let proxyResponse: Response | undefined;
+    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin) {
+        const { origin } = env;
+        const { method } = request;
+        proxyResponse = await tryComputeHlsResponse(redirectRequest.targetUrl, { method, origin });
+    }
+
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
         const { backendNamespace, kvNamespace } = env;
@@ -261,11 +272,57 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
         console.log(`Non-podcast redirect url: ${request.url}`);
         return new Response('Non-podcast redirect url', { status: 400 });
     } else if (redirectRequest.kind === 'valid') {
-        console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
-        return computeRedirectResponse(redirectRequest);
+        if (proxyResponse) {
+            console.log(`Proxied: ${request.method} ${redirectRequest.targetUrl}`);
+            return proxyResponse;
+        } else {
+            console.log(`Redirecting to: ${redirectRequest.targetUrl}`);
+            return computeRedirectResponse(redirectRequest);
+        }
     } else {
         console.log(`Invalid redirect url: ${request.url}`);
         return new Response('Invalid redirect url', { status: 400 });
+    }
+}
+
+async function tryComputeHlsResponse(hlsUrl: string, { method, origin }: { method: string, origin: string }): Promise<Response | undefined> {
+    const u = tryParseUrl(hlsUrl);
+    if (!u?.pathname.endsWith('.m3u8')) return undefined;
+    if (method === 'OPTIONS') return new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }); // cors pre-flight
+    if (method !== 'GET' && method !== 'HEAD') return undefined; // only proxy read requests
+    u.searchParams.set('_t', Date.now().toString());
+    try {
+        const times: Record<string, number> = {};
+        const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
+        if (!res.ok) return undefined; // unexpected response status, log these?
+        const { 'content-type': contentType } = Object.fromEntries(res.headers);
+        if (contentType !== 'application/vnd.apple.mpegurl') return undefined;  // unexpected content-type, log these?
+        if (!res.body) return undefined;  // no response body, log these?
+        const sid = generateUuid();
+        const lines: string[] = [];
+        await timed(times, 'read', async () => {
+            for await (const line of computeLinestream(res.body!)) {
+                const trimmed = line.trim();
+                if (trimmed.length > 0 && !trimmed.startsWith('#')) {
+                    // uri line, transform!
+                    const absUrl = new URL(trimmed, u).toString();
+                    if (!absUrl.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
+                    const transformedLine = `${origin}/e,hls=1,s=${sid}/${absUrl.substring('https://'.length)}`;
+                    lines.push(transformedLine);
+                } else {
+                    lines.push(line);
+                }
+            }
+        });
+        const headers = new Headers(res.headers);
+        headers.set('cache-control', 'private, no-cache');
+        headers.set('access-control-allow-origin', '*');
+        headers.set('x-times', JSON.stringify(times)); // use Server-Timing ?
+        headers.set('x-sid', sid);
+        return new Response(lines.join('\n'), { headers });
+    } catch {
+        // we tried, log these?
+        return undefined;
     }
 }
 

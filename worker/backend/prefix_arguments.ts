@@ -1,4 +1,5 @@
 import { isValidGuid } from '../check.ts';
+import { isValidUuid } from '../uuid.ts';
 
 export function tryParsePrefixArguments(url: string, { origin }: { origin: string }): Record<string, string> | undefined {
     // not necessarily an inbound url, could be from an external notification with op3 somewhere in the middle of the redirect chain
@@ -17,11 +18,15 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
                 if (isValidGuid(pg)) {
                     rt = { ...rt, pg };
                 }
-            }
-            if (name === 'hls') {
+            } else if (name === 'hls') {
                 const hls = value.toLowerCase();
                 if (/^[01]$/.test(hls)) {
                     rt = { ...rt, hls };
+                }
+            } else if (name === 's') {
+                const s = value.toLowerCase();
+                if (isValidUuid(s)) {
+                    rt = { ...rt, s };
                 }
             }
         }
@@ -31,5 +36,5 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
 
 //
 
-const ARGSTRING = ',(pg|hls)(=|%3[Dd])([0-9A-Fa-f-]+)';
+const ARGSTRING = ',(pg|hls|s)(=|%3[Dd])([0-9A-Fa-f-]+)';
 const ARGSTRING_PATTERN = new RegExp(ARGSTRING, 'g');
