@@ -42,6 +42,14 @@ interface CostDetail {
 
 const COSTS: Cost[] = [
     {
+        date: '2025-08-18',
+        description: 'Cloudflare invoice',
+        cost: 18.55,
+        detail: [
+            { description: 'Cloudflare Pro Plan (op3.dev)', cost: 18.55 },
+        ]
+    },
+    {
         date: '2025-08-10',
         description: 'Cloudflare invoice',
         cost: 497.27,
