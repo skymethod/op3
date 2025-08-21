@@ -138,7 +138,7 @@ export class HlsController {
             return { results, message };
         }
         if (targetPath === '/hls/reinit' && operationKind === 'update') {
-            if (!origin.startsWith('ci.')) throw new Error(`Only allowed on ci!`);
+            if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
             [ 'request', 'pid_hls_hash', 'hls_variant' ].forEach(v => sql.exec(`drop table if exists ${v}`));
             initSql(sql);
             return { message: 'reinit!' };
