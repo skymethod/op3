@@ -20,15 +20,15 @@ export class HlsController {
         const { sql } = storage;
         this.sql = sql;
         this.origin = origin;
-
-        sql.exec(`create table if not exists request(${REQUEST_COLUMNS.join(', ')}) without rowid`);
+        initSql(sql);
     }
 
     async sendPackedRecords(request: SendPackedRecordsRequest): Promise<void> {
         await Promise.resolve();
         const { storage, sql, origin } = this;
         const attNums = new AttNums(request.attNums);
-        const rows = new Map<string, (string | undefined)[]>(); // binding values by uuid
+        const requestRows = new Map<string, (string | undefined)[]>(); // binding values by uuid
+        const pidHlsHashRows = new Map<string, (string | undefined)[]>(); // binding values by pid
         for (const [ uuid, record ] of Object.entries(request.records)) {
             if (!isValidUuid(uuid)) throw new Error(`Bad uuid: ${uuid}`);
             const obj = attNums.unpackRecord(record);
@@ -76,7 +76,7 @@ export class HlsController {
             const hashedIpAddressForDownload = packedHashedIpAddressForDownload ? unpackHashedIpAddressHash(packedHashedIpAddressForDownload) : undefined;
 
             const prefixArgs = tryParsePrefixArguments(url, { origin });
-            rows.set(uuid, [
+            requestRows.set(uuid, [
                 uuid,
                 JSON.stringify({ ...rest, prefixArgs }),
                 method,
@@ -101,35 +101,47 @@ export class HlsController {
                 asnStr,
                 subrequest,
                 doColo,
+                undefined, // hls_variant_hash
             ]);
+
+            if (typeof pid === 'string' && typeof hlsHash === 'string') {
+                pidHlsHashRows.set(pid, [ pid, hlsHash ]);
+            }
         }
         storage.transactionSync(() => {
-            for (const bindings of rows.values()) {
+            for (const bindings of requestRows.values()) {
                 sql.exec(`insert or ignore into request(${REQUEST_COLUMN_NAMES.join(', ')}) values (${REQUEST_COLUMN_NAMES.map(_ => '?').join(', ')})`, ...bindings);
+            }
+            for (const bindings of pidHlsHashRows.values()) {
+                sql.exec(`insert or ignore into pid_hls_hash(pid, hls_hash) values (?, ?)`, ...bindings);
             }
         });
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         await Promise.resolve();
-        const { sql } = this;
+        const { sql, origin } = this;
         const { operationKind, targetPath, parameters } = req;
-        if (targetPath === '/hls/query') {
-            if (operationKind === 'update') {
-                const { q, ...rest } = parameters ?? {};
-                if (typeof q !== 'string') throw new Error(`Param 'q' is required`);
-                const params: unknown[] = [];
-                for (let i = 1; i < 10; i++) {
-                    const v = rest[`p${i}`];
-                    if (typeof v !== 'string') break;
-                    params.push(v);
-                }
-                const c = sql.exec(q, ...params);
-                const { rowsRead, rowsWritten } = c;
-                const results = c.toArray();
-                const message = JSON.stringify({ rowsRead, rowsWritten });
-                return { results, message };
+        if (targetPath === '/hls/query' && operationKind === 'update') {
+            const { q, ...rest } = parameters ?? {};
+            if (typeof q !== 'string') throw new Error(`Param 'q' is required`);
+            const params: unknown[] = [];
+            for (let i = 1; i < 10; i++) {
+                const v = rest[`p${i}`];
+                if (typeof v !== 'string') break;
+                params.push(v);
             }
+            const c = sql.exec(q, ...params);
+            const { rowsRead, rowsWritten } = c;
+            const results = c.toArray();
+            const message = JSON.stringify({ rowsRead, rowsWritten });
+            return { results, message };
+        }
+        if (targetPath === '/hls/reinit' && operationKind === 'update') {
+            if (!origin.startsWith('ci.')) throw new Error(`Only allowed on ci!`);
+            [ 'request', 'pid_hls_hash', 'hls_variant' ].forEach(v => sql.exec(`drop table if exists ${v}`));
+            initSql(sql);
+            return { message: 'reinit!' };
         }
 
         throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters })}`);
@@ -166,6 +178,13 @@ const REQUEST_COLUMNS = [
     'asn text',
     'subrequest text',
     'do_colo text',
+    'hls_variant_hash text',
 ];
 
 const REQUEST_COLUMN_NAMES = REQUEST_COLUMNS.map(v => v.split(' ')[0]);
+
+function initSql(sql: SqlStorage) {
+    sql.exec(`create table if not exists request(${REQUEST_COLUMNS.join(', ')}) without rowid`);
+    sql.exec(`create table if not exists pid_hls_hash(pid text primary key, hls_hash text not null) without rowid`);
+    sql.exec(`create table if not exists hls_variant(hls_variant_hash text primary key, atts text not null) without rowid`);
+}
