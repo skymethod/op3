@@ -335,7 +335,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
             try {
                 const key = `hls/playlists/${hash}.txt`;
                 if (!await blobsBucket.head(key)) {
-                    await blobsBucket.put(key, originalBytes.array());
+                    await blobsBucket.put(key, originalBytes.array(), { httpMetadata: { contentType: 'text/plain' } });
                 }
             } catch (e) {
                 console.error(`error saving playlist ${hash}: ${(e as Error).stack || e}`);
