@@ -180,7 +180,7 @@ export default {
 
 //
 
-type HlsResult = { response: Response, sid?: string, pendingWork?: () => Promise<{ hash: string }> };
+type HlsResult = { response: Response, sid?: string, pid?: string, pendingWork?: () => Promise<{ hash: string }> };
 
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
@@ -219,13 +219,16 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             
             rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
             if (redirectRequest.kind === 'valid' && !banned) {
+                const { prefixArgs } = redirectRequest;
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
-                const sid = hlsResult?.sid ?? redirectRequest.prefixArgs?.s;
+                const sid = hlsResult?.sid ?? prefixArgs?.s;
                 if (sid) other.sid = sid;
+                if (hlsResult?.pid) other.pid = hlsResult.pid;
                 if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
-                if (typeof redirectRequest.prefixArgs?.s === 'string') other.subrequest = 'hls';
+                if (typeof prefixArgs?.s === 'string') other.subrequest = 'hls';
+                if (typeof prefixArgs?.p === 'string') other.ppid = prefixArgs.p;
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                 rawRedirects.push(rawRedirect);
@@ -306,6 +309,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         if (contentType !== 'application/vnd.apple.mpegurl') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
         const sid = prefixArgs.s ?? generateUuid();
+        const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
         const oldLines: string[] = [];
         const newLines: string[] = [];
         await timed(times, 'read', async () => {
@@ -316,7 +320,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
                     // uri line, transform!
                     const absUrl = new URL(trimmed, u).toString();
                     if (!absUrl.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
-                    const transformedLine = `${origin}/e,hls=1,s=${sid}/${absUrl.substring('https://'.length)}`;
+                    const transformedLine = `${origin}/e,hls=1,s=${sid},p=${pid}/${absUrl.substring('https://'.length)}`;
                     newLines.push(transformedLine);
                 } else {
                     newLines.push(line);
@@ -329,6 +333,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         if (server) headers.set('x-server', server);
         headers.set('x-times', JSON.stringify(times)); // TODO use Server-Timing ?
         headers.set('x-sid', sid);
+        headers.set('x-pid', pid);
         const pendingWork = async () => {
             const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
             const hash = (await originalBytes.sha1()).hex();
@@ -343,7 +348,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
             }
             return { hash };
         }
-        return { response: new Response(newLines.join('\n'), { headers }), sid, pendingWork };
+        return { response: new Response(newLines.join('\n'), { headers }), sid, pid, pendingWork };
     } catch {
         // we tried, log these?
         return undefined;

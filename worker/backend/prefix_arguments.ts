@@ -28,6 +28,11 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
                 if (isValidUuid(s)) {
                     rt = { ...rt, s };
                 }
+            } else if (name === 'p') {
+                const p = value.toLowerCase();
+                if (isValidUuid(p)) {
+                    rt = { ...rt, p };
+                }
             }
         }
     }
@@ -36,5 +41,5 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
 
 //
 
-const ARGSTRING = ',(pg|hls|s)(=|%3[Dd])([0-9A-Fa-f-]+)';
+const ARGSTRING = ',(pg|hls|s|p)(=|%3[Dd])([0-9A-Fa-f-]+)';
 const ARGSTRING_PATTERN = new RegExp(ARGSTRING, 'g');
