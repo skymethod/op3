@@ -306,7 +306,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
         if (!res.ok) return undefined; // unexpected response status, log these?
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
-        if (contentType !== 'application/vnd.apple.mpegurl') return undefined;  // unexpected content-type, log these?
+        if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
