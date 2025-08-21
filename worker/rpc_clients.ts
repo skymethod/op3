@@ -1,5 +1,5 @@
 import { check, checkMatches, isNotBlank, isValidOrigin } from './check.ts';
-import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, QueryHitsIndexRequest } from './rpc_model.ts';
+import { LogRawRedirectsBatchRequest, LogRawRedirectsBatchResponse, QueryHitsIndexRequest, SendPackedRecordsRequest } from './rpc_model.ts';
 import { AdminDataRequest, AdminDataResponse, AdminGetMetricsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AlarmRequest, ApiKeyResponse, ExternalNotificationRequest, GenerateNewApiKeyRequest, GetApiKeyRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, LogRawRedirectsRequest, ModifyApiKeyRequest, OkResponse, PackedRedirectLogsResponse, QueryDownloadsRequest, QueryPackedRedirectLogsRequest, QueryRedirectLogsRequest, RedirectLogsNotificationRequest, RegisterDORequest, ResolveApiTokenRequest, ResolveApiTokenResponse, RpcClient, RpcRequest, RpcResponse, Unkinded } from './rpc_model.ts';
 
 export class StubRpcClient implements RpcClient {
@@ -67,8 +67,12 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: receiveExternalNotification(${JSON.stringify({ request, target })}) not implemented`);
     }
 
-    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        throw new Error(`StubRpcClient: adminExecuteDataQuery(${JSON.stringify({ request, target })}) not implemented`);
+    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>,  target: string, { sql }: { sql?: boolean } = {}): Promise<OkResponse> {
+        throw new Error(`StubRpcClient: sendPackedRecords(${JSON.stringify({ request, target, sql })}) not implemented`);
+    }
+
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<AdminDataResponse> {
+        throw new Error(`StubRpcClient: adminExecuteDataQuery(${JSON.stringify({ request, target, sql })}) not implemented`);
     }
 
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {

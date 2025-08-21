@@ -23,6 +23,7 @@ export type RpcRequest =
     | RedirectLogsNotificationRequest
     | RegisterDORequest 
     | ResolveApiTokenRequest
+    | SendPackedRecordsRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -46,6 +47,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'redirect-logs-notification'
         || obj.kind === 'register-do' 
         || obj.kind === 'resolve-api-token'
+        || obj.kind === 'send-packed-records'
     );
 }
 
@@ -114,6 +116,7 @@ export interface DOInfo {
     readonly firstSeen: string; // instant
     readonly lastSeen: string; // instant
     readonly changes: readonly Change[]; // to id, name, colo
+    readonly sql?: boolean;
 }
 
 export function isValidDOInfo(obj: any): obj is DOInfo {
@@ -133,6 +136,7 @@ export function checkDOInfo(obj: any): obj is DOInfo {
         && check('firstSeen', obj.firstSeen, v => typeof v === 'string')
         && check('lastSeen', obj.lastSeen, v => typeof v === 'string')
         && check('changes', obj.changes, v => Array.isArray(v) && v.every(isValidChange))
+        && check('sql', obj.sql, v => v === undefined || typeof v === 'boolean')
         ;
 }
 
@@ -348,6 +352,12 @@ export function isExternalNotification(obj: unknown): obj is ExternalNotificatio
         ;
 }
 
+export interface SendPackedRecordsRequest {
+    readonly kind: 'send-packed-records';
+    readonly attNums: Record<string, number>;
+    readonly records: Record<string, string>; // uuid -> record
+}
+
 //
 
 export type RpcResponse = 
@@ -512,6 +522,7 @@ export interface LogRawRedirectsBatchResponse {
         readonly saveMinuteFile: number,
         readonly saveIndexRecords: number,
         readonly sendNotification: number,
+        readonly sendPackedRecords: number,
     }
 }
 
@@ -536,8 +547,9 @@ export interface RpcClient {
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse>;
+    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, opts?: { sql?: boolean }): Promise<OkResponse>;
 
-    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, opts?: { sql?: boolean }): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
 }

@@ -32,6 +32,7 @@ jobs:
           CF_CUSTOM_DOMAIN: ci.op3.dev
           CF_SCRIPT_NAME: op3-ci
           CF_BACKEND_DO_NAMESPACE: backend-do-ci
+          CF_BACKEND_SQL_DO_NAMESPACE: backend-sql-do-ci
           CF_AE_DATASET: dataset1-ci
           CF_ANALYTICS_TOKEN: 031c86bb64214cb5a6b7aab02b5e1925
           TURNSTILE_SITEKEY: 0x4AAAAAAAAv-9Je89jD5c9h
@@ -59,6 +60,7 @@ jobs:
           CF_CUSTOM_DOMAIN: staging.op3.dev
           CF_SCRIPT_NAME: op3-staging
           CF_BACKEND_DO_NAMESPACE: backend-do-staging
+          CF_BACKEND_SQL_DO_NAMESPACE: backend-sql-do-staging
           CF_AE_DATASET: dataset1-staging
           CF_ANALYTICS_TOKEN: 3c527d531d83451b8c89fba58678822a
           TURNSTILE_SITEKEY: 0x4AAAAAAAA2w5UVs5xYhwmA
@@ -86,6 +88,7 @@ jobs:
           CF_CUSTOM_DOMAIN: ${{ env.PRODUCTION_DOMAIN }}
           CF_SCRIPT_NAME: op3-prod
           CF_BACKEND_DO_NAMESPACE: backend-do-prod
+          CF_BACKEND_SQL_DO_NAMESPACE: backend-sql-do-prod
           CF_AE_DATASET: dataset1-prod
           CF_ANALYTICS_TOKEN: 7da609030515408f9ec8b16c529cecaf
           TURNSTILE_SITEKEY: 0x4AAAAAAAA2spHLeOT__ylU

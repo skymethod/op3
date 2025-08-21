@@ -33,7 +33,7 @@ import { computeDownloadCalculationResponse } from './routes/download_calculatio
 import { computeStatsResponse } from './routes/stats.ts';
 import { computeStatusResponse, tryParseStatusRequest } from './routes/status.ts';
 import { computeListenTimeCalculationResponse } from './routes/listen_time_calculation.ts';
-export { BackendDO } from './backend/backend_do.ts';
+export { BackendDO, BackendSqlDO } from './backend/backend_do.ts';
 import { sendWithRetries } from './queues.ts';
 import { computeRedirectTraceEvent } from './redirect_trace_events.ts';
 import { computeFaviconSvgResponse } from './routes/favicons.ts';
@@ -94,12 +94,12 @@ export default {
     async queue(batch: QueueMessageBatch, env: WorkerEnv) {
         try {
             const consumerStart = Date.now();
-            const { dataset1, backendNamespace, blobsBucket, queue1Name, queue2Name } = env;
+            const { dataset1, backendNamespace, backendSqlNamespace, blobsBucket, queue1Name, queue2Name } = env;
             initCloudflareTracer(dataset1);
             const colo = await ManualColo.get();
             setWorkerInfo({ colo, name: 'eyeball' });
 
-            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+            const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 3);
 
             if (batch.queue === queue1Name) {
                 // admin data job
@@ -202,12 +202,13 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket) {
         const { origin, blobsBucket } = env;
         const { method } = request;
-        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket });
+        const { prefixArgs } = redirectRequest;
+        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket, prefixArgs });
     }
 
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
-        const { backendNamespace, kvNamespace } = env;
+        const { backendNamespace, backendSqlNamespace, kvNamespace } = env;
         const { method } = request;
         let colo = 'XXX';
         let rawIpAddress = '';
@@ -223,6 +224,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 other.isolateId = IsolateId.get();
                 if (hlsResult?.sid) other.sid = hlsResult.sid;
                 if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
+                if (typeof redirectRequest.prefixArgs?.s === 'string') other.subrequest = 'hls';
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                 rawRedirects.push(rawRedirect);
@@ -230,7 +232,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             }
             
             if (rawRedirects.length > 0) {
-                const rpcClient = new CloudflareRpcClient(backendNamespace, 5);
+                const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 5);
                 const doName = DoNames.redirectLogForColo(colo);
 
                 // send raw redirects the new way
@@ -289,7 +291,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket }: { method: string, origin: string, blobsBucket: R2Bucket }): Promise<HlsResult | undefined> {
+async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string> }): Promise<HlsResult | undefined> {
     const u = tryParseUrl(hlsUrl);
     if (!u?.pathname.endsWith('.m3u8')) return undefined;
     if (method === 'OPTIONS') return { response: new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }) }; // cors pre-flight
@@ -302,7 +304,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
-        const sid = generateUuid();
+        const sid = prefixArgs.s ?? generateUuid();
         const oldLines: string[] = [];
         const newLines: string[] = [];
         await timed(times, 'read', async () => {
@@ -329,9 +331,11 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const pendingWork = async () => {
             const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
             const hash = (await originalBytes.sha1()).hex();
-            // TODO avoid repeated puts by caching known playlist hashes
             try {
-                await blobsBucket.put(`hls/playlists/${hash}.txt`, originalBytes.array(), { onlyIf: new Headers({ 'if-match': '*' }) }); // put if not exists
+                const key = `hls/playlists/${hash}.txt`;
+                if (!await blobsBucket.head(key)) {
+                    await blobsBucket.put(key, originalBytes.array(), { onlyIf: new Headers({ 'if-match': '*' }) }); // put if not exists
+                }
             } catch {
                 // better luck next time
             }
@@ -349,7 +353,7 @@ function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
 }
 
 async function computeResponse(request: Request, colo: string | undefined, env: WorkerEnv, context: ModuleWorkerContext): Promise<Response> {
-    const { instance, backendNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace, baselimeEventsUrl, baselimeApiKey, limiter1, xfetcher } = env;
+    const { instance, backendNamespace, backendSqlNamespace, productionDomain, cfAnalyticsToken, turnstileSitekey, turnstileSecretKey, podcastIndexCredentials, deploySha, deployTime, queue1: jobQueue, blobsBucket, roBlobsBucket, roRpcClientParams, kvNamespace, baselimeEventsUrl, baselimeApiKey, limiter1, xfetcher } = env;
     IsolateId.log();
     const { origin, hostname, pathname, searchParams, protocol } = new URL(request.url);
     const { method, headers } = request;
@@ -378,7 +382,7 @@ async function computeResponse(request: Request, colo: string | undefined, env: 
     { const r = tryParseReleasesRequest({ method, pathname, headers }); if (r) return computeReleasesResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken }); }
     if (method === 'GET' && pathname === '/robots.txt') return computeRobotsTxtResponse({ origin });
     if (method === 'GET' && pathname === '/sitemap.xml') return computeSitemapXmlResponse({ origin });
-    const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+    const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 3);
     { const r = tryParseStatusRequest({ method, pathname, headers }); if (r) return computeStatusResponse(r, { instance, origin, productionOrigin, cfAnalyticsToken, rpcClient }); }
 
     const background: Background = work => {

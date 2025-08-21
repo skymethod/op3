@@ -61,10 +61,13 @@ export class HitsController {
         const minuteTimestampsChanged = new Set<string>();
         const indexRecords: Record<string, string> = {};
         const serverUrlFoundTimestamps: Record<string /* serverUrl */ , string /* found timestamp */> = {};
+        const hlsRecords: Record<string, string> = {}; // uuid -> record
         for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
             for (const rawRedirect of rawRedirects) {
                 const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));
                 const obj = attNums.unpackRecord(record);
+                if (typeof rawRedirect.other?.sid === 'string') hlsRecords[rawRedirect.uuid] = record;
+                if (typeof rawRedirect.other?.subrequest === 'string') continue; // exclude these from hits and new url notifications, they will never match enclosures
                 const { sortKey, minuteTimestamp, timestamp } = computeRecordInfo(obj);
                 const minuteFile = await timed(times, 'ensureMinuteFileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
                 const inserted = minuteFile.insert([ record, sortKey ]);
@@ -140,8 +143,14 @@ export class HitsController {
             }
         }
 
+        // send hls records
+        if (Object.keys(hlsRecords).length > 0 && rpcClient) {
+            // fail batch if this fails
+            await timed(times, 'sendPackedRecords', () => rpcClient.sendPackedRecords({ attNums: attNums.toJson(), records: hlsRecords }, DoNames.hlsServer, { sql: true }));
+        }
+
         // summary analytics
-        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0, saveIndexRecords = 0, sendNotification = 0 } = times;
+        const { packRawRedirects = 0, saveAttNums = 0, ensureMinuteFileLoaded = 0, saveMinuteFile = 0, saveIndexRecords = 0, sendNotification = 0, sendPackedRecords = 0 } = times;
         const putCount = minuteTimestampsChanged.size;
 
         return { 
@@ -164,6 +173,7 @@ export class HitsController {
                 saveMinuteFile,
                 saveIndexRecords,
                 sendNotification,
+                sendPackedRecords,
             }
         };
     }

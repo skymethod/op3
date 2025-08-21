@@ -26,6 +26,7 @@ import { recomputeShowSummariesForMonth, tryParseRecomputeShowSummariesForMonthR
 import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } from './downloads.ts';
 import { computeQueryDownloadsResponse } from './query_downloads.ts';
 import { HitsController } from './hits_controller.ts';
+import { HlsController } from './hls_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -41,6 +42,7 @@ export class BackendDO {
     private apiAuthController?: ApiAuthController;
     private showController?: ShowController;
     private hitsController?: HitsController;
+    private hlsController?: HlsController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -65,9 +67,10 @@ export class BackendDO {
             writeTraceEvent({ kind: 'do-fetch', colo, durableObjectClass, durableObjectId, durableObjectName: durableObjectName ?? '<unnamed>', isolateId, method, pathname });
 
             if (!durableObjectName) throw new Error(`Missing do-name header!`);
-            const { backendNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, queue2, instance, xfetcher } = this.env;
+            const { backendNamespace, backendSqlNamespace, redirectLogNotificationDelaySeconds, deploySha, deployTime, origin, podcastIndexCredentials, blobsBucket, roBlobsBucket, queue2, instance, xfetcher } = this.env;
             if (!backendNamespace) throw new Error(`Missing backendNamespace!`);
-            const rpcClient = new CloudflareRpcClient(backendNamespace, 3);
+            if (!backendSqlNamespace) throw new Error(`Missing backendSqlNamespace!`);
+            const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 3);
             const doInfo = await this.ensureInitialized({ colo, name: durableObjectName, rpcClient });
 
             if (method === 'POST' && pathname === '/rpc') {
@@ -141,6 +144,13 @@ export class BackendDO {
                         return this.hitsController;
                     }
 
+                    const getOrLoadHlsController = () => {
+                        if (this.info?.sql !== true) throw new Error(`HlsController must use sql backend!`);
+                        if (typeof origin !== 'string') throw new Error(`Valid 'origin' is required to init HlsController: ${JSON.stringify(origin)}`);
+                        if (!this.hlsController) this.hlsController = new HlsController({ storage, origin });
+                        return this.hlsController;
+                    }
+
                     if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
                         if (obj.saveForLater) {
@@ -179,6 +189,9 @@ export class BackendDO {
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs, hitsBlobs) });
                         } else if (targetPath.startsWith('/hits/') && durableObjectName === DoNames.hitsServer) {
                             const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
+                            return newRpcResponse({ kind: 'admin-data', results, message });
+                        } else if (targetPath.startsWith('/hls/') && durableObjectName === DoNames.hlsServer) {
+                            const { results, message } = await getOrLoadHlsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } 
 
@@ -279,6 +292,9 @@ export class BackendDO {
                         return newRpcResponse(await getOrLoadHitsController().queryPackedRedirectLogs(obj));
                     } else if (obj.kind === 'query-hits-index' && durableObjectName === DoNames.hitsServer) {
                         return await getOrLoadHitsController().queryHitsIndex(obj);
+                    } else if (obj.kind === 'send-packed-records' && durableObjectName === DoNames.hlsServer) {
+                        await getOrLoadHlsController().sendPackedRecords(obj);
+                        return newRpcResponse({ kind: 'ok' });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
                     }
@@ -305,8 +321,8 @@ export class BackendDO {
             if (isValidAlarmPayload(payload)) {
                 // workaround no logs for alarm handlers
                 // make an rpc call back to this object
-                const { backendNamespace } = this.env;
-                const rpcClient = new CloudflareRpcClient(backendNamespace, 5); // alarm will retry for us, but we don't want to rely on that
+                const { backendNamespace, backendSqlNamespace } = this.env;
+                const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 5); // alarm will retry for us, but we don't want to rely on that
                 const fromIsolateId = IsolateId.get();
                 info = this.info ?? await loadDOInfo(storage);
                 if (!info) {
@@ -338,9 +354,10 @@ export class BackendDO {
         const { colo, name, rpcClient } = opts;
         const time = new Date().toISOString();
         const id = this.state.id.toString();
+        const sql = this instanceof BackendSqlDO;
 
         if (DoNames.isStorageless(name)) {
-            this.info = { id, name, colo, firstSeen: time, lastSeen: time, changes: [] };
+            this.info = { id, name, colo, firstSeen: time, lastSeen: time, changes: [], sql };
             return this.info;
         }
 
@@ -356,6 +373,9 @@ export class BackendDO {
             if (info.colo !== colo) {
                 info = { ...info, colo, changes: [ ...info.changes, { name: 'colo', value: colo, time }] };
             }
+            if ((info.sql ?? false) !== sql) {
+                info = { ...info, sql, changes: [ ...info.changes, { name: 'sql', value: sql.toString(), time }] };
+            }
             info = { ...info, lastSeen: time };
         } else {
             console.log(`ensureInitialized: adding`);
@@ -363,7 +383,8 @@ export class BackendDO {
                 { name: 'id', value: id, time },
                 { name: 'name', value: name, time },
                 { name: 'colo', value: colo, time },
-            ] };
+                { name: 'sql', value: sql.toString(), time },
+            ], sql };
         }
         await saveDOInfo(info, storage);
         this.info = info;
@@ -383,6 +404,12 @@ export class BackendDO {
         return info;
     }
 
+}
+
+export class BackendSqlDO extends BackendDO {
+    constructor(state: DurableObjectState, env: WorkerEnv) {
+        super(state, env);
+    }
 }
 
 //

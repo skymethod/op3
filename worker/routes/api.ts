@@ -148,6 +148,8 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/hits/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer);
+    } else if (targetPath.startsWith('/hls/')) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsServer, { sql: true });
     } 
     
     const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });

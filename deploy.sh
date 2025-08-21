@@ -4,8 +4,8 @@
 set -e
 
 # ensure required environment variables are defined
-if [ -z "$INSTANCE" ] || [ -z "$CF_ACCOUNT_ID" ] || [ -z "$CF_API_TOKEN" ] || [ -z "$CF_CUSTOM_DOMAIN" ] || [ -z "$CF_BACKEND_DO_NAMESPACE" ] || [ -z "$CF_SCRIPT_NAME" ]; then
-  echo "\$INSTANCE, \$CF_ACCOUNT_ID, \$CF_API_TOKEN, \$CF_CUSTOM_DOMAIN, \$CF_BACKEND_DO_NAMESPACE, and \$CF_SCRIPT_NAME are required"
+if [ -z "$INSTANCE" ] || [ -z "$CF_ACCOUNT_ID" ] || [ -z "$CF_API_TOKEN" ] || [ -z "$CF_CUSTOM_DOMAIN" ] || [ -z "$CF_BACKEND_DO_NAMESPACE" ] || [ -z "$CF_BACKEND_SQL_DO_NAMESPACE" ] || [ -z "$CF_SCRIPT_NAME" ]; then
+  echo "\$INSTANCE, \$CF_ACCOUNT_ID, \$CF_API_TOKEN, \$CF_CUSTOM_DOMAIN, \$CF_BACKEND_DO_NAMESPACE, \$CF_BACKEND_SQL_DO_NAMESPACE, and \$CF_SCRIPT_NAME are required"
   exit 1
 fi
 
@@ -40,6 +40,7 @@ push ./worker/worker.ts --account-id $CF_ACCOUNT_ID --api-token $CF_API_TOKEN --
 --text-binding deployFrom:$DEPLOY_FROM \
 --text-binding origin:https://$CF_CUSTOM_DOMAIN \
 --do-namespace-binding backendNamespace:$CF_BACKEND_DO_NAMESPACE:BackendDO \
+--do-namespace-binding backendSqlNamespace:$CF_BACKEND_SQL_DO_NAMESPACE:BackendSqlDO:backend=sql \
 --secret-binding adminTokens:$ADMIN_TOKENS \
 --secret-binding previewTokens:$PREVIEW_TOKENS \
 ${REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS:+--text-binding redirectLogNotificationDelaySeconds:$REDIRECT_LOG_NOTIFICATION_DELAY_SECONDS} \

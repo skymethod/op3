@@ -1,15 +1,17 @@
 import { tryParseInt } from './check.ts';
 import { isDurableObjectFetchErrorRetryable } from './cloudflare_errors.ts';
 import { DurableObjectNamespace } from './deps.ts';
-import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest } from './rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest, SendPackedRecordsRequest } from './rpc_model.ts';
 import { executeWithRetries } from './sleep.ts';
 
 export class CloudflareRpcClient implements RpcClient {
     private readonly backendNamespace: DurableObjectNamespace;
+    private readonly backendSqlNamespace: DurableObjectNamespace;
     private readonly maxRetries: number;
 
-    constructor(backendNamespace: DurableObjectNamespace, maxRetries: number) {
+    constructor(backendNamespace: DurableObjectNamespace, backendSqlNamespace: DurableObjectNamespace, maxRetries: number) {
         this.backendNamespace = backendNamespace;
+        this.backendSqlNamespace = backendSqlNamespace;
         this.maxRetries = maxRetries;
     }
 
@@ -77,10 +79,14 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<OkResponse>({ kind: 'external-notification', ...request }, 'ok', this.computeOpts(target));
     }
 
+    async sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<OkResponse> {
+        return await sendRpc<OkResponse>({ kind: 'send-packed-records', ...request }, 'ok', this.computeOpts(target, undefined, sql));
+    }
+
     //
 
-    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters));
+    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<AdminDataResponse> {
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters, sql));
     }
 
     async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
@@ -93,25 +99,26 @@ export class CloudflareRpcClient implements RpcClient {
 
     //
 
-    private computeOpts(target: string, parameters?: Record<string, string>): { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number } {
-        const { backendNamespace } = this;
+    private computeOpts(target: string, parameters?: Record<string, string>, sql?: boolean): { doName: string, backendOrSqlNamespace: DurableObjectNamespace, maxRetries: number } {
+        const { backendNamespace, backendSqlNamespace } = this;
         const maxRetries = tryParseInt(parameters?.maxRetries) ?? this.maxRetries;
-        return { doName: target, backendNamespace, maxRetries };
+        const backendOrSqlNamespace = sql ? backendSqlNamespace : backendNamespace;
+        return { doName: target, backendOrSqlNamespace, maxRetries };
     }
 
 }
 
 //
 
-async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace, maxRetries: number }): Promise<T> {
+async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendOrSqlNamespace: DurableObjectNamespace, maxRetries: number }): Promise<T> {
     const { maxRetries } = opts;
     return await executeWithRetries(() => sendSingleRpc(request, expectedResponseKind, opts), { tag: 'sendRpc', isRetryable: isDurableObjectFetchErrorRetryable, maxRetries });
 }
 
-async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendNamespace: DurableObjectNamespace }) {
-    const { doName, backendNamespace } = opts;
+async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendOrSqlNamespace: DurableObjectNamespace }) {
+    const { doName, backendOrSqlNamespace } = opts;
 
-    const stub = backendNamespace.get(backendNamespace.idFromName(doName));
+    const stub = backendOrSqlNamespace.get(backendOrSqlNamespace.idFromName(doName));
     const res = await stub.fetch('https://backend/rpc', { method: 'POST', body: JSON.stringify(request), headers: { 'do-name': doName } });
 
     if (res.status !== 200) throw new Error(`Bad rpc status: ${res.status}, body=${await res.text()}`);
@@ -126,4 +133,3 @@ async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, 
     // deno-lint-ignore no-explicit-any
     return obj as any;
 }
-
