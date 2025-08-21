@@ -222,7 +222,8 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
-                if (hlsResult?.sid) other.sid = hlsResult.sid;
+                const sid = hlsResult?.sid ?? redirectRequest.prefixArgs?.s;
+                if (sid) other.sid = sid;
                 if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
                 if (typeof redirectRequest.prefixArgs?.s === 'string') other.subrequest = 'hls';
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
@@ -334,9 +335,10 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
             try {
                 const key = `hls/playlists/${hash}.txt`;
                 if (!await blobsBucket.head(key)) {
-                    await blobsBucket.put(key, originalBytes.array(), { onlyIf: new Headers({ 'if-match': '*' }) }); // put if not exists
+                    await blobsBucket.put(key, originalBytes.array());
                 }
-            } catch {
+            } catch (e) {
+                console.error(`error saving playlist ${hash}: ${(e as Error).stack || e}`);
                 // better luck next time
             }
             return { hash };
