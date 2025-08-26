@@ -71,8 +71,8 @@ export class HlsController {
             if (!isValidUuid(sid)) throw new Error(`Bad sid: ${sid}`);
             if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestamp: ${timestamp}`);
             const time = timestampToInstant(timestamp);
-            if (!isValidTimestamp(verifiedTimestamp)) throw new Error(`Bad verifiedTimestamp: ${verifiedTimestamp}`);
-            const verifiedTime = timestampToInstant(verifiedTimestamp);
+            if (verifiedTimestamp !== undefined && !isValidTimestamp(verifiedTimestamp)) throw new Error(`Bad verifiedTimestamp: ${verifiedTimestamp}`);
+            const verifiedTime = verifiedTimestamp !== undefined ? timestampToInstant(verifiedTimestamp) : undefined;
             if (typeof isolateId !== 'string') throw new Error(`Bad isolateId: ${isolateId}`);
 
             const hashedIpAddress = packedHashedIpAddress ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
