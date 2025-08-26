@@ -223,35 +223,16 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             
             rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
             if (redirectRequest.kind === 'valid' && !banned) {
-                const { prefixArgs = {} } = redirectRequest;
+                const { prefixArgs = {}, targetUrl } = redirectRequest;
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
-                let sid = hlsResult?.sid;
-                let hlsPrefixArgsVerified = !!hlsResult;
-                let ignoreReason: string | undefined;
-                if (!hlsResult && prefixArgs.hls === '1' && prefixArgs.s && secret) {
-                    const u = tryParseUrl(redirectRequest.targetUrl);
-                    if (u && (await verifyHlsPrefixArgs(prefixArgs, u, secret)).verified) {
-                        hlsPrefixArgsVerified = true;
-                        sid = prefixArgs.s;
-                    }
-                    if (!hlsPrefixArgsVerified) ignoreReason = `Invalid hls prefix args: ${JSON.stringify(prefixArgs)}`;
-                }
-                if (typeof ignoreReason === 'string') {
-                    consoleWarn('worker-ignored-redirect', ignoreReason);
-                } else {
-                    if (sid) other.sid = sid;
-                    if (hlsResult?.pid) other.pid = hlsResult.pid;
-                    if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
-                    if (typeof prefixArgs?.s === 'string' && hlsPrefixArgsVerified) other.subrequest = 'hls';
-                    if (typeof prefixArgs?.p === 'string' && hlsPrefixArgsVerified) other.ppid = prefixArgs.p;
+                if (secret) await addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl });
 
-                    const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
-                    console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                    rawRedirects.push(rawRedirect);
-                    validRawRedirect = rawRedirect;
-                }
+                const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
+                console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                rawRedirects.push(rawRedirect);
+                validRawRedirect = rawRedirect;
             }
             
             if (rawRedirects.length > 0) {
@@ -314,15 +295,6 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function verifyHlsPrefixArgs(prefixArgs: Record<string, string>, u: URL, secret: string): Promise<{ hmacKey: CryptoKey, verified?: boolean }> {
-    const { s, p, t, g } = prefixArgs;
-    const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
-    if ([ s, p, t, g ].some(v => typeof v !== 'string')) return { hmacKey };
-    
-    const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
-    return { hmacKey, verified: sig === g };
-}
-
 async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs, secret }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string>, secret: string }): Promise<HlsResult | undefined> {
     const u = tryParseUrl(hlsUrl);
     if (!u?.pathname.endsWith('.m3u8')) return undefined;
@@ -336,12 +308,10 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
-        const { hmacKey, verified } = await verifyHlsPrefixArgs(prefixArgs, u, secret);
-        if (prefixArgs.s && !verified) return undefined; // verification failed, log these?
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
-
         const timestamp = computeTimestamp();
+        const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
         const oldLines: string[] = [];
         const newLines: string[] = [];
         await timed(times, 'read', async () => {
@@ -388,6 +358,29 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         // we tried, log these?
         return undefined;
     }
+}
+
+async function addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl }: { other: Record<string, string>, hlsResult: HlsResult | undefined, prefixArgs: Record<string, string>, secret: string, targetUrl: string }): Promise<void> {
+    const sid = hlsResult?.sid ?? prefixArgs.s;
+    if (sid) other.sid = sid;
+    if (hlsResult?.pid) other.pid = hlsResult.pid;
+    if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
+    if (typeof prefixArgs.p === 'string') other.ppid = prefixArgs.p;
+    if (typeof prefixArgs.s === 'string') {
+        other.subrequest = 'hls';
+        const { s, p, t, g } = prefixArgs;
+        if ([ s, p, t, g ].every(v => typeof v === 'string')) {
+            const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
+            const u = tryParseUrl(targetUrl);
+            if (u) {
+                const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
+                if (sig === g) {
+                    other.verifiedTimestamp = g;
+                }
+            }
+        }
+    }
+    
 }
 
 function parseStringSet(commaDelimitedString: string | undefined): Set<string> {

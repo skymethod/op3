@@ -44,6 +44,7 @@ export class HlsController {
                 // optional
                 'other.pid': pid,
                 'other.ppid': ppid,
+                'other.verifiedTimestamp': verifiedTimestamp,
                 'other.hlsHash': hlsHash,
                 encryptedIpAddress: _,
                 hashedIpAddress: packedHashedIpAddress,
@@ -70,6 +71,8 @@ export class HlsController {
             if (!isValidUuid(sid)) throw new Error(`Bad sid: ${sid}`);
             if (!isValidTimestamp(timestamp)) throw new Error(`Bad timestamp: ${timestamp}`);
             const time = timestampToInstant(timestamp);
+            if (!isValidTimestamp(verifiedTimestamp)) throw new Error(`Bad verifiedTimestamp: ${verifiedTimestamp}`);
+            const verifiedTime = timestampToInstant(verifiedTimestamp);
             if (typeof isolateId !== 'string') throw new Error(`Bad isolateId: ${isolateId}`);
 
             const hashedIpAddress = packedHashedIpAddress ? unpackHashedIpAddressHash(packedHashedIpAddress) : undefined;
@@ -87,6 +90,7 @@ export class HlsController {
 
                 pid,
                 ppid,
+                verifiedTime,
                 hlsHash,
                 hashedIpAddress,
                 hashedIpAddressForDownload,
@@ -164,6 +168,7 @@ const REQUEST_COLUMNS = [
     // optional
     'pid text',
     'ppid text',
+    'verified_time text',
     'hls_hash text',
     'hashed_ip_address text',
     'hashed_ip_address_for_download text',
