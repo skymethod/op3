@@ -2,7 +2,7 @@ import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { isValidHttpUrl } from '../check.ts';
 import { DurableObjectStorage, SqlStorage } from '../deps.ts';
 import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
-import { AdminDataRequest, AdminDataResponse, SendPackedRecordsRequest, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, ExecuteSqlRequest, ExecuteSqlResponse, SendPackedRecordsRequest, Unkinded } from '../rpc_model.ts';
 import { timestampToInstant } from '../timestamp.ts';
 import { isValidTimestamp } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -149,6 +149,21 @@ export class HlsController {
         }
 
         throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters })}`);
+    }
+
+    async executeSql(req: Unkinded<ExecuteSqlRequest>): Promise<Unkinded<ExecuteSqlResponse>> {
+        await Promise.resolve();
+        const { sql, storage } = this;
+        const rt: Unkinded<ExecuteSqlResponse> = { results: [] };
+        storage.transactionSync(() => {
+            for (const { q, params = [] } of req.statements) {
+                const c = sql.exec(q, ...params);
+                const { rowsRead, rowsWritten } = c;
+                const rows = c.toArray();
+                rt.results.push({ rows, rowsRead, rowsWritten });
+            }
+        });
+        return rt;
     }
 
 }

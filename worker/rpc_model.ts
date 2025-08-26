@@ -24,6 +24,7 @@ export type RpcRequest =
     | RegisterDORequest 
     | ResolveApiTokenRequest
     | SendPackedRecordsRequest
+    | ExecuteSqlRequest
     ;
 
 export function isRpcRequest(obj: any): obj is RpcRequest {
@@ -48,6 +49,7 @@ export function isRpcRequest(obj: any): obj is RpcRequest {
         || obj.kind === 'register-do' 
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'send-packed-records'
+        || obj.kind === 'execute-sql'
     );
 }
 
@@ -358,6 +360,15 @@ export interface SendPackedRecordsRequest {
     readonly records: Record<string, string>; // uuid -> record
 }
 
+export type SqlParam = string | number | boolean | null | undefined;
+
+export type SqlStatement = { q: string, params?: SqlParam[] };
+
+export interface ExecuteSqlRequest {
+    readonly kind: 'execute-sql';
+    readonly statements: SqlStatement[];
+}
+
 //
 
 export type RpcResponse = 
@@ -370,6 +381,7 @@ export type RpcResponse =
     | ResolveApiTokenResponse
     | ApiKeyResponse
     | LogRawRedirectsBatchResponse
+    | ExecuteSqlResponse
     ;
 
 export function isRpcResponse(obj: any): obj is RpcResponse {
@@ -383,6 +395,7 @@ export function isRpcResponse(obj: any): obj is RpcResponse {
         || obj.kind === 'resolve-api-token'
         || obj.kind === 'api-key'
         || obj.kind === 'log-raw-redirects-batch'
+        || obj.kind === 'execute-sql'
     );
 }
 
@@ -526,6 +539,17 @@ export interface LogRawRedirectsBatchResponse {
     }
 }
 
+export interface SqlStatementResult {
+    readonly rows: unknown[];
+    readonly rowsRead: number;
+    readonly rowsWritten: number;
+}
+
+export interface ExecuteSqlResponse {
+    readonly kind: 'execute-sql';
+    readonly results: SqlStatementResult[];
+}
+
 //
 
 export type Unkinded<T extends RpcRequest | RpcResponse> = Omit<T, 'kind'>;
@@ -548,6 +572,7 @@ export interface RpcClient {
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse>;
     sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, opts?: { sql?: boolean }): Promise<OkResponse>;
+    executeSql(request: Unkinded<ExecuteSqlRequest>, target: string): Promise<ExecuteSqlResponse>;
 
     adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, opts?: { sql?: boolean }): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
