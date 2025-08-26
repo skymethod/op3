@@ -291,6 +291,7 @@ async function computeAdminRpcResponse(method: string, bodyProvider: JsonProvide
     const { request, target } = await bodyProvider() as { request: RpcRequest, target: string };
     if (request.kind === 'query-packed-redirect-logs') return newJsonResponse(await rpcClient.queryPackedRedirectLogs(request, target));
     if (request.kind === 'query-hits-index') return await rpcClient.queryHitsIndex(request, target);
+    if (request.kind === 'execute-sql') return newJsonResponse(await rpcClient.executeSql(request, target));
     
     throw new Error(`Unsupported rpc call: ${JSON.stringify({ request, target })}`);
 }

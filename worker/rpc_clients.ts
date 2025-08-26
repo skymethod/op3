@@ -146,6 +146,10 @@ export class RemoteRpcClient extends StubRpcClient {
         return await this.executeRpc({ kind: 'query-packed-redirect-logs', ...request }, target);
     }
 
+    override async executeSql(request: Unkinded<ExecuteSqlRequest>, target: string): Promise<ExecuteSqlResponse> {
+        return await this.executeRpc({ kind: 'execute-sql', ...request }, target);
+    }
+
     //
     
     private async executeRpc<TResponse extends RpcResponse>(request: RpcRequest, target: string): Promise<TResponse> {
