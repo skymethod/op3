@@ -375,7 +375,7 @@ async function addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl }: 
             if (u) {
                 const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
                 if (sig === g) {
-                    other.verifiedTimestamp = g;
+                    other.verifiedTimestamp = t;
                 }
             }
         }
