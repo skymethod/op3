@@ -39,6 +39,11 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string): Record<
                 if (isValidTimestamp(t)) {
                     rt = { ...rt, t };
                 }
+            } else if (name === 'g') {
+                const g = value.toLowerCase();
+                if (/^[0-9a-f]{40}$/.test(g)) {
+                    rt = { ...rt, g };
+                }
             }
         }
     }
@@ -47,5 +52,5 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string): Record<
 
 //
 
-const ARGSTRING = ',(pg|hls|s|p|t)(=|%3[Dd])([0-9A-Fa-f-]+)';
+const ARGSTRING = ',(pg|hls|s|p|t|g)(=|%3[Dd])([0-9A-Fa-f-]+)';
 const ARGSTRING_PATTERN = new RegExp(ARGSTRING, 'g');
