@@ -44,6 +44,9 @@ import { tryParseInt, tryParseUrl } from './check.ts';
 import { computeUserAgent } from './outbound.ts';
 import { computeLinestream } from './streams.ts';
 import { timed } from './async.ts';
+import { importHmacKey } from './crypto.ts';
+import { hmac } from './crypto.ts';
+import { computeTimestamp } from './timestamp.ts';
 
 export default {
     
@@ -184,6 +187,7 @@ type HlsResult = { response: Response, sid?: string, pid?: string, pendingWork?:
 
 const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
+const hmacKeys = new Map<string, CryptoKey>();
 
 async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number, cache: CfCache }): Promise<Response | undefined> {
     // must never throw!
@@ -199,16 +203,16 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
 
     // proxy hls playlist requests (if opted in)
     let hlsResult: HlsResult | undefined;
-    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket) {
-        const { origin, blobsBucket } = env;
+    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket && env.podcastIndexCredentials) {
+        const { origin, blobsBucket, podcastIndexCredentials: secret } = env;
         const { method } = request;
         const { prefixArgs } = redirectRequest;
-        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket, prefixArgs });
+        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket, prefixArgs, secret });
     }
 
     // do the expensive work after quickly returning the redirect response
     context.waitUntil((async () => {
-        const { backendNamespace, backendSqlNamespace, kvNamespace } = env;
+        const { backendNamespace, backendSqlNamespace, kvNamespace, podcastIndexCredentials: secret } = env;
         const { method } = request;
         let colo = 'XXX';
         let rawIpAddress = '';
@@ -219,16 +223,25 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             
             rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
             if (redirectRequest.kind === 'valid' && !banned) {
-                const { prefixArgs } = redirectRequest;
+                const { prefixArgs = {} } = redirectRequest;
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
-                const sid = hlsResult?.sid ?? prefixArgs?.s;
+                let sid = hlsResult?.sid;
+                let hlsPrefixArgsVerified = !!hlsResult;
+                if (!hlsResult && prefixArgs.hls === '1' && prefixArgs.s && secret) {
+                    const u = tryParseUrl(redirectRequest.targetUrl);
+                    if (u && await verifyHlsPrefixArgs(prefixArgs, u, secret) !== undefined) {
+                        hlsPrefixArgsVerified = true;
+                        sid = prefixArgs.s;
+                    }
+                }
                 if (sid) other.sid = sid;
                 if (hlsResult?.pid) other.pid = hlsResult.pid;
                 if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
-                if (typeof prefixArgs?.s === 'string') other.subrequest = 'hls';
-                if (typeof prefixArgs?.p === 'string') other.ppid = prefixArgs.p;
+                if (typeof prefixArgs?.s === 'string' && hlsPrefixArgsVerified) other.subrequest = 'hls';
+                if (typeof prefixArgs?.p === 'string' && hlsPrefixArgsVerified) other.ppid = prefixArgs.p;
+
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
                 rawRedirects.push(rawRedirect);
@@ -295,7 +308,15 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string> }): Promise<HlsResult | undefined> {
+async function verifyHlsPrefixArgs(prefixArgs: Record<string, string>, u: URL, secret: string): Promise<CryptoKey | undefined> {
+    const { s, p, t, g } = prefixArgs;
+    if ([ s, p, t, g ].some(v => typeof v !== 'string')) return undefined;
+    const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
+    const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
+    if (sig === g) return hmacKey;
+}
+
+async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs, secret }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string>, secret: string }): Promise<HlsResult | undefined> {
     const u = tryParseUrl(hlsUrl);
     if (!u?.pathname.endsWith('.m3u8')) return undefined;
     if (method === 'OPTIONS') return { response: new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }) }; // cors pre-flight
@@ -308,8 +329,12 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
+        const hmacKey = await verifyHlsPrefixArgs(prefixArgs, u, secret);
+        if (!hmacKey) return undefined; // verification failed, log these?
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
+
+        const timestamp = computeTimestamp();
         const oldLines: string[] = [];
         const newLines: string[] = [];
         await timed(times, 'read', async () => {
@@ -318,9 +343,11 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
                 const trimmed = line.trim();
                 if (trimmed.length > 0 && !trimmed.startsWith('#')) {
                     // uri line, transform!
-                    const absUrl = new URL(trimmed, u).toString();
-                    if (!absUrl.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
-                    const transformedLine = `${origin}/e,hls=1,s=${sid},p=${pid}/${absUrl.substring('https://'.length)}`;
+                    const absUrl = new URL(trimmed, u);
+                    const absUrlStr = absUrl.toString();
+                    if (!absUrlStr.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
+                    const sig = (await hmac(Bytes.ofUtf8([ 's', sid, 'p', pid, 't', timestamp, 'hn', absUrl.hostname, 'pn', absUrl.pathname ].join(',')), hmacKey)).hex();
+                    const transformedLine = `${origin}/e,hls=1,s=${sid},p=${pid},t=${timestamp},g=${sig}/${absUrlStr.substring('https://'.length)}`;
                     newLines.push(transformedLine);
                 } else {
                     newLines.push(line);
@@ -334,6 +361,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         headers.set('x-times', JSON.stringify(times)); // TODO use Server-Timing ?
         headers.set('x-sid', sid);
         headers.set('x-pid', pid);
+        headers.set('x-timestatmp', timestamp);
         const pendingWork = async () => {
             const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
             const hash = (await originalBytes.sha1()).hex();

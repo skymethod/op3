@@ -1,4 +1,5 @@
 import { isValidGuid } from '../check.ts';
+import { isValidTimestamp } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 
 export function tryParsePrefixArguments(url: string, { origin }: { origin: string }): Record<string, string> | undefined {
@@ -8,7 +9,7 @@ export function tryParsePrefixArguments(url: string, { origin }: { origin: strin
     return m ? tryParsePrefixArgumentsFromArgstring(m[1]) : undefined;
 }
 
-export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
+export function tryParsePrefixArgumentsFromArgstring(argstring: string): Record<string, string> | undefined {
     let rt: Record<string, string> | undefined;
     if (typeof argstring === 'string') {
         for (const m2 of argstring.matchAll(ARGSTRING_PATTERN)) {
@@ -33,6 +34,11 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
                 if (isValidUuid(p)) {
                     rt = { ...rt, p };
                 }
+            } else if (name === 't') {
+                const t = value;
+                if (isValidTimestamp(t)) {
+                    rt = { ...rt, t };
+                }
             }
         }
     }
@@ -41,5 +47,5 @@ export function tryParsePrefixArgumentsFromArgstring(argstring: string) {
 
 //
 
-const ARGSTRING = ',(pg|hls|s|p)(=|%3[Dd])([0-9A-Fa-f-]+)';
+const ARGSTRING = ',(pg|hls|s|p|t)(=|%3[Dd])([0-9A-Fa-f-]+)';
 const ARGSTRING_PATTERN = new RegExp(ARGSTRING, 'g');

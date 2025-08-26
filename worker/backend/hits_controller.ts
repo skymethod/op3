@@ -145,8 +145,12 @@ export class HitsController {
 
         // send hls records
         if (Object.keys(hlsRecords).length > 0 && rpcClient) {
-            // fail batch if this fails
-            await timed(times, 'sendPackedRecords', () => rpcClient.sendPackedRecords({ attNums: attNums.toJson(), records: hlsRecords }, DoNames.hlsServer, { sql: true }));
+            try {
+                await timed(times, 'sendPackedRecords', () => rpcClient.sendPackedRecords({ attNums: attNums.toJson(), records: hlsRecords }, DoNames.hlsServer, { sql: true }));
+            } catch (e) {
+                // don't fail the hits batch for this - maybe later once we've been in production for a while
+                consoleWarn('hits-to-hls', `Unexpected error in rpc call: ${(e as Error).stack || e}`);
+            }
         }
 
         // summary analytics
