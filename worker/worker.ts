@@ -232,7 +232,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 let ignoreReason: string | undefined;
                 if (!hlsResult && prefixArgs.hls === '1' && prefixArgs.s && secret) {
                     const u = tryParseUrl(redirectRequest.targetUrl);
-                    if (u && await verifyHlsPrefixArgs(prefixArgs, u, secret) !== undefined) {
+                    if (u && (await verifyHlsPrefixArgs(prefixArgs, u, secret)).verified) {
                         hlsPrefixArgsVerified = true;
                         sid = prefixArgs.s;
                     }
@@ -314,12 +314,13 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function verifyHlsPrefixArgs(prefixArgs: Record<string, string>, u: URL, secret: string): Promise<CryptoKey | undefined> {
+async function verifyHlsPrefixArgs(prefixArgs: Record<string, string>, u: URL, secret: string): Promise<{ hmacKey: CryptoKey, verified?: boolean }> {
     const { s, p, t, g } = prefixArgs;
-    if ([ s, p, t, g ].some(v => typeof v !== 'string')) return undefined;
     const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
+    if ([ s, p, t, g ].some(v => typeof v !== 'string')) return { hmacKey };
+    
     const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
-    if (sig === g) return hmacKey;
+    return { hmacKey, verified: sig === g };
 }
 
 async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs, secret }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string>, secret: string }): Promise<HlsResult | undefined> {
@@ -335,8 +336,8 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') return undefined;  // unexpected content-type, log these?
         if (!res.body) return undefined;  // no response body, log these?
-        const hmacKey = await verifyHlsPrefixArgs(prefixArgs, u, secret);
-        if (!hmacKey) return undefined; // verification failed, log these?
+        const { hmacKey, verified } = await verifyHlsPrefixArgs(prefixArgs, u, secret);
+        if (prefixArgs.s && !verified) return undefined; // verification failed, log these?
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
 
