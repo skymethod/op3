@@ -229,23 +229,29 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 other.isolateId = IsolateId.get();
                 let sid = hlsResult?.sid;
                 let hlsPrefixArgsVerified = !!hlsResult;
+                let ignoreReason: string | undefined;
                 if (!hlsResult && prefixArgs.hls === '1' && prefixArgs.s && secret) {
                     const u = tryParseUrl(redirectRequest.targetUrl);
                     if (u && await verifyHlsPrefixArgs(prefixArgs, u, secret) !== undefined) {
                         hlsPrefixArgsVerified = true;
                         sid = prefixArgs.s;
                     }
+                    if (!hlsPrefixArgsVerified) ignoreReason = `Invalid hls prefix args: ${JSON.stringify(prefixArgs)}`;
                 }
-                if (sid) other.sid = sid;
-                if (hlsResult?.pid) other.pid = hlsResult.pid;
-                if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
-                if (typeof prefixArgs?.s === 'string' && hlsPrefixArgsVerified) other.subrequest = 'hls';
-                if (typeof prefixArgs?.p === 'string' && hlsPrefixArgsVerified) other.ppid = prefixArgs.p;
+                if (typeof ignoreReason === 'string') {
+                    consoleWarn('worker-ignored-redirect', ignoreReason);
+                } else {
+                    if (sid) other.sid = sid;
+                    if (hlsResult?.pid) other.pid = hlsResult.pid;
+                    if (hlsResult?.pendingWork) try { other.hlsHash = (await hlsResult.pendingWork()).hash; } catch { /* noop */ } 
+                    if (typeof prefixArgs?.s === 'string' && hlsPrefixArgsVerified) other.subrequest = 'hls';
+                    if (typeof prefixArgs?.p === 'string' && hlsPrefixArgsVerified) other.ppid = prefixArgs.p;
 
-                const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
-                console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                rawRedirects.push(rawRedirect);
-                validRawRedirect = rawRedirect;
+                    const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
+                    console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                    rawRedirects.push(rawRedirect);
+                    validRawRedirect = rawRedirect;
+                }
             }
             
             if (rawRedirects.length > 0) {
