@@ -60,6 +60,8 @@ export class HlsController {
                 'other.asn': asnStr,
                 'other.subrequest': subrequest,
                 doColo,
+                referer,
+                xpsId,
                 ...rest
             } = obj;
             // mandatory
@@ -81,7 +83,7 @@ export class HlsController {
             const prefixArgs = tryParsePrefixArguments(url, { origin });
             requestRows.set(uuid, [
                 uuid,
-                JSON.stringify({ ...rest, prefixArgs }),
+                JSON.stringify(rest),
                 method,
                 destinationUrl,
                 sid,
@@ -106,6 +108,9 @@ export class HlsController {
                 subrequest,
                 doColo,
                 undefined, // hls_variant_hash
+                referer,
+                xpsId,
+                prefixArgs ? JSON.stringify(prefixArgs) : undefined,
             ]);
 
             if (typeof pid === 'string' && typeof hlsHash === 'string') {
@@ -170,6 +175,12 @@ export class HlsController {
 
 //
 
+const NEW_REQUEST_COLUMNS = [
+    'referer text',
+    'xps_id text',
+    'prefix_args text',
+];
+
 const REQUEST_COLUMNS = [
     // mandatory
     'uuid text primary key',
@@ -199,12 +210,22 @@ const REQUEST_COLUMNS = [
     'subrequest text',
     'do_colo text',
     'hls_variant_hash text',
+    ...NEW_REQUEST_COLUMNS
 ];
 
 const REQUEST_COLUMN_NAMES = REQUEST_COLUMNS.map(v => v.split(' ')[0]);
 
 function initSql(sql: SqlStorage) {
     sql.exec(`create table if not exists request(${REQUEST_COLUMNS.join(', ')}) without rowid`);
+    addColumnsIfNecessary('request', sql, NEW_REQUEST_COLUMNS);
     sql.exec(`create table if not exists pid_hls_hash(pid text primary key, hls_hash text not null) without rowid`);
     sql.exec(`create table if not exists hls_variant(hls_variant_hash text primary key, atts text not null) without rowid`);
+}
+
+function addColumnsIfNecessary(tableName: string, sql: SqlStorage, columnSpecs: string[]) {
+    const oldColumns = sql.exec<{ cid: number, name: string, type: string }>(`pragma table_info(${tableName})`).toArray().map(v => v.name);
+    for (const columnSpec of columnSpecs) {
+        const [ name ] = columnSpec.split(' ');
+        if (!oldColumns.includes(name)) sql.exec(`alter table ${tableName} add ${columnSpec}`);
+    }
 }
