@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@774d0370fb10090ee7004faa345aa44985f30e2e (2025-08-30T14:11:21Z)
+// from user-agents-v2@c19872fdd4a46e8aeb0859c1fa46ebf73e17c1d5 (2025-08-30T21:03:27Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -41,6 +41,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
     if (/^audioBoomBot\/\d/.test(userAgent)) return { name: `Audioboom bot`, type: 'bot' };
+    if (/AudioFetcher\/\d.*\+http/.test(userAgent)) return { name: `AudioFetcher`, type: 'bot' };
     if (/^Audiomack Podcast Processor\//.test(userAgent)) return { name: `Audiomack`, type: 'bot' };
     if (/^AudioWaveBot\/1\.0/.test(userAgent)) return { name: `AudioWave feed parser`, type: 'bot' };
     if (/^AwarioSmartBot\//.test(userAgent)) return { name: `AwarioSmartBot`, type: 'bot' };

@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@774d0370fb10090ee7004faa345aa44985f30e2e (2025-08-30T14:11:21Z)
+// from user-agents-v2@c19872fdd4a46e8aeb0859c1fa46ebf73e17c1d5 (2025-08-30T21:03:27Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -56,6 +56,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; archive.org_bot http://archive.org/details/archive.org_bot)': { type: 'bot', name: `Archive.org` },
     'atheerfm/1 CFNetwork/758.3.15 Darwin/15.3.0': { type: 'bot', name: `atheerfm` },
     'audioBoomBot/1.0; (+http://audioboom.com)': { type: 'bot', name: `Audioboom bot` },
+    'Mozilla/5.0 (compatible; AudioFetcher/1.0; +https://example.invalid)': { type: 'bot', name: `AudioFetcher` },
     'Audiomack Podcast Processor/1.0 (https://audiomack.com/)': { type: 'bot', name: `Audiomack` },
     'AudioWaveBot/1.0': { type: 'bot', name: `AudioWave feed parser` },
     'AwarioSmartBot/1.0 (+https://awario.com/bots.html; bots@awario.com)': { type: 'bot', name: `AwarioSmartBot` },
