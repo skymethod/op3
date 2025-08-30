@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@802fde3531f73a7fc83bc6ceb468bcc411d2cd60 (2025-08-16T15:47:13Z)
+// from user-agents-v2@774d0370fb10090ee7004faa345aa44985f30e2e (2025-08-30T14:11:21Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -88,7 +88,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^storagegw-v1-go$/.test(userAgent)) return { name: `Go Storage Gateway V1`, type: 'bot' };
     if (/Goodpods\/\d+\.\d+/.test(userAgent)) return { name: `Goodpods Bot`, type: 'bot' };
     if (/Mediapartners-Google/.test(userAgent)) return { name: `Google Adsense Bot`, type: 'bot' };
-    if (/AdsBot-Google/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
+    if (/AdsBot-Google|Google-AdWords-Express/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
     if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
@@ -111,7 +111,8 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^ltx71 /.test(userAgent)) return { name: `LTX71`, type: 'bot' };
     if (/^ShareSheetUI\//.test(userAgent)) return { name: `MacOS share menu`, type: 'bot' };
     if (/^MauiBot/.test(userAgent)) return { name: `MauiBot`, type: 'bot' };
-    if (/rb\/.*Mastodon\//.test(userAgent)) return { name: `Mastodon Bot`, type: 'bot' };
+    if (/rb\/.*Mastodon\/|Mastodon\/.*http\.rb/.test(userAgent)) return { name: `Mastodon Bot`, type: 'bot' };
+    if (/^Misskey\/|^CherryPick\/|^Iceshrimp\/|^gotosocial\//.test(userAgent)) return { name: `Fediverse Bot`, type: 'bot' };
     if (/^Metacast\/.* Crawler/.test(userAgent)) return { name: `Metacast Crawler`, type: 'bot' };
     if (/(BingPreview\/|adidxbot\/|[bB]ingbot\/)/.test(userAgent)) return { name: `Microsoft Bingbot`, type: 'bot' };
     if (/ms-office; MSOffice/.test(userAgent)) return { name: `Microsoft Office`, type: 'bot' };
@@ -156,21 +157,25 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };
     if (/(podnods-crawler|podnods)/.test(userAgent)) return { name: `Podnods Bot`, type: 'bot' };
     if (/^Podplay-Podcast-Sync\//.test(userAgent)) return { name: `Podplay Podcast Sync`, type: 'bot' };
+    if (/^pod-rank-downloader\//.test(userAgent)) return { name: `PodRank Downloader`, type: 'bot' };
     if (/^pdrl\.fm /.test(userAgent)) return { name: `Podroll Analyzer`, type: 'bot' };
     if (/^PodscanBot\//.test(userAgent)) return { name: `Podscan Bot`, type: 'bot' };
     if (/(^Adswizz-podscribe\/|^Podscribe\/)/.test(userAgent)) return { name: `Podscribe`, type: 'bot' };
     if (/(PodUptime|PodUptimeBot)\/\d/.test(userAgent)) return { name: `PodUptime`, type: 'bot' };
     if (/\/podtail\.com/.test(userAgent)) return { name: `Podtail RSS Crawler`, type: 'bot' };
+    if (/^Podtrac Feed Scanner/.test(userAgent)) return { name: `Podtrac Feed Scanner`, type: 'bot' };
     if (/^Podverse\/Feed Parser/.test(userAgent)) return { name: `Podverse Feed Parser`, type: 'bot' };
     if (/^PodvineBot\//.test(userAgent)) return { name: `PodvineBot`, type: 'bot' };
     if (/^PostRank\//.test(userAgent)) return { name: `PostRank Bot`, type: 'bot' };
     if (/Podwatch-Pro Crawler/.test(userAgent)) return { name: `PodwatchPro`, type: 'bot' };
     if (/ HeadlessChrome\/\d/.test(userAgent)) return { name: `Puppeteer`, type: 'bot' };
+    if (/^pyannoteAI/.test(userAgent)) return { name: `Pyannote`, type: 'bot' };
     if (/python-requests/.test(userAgent)) return { name: `python-requests`, type: 'bot' };
     if (/qiniu.*spider/.test(userAgent)) return { name: `Qiniu spider`, type: 'bot' };
     if (/^Radioline Stream Monitoring/.test(userAgent)) return { name: `Radioline Stream Monitoring`, type: 'bot' };
     if (/RedCircle/.test(userAgent)) return { name: `RedCircle`, type: 'bot' };
     if (/^Rephonic\/\d/.test(userAgent)) return { name: `Rephonic`, type: 'bot' };
+    if (/^req\/\d/.test(userAgent)) return { name: `Req`, type: 'bot' };
     if (/ RidderBot\//.test(userAgent)) return { name: `Ridder Bot`, type: 'bot' };
     if (/^RSStT/.test(userAgent)) return { name: `RSS to Telegram`, type: 'bot' };
     if (/^RSSRadio \(/.test(userAgent)) return { name: `RSSRadio`, type: 'bot' };
@@ -413,7 +418,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Expo\//.test(userAgent)) return { name: `Expo`, type: 'app' };
     if (/^ExtDownloader\//.test(userAgent)) return { name: `ExtDownloader`, type: 'app' };
     if (/^ExtraCloud\//.test(userAgent)) return { name: `ExtraCloud`, type: 'app' };
-    if (/(iPhone|iPad).* \[FBAN|iOS\/Facebook|^FB4A\/Facebook|^facebook-mobile\/|^Facebook\/|^\[FBAN\//.test(userAgent)) return { name: `Facebook`, type: 'app' };
+    if (/(iPhone|iPad).* \[FBAN|iOS\/Facebook|^FB4A\/Facebook|^facebook-mobile\/|^Facebook\/|^\[FBAN\/|  MetaIAB| IABMV\//.test(userAgent)) return { name: `Facebook`, type: 'app' };
     if (/^CFR%20Plus\//.test(userAgent)) return { name: `faidr`, type: 'app' };
     if (/^FaithPlay FaithPlay\//.test(userAgent)) return { name: `FaithPlay`, type: 'app' };
     if (/^Fallound\//.test(userAgent)) return { name: `Fallound`, type: 'app' };
@@ -557,7 +562,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Menucast\//.test(userAgent)) return { name: `Menucast`, type: 'app' };
     if (/^Message\+\//.test(userAgent)) return { name: `Message+`, type: 'app' };
     if (/^Messenger\//.test(userAgent)) return { name: `Messenger`, type: 'app' };
-    if (/^Metacast\//.test(userAgent)) return { name: `Metacast`, type: 'app' };
+    if (/^Metacast\/| \+metacast\.app/.test(userAgent)) return { name: `Metacast`, type: 'app' };
     if (/^Outlook-Android\/|^Microsoft Office\/.*?Microsoft Outlook/.test(userAgent)) return { name: `Microsoft Outlook`, type: 'app' };
     if (/^microsoft;xbox_/.test(userAgent)) return { name: `Microsoft Xbox`, type: 'app' };
     if (/^Mimir(-macOS|-iOS)?\//.test(userAgent)) return { name: `Mimir`, type: 'app' };
@@ -611,7 +616,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podclipper\//.test(userAgent)) return { name: `Podclipper`, type: 'app' };
     if (/^Podcoin/.test(userAgent)) return { name: `Podcoin`, type: 'app' };
     if (/^PodCruncher\/.* CFNetwork\//.test(userAgent)) return { name: `PodCruncher`, type: 'app' };
-    if (/poddl - podcast downloader/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'app' };
+    if (/poddl - (podcast downloader|https:\/\/github.com\/freshe\/poddl)/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'app' };
     if (/^Podeo\//.test(userAgent)) return { name: `Podeo`, type: 'app' };
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
     if (/^Podgrab /.test(userAgent)) return { name: `Podgrab`, type: 'app' };
@@ -656,7 +661,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Roka Stereo\//.test(userAgent)) return { name: `Roka Stereo`, type: 'app' };
     if (/^Roku\//.test(userAgent)) return { name: `Roku`, type: 'app' };
     if (/(^gvfs\/|^rhythmbox\/)/.test(userAgent)) return { name: `Rhythmbox`, type: 'app' };
-    if (/^RSSRadio/.test(userAgent)) return { name: `RSS Radio`, type: 'app' };
+    if (/^RSSRadio|^RSS Radio -/.test(userAgent)) return { name: `RSS Radio`, type: 'app' };
     if (/com\.meecel\.feedreader\.RssDemonAd/.test(userAgent)) return { name: `RSSDemon`, type: 'app' };
     if (/^RSSOwl.*Windows/.test(userAgent)) return { name: `RSSOwl`, type: 'app' };
     if (/RTL\+/.test(userAgent)) return { name: `RTL+`, type: 'app' };
@@ -687,7 +692,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Storiyoh\//.test(userAgent)) return { name: `Storiyoh`, type: 'app' };
     if (/^Storybutton\//.test(userAgent)) return { name: `Storybutton`, type: 'app' };
     if (/^StoryShots\//.test(userAgent)) return { name: `StoryShots`, type: 'app' };
-    if (/^Storytel\/\d/.test(userAgent)) return { name: `Storytel`, type: 'app' };
+    if (/^Storytel(Downloader)?\/\d/.test(userAgent)) return { name: `Storytel`, type: 'app' };
     if (/iOS Strilen Hermes\//.test(userAgent)) return { name: `Strilen iOS app`, type: 'app' };
     if (/^Subcast/.test(userAgent)) return { name: `Subcast`, type: 'app' };
     if (/^Substack\//.test(userAgent)) return { name: `Substack`, type: 'app' };
