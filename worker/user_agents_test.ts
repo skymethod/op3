@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8c3587c6f995be512904fbff51ed7a56e2fc3798 (2025-09-10T20:00:47Z)
+// from user-agents-v2@2be75aef2905c5d2243e9f7d2c295bbd774acaa2 (2025-10-07T20:53:32Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -77,6 +77,7 @@ const botTests = {
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
+    'TerraCotta https://github.com/CeramicTeam/CeramicTerracotta': { type: 'bot', name: `Ceramic Terracotta Crawler` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)': { type: 'bot', name: `Claudebot` },
     'Cloudflare-SSLDetector': { type: 'bot', name: `Cloudflare SSL detector` },
     'Mozilla/5.0 (compatible; proximic;  https://www.comscore.com/Web-Crawler)': { type: 'bot', name: `Comscore Crawler` },
@@ -195,6 +196,7 @@ const botTests = {
     'Podgrab': { type: 'bot', name: `Podgrab` },
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
+    'PodlexiconDownloader/1.0': { type: 'bot', name: `Podlexicon Downloader` },
     'Podmonbot/1.0': { type: 'bot', name: `Podmon Bot` },
     'Podplay-Podcast-Sync/1.0 (+https://podplay.com/articles/contact)': { type: 'bot', name: `Podplay Podcast Sync` },
     'pod-rank-downloader/1.0': { type: 'bot', name: `PodRank Downloader` },
@@ -207,6 +209,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; PodUptimeBot/1.0; +https://poduptime.com; rid:5c02fc9b-2660-4d3e-a352-de1a1aabdc0a)': { type: 'bot', name: `PodUptime` },
     'Mozilla/5.0 (compatible; Podtail/2.0; +https://podtail.com/)': { type: 'bot', name: `Podtail RSS Crawler` },
     'Podtrac Feed Scanner': { type: 'bot', name: `Podtrac Feed Scanner` },
+    'Podtrac Network Client/1.0 (beta)': { type: 'bot', name: `Podtrac Feed Scanner` },
     'PodvineBot/4.0.1 (www.podvine.com)': { type: 'bot', name: `PodvineBot` },
     'PostRank/2.0 (postrank.com; 1 subscribers)': { type: 'bot', name: `PostRank Bot` },
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
@@ -266,6 +269,7 @@ const botTests = {
     'Zapier': { type: 'bot', name: `Zapier` },
     'Zencastr/2.0': { type: 'bot', name: `Zencast` },
     'podwordsbot/0.0.1 podwords': { type: 'bot', name: `podwords` },
+    'Mozilla/5.0 (compatible; Spider/2.0; +https://spider.cloud)': { type: 'bot', name: `Spider` },
 };
 
 const appTests = {
@@ -769,6 +773,8 @@ const appTests = {
     'KREAFUNK/1.7 CFNetwork/711.3.18 Darwin/14.0.0': { type: 'app', name: `KREAFUNK` },
     'labs/0.1.1.5 CFNetwork/711.2.23 Darwin/14.0.0': { type: 'app', name: `labs` },
     'Laughable/2.1.6.1 CFNetwork/808.1.4 Darwin/16.1.0': { type: 'app', name: `Laughable` },
+    'AEC/9.16 (free; fr; ABTest 123) iOS/26.0 (phone; iPhone18,1)': { type: 'app', name: `Le Monde` },
+    'AEC/9.15.2 (free; fr; ABTest 427) Android/14/34 (phone; Pixel 7a)': { type: 'app', name: `Le Monde` },
     'leparisien/Android': { type: 'app', name: `LeParisien` },
     'leparisien/iOS': { type: 'app', name: `LeParisien` },
     'Leaf/12 CFNetwork/720.0.9 Darwin/14.0.0 (x86_64)': { type: 'app', name: `Leaf` },
@@ -895,6 +901,8 @@ const appTests = {
     'Alpha%20PlayerFM/108 CFNetwork/808.0.2 Darwin/16.0.0': { type: 'app', name: `Player FM` },
     'Pocket Casts': { type: 'app', name: `Pocket Casts` },
     'Shifty Jelly Pocket Casts, iOS v4.2': { type: 'app', name: `Pocket Casts` },
+    'Pocket%20Casts/7.96.0.4 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `Pocket Casts` },
+    'Pocket%20Casts/7.95.0.4 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `Pocket Casts` },
     'Podbay/21 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Podbay` },
     'Podbean/Android App 7.6.4 (http://podbean.com),1927526fe23b5acf535b3e91b64cee95': { type: 'app', name: `Podbean` },
     'Podbean/Android App 8.1.5 (http://podbean.com),4f6852f59091d32475ef75a53325a4fe': { type: 'app', name: `Podbean` },
