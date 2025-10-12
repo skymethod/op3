@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2be75aef2905c5d2243e9f7d2c295bbd774acaa2 (2025-10-07T20:53:32Z)
+// from user-agents-v2@2c9036fa0bf36a6c5ff4147524a309afbfb15a3f (2025-10-12T14:41:37Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -59,6 +59,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; AudioFetcher/1.0; +https://example.invalid)': { type: 'bot', name: `AudioFetcher` },
     'Audiomack Podcast Processor/1.0 (https://audiomack.com/)': { type: 'bot', name: `Audiomack` },
     'AudioWaveBot/1.0': { type: 'bot', name: `AudioWave feed parser` },
+    'AutoHotkey': { type: 'bot', name: `AutoHotkey` },
     'AwarioSmartBot/1.0 (+https://awario.com/bots.html; bots@awario.com)': { type: 'bot', name: `AwarioSmartBot` },
     'Baidu-YunGuanCe-SLABot(ce.baidu.com)': { type: 'bot', name: `Baidu` },
     'bbot/0.1': { type: 'bot', name: `bbot` },

@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@2be75aef2905c5d2243e9f7d2c295bbd774acaa2 (2025-10-07T20:53:32Z)
+// from user-agents-v2@2c9036fa0bf36a6c5ff4147524a309afbfb15a3f (2025-10-12T14:41:37Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -44,6 +44,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/AudioFetcher\/\d.*\+http/.test(userAgent)) return { name: `AudioFetcher`, type: 'bot' };
     if (/^Audiomack Podcast Processor\//.test(userAgent)) return { name: `Audiomack`, type: 'bot' };
     if (/^AudioWaveBot\/1\.0/.test(userAgent)) return { name: `AudioWave feed parser`, type: 'bot' };
+    if (/^AutoHotkey/.test(userAgent)) return { name: `AutoHotkey`, type: 'bot' };
     if (/^AwarioSmartBot\//.test(userAgent)) return { name: `AwarioSmartBot`, type: 'bot' };
     if (/Barkrowler\//.test(userAgent)) return { name: `Babbar`, type: 'bot' };
     if (/\(ce\.baidu\.com/.test(userAgent)) return { name: `Baidu`, type: 'bot' };
