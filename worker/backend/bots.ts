@@ -174,4 +174,6 @@ const botIpHashes = new Set([
     'df752bbf6661373ce93531c63a4b07f2e7a4d936', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
     'f8545b85516ad67c513a56c2b8fd945950d2d004', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
     'feb09ba8632f7ea2949006f7c02ea8a72bb7c400', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
+    '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
+    'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
 ]);
