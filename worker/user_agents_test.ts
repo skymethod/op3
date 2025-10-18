@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2c9036fa0bf36a6c5ff4147524a309afbfb15a3f (2025-10-12T14:41:37Z)
+// from user-agents-v2@c2e25498249f7bf59c4a125c55bf5a9ba933559f (2025-10-18T14:31:10Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -142,6 +142,7 @@ const botTests = {
     'ltx71 - (http://ltx71.com/)': { type: 'bot', name: `LTX71` },
     'ShareSheetUI/1 CFNetwork/1399.4 Darwin/22.1.0': { type: 'bot', name: `MacOS share menu` },
     'ShareSheetUI/1 CFNetwork/1474 Darwin/23.0.0': { type: 'bot', name: `MacOS share menu` },
+    'magic-podcast-downloader/1.0': { type: 'bot', name: `magic-podcast-downloader` },
     'MauiBot (crawler.feedback dc@gmail.com)': { type: 'bot', name: `MauiBot` },
     'http.rb/5.0.4 (Mastodon/3.5.3; +https://mastodon.xyz/) Bot': { type: 'bot', name: `Mastodon Bot` },
     'Mastodon/4.3.9 (http.rb/5.2.0; +https://mastodon.shultz.ynh.fr/)': { type: 'bot', name: `Mastodon Bot` },
@@ -191,6 +192,8 @@ const botTests = {
     'Podcatcher Bot 1.0': { type: 'bot', name: `Podcatcher Bot` },
     'Podcatcher Bot 1.0 (1 subscribers; +https://podcatcher.net)': { type: 'bot', name: `Podcatcher Bot` },
     'PodchaserParser/2.0 (https://podchaser.com)': { type: 'bot', name: `Podchaser Parser` },
+    'PodcastBulkDownloader/0.10.1': { type: 'bot', name: `PodcastBulkDownloader` },
+    'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
@@ -223,7 +226,9 @@ const botTests = {
     'Rephonic/1.0': { type: 'bot', name: `Rephonic` },
     'req/0.5.10': { type: 'bot', name: `Req` },
     'Mozilla/5.0 (compatible; RidderBot/1.0; bot@ridder.co)': { type: 'bot', name: `Ridder Bot` },
+    'rss-audio-downloader/1.1 (+https://example.invalid)': { type: 'bot', name: `RSS Audio Downloader` },
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
+    'rssfeedfetcher libfetch/2.0': { type: 'bot', name: `rssfeedfetcher` },
     'Mozilla/5.0 (compatible; Mechanize/2.7.4)': { type: 'bot', name: `Ruby Mechanize` },
     'WWW-Mechanize/1.72': { type: 'bot', name: `Ruby Mechanize` },
     'runpod-python/0.0.0 (https://runpod.io; support@runpod.io)': { type: 'bot', name: `RunPod` },
@@ -563,6 +568,7 @@ const appTests = {
     'EQu/14101 CFNetwork/711.1.12 Darwin/14.0.0': { type: 'app', name: `EQu` },
     'EvanApp/1 CFNetwork/897.15 Darwin/17.5.0': { type: 'app', name: `EvanApp` },
     'Everand/167 CFNetwork/1568.200.51 Darwin/24.1.0': { type: 'app', name: `Everand` },
+    'everand-android/15.18 (Linux;Android 14) AndroidXMedia3/1.4.1': { type: 'app', name: `Everand` },
     'Expo/2.11.1.106175 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Expo` },
     'ExtDownloader/5.0.2 CFNetwork/758.2.8 Darwin/15.0.0': { type: 'app', name: `ExtDownloader` },
     'ExtraCloud/1.3 CFNetwork/758.2.8 Darwin/15.0.0': { type: 'app', name: `ExtraCloud` },
@@ -767,6 +773,7 @@ const appTests = {
     'Kids Listen/55 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Kids Listen` },
     'KidspodMobileClient/111 CFNetwork/1465.2 Darwin/23.0.0': { type: 'app', name: `KidsPod` },
     'KidspodMobileClient/111 CFNetwork/1408.0.4 Darwin/22.5.0': { type: 'app', name: `KidsPod` },
+    'KidsPod/1.0': { type: 'app', name: `KidsPod` },
     'KKBOX/7.10.70/iOS/14.2': { type: 'app', name: `KKBOX` },
     'Kloudie/1.0 CFNetwork/758.1.6 Darwin/15.0.0': { type: 'app', name: `Kloudie` },
     'Knomad/1.1.9 CFNetwork/711.1.12 Darwin/14.0.0': { type: 'app', name: `Knomad` },
@@ -1117,6 +1124,7 @@ const appTests = {
     'Tweetbot/53300 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Tweetbot` },
     'Ubook Player': { type: 'app', name: `Ubook Player` },
     'Upcast/1.0 (+https://getupcast.app/; iOS podcast app)': { type: 'app', name: `Upcast` },
+    'Updates/1.10 (+https://getupdates.app/; iOS podcast app)': { type: 'app', name: `Updates` },
     'BTWebClient/1870(43938)': { type: 'app', name: `uTorrent` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Vestnytt Hermes/90.0.0 _app_': { type: 'app', name: `Vestnytt iOS app` },
     'Android VG Hermes/1000094692 app vg_app_ VG/Snarvei/1000094692 VG-App': { type: 'app', name: `VG Android app` },
@@ -1145,6 +1153,7 @@ const appTests = {
     'Ya.Music/2022-10-06.trunk.10125214': { type: 'app', name: `Yandex Music` },
     'Yoto/14665 CFNetwork/1.0 Darwin/18.5.0': { type: 'app', name: `Yoto` },
     'Yoto/15035 CFNetwork/1335.0.3.4 Darwin/15.8.4': { type: 'app', name: `Yoto` },
+    'Yoto v2 FW; version v2.23.2': { type: 'app', name: `Yoto` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231105.002; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62251340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
     'com.google.android.apps.youtube.music/62354340 (Linux; U; Android 14; en_US; Pixel 7 Pro; Build/UP1A.231005.007; Cronet/114.0.5735.84)': { type: 'app', name: `YouTube Music` },
