@@ -177,4 +177,6 @@ const botIpHashes = new Set([
     '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
     'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
     '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google  Chrome,Safari
+    '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen  Mozilla/5.0 (compatible; PodcastDownloader/1.0)
+    '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    centurylink  Chrome
 ]);
