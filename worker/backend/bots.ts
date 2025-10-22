@@ -187,4 +187,6 @@ const botIpHashes = new Set([
     '30b64f29576d0239eb7d6c8f0ac4e7edcaebdf4f', // 2025-10-21 for 2025-10-20 12876  scaleway Mplayer, Windows Media Player
     '3c8be3e51b6b81462bee716cc30728aeead1346e', // 2025-10-21 for 2025-10-20 48090  dmzhost Firefox
     'd69de8a319bd4b2b4d800b111ad0d7cb8e3ea5ee', // 2025-10-21 for 2025-10-20 16509  amazon  Chrome
+    'cae9d8515527a5c84fe36713b2b279e23b8400ec', // 2025-10-22 for 2025-10-21 16509  amazon  Chrome
+    '6259e266825587b0b4ce761925c2b02d9e0036b6', // 2025-10-22 for 2025-10-21 16509  amazon  Chrome
 ]);
