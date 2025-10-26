@@ -1100,8 +1100,8 @@ async function deleteFeedItems({ feedRecordId, go, matchUrlPrefix, itemGuids, st
             const matchUrlsMap = await storage.list({ prefix: prefix + matchUrlPrefix });
             for (const [ key, feedItemIndexRecord ] of matchUrlsMap) {
                 if (!isFeedItemIndexRecord(feedItemIndexRecord)) throw new Error(`Bad index record ${key}`);
-                const { feedItemRecordId } = unpackMatchUrlToFeedItemIndexKey(key);
-                if (feedItemRecordIds.has(feedItemRecordId)) {
+                const { feedItemRecordId, feedRecordId: feedRecordIdFromIndex } = unpackMatchUrlToFeedItemIndexKey(key);
+                if (feedItemRecordIds.has(feedItemRecordId) && feedRecordIdFromIndex === feedRecordId) {
                     indexRecordKeysToDelete.push(key);
                 }
             }
