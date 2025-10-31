@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@c2e25498249f7bf59c4a125c55bf5a9ba933559f (2025-10-18T14:31:10Z)
+// from user-agents-v2@fe0442920176f9143bc875c31b0e67662bdacac8 (2025-10-31T14:34:22Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -196,6 +196,8 @@ const botTests = {
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
+    'poddl - podcast downloader': { type: 'bot', name: `poddl - podcast downloader` },
+    'poddl - https://github.com/freshe/poddl': { type: 'bot', name: `poddl - podcast downloader` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
     'Podgrab': { type: 'bot', name: `Podgrab` },
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
@@ -934,8 +936,6 @@ const appTests = {
     'Podclipper/4.2 (miguelDSP.Podclipper; build:4; iOS 13.1.3) Alamofire/4.7.3': { type: 'app', name: `Podclipper` },
     'PodCruncher/3.7.1 CFNetwork/1125.2 Darwin/19.4.0': { type: 'app', name: `PodCruncher` },
     'PodCruncher/3.7.1 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `PodCruncher` },
-    'poddl - podcast downloader': { type: 'app', name: `poddl - podcast downloader` },
-    'poddl - https://github.com/freshe/poddl': { type: 'app', name: `poddl - podcast downloader` },
     'Podeo/4.2.3 (Linux;Android 12) ExoPlayerLib/2.11.7': { type: 'app', name: `Podeo` },
     'Podfriend/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) PodFriend/0.7.11 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36': { type: 'app', name: `Podfriend` },
     'Podgrab - docker': { type: 'app', name: `Podgrab` },

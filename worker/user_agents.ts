@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@c2e25498249f7bf59c4a125c55bf5a9ba933559f (2025-10-18T14:31:10Z)
+// from user-agents-v2@fe0442920176f9143bc875c31b0e67662bdacac8 (2025-10-31T14:34:22Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -156,6 +156,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
     if (/PodderBot\//.test(userAgent)) return { name: `PodderBot`, type: 'bot' };
+    if (/poddl - (podcast downloader|https:\/\/github.com\/freshe\/poddl)/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'bot' };
     if (/podfollowbot\//.test(userAgent)) return { name: `Podfollow`, type: 'bot' };
     if (/^Podgrab$/.test(userAgent)) return { name: `Podgrab`, type: 'bot' };
     if (/PodhoundBeta/.test(userAgent)) return { name: `Podhound`, type: 'bot' };
@@ -628,7 +629,6 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podclipper\//.test(userAgent)) return { name: `Podclipper`, type: 'app' };
     if (/^Podcoin/.test(userAgent)) return { name: `Podcoin`, type: 'app' };
     if (/^PodCruncher\/.* CFNetwork\//.test(userAgent)) return { name: `PodCruncher`, type: 'app' };
-    if (/poddl - (podcast downloader|https:\/\/github.com\/freshe\/poddl)/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'app' };
     if (/^Podeo\//.test(userAgent)) return { name: `Podeo`, type: 'app' };
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
     if (/^Podgrab /.test(userAgent)) return { name: `Podgrab`, type: 'app' };
