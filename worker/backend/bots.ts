@@ -197,4 +197,6 @@ const botIpHashes = new Set([
     '97794061baa2ac7f9aef0446c892ddce2ea397c5', // 2025-10-30 for 2025-10-29 399296 rackdog Chrome
     'b9aea9d2f837a5f22cb473dd2a31d42ca8dcd556', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
     'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
+    '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
+    '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
 ]);
