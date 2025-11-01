@@ -199,4 +199,6 @@ const botIpHashes = new Set([
     'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
     '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
     '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
+    '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron  Chrome
+    '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google  Chrome,Safari
 ]);
