@@ -201,4 +201,11 @@ const botIpHashes = new Set([
     '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
     '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron  Chrome
     '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google  Chrome,Safari
+    '402c9e27aa09039a1ecc51897f6c2426624c0e34', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
+    '6d70a6d5bbfbc5e5974a083cc6da3c1e29abd021', // 2025-11-02 for 2025-11-01 202662 hytron  Chrome
+    '91026456749015bcbeb9e2f265ed746bdbdcd6ed', // 2025-11-02 for 2025-11-01 7922   comcast Chrome,Safari,Edge,Firefox,Opera
+    '99637dd8cc4969338f809ff7b9e15986b71d5cb3', // 2025-11-02 for 2025-11-01 396982 google  Chrome
+    'a312bf280cad74c81b35129c659900269851715d', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
+    'c626fb2d3b1bb93f6ca8c3e9a43f32cccbc1f426', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
+    'fe3aaf8e15a7247337745b97adda8f0e7ce8df03', // 2025-11-02 for 2025-11-01 24940  hetzner Chrome,Safari,Edge,Firefox
 ]);
