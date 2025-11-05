@@ -155,57 +155,62 @@ const botIpHashes = new Set([
     '7d6f02aaa2783269230b6bde0886a94a8e4b8906', // 2025-10-11 for 2025-10-10
     'efd3b56879c835a1d986893c0bb80de69fefec66', // 2025-10-11 for 2025-10-10
     'f7b8b173c662ce8d43e737ae9aba73c24afcc749', // 2025-10-11 for 2025-10-10
-    '06f676292c8d87007ec3ec79f63c87c1fd05d0f0', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '1bf55306666f3064ffa84a5c5d0caa249b3df6dd', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '35e193bb70d73097b16f98dd284e45c73b123bf1', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    '436e2b2c3f0e081249335e5861ea86d6d353bdc8', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    '5610c6f4409f62e6c9800bd7f71c84c42e6e4124', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    '56d538b9b548563f39da16d1dfdf23aa35786b6e', // 2025-10-12 for 2025-10-11 396982 google  Chrome,Safari
-    '7445432cc3b887d16924889f0387f437ea77b027', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    '74eb7c52d6b182f036ed60c9bb64552c793f9b63', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '7d2ff41411bb8ec9bf144371462b55faf5a63000', // 2025-10-12 for 2025-10-11 396982 google  Chrome,Safari
-    '7ec34b4cb6e8302fcf01f7592aeafa174468f773', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '815c4dbb996ddeac66ad61027f236baf9eae93bf', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '8dca93c9b69b1618b16249a917261002823de91f', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '9315a9cc0880a83b5ec88b66f668688569fb6220', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    'a4a11721f7f0bb216a763f1743e58de9a34e05f8', // 2025-10-12 for 2025-10-11 398465 rackdog Chrome
-    'c60ee802f425a3b920059be546c2a602c755ae8e', // 2025-10-12 for 2025-10-11 396982 google  Chrome,Safari
-    'cd59ea79296cdc41db82e2d25cdb17c8e7ec5145', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    'df752bbf6661373ce93531c63a4b07f2e7a4d936', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    'f8545b85516ad67c513a56c2b8fd945950d2d004', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    'feb09ba8632f7ea2949006f7c02ea8a72bb7c400', // 2025-10-12 for 2025-10-11 399296 rackdog Chrome
-    '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
-    'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google  Chrome,Safari
-    '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google  Chrome,Safari
-    '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen  Mozilla/5.0 (compatible; PodcastDownloader/1.0)
+    '06f676292c8d87007ec3ec79f63c87c1fd05d0f0', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '1bf55306666f3064ffa84a5c5d0caa249b3df6dd', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '35e193bb70d73097b16f98dd284e45c73b123bf1', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    '436e2b2c3f0e081249335e5861ea86d6d353bdc8', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    '5610c6f4409f62e6c9800bd7f71c84c42e6e4124', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    '56d538b9b548563f39da16d1dfdf23aa35786b6e', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
+    '7445432cc3b887d16924889f0387f437ea77b027', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    '74eb7c52d6b182f036ed60c9bb64552c793f9b63', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '7d2ff41411bb8ec9bf144371462b55faf5a63000', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
+    '7ec34b4cb6e8302fcf01f7592aeafa174468f773', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '815c4dbb996ddeac66ad61027f236baf9eae93bf', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '8dca93c9b69b1618b16249a917261002823de91f', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '9315a9cc0880a83b5ec88b66f668688569fb6220', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    'a4a11721f7f0bb216a763f1743e58de9a34e05f8', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
+    'c60ee802f425a3b920059be546c2a602c755ae8e', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
+    'cd59ea79296cdc41db82e2d25cdb17c8e7ec5145', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    'df752bbf6661373ce93531c63a4b07f2e7a4d936', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    'f8545b85516ad67c513a56c2b8fd945950d2d004', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    'feb09ba8632f7ea2949006f7c02ea8a72bb7c400', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
+    '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google   Chrome,Safari
+    'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google   Chrome,Safari
+    '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google   Chrome,Safari
+    '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen   Mozilla/5.0 (compatible; PodcastDownloader/1.0)
     '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    centurylink  Chrome
-    '1c2eceb20f01f649aa3d7d6ed4b4d79128152d15', // 2025-10-20 for 2025-10-19 16509  amazon  Chrome
-    '76933aa76d9d312492f453613075a769ba3eda65', // 2025-10-20 for 2025-10-19 16509  amazon  Chrome
-    'a047086d66d44f7051f874479f78e03b7ef04c05', // 2025-10-20 for 2025-10-19 16509  amazon  Chrome
-    'a0a823f7962ed7c912efcf174a64e80db50fb027', // 2025-10-20 for 2025-10-19 16509  amazon  Chrome
-    'fb5cf927d28adb1a940a551c0ea0f22d1d61d7ac', // 2025-10-20 for 2025-10-19 24940  hetzner Chrome,Safari,Edge,Firefox
+    '1c2eceb20f01f649aa3d7d6ed4b4d79128152d15', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
+    '76933aa76d9d312492f453613075a769ba3eda65', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
+    'a047086d66d44f7051f874479f78e03b7ef04c05', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
+    'a0a823f7962ed7c912efcf174a64e80db50fb027', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
+    'fb5cf927d28adb1a940a551c0ea0f22d1d61d7ac', // 2025-10-20 for 2025-10-19 24940  hetzner  Chrome,Safari,Edge,Firefox
     '30b64f29576d0239eb7d6c8f0ac4e7edcaebdf4f', // 2025-10-21 for 2025-10-20 12876  scaleway Mplayer, Windows Media Player
-    '3c8be3e51b6b81462bee716cc30728aeead1346e', // 2025-10-21 for 2025-10-20 48090  dmzhost Firefox
-    'd69de8a319bd4b2b4d800b111ad0d7cb8e3ea5ee', // 2025-10-21 for 2025-10-20 16509  amazon  Chrome
-    'cae9d8515527a5c84fe36713b2b279e23b8400ec', // 2025-10-22 for 2025-10-21 16509  amazon  Chrome
-    '6259e266825587b0b4ce761925c2b02d9e0036b6', // 2025-10-22 for 2025-10-21 16509  amazon  Chrome
-    '9fa41cc8729f8f9d1e4254cd5ad720b8ea6b2ed3', // 2025-10-23 for 2025-10-22 16509  amazon  Chrome
-    'fe765bfd72275d6c22f60aa2b5f0c2039d7af0b7', // 2025-10-28 for 2025-10-27 396982 google  Chrome,Safari
-    '2516177353bc8cd6637685248975a0263c76d78c', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
-    '63640aea78cf162ee673ab7a4853099aef4ad9e1', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
-    '92ee8dc4db8dc0751172885bca749f21b4de588a', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
-    '97794061baa2ac7f9aef0446c892ddce2ea397c5', // 2025-10-30 for 2025-10-29 399296 rackdog Chrome
-    'b9aea9d2f837a5f22cb473dd2a31d42ca8dcd556', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
-    'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon  poddl - podcast downloader
-    '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
-    '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon  poddl - podcast downloader
-    '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron  Chrome
-    '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google  Chrome,Safari
-    '402c9e27aa09039a1ecc51897f6c2426624c0e34', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
-    '6d70a6d5bbfbc5e5974a083cc6da3c1e29abd021', // 2025-11-02 for 2025-11-01 202662 hytron  Chrome
-    '91026456749015bcbeb9e2f265ed746bdbdcd6ed', // 2025-11-02 for 2025-11-01 7922   comcast Chrome,Safari,Edge,Firefox,Opera
-    '99637dd8cc4969338f809ff7b9e15986b71d5cb3', // 2025-11-02 for 2025-11-01 396982 google  Chrome
-    'a312bf280cad74c81b35129c659900269851715d', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
-    'c626fb2d3b1bb93f6ca8c3e9a43f32cccbc1f426', // 2025-11-02 for 2025-11-01 396982 google  Chrome,Safari
-    'fe3aaf8e15a7247337745b97adda8f0e7ce8df03', // 2025-11-02 for 2025-11-01 24940  hetzner Chrome,Safari,Edge,Firefox
+    '3c8be3e51b6b81462bee716cc30728aeead1346e', // 2025-10-21 for 2025-10-20 48090  dmzhost  Firefox
+    'd69de8a319bd4b2b4d800b111ad0d7cb8e3ea5ee', // 2025-10-21 for 2025-10-20 16509  amazon   Chrome
+    'cae9d8515527a5c84fe36713b2b279e23b8400ec', // 2025-10-22 for 2025-10-21 16509  amazon   Chrome
+    '6259e266825587b0b4ce761925c2b02d9e0036b6', // 2025-10-22 for 2025-10-21 16509  amazon   Chrome
+    '9fa41cc8729f8f9d1e4254cd5ad720b8ea6b2ed3', // 2025-10-23 for 2025-10-22 16509  amazon   Chrome
+    'fe765bfd72275d6c22f60aa2b5f0c2039d7af0b7', // 2025-10-28 for 2025-10-27 396982 google   Chrome,Safari
+    '2516177353bc8cd6637685248975a0263c76d78c', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
+    '63640aea78cf162ee673ab7a4853099aef4ad9e1', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
+    '92ee8dc4db8dc0751172885bca749f21b4de588a', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
+    '97794061baa2ac7f9aef0446c892ddce2ea397c5', // 2025-10-30 for 2025-10-29 399296 rackdog  Chrome
+    'b9aea9d2f837a5f22cb473dd2a31d42ca8dcd556', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
+    'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
+    '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon   poddl - podcast downloader
+    '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon   poddl - podcast downloader
+    '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron   Chrome
+    '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google   Chrome,Safari
+    '402c9e27aa09039a1ecc51897f6c2426624c0e34', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
+    '6d70a6d5bbfbc5e5974a083cc6da3c1e29abd021', // 2025-11-02 for 2025-11-01 202662 hytron   Chrome
+    '91026456749015bcbeb9e2f265ed746bdbdcd6ed', // 2025-11-02 for 2025-11-01 7922   comcast  Chrome,Safari,Edge,Firefox,Opera
+    '99637dd8cc4969338f809ff7b9e15986b71d5cb3', // 2025-11-02 for 2025-11-01 396982 google   Chrome
+    'a312bf280cad74c81b35129c659900269851715d', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
+    'c626fb2d3b1bb93f6ca8c3e9a43f32cccbc1f426', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
+    'fe3aaf8e15a7247337745b97adda8f0e7ce8df03', // 2025-11-02 for 2025-11-01 24940  hetzner  Chrome,Safari,Edge,Firefox
+    '39bff10160c2268dc5941abca5e346bbe1b08cda', // 2025-11-05 for 2025-11-04 30600  metronet Overcast
+    '3cc81df3374645d8abfa259844428aa602e9e210', // 2025-11-05 for 2025-11-04 24940  hetzner  Chrome,Safari,Edge,Firefox
+    '442553039dedd201e0e750ac8fd446b74c19044a', // 2025-11-05 for 2025-11-04 812    rogers   Overcast
+    'c6de8def59101c25cda6d023a99558c4610e804d', // 2025-11-05 for 2025-11-04 7018   att      Overcast
+    'ea146eb5098e9e27b4822356965bdfe0ac1429cd', // 2025-11-05 for 2025-11-04 812    rogers   Overcast
 ]);
