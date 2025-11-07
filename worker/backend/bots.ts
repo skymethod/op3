@@ -226,4 +226,13 @@ const botIpHashes = new Set([
     'dbc7c7a22fb21abb03945ec8c26ade17fcc9d890', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
     'f619cac77bc8ca779510c60409d5493267f7245e', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
     '8cb261c78dad3efcd48d940c3f5e77f263ea7bbf', // 2025-11-06 for 2025-11-05 3352   telefonica Overcast
+    '01b3e6295170048c5cd7b8cf547c969075a389ed', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
+    '0cd29ac1619162228d7803687a88073060284d10', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
+    '2e72a00adccf985b83df9de368d390da91b89b23', // 2025-11-07 for 2025-11-06 701  verizon    Overcast
+    '8b9ce9738c7647199a1240f6c41966ab7ad68243', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
+    '9b45aca69b1d61a927ad1dd0d8238ac801cda0c1', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
+    'a6da9f1f3aafd46d46dfc8a385397620d2c593c3', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
+    'dd0078339e6da6546348c0c954f6f60776bdb494', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
+    'e198962f37bc5060f4bd9a8481a18e7047430523', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
+    'ecbcfb4f15bff76857bd65bcff5961b712486097', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
 ]);
