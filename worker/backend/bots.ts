@@ -238,4 +238,6 @@ const botIpHashes = new Set([
     '54112768e3f5823b6eb938c7993bcb4a7d194323', // 2025-11-08 for 2025-11-07 16509  amazon   Chrome
     'a4f08a570d2f21b65a3f332651cc389043206ac8', // 2025-11-08 for 2025-11-07 12119  itv3     Overcast
     'e49a3868aec3927e1914d51c09c27ec13f0e8083', // 2025-11-08 for 2025-11-07 812    rogers   Overcast
+    '80a88f03d467b5c3fb915f878fb23c13d82cf8a1', // 2025-11-09 for 2025-11-08 4837   chinaunicom Chrome
+    '8ece917829ad44ba694a723c9bec628fc8264520', // 2025-11-09 for 2025-11-08 11427  charter  Overcast
 ]);
