@@ -178,7 +178,7 @@ const botIpHashes = new Set([
     'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google   Chrome,Safari
     '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google   Chrome,Safari
     '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen   Mozilla/5.0 (compatible; PodcastDownloader/1.0)
-    '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    centurylink  Chrome
+    '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    century  Chrome
     '1c2eceb20f01f649aa3d7d6ed4b4d79128152d15', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
     '76933aa76d9d312492f453613075a769ba3eda65', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
     'a047086d66d44f7051f874479f78e03b7ef04c05', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
@@ -238,6 +238,12 @@ const botIpHashes = new Set([
     '54112768e3f5823b6eb938c7993bcb4a7d194323', // 2025-11-08 for 2025-11-07 16509  amazon   Chrome
     'a4f08a570d2f21b65a3f332651cc389043206ac8', // 2025-11-08 for 2025-11-07 12119  itv3     Overcast
     'e49a3868aec3927e1914d51c09c27ec13f0e8083', // 2025-11-08 for 2025-11-07 812    rogers   Overcast
-    '80a88f03d467b5c3fb915f878fb23c13d82cf8a1', // 2025-11-09 for 2025-11-08 4837   chinaunicom Chrome
+    '80a88f03d467b5c3fb915f878fb23c13d82cf8a1', // 2025-11-09 for 2025-11-08 4837   chinauni Chrome
     '8ece917829ad44ba694a723c9bec628fc8264520', // 2025-11-09 for 2025-11-08 11427  charter  Overcast
+    '0c8480fbbd158bce4b29fcc8889c128ee5abb16c', // 2025-11-10 for 2025-11-09 16509  amazon   Chrome
+    '97c764577483c41d7b1fd880cfaa33af898f88ec', // 2025-11-10 for 2025-11-09 16509  amazon   Chrome
+    '1303a5aea99bbf6aadea082e26cdae4586a5305d', // 2025-11-10 for 2025-11-09 812    rogers   Overcast
+    '486d0b1138fbf8633e538a8d2218fb0caea6a00d', // 2025-11-10 for 2025-11-09 812    rogers   Overcast
+    '98884dda13bf9e30cb6ce043707d606d6bcf43d1', // 2025-11-10 for 2025-11-09 18403  fpt      Dalvik
+    'b483d3d32f245a059398f81919216ea1950f4a73', // 2025-11-10 for 2025-11-09 132817 dzcrd    Chrome
 ]);
