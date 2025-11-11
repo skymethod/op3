@@ -246,4 +246,8 @@ const botIpHashes = new Set([
     '486d0b1138fbf8633e538a8d2218fb0caea6a00d', // 2025-11-10 for 2025-11-09 812    rogers   Overcast
     '98884dda13bf9e30cb6ce043707d606d6bcf43d1', // 2025-11-10 for 2025-11-09 18403  fpt      Dalvik
     'b483d3d32f245a059398f81919216ea1950f4a73', // 2025-11-10 for 2025-11-09 132817 dzcrd    Chrome
+    '83ce17496be6b511df9c5c042348e35b3bf7ad1d', // 2025-11-11 for 2025-11-10 812    rogers   Overcast
+    'bc5c94a17370bb4cc09a7576a9f2cdcdded5b945', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
+    'd5c27f0f3b2b11915a71bd05b7d591897af2cde3', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
+    'dfe9e983a7acd64f65482a018246cf0b05098992', // 2025-11-11 for 2025-11-10 812    rogers   Overcast
 ]);
