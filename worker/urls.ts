@@ -38,12 +38,14 @@ export function computeMatchUrl(url: string, opts: { queryless?: boolean } = {})
             rt = rt.substring(0, i);
         }
     }
-    if (!rt.includes('?')) {
+    const hasQuery = rt.includes('?');
+    if (!hasQuery) {
         while (rt.endsWith('/')) {
             rt = rt.substring(0, rt.length - 1);
         }
     }
     rt = rt.toLowerCase();
+    if (hasQuery) rt = rt.replaceAll('&amp;', '&');
     const m = /^https?:\/\/(.+?)$/.exec(rt);
     if (!m) throw new Error(`Unable to compute match url for: ${url}`);
     return m[1];

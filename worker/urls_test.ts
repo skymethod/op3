@@ -42,6 +42,7 @@ Deno.test({
             'HTTPS://a.com': 'a.com',
             'HTTPS://a.com/FOO/': 'a.com/foo',
             'HTTPS://a.com/FOO/#a': 'a.com/foo',
+            'https://a.com/foo?a=b&amp;c=d': 'a.com/foo?a=b&c=d',
         }
         for (const [ input, expected ] of Object.entries(good)) {
             assertEquals(computeMatchUrl(input), expected);
