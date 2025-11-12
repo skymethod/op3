@@ -250,4 +250,14 @@ const botIpHashes = new Set([
     'bc5c94a17370bb4cc09a7576a9f2cdcdded5b945', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
     'd5c27f0f3b2b11915a71bd05b7d591897af2cde3', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
     'dfe9e983a7acd64f65482a018246cf0b05098992', // 2025-11-11 for 2025-11-10 812    rogers   Overcast
+    '109d1beeb592d4314ad31c8d5000ad4d064b0a42', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    '2c91f0c49c0e1795e08f75cbf34f471c128872dd', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    '31337704dcecc3999e59bf6c9f6e1be60cf378f2', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
+    '94748497c1fc9a916fad5b51710026140b126eba', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
+    'f32ecf774bab947b1adb5a07fde6a8107b55eb09', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
+    '572e1028f4afefe97ad604225958282492f27699', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    '8a5aedf162d92d8d7439c89b1ea6870f2c4c5965', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    '991ecd570a2d55b489986f0fb124c3c88ecc8de8', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    'e284de463bf218a93031ecc6bc356cd05045909d', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    'f5e9f828393bfb80add6fbb8816634a05b9af012', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
 ]);
