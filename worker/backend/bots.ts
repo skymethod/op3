@@ -260,4 +260,9 @@ const botIpHashes = new Set([
     '991ecd570a2d55b489986f0fb124c3c88ecc8de8', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
     'e284de463bf218a93031ecc6bc356cd05045909d', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
     'f5e9f828393bfb80add6fbb8816634a05b9af012', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
+    '03f09f1673ba592cbe224bce0b0443773c086fd2', // 2025-11-13 for 2025-11-12 62874  web2obj  Chrome
+    '0d512f4c886c7045aa077213c8fb0a68a032fd32', // 2025-11-13 for 2025-11-12 16509  amazon   Chrome
+    '26208b6ae99780ba1a8d7c403b988abd92621de8', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
+    'c53a1ac8fa0f79764c016bdb725bf8cab51c25db', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
+    'cf9657f886e0a050be8215e69d4bcbde752a65c0', // 2025-11-13 for 2025-11-12 12876  scaleway MPlayer, Windows Media Player
 ]);
