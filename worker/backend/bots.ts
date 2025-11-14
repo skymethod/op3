@@ -265,4 +265,6 @@ const botIpHashes = new Set([
     '26208b6ae99780ba1a8d7c403b988abd92621de8', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
     'c53a1ac8fa0f79764c016bdb725bf8cab51c25db', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
     'cf9657f886e0a050be8215e69d4bcbde752a65c0', // 2025-11-13 for 2025-11-12 12876  scaleway MPlayer, Windows Media Player
+    '4c4f0fb17f89fbf2fb69b2be8ef9c0030fa1753c', // 2025-11-14 for 2025-11-13 812    rogers   Overcast
+    '7cb4d07418e059efab22f05002e96ce6b4f635e2', // 2025-11-14 for 2025-11-13 812    rogers   Overcast
 ]);
