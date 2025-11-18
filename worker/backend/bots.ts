@@ -269,4 +269,7 @@ const botIpHashes = new Set([
     '7cb4d07418e059efab22f05002e96ce6b4f635e2', // 2025-11-14 for 2025-11-13 812    rogers   Overcast
     '31080a7abab9047e56ee06be96b98b8780beff83', // 2025-11-15 for 2025-11-14 212238 datacamp Chrome
     '745da2ead0ca8146cb2e561d970b4d695afd48ae', // 2025-11-16 for 2025-11-15 13335  cloudflare Chrome
+    '239777f4527a31a5c21087cef90ba41b466d42cf', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
+    'd9df76bd6bd0c45e185ddb7bee18e2af3f2f6c04', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
+    'ae622ff3f5aaed93c4c14aa18c477d7a1f10d130', // 2025-11-18 for 2025-11-17 212238 datacamp Chrome
 ]);
