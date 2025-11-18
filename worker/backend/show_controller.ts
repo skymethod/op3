@@ -731,6 +731,10 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
     return { lookupShow, preloadMillis, matchUrls: matchUrls.size, querylessMatchUrls: querylessMatchUrls.size, feedRecordIdsToShowUuids: feedRecordIdsToShowUuids.size };
 }
 
+export function isValidPodcastGuid(podcastGuid: string): boolean {
+    return typeof podcastGuid === 'string' && (isValidGuid(podcastGuid) || /^0x[a-fA-F0-9]{40}$/.test(podcastGuid)); // 0x1bECc6153CBdF5654357E5AAc813D5f1a45c40a6
+}
+
 //
 
 const WORK_EPOCH_TIMESTAMP = computeStartOfYearTimestamp(2020);
@@ -1209,10 +1213,6 @@ function computeRelevantUrls(item: Item, knownRedirects?: Record<string, string[
         });
     }
     return rt;
-}
-
-function isValidPodcastGuid(podcastGuid: string): boolean {
-    return typeof podcastGuid === 'string' && (isValidGuid(podcastGuid) || /^0x[a-fA-F0-9]{40}$/.test(podcastGuid)); // 0x1bECc6153CBdF5654357E5AAc813D5f1a45c40a6
 }
 
 async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: string, opts: { storage: DurableObjectStorage }): Promise<string> {
