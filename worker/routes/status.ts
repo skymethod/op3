@@ -46,13 +46,13 @@ export interface StatusRequest {
 
 const ITEMS: FeedItem[] = [
     {
-        id: '2025-11-18',
-        time: '2025-11-18T21:00:25.042Z',
-        title: '2025-11-18: Cloudflare global outage',
+        id: '2025-11-18-update-11-19',
+        time: '2025-11-19T17:11:59.473Z',
+        title: '2025-11-18: Cloudflare global outage (11-19 update)',
         bulletPoints: [
             () => `OP3 was impacted by a [Cloudflare global outage](https://www.cloudflarestatus.com/incidents/8gmgl950y3h7), which affected all edge locations, caused by ["a latent bug"](https://x.com/dok2001/status/1990791419653484646) ([full Cloudflare post-mortem](https://blog.cloudflare.com/18-november-2025-outage/))`,
             () => `Based on initial telemetry it looks like OP3 podcast redirects went down completely for a short period around 7am Eastern (12pm GMT), then down again at 8am (1pm GMT) for 90 minutes, and back to normal at 9.30am Eastern (2.30pm GMT)`,
-            () => `[2025-11-18]: We'll have an analysis tomorrow of all OP3-measured downloads after tonight's daily stats computation completes`,
+            () => `[2025-11-19]: Looking at all OP3-measured downloads for yesterday in a [comparison with the same day last week](https://podcastindex.social/@js/115576859733234449), we see the same outage periods confirmed. Apart from those time periods, very similar download numbers on a daily, hourly, and 10-minutely basis.`,
         ]
     },
     {

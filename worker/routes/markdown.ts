@@ -1,7 +1,7 @@
 import { encodeXml } from '../deps.ts';
 
 export function computeMarkdownHtml(markdown: string): string {
-    const regex = /\[(.*?)\]\((.*?)\)/g;
+    const regex = /\[([^\]\[]+)\]\((.*?)\)/g;
     let m: RegExpExecArray | null;
     const parts: string[] = [];
     let i = 0;
@@ -22,7 +22,7 @@ export function computeMarkdownHtml(markdown: string): string {
 }
 
 export function computeMarkdownText(markdown: string): string {
-    const regex = /\[(.*?)\]\((.*?)\)/g;
+    const regex = /\[([^\]\[]+)\]\((.*?)\)/g;
     let m: RegExpExecArray | null;
     const parts: string[] = [];
     let i = 0;
