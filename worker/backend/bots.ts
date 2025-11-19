@@ -272,4 +272,7 @@ const botIpHashes = new Set([
     '239777f4527a31a5c21087cef90ba41b466d42cf', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
     'd9df76bd6bd0c45e185ddb7bee18e2af3f2f6c04', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
     'ae622ff3f5aaed93c4c14aa18c477d7a1f10d130', // 2025-11-18 for 2025-11-17 212238 datacamp Chrome
+    '3995b9d85cc005f77372d33d027a1b45861059ab', // 2025-11-19 for 2025-11-18 3352   telefonica Overcast
+    '9ae7320d4429af77566b2088f11afbed91d071d5', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
+    'd28da9aff1011e3d12202dd6e83ed5d2006f13cc', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
 ]);
