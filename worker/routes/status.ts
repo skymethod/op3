@@ -50,7 +50,7 @@ const ITEMS: FeedItem[] = [
         time: '2025-11-18T21:00:25.042Z',
         title: '2025-11-18: Cloudflare global outage',
         bulletPoints: [
-            () => `OP3 was impacted by a [Cloudflare global outage](https://www.cloudflarestatus.com/incidents/8gmgl950y3h7), which affected all edge locations, caused by ["a latent bug"](https://x.com/dok2001/status/1990791419653484646) (full Cloudflare post-mortem pending)`,
+            () => `OP3 was impacted by a [Cloudflare global outage](https://www.cloudflarestatus.com/incidents/8gmgl950y3h7), which affected all edge locations, caused by ["a latent bug"](https://x.com/dok2001/status/1990791419653484646) ([full Cloudflare post-mortem](https://blog.cloudflare.com/18-november-2025-outage/))`,
             () => `Based on initial telemetry it looks like OP3 podcast redirects went down completely for a short period around 7am Eastern (12pm GMT), then down again at 8am (1pm GMT) for 90 minutes, and back to normal at 9.30am Eastern (2.30pm GMT)`,
             () => `[2025-11-18]: We'll have an analysis tomorrow of all OP3-measured downloads after tonight's daily stats computation completes`,
         ]
