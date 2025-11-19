@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@fe0442920176f9143bc875c31b0e67662bdacac8 (2025-10-31T14:34:22Z)
+// from user-agents-v2@dcd75f61a0e05698151b45be0975404f003147a4 (2025-11-19T17:02:08Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -34,6 +34,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
     'AirableBot-Podcast/1.0 (+https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
     'AirableBot-Podcast/1.0 ( https//www.airablenow.com)': { type: 'bot', name: `AirableBot` },
+    'AliyunSecBot/Aliyun (AliyunSecBot@service.alibaba.com)': { type: 'bot', name: `AliyunSecBot` },
     'Alignabot 1.0 (https://www.alignable.com/)': { type: 'bot', name: `AlignaBot` },
     'AllEars/1.0; (+www.allears.ai)': { type: 'bot', name: `All Ears` },
     'AnchorImport/1.0': { type: 'bot', name: `Anchor Importer` },
@@ -181,6 +182,7 @@ const botTests = {
     'Mozilla/5.0 (Linux; Android 7.0;) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; PetalBot; https://aspiegel.com/petalbot)': { type: 'bot', name: `PetalBot` },
     'Pinecast/Importer 1.1': { type: 'bot', name: `Pinecast Importer` },
     'PlayerFM/1.0 Podcast Sync (0 subscribers; url=https://player.fm/series/series-2567872)': { type: 'bot', name: `PlayerFM Podcast Sync` },
+    'PodbeanFeedReader/6.0 (Feed Parser; http://www.podbean.com/; Allow like Gecko) Build/20251103053444': { type: 'bot', name: `PodBean Feed Reader` },
     'Podbean Importer': { type: 'bot', name: `Podbean Importer` },
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
     'Aggrivator (PodcastIndex.org)/v0.1.7': { type: 'bot', name: `Podcastindex.org` },
@@ -219,6 +221,7 @@ const botTests = {
     'PodvineBot/4.0.1 (www.podvine.com)': { type: 'bot', name: `PodvineBot` },
     'PostRank/2.0 (postrank.com; 1 subscribers)': { type: 'bot', name: `PostRank Bot` },
     'Podwatch-Pro Crawler': { type: 'bot', name: `PodwatchPro` },
+    'private-podcast-puller/0.1': { type: 'bot', name: `private-podcast-puller` },
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/105.0.5173.0 Safari/537.36': { type: 'bot', name: `Puppeteer` },
     'pyannoteAI': { type: 'bot', name: `Pyannote` },
     'pyannoteAI/2025.19.1-021f79d.production': { type: 'bot', name: `Pyannote` },
@@ -1083,6 +1086,7 @@ const appTests = {
     'TED/2941 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `TED` },
     'TED Android; Version 3.3.3; OPPO R15 9': { type: 'app', name: `TED` },
     'telmate-audio-player': { type: 'app', name: `Telmate` },
+    'TPRPublicRadioApp/6.3.13 (SM-A326U; Android 13)': { type: 'app', name: `TPR: Texas Public Radio` },
     'theathletic-ios/13.88.0,(10983.250528d) iPhone17,5 iOS/18.5 CFNetwork/1.0 Darwin/24.5.0': { type: 'app', name: `The Athletic` },
     'Mozilla/5.0 (Linux; Android 15; Pixel 8a Build/BP1A.250505.005.B1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/138.0.7204.67 Mobile Safari/537.36 theathletic-android': { type: 'app', name: `The Athletic` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) theathletic-ios/13.92.0 (11205.250625d)': { type: 'app', name: `The Athletic` },
