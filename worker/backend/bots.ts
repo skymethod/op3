@@ -275,4 +275,8 @@ const botIpHashes = new Set([
     '3995b9d85cc005f77372d33d027a1b45861059ab', // 2025-11-19 for 2025-11-18 3352   telefonica Overcast
     '9ae7320d4429af77566b2088f11afbed91d071d5', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
     'd28da9aff1011e3d12202dd6e83ed5d2006f13cc', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
+    '14b92055924ca372fb04c94b052acf504132809b', // 2025-11-20 for 2025-11-19 14618  amazon   Chrome
+    '8726a14f3308d3f3cc4bbce289b08abb57ed653b', // 2025-11-20 for 2025-11-19 13335  cloudflare Chrome
+    'd35a967c93b3596be148f1803b246fb5538214c6', // 2025-11-20 for 2025-11-19 12479  orange   Overcast
+    'eedd2f9af3978baa73acb59a5c404b53e56fc63e', // 2025-11-20 for 2025-11-19 396982 google   Storytel
 ]);
