@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@dcd75f61a0e05698151b45be0975404f003147a4 (2025-11-19T17:02:08Z)
+// from user-agents-v2@150e8f1cf777b2ddfdb9eaa83f729e17805bc7f6 (2025-11-20T16:34:45Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -164,6 +164,7 @@ const botTests = {
     'Mozilla/5.0...': { type: 'bot', name: `Mozilla Bot` },
     '\'Mozilla/5.0': { type: 'bot', name: `Mozilla Bot` },
     '(Mozilla/5.0)': { type: 'bot', name: `Mozilla Bot` },
+    'n8n': { type: 'bot', name: `n8n` },
     'Mozilla/5.0 (compatible; Neevabot/1.0; https://neeva.com/neevabot)': { type: 'bot', name: `Neevabot` },
     'Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)': { type: 'bot', name: `Netcraft Survey Agent` },
     'newspaper/0.3.0': { type: 'bot', name: `Newspaper` },
@@ -1197,6 +1198,8 @@ const appTests = {
     'Gold/78.1.0 Android 14/samsung SM-S911B': { type: 'app', name: `Global Player` },
     'Talk%20Radio/45.2.1./iOS 17.2.1/iPhone iPhone': { type: 'app', name: `TalkRadio` },
     'Talk%20Radio/45.2.1./iPadOS 15.8/iPad 3)': { type: 'app', name: `TalkRadio` },
+    'TrueFans': { type: 'app', name: `TrueFans` },
+    'TrueFans/1.0.1': { type: 'app', name: `TrueFans` },
 };
 
 const libraryTests = {

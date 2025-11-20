@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@dcd75f61a0e05698151b45be0975404f003147a4 (2025-11-19T17:02:08Z)
+// from user-agents-v2@150e8f1cf777b2ddfdb9eaa83f729e17805bc7f6 (2025-11-20T16:34:45Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -125,6 +125,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/.*MJ12bot/.test(userAgent)) return { name: `MJ12bot`, type: 'bot' };
     if (/^'?Mozilla(\/5\.0(\.\.\.)?)?$|^\(Mozilla\/5\.0\)$/.test(userAgent)) return { name: `Mozilla Bot`, type: 'bot' };
     if (/^msnbot\//.test(userAgent)) return { name: `MSN Bot`, type: 'bot' };
+    if (/^n8n/.test(userAgent)) return { name: `n8n`, type: 'bot' };
     if (/.*Neevabot/.test(userAgent)) return { name: `Neevabot`, type: 'bot' };
     if (/ NetcraftSurveyAgent\//.test(userAgent)) return { name: `Netcraft Survey Agent`, type: 'bot' };
     if (/^newspaper\/\d/.test(userAgent)) return { name: `Newspaper`, type: 'bot' };
@@ -773,6 +774,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Virgin(%20|\s)Radio/.test(userAgent)) return { name: `Virgin Radio app`, type: 'app' };
     if (/^Global Player\/|^Radio X\/|^Capital (XTRA|FM)\/|^Smooth\/|^LBC\/|^Heart\/|^Classic FM\/|^Gold\//.test(userAgent)) return { name: `Global Player`, type: 'app' };
     if (/^Talk%20Radio\//.test(userAgent)) return { name: `TalkRadio`, type: 'app' };
+    if (/^TrueFans|^TrueFans\//.test(userAgent)) return { name: `TrueFans`, type: 'app' };
 
     // libraries
     if (/^Python\/\d.*aiohttp\/\d/.test(userAgent)) return { name: `AIOHTTP`, type: 'library', category: 'bot' };
