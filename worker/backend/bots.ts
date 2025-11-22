@@ -279,4 +279,5 @@ const botIpHashes = new Set([
     '8726a14f3308d3f3cc4bbce289b08abb57ed653b', // 2025-11-20 for 2025-11-19 13335  cloudflare Chrome
     'd35a967c93b3596be148f1803b246fb5538214c6', // 2025-11-20 for 2025-11-19 12479  orange   Overcast
     'eedd2f9af3978baa73acb59a5c404b53e56fc63e', // 2025-11-20 for 2025-11-19 396982 google   Storytel
+    '251249e0e4150bc54003d258fc13b20646b5288a', // 2025-11-22 for 2025-11-21 48090  dmzhost  Firefox
 ]);
