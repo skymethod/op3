@@ -284,4 +284,6 @@ const botIpHashes = new Set([
     'fcd523c1e93e1292807ce9a9a2965ce74c372a06', // 2025-11-23 for 2025-11-22 7545   tpg      Overcast
     '262191ebfe7487d9bb6b084ffd47af3d34346d30', // 2025-11-24 for 2025-11-23 142125 capti    Overcast
     '8fd7e80eec1b564caa8c8ae8dcc7b9d14bf01f90', // 2025-11-24 for 2025-11-23 137409 gsl      Overcast
+    'c01570708935959bea8d17fc0367d70c5ecefc08', // 2025-11-25 for 2025-11-24 7545   tpg      Overcast
+    'dc9590518199ba17630e1c0b5eead5ba4161dfe0', // 2025-11-25 for 2025-11-24 137409 gsl      Overcast
 ]);
