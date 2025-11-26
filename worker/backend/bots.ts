@@ -286,4 +286,9 @@ const botIpHashes = new Set([
     '8fd7e80eec1b564caa8c8ae8dcc7b9d14bf01f90', // 2025-11-24 for 2025-11-23 137409 gsl      Overcast
     'c01570708935959bea8d17fc0367d70c5ecefc08', // 2025-11-25 for 2025-11-24 7545   tpg      Overcast
     'dc9590518199ba17630e1c0b5eead5ba4161dfe0', // 2025-11-25 for 2025-11-24 137409 gsl      Overcast
+    '3308a56a9e02f9aec00957bf93e3eb18ed336b9b', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
+    '50b4b15e5d5b9ad6dea564ff9af1d401aa591a19', // 2025-11-26 for 2025-11-25 396982 google   Storytel
+    '957a00e8f65fadbee02fdc74ac75c9e2882c59a2', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
+    'e5bdfeca1e3418a8426d63c1656d50609cfe518c', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
+    'fdb339276e627b4b64acc1d88e5bf80f8434adbd', // 2025-11-26 for 2025-11-25 28573  claro   Overcast
 ]);
