@@ -1,4 +1,5 @@
 import { IncomingRequestCf } from './deps.ts';
+import { ZIPCODES } from './zipcodes.ts';
 
 export function computeRawIpAddress(headers: Headers, header = 'cf-connecting-ip'): string | undefined {
     // e.g. 1.1.1.1
@@ -17,6 +18,10 @@ export function computeOther(request: Request): Record<string, string> | undefin
     const { asn } = req.cf;
     if (typeof asn === 'number' && Number.isInteger(asn) && asn > 0) {
         rt.asn = asn.toString();
+    }
+    // 2025-11-27: Cloudflare's new provider no longer provides metroCode: "Currently metroCode is not populated, but this may change in the future"
+    if (rt.metroCode === undefined && rt.country === 'US' && 'postalCode' in req.cf && typeof req.cf.postalCode === 'string') {
+        rt.metroCode = ZIPCODES[req.cf.postalCode];
     }
     return Object.keys(rt).length > 0 ? rt : undefined;
 }
