@@ -29,7 +29,9 @@ export function isWebWidgetHostname(hostname: string): boolean {
 
 export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentName, deviceName, regionCode }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string }): boolean {
     return botIpHashes.has(hashedIpAddress)
-        || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now');
+        || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now')
+        || asn === '33425'&& agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
+        ;
 }
 
 //
@@ -295,4 +297,13 @@ const botIpHashes = new Set([
     '7a92e26c7f0cbbc6114e674896368e870cad6e28', // 2025-11-27 for 2025-11-26 132203 tencent  Chrome,Safari,Edge,Firefox,Google Podcasts
     'a019e0da47c5d5b2aab22593b162fc8eda31e7ed', // 2025-11-27 for 2025-11-26 137409 gsl      Firefox
     'a3c8685716597956d0a1fab0e0eddde35f5628b6', // 2025-11-27 for 2025-11-26 812    rogers   Overcast
+    '14401effc9138387d032813a861218a6fb571ce4', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    '3ce7002ff35ff798627cd2b6e72105bc6d900703', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    '928ae3f54ac4dba7b90a8834e286d2a1559cbea9', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    'b93a274b50849655002cb324608f5da9b1738184', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    'bea7c969885f217462b612769ade259ac9dc090a', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    'ff5ddebd318f6b7c6c756f161eca586d3e583638', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
+    '5f9f65d90dddbe3148936fa090f438be00129897', // 2025-11-28 for 2025-11-27 137409 gsl      Overcast
+    'c8d43cefb0c7cbcdfff4772e299441c2adfd08ec', // 2025-11-28 for 2025-11-27 812    rogers   Overcast
+    'f068b46d977691bc25b923739895f14b690e3c9b', // 2025-11-28 for 2025-11-27 142125 capti    Overcast
 ]);
