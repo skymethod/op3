@@ -30,7 +30,7 @@ export function isWebWidgetHostname(hostname: string): boolean {
 export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentName, deviceName, regionCode }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string }): boolean {
     return botIpHashes.has(hashedIpAddress)
         || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now')
-        || asn === '33425'&& agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
+        || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
         ;
 }
 
@@ -306,4 +306,5 @@ const botIpHashes = new Set([
     '5f9f65d90dddbe3148936fa090f438be00129897', // 2025-11-28 for 2025-11-27 137409 gsl      Overcast
     'c8d43cefb0c7cbcdfff4772e299441c2adfd08ec', // 2025-11-28 for 2025-11-27 812    rogers   Overcast
     'f068b46d977691bc25b923739895f14b690e3c9b', // 2025-11-28 for 2025-11-27 142125 capti    Overcast
+    '4b910e5aa623ab46ae6a64923a196e7b3fd832ce', // 2025-11-29 for 2025-11-28 4713   docomo   Chrome
 ]);
