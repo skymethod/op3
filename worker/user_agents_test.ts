@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@150e8f1cf777b2ddfdb9eaa83f729e17805bc7f6 (2025-11-20T16:34:45Z)
+// from user-agents-v2@0f431d58ef61aa709f1f0aa4046f43e55ebfc7b5 (2025-11-30T15:41:55Z)
 
 const botTests = {
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
@@ -169,6 +169,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)': { type: 'bot', name: `Netcraft Survey Agent` },
     'newspaper/0.3.0': { type: 'bot', name: `Newspaper` },
     'Mozilla/5.0 (compatible; NL-Israel_IAHarvester2025/3.3.0;  https://www.nli.org.il/he/research-and-teach/internet-archive/law-and-order)': { type: 'bot', name: `NL Israel Internet Archiver` },
+    'NovaStreamLive/1.0 (Podcast Import)': { type: 'bot', name: `NovaStream Live Importer` },
     'OgScrper': { type: 'bot', name: `OgScrper` },
     'OmnyStudio/1.0': { type: 'bot', name: `OmniStudio` },
     'op3-fetcher/1.0 (https://op3.dev)': { type: 'bot', name: `OP3 Fetcher` },

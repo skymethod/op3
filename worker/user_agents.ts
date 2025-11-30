@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@150e8f1cf777b2ddfdb9eaa83f729e17805bc7f6 (2025-11-20T16:34:45Z)
+// from user-agents-v2@0f431d58ef61aa709f1f0aa4046f43e55ebfc7b5 (2025-11-30T15:41:55Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -130,6 +130,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ NetcraftSurveyAgent\//.test(userAgent)) return { name: `Netcraft Survey Agent`, type: 'bot' };
     if (/^newspaper\/\d/.test(userAgent)) return { name: `Newspaper`, type: 'bot' };
     if (/NL-Israel_IA/.test(userAgent)) return { name: `NL Israel Internet Archiver`, type: 'bot' };
+    if (/^NovaStreamLive\/.*Import/.test(userAgent)) return { name: `NovaStream Live Importer`, type: 'bot' };
     if (/OgScrper/.test(userAgent)) return { name: `OgScrper`, type: 'bot' };
     if (/^OkDownload\//.test(userAgent)) return { name: `OkDownload`, type: 'bot' };
     if (/^OmnyStudio\/\d/.test(userAgent)) return { name: `OmniStudio`, type: 'bot' };
