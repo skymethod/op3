@@ -309,4 +309,8 @@ const botIpHashes = new Set([
     '4b910e5aa623ab46ae6a64923a196e7b3fd832ce', // 2025-11-29 for 2025-11-28 4713   docomo   Chrome
     'affc2652097ddb641731bae94b3bee621dec88cf', // 2025-11-30 for 2025-11-29 812    rogers   Overcast
     '758f87aab95732a9bd7c0fb69facce5f6abaa91e', // 2025-12-01 for 2025-11-30 812    rogers   Overcast
+    '39df19da3ce608e6c5ef496b489738d520714543', // 2025-12-02 for 2025-12-01 6167   verizon  Overcast
+    '76fc5e3c62d4d406b49ecc97248302ea5459352d', // 2025-12-02 for 2025-12-01 212238 datacamp Chrome
+    'e241555d5ba98fb9545e215523a1f3e0fdd4f127', // 2025-12-02 for 2025-12-01 30600  metronet Overcast
+    'fa63872fc57d794b7249767c4c5f2b1ecebf6173', // 2025-12-02 for 2025-12-01 3352   telefonica Overcast
 ]);
