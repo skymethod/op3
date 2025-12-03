@@ -313,4 +313,8 @@ const botIpHashes = new Set([
     '76fc5e3c62d4d406b49ecc97248302ea5459352d', // 2025-12-02 for 2025-12-01 212238 datacamp Chrome
     'e241555d5ba98fb9545e215523a1f3e0fdd4f127', // 2025-12-02 for 2025-12-01 30600  metronet Overcast
     'fa63872fc57d794b7249767c4c5f2b1ecebf6173', // 2025-12-02 for 2025-12-01 3352   telefonica Overcast
+    '2703e00f5fe808d6a6206dc22db6efc214beebd5', // 2025-12-03 for 2025-12-02 57269  digispain Overcast
+    '9978c2a27ee141b9240ba5f4922c92a43edb6343', // 2025-12-03 for 2025-12-02 7922   comcast  Overcast
+    'fb8667ae5695a51fbe2d8d7d68762a8058422532', // 2025-12-03 for 2025-12-02 12119  itv3     Overcast
+    'd5d958d04449f1c55f574162cb5489f9589165dc', // 2025-12-03 for 2025-12-02 137409 gsl      Firefox, Safari, Podcast Addict, stagefright
 ]);
