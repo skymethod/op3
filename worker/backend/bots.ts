@@ -317,4 +317,10 @@ const botIpHashes = new Set([
     '9978c2a27ee141b9240ba5f4922c92a43edb6343', // 2025-12-03 for 2025-12-02 7922   comcast  Overcast
     'fb8667ae5695a51fbe2d8d7d68762a8058422532', // 2025-12-03 for 2025-12-02 12119  itv3     Overcast
     'd5d958d04449f1c55f574162cb5489f9589165dc', // 2025-12-03 for 2025-12-02 137409 gsl      Firefox, Safari, Podcast Addict, stagefright
+    '686ea059441592dd280628f1a1485769cca3f7c3', // 2025-12-04 for 2025-12-03 7922   comcast  Overcast
+    '77ff6109958918afd0d64efe1279aace1cbbae6a', // 2025-12-04 for 2025-12-03 12479  orange   Overcast
+    '97b66f73ee04089c87234c72c82590bce3881a66', // 2025-12-04 for 2025-12-03 136787 packethub Overcast
+    'a45f1cc2c2dd1af85607000c18da89aa0c44f203', // 2025-12-04 for 2025-12-03 4812   chinatelecom Firefox
+    'b1e9780e3591310b55c76a811312d6c5c15da296', // 2025-12-04 for 2025-12-03 9299   philippine Podurama
+    'c5bbd13c52a17f4c1f67850c653ebd8b694617ba', // 2025-12-04 for 2025-12-03 48090  dmzhost  Firefox
 ]);
