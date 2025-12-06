@@ -324,4 +324,6 @@ const botIpHashes = new Set([
     'b1e9780e3591310b55c76a811312d6c5c15da296', // 2025-12-04 for 2025-12-03 9299   philippine Podurama
     'c5bbd13c52a17f4c1f67850c653ebd8b694617ba', // 2025-12-04 for 2025-12-03 48090  dmzhost  Firefox
     'b715605af60070cc40d82bb19b3274f71f5e7a59', // 2025-12-05 for 2025-12-04 16509  amazon   Chrome
+    '1ee1b2aa3b8d64efe15e53be2efff7da3236d391', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
+    'a332cbc244ac45016020e171f73d5fe287283450', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
 ]);
