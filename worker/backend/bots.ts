@@ -326,4 +326,5 @@ const botIpHashes = new Set([
     'b715605af60070cc40d82bb19b3274f71f5e7a59', // 2025-12-05 for 2025-12-04 16509  amazon   Chrome
     '1ee1b2aa3b8d64efe15e53be2efff7da3236d391', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
     'a332cbc244ac45016020e171f73d5fe287283450', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
+    '5398eb8adac2422ca7767abbb1295d16678bc61f', // 2025-12-07 for 2025-12-06 58065  packet   Chrome, Firefox
 ]);
