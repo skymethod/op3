@@ -23,7 +23,7 @@ export interface ListBlobsResponse {
 }
 
 export interface ListBlobsWithMetadataResponse {
-    readonly entries: readonly { key: string, size: number }[];
+    readonly entries: readonly { key: string, size: number, etag?: string }[];
 }
 
 export interface Multiput {
