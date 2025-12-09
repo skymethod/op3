@@ -328,4 +328,5 @@ const botIpHashes = new Set([
     'a332cbc244ac45016020e171f73d5fe287283450', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
     '5398eb8adac2422ca7767abbb1295d16678bc61f', // 2025-12-07 for 2025-12-06 58065  packet   Chrome, Firefox
     '55dade2ad5ecc7069efb6a63409611ccc7d7813f', // 2025-12-08 for 2025-12-07 803    sasktel  Firefox
+    'b5cbf4655cbde3b1e2d5cb55409a3b3473199c5b', // 2025-12-09 for 2025-12-08 141039 packethub Overcast
 ]);
