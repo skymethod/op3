@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@af521e0ad6243fddb5f90135e00ac67dc358464d (2025-12-10T17:17:50Z)
+// from user-agents-v2@8d68be890603a5d600819ded2f997bc0a34135dc (2025-12-10T22:41:51Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -901,6 +901,7 @@ const appTests = {
     'Overcast (+http://overcast.fm/; Apple Watch podcast app)': { type: 'app', name: `Overcast` },
     'Overcast/792 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Overcast` },
     'Overcast Player 66271': { type: 'app', name: `Overcast` },
+    'Watch/1140 CFNetwork/3860.200.71 Darwin/25.1.0': { type: 'app', name: `Overcast` },
     'Podcast Overhaul/4.1.1 iOS/16.1.1 +https://www.podcastoverhaul.com/': { type: 'app', name: `Overhaul` },
     'Overhaul FM/2.0 SM-P615/13 +https://overhaul.fm': { type: 'app', name: `Overhaul` },
     'Palco MP3/3.13.18 (Linux;Android 11) ExoPlayerLib/2.11.0': { type: 'app', name: `Palco MP3` },
@@ -1324,6 +1325,7 @@ const deviceTests = {
     'AppleCoreMedia/1.0.0.20K71 (Apple TV; U; CPU OS 16_1 like Mac OS X; en_au)': { type: 'device', name: `Apple TV` },
     'Fountain/0.5.3 ios https://www.fountain.fm': { type: 'device', name: `Apple iPhone` },
     'Anytime/1.1 b64 (phone;ios Version 15.6.1 (Build 19G82)) https://github.com/amugofjava/anytime_podcast_player': { type: 'device', name: `Apple iPhone` },
+    'Watch/1140 CFNetwork/3860.200.71 Darwin/25.1.0': { type: 'device', name: `Apple Watch` },
     'net/http-easy (macosx; racket[CS] 8.15.0.7; 0.8.2)': { type: 'device', name: `Apple Computer` },
     'Mimir-macOS/1.8.1': { type: 'device', name: `Apple Computer` },
     'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.225 Safari/537.36 CrKey/1.56.500000 DeviceType/SmartSpeaker': { type: 'device', name: `Google Home` },

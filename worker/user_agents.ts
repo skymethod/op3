@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@af521e0ad6243fddb5f90135e00ac67dc358464d (2025-12-10T17:17:50Z)
+// from user-agents-v2@8d68be890603a5d600819ded2f997bc0a34135dc (2025-12-10T22:41:51Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -609,7 +609,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
     if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
-    if (/^Overcast\/|^Overcast.*Apple Watch|^Overcast Player /.test(userAgent)) return { name: `Overcast`, type: 'app' };
+    if (/^Overcast\/|^Overcast.*Apple Watch|^Overcast Player |^Watch\/\d+ CFNetwork\//.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\/|^Overhaul FM\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
     if (/^Palco MP3/.test(userAgent)) return { name: `Palco MP3`, type: 'app' };
     if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
@@ -854,10 +854,11 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/HomePod|^AirPodcasts\/\d/.test(userAgent)) return { name: `Apple HomePod`, type: 'device', category: 'smart_speaker' };
     if (/ipad|iPad|IPAD/.test(userAgent)) return { name: `Apple iPad`, type: 'device', category: 'mobile' };
     if (/Apple TV|AppleTV|apple;apple_tv/.test(userAgent)) return { name: `Apple TV`, type: 'device', category: 'smart_tv' };
-    if (/iphone|iOS|iPhone|CFNetwork| ios |phone;ios/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
-    if (/watch|Watch OS/.test(userAgent)) return { name: `Apple Watch`, type: 'device', category: 'watch' };
+    if (/iphone|iOS|iPhone| ios |phone;ios/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
+    if (/watch|Watch OS|^Watch\/\d+ CFNetwork\//.test(userAgent)) return { name: `Apple Watch`, type: 'device', category: 'watch' };
     if (/iPod|IPOD/.test(userAgent)) return { name: `Apple iPod`, type: 'device', category: 'mobile' };
     if (/OS X|OSX|Macintosh|Macbook|macosx|macOS/.test(userAgent)) return { name: `Apple Computer`, type: 'device', category: 'computer' };
+    if (/CFNetwork/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
     if (/GoogleChirp|Google-Speech-Actions|CrKey.*DeviceType\/SmartSpeaker/.test(userAgent)) return { name: `Google Home`, type: 'device', category: 'smart_speaker' };
     if (/Chromebook|CrOS/.test(userAgent)) return { name: `Google Chromebook`, type: 'device', category: 'computer' };
     if (/[a|A]ndroid.*[t|T]ablet|[t|T]ablet.*[a|A]ndroid|SM-T| GT-|^ZTE;Xview/.test(userAgent)) return { name: `Android Tablet`, type: 'device', category: 'mobile' };
