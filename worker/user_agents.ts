@@ -19,11 +19,12 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@0f431d58ef61aa709f1f0aa4046f43e55ebfc7b5 (2025-11-30T15:41:55Z)
+// from user-agents-v2@af521e0ad6243fddb5f90135e00ac67dc358464d (2025-12-10T17:17:50Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
     // bots
+    if (/^7Siters/.test(userAgent)) return { name: `7Siters Crawler`, type: 'bot' };
     if (/AAABot/.test(userAgent)) return { name: `AAABot - unknown bot`, type: 'bot' };
     if (/^AIS VirtualListener/.test(userAgent)) return { name: `Adswizz`, type: 'bot' };
     if (/^agma\//.test(userAgent)) return { name: `ma Podcast (agma) Bot`, type: 'bot' };
@@ -700,7 +701,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Android Sportbladet Hermes\//.test(userAgent)) return { name: `Sportbladet Android app`, type: 'app' };
     if (/iOS Sportbladet Hermes\//.test(userAgent)) return { name: `Sportbladet iOS app`, type: 'app' };
     if (/^Spotify\/.+Linux|Macintosh.+Spotify\/|^Spotify\/.+OSX|Windows.+Spotify\/|^Spotify\/.+Win32|^Spotify\/.+Android|^Spotify\/.+iOS|^Spotify\/.+Polestar|^Spotify\/.+Volvo|^spotify_|^Spotify-Lite|^Spotify\/\d/.test(userAgent)) return { name: `Spotify`, type: 'app' };
-    if (/^Spreaker for Android|^Spreaker Custom App for (Android|iOS)|Spreaker\/|^Spreaker \d/.test(userAgent)) return { name: `Spreaker`, type: 'app' };
+    if (/^(SpreakerPodcast\/|Spreaker Custom App for (Android|iOS) |Spreaker for Android |Spreaker )\d/.test(userAgent)) return { name: `Spreaker`, type: 'app' };
     if (/^Sprewell\//.test(userAgent)) return { name: `Sprewell`, type: 'app' };
     if (/Android SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad Android app`, type: 'app' };
     if (/iOS SA Hermes\//.test(userAgent)) return { name: `Stavanger Aftenblad iOS app`, type: 'app' };

@@ -24,9 +24,10 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@0f431d58ef61aa709f1f0aa4046f43e55ebfc7b5 (2025-11-30T15:41:55Z)
+// from user-agents-v2@af521e0ad6243fddb5f90135e00ac67dc358464d (2025-12-10T17:17:50Z)
 
 const botTests = {
+    '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
     'AIS VirtualListener': { type: 'bot', name: `Adswizz` },
     'agma/1.0': { type: 'bot', name: `ma Podcast (agma) Bot` },
@@ -1056,9 +1057,12 @@ const appTests = {
     'Spotify/4.3.2.0 Polestar/30 (Polestar)': { type: 'app', name: `Spotify` },
     'Spotify/4.3.2.0 Volvo/30 (Volvo)': { type: 'app', name: `Spotify` },
     'Spotify/8.7.76.359 SM-R870/30 (SM-R870)': { type: 'app', name: `Spotify` },
-    'Spreaker Custom App for Android 5.5.3 release:2021-04-08 device:phone (samsung SM-N986B; Android 12; it_IT)': { type: 'app', name: `Spreaker` },
-    'Spreaker Custom App for iOS 2.2.2 rv:6302 (iPhone15,3; iOS 18.1.1; en_US) SPKAudioPlayer': { type: 'app', name: `Spreaker` },
     'Spreaker 7.17.0 rv:1300 (iPhone8,4; iOS 15.8.3; en_CA)': { type: 'app', name: `Spreaker` },
+    'Spreaker for Android 4.10.5 release:2018-12-03 device:phone (google Pixel 6; Android 14; it_IT)': { type: 'app', name: `Spreaker` },
+    'SpreakerPodcast/1.0 (iOS/14.8.1; iPhone10,6; en_US)': { type: 'app', name: `Spreaker` },
+    'SpreakerPodcast/1.0 (Android/12; Google Pixel 4a; en_US)': { type: 'app', name: `Spreaker` },
+    'Spreaker Custom App for iOS 2.2.2 rv:6302 (iPhone15,3; iOS 18.1.1; en_US) SPKAudioPlayer': { type: 'app', name: `Spreaker` },
+    'Spreaker Custom App for Android 5.5.3 release:2021-04-08 device:phone (samsung SM-N986B; Android 12; it_IT)': { type: 'app', name: `Spreaker` },
     'Sprewell/101 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'app', name: `Sprewell` },
     'Android SA Hermes/1000094692 _app_': { type: 'app', name: `Stavanger Aftenblad Android app` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS SA Hermes/90.0.0 _app_': { type: 'app', name: `Stavanger Aftenblad iOS app` },
