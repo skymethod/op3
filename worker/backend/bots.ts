@@ -333,4 +333,6 @@ const botIpHashes = new Set([
     '6d82a3fedf63363b27d9647858b43b13498a74a9', // 2025-12-10 for 2025-12-09 53850  gorilla  Chrome
     '8f325e94eb4880753526c8724f50eae5d9628752', // 2025-12-10 for 2025-12-09 16509  amazon   Chrome
     'ee0302cd473b235dbfcca4a42dda66856760c644', // 2025-12-10 for 2025-12-09 141039 packethub Overcast
+    '7c54589378df3adc8bf5b1d661d513174cf51de9', // 2025-12-11 for 2025-12-10 11351  charter  Chrome
+    'cf3112fe57a843c46e728a5ddbe2d5089951fd35', // 2025-12-11 for 2025-12-10 45090  tencent  Chrome, Firefox, Edge, Safari
 ]);
