@@ -337,4 +337,8 @@ const botIpHashes = new Set([
     'cf3112fe57a843c46e728a5ddbe2d5089951fd35', // 2025-12-11 for 2025-12-10 45090  tencent  Chrome, Firefox, Edge, Safari
     '8668d7a3b43fa110eade86a3360b6df56094955b', // 2025-12-13 for 2025-12-12 48090  techoff  Firefox
     'c0c3813ce46dc86e5903d419b3be8345a6698516', // 2025-12-13 for 2025-12-12 395965 carrytel Chrome
+    '236f05b2102ab54b9b7e5675ba5092e5f217501e', // 2025-12-16 for 2025-12-15 7018   att      Overcast
+    '7ccc558874175988e511afde0ea5ba4668845862', // 2025-12-16 for 2025-12-15 812    rogers   Overcast
+    'd366c427875f90e64cfb16d5a61981a47832ed6a', // 2025-12-16 for 2025-12-15 812    rogers   Overcast
+    'faff1fe55396bb4a3f4646845d8d1b860d7665fa', // 2025-12-16 for 2025-12-15 3320   telekom  Overcast
 ]);
