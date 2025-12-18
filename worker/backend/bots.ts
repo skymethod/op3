@@ -348,4 +348,16 @@ const botIpHashes = new Set([
     'e57239eb5a9731c9729880787c3878188548ad5b', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
     'eee8bad0865d3740d9ff7d76c38ece95e6752b17', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
     '7b135c897236a039f4f5d0b0cfe5c69dffb97fa3', // 2025-12-17 for 2025-12-16 136787 packethub Overcast
+    '06509fa1b0ad4dcc6ece1fd5ee11ea3c14c7bfa9', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    '69a25c78acf8a89147b94c2fea18831b7394e932', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    '73238592035cd081c6f42e70aec59bc21591f9f2', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    '74bceb64e32d15ff244216cd85f2b17beadc8892', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    'd0324308a0cbfd944cae0ecd53443d3478aa1047', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    'e5f4fd09355da80bdd45e68df6274e37aaa66dc1', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    'ebfe7d1ba3f3aee90178881eebd4c3541219a047', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
+    'c74e4942c52b56214ab307a94c599a8e2ba02b15', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome, feedparser/6.0.11 +https://github.com/kurtmckee/feedparser/
+    '4a1a5328c28f04a1297502df016ba28b10f23155', // 2025-12-18 for 2025-12-17 812    rogers   Overcast
+    '4c411f183456460e6ebf166144430d674560407a', // 2025-12-18 for 2025-12-17 812    rogers   Overcast
+    'be579bf37339f127f71a236be73026ce9ef1b4d9', // 2025-12-18 for 2025-12-17 136787 packethub Overcast
+    'ab1a376685d5be76db10d2440e65e2fdb1a5fb14', // 2025-12-18 for 2025-12-17 7018   att      Chrome, Safari, Edge
 ]);
