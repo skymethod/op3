@@ -27,10 +27,11 @@ export function isWebWidgetHostname(hostname: string): boolean {
     return knownWebWidgetHostnames.has(hostname);
 }
 
-export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentName, deviceName, regionCode }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string }): boolean {
+export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentName, deviceName, regionCode, date }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string, date: string }): boolean {
     return botIpHashes.has(hashedIpAddress)
-        || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now')
+        || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now') // google fiber
         || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
+        || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
         ;
 }
 

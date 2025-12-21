@@ -95,6 +95,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             }
             // tagging
             const time = timestampToInstant(timestamp);
+            const date = time.substring(0, 10);
             const { agentType, agentName, deviceType, deviceName, referrerType, referrerName, isWebWidget } = computeAgentInfo({ userAgent, referer });
             let tags = isFirstTwoBytes ? 'first-two' : undefined;
             const streaming = typeof xpsId === 'string' && xpsId !== '' || agentName === 'AppleCoreMedia';
@@ -106,7 +107,7 @@ export async function computeHourlyDownloads(hour: string, { statsBlobs, rpcClie
             } else if (ipSource === 'unknown-crosszone') {
                 tags = (tags ? `${tags},unknown-crosszone` : 'unknown-crosszone');
             }
-            if (hashedIpAddress && isBotIpHash({ hashedIpAddress, asn, agentName, deviceName, destinationServerUrl, regionCode })) tags = (tags ? `${tags},bot-ip` : 'bot-ip');
+            if (hashedIpAddress && isBotIpHash({ hashedIpAddress, asn, agentName, deviceName, destinationServerUrl, regionCode, date })) tags = (tags ? `${tags},bot-ip` : 'bot-ip');
 
             const line = [ serverUrl, audienceId, time, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn, tags ].map(v => v ?? '').join('\t') + '\n';
             const chunkIndex = chunks.length;
