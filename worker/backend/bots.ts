@@ -388,4 +388,13 @@ const botIpHashes = new Set([
     '5138d288a2712a68a18689db1d2bee9ba4db296f', // 2025-12-23 for 2025-12-22 812    rogers   Overcast
     'bb3a0792b826da7209b5cdd30270f9bfc0055df0', // 2025-12-23 for 2025-12-22 812    rogers   Overcast
     '6f0bc0558e3eecbc3118f058942842febe783dd7', // 2025-12-23 for 2025-12-22 28573  claro    Overcast
+    '230c8b3986b9b65cd03a2ba55a6c2b629e0d2014', // 2025-12-24 for 2025-12-23 812    rogers   Overcast
+    '294e063b84af83399acee4a0168e0d9a8faffb68', // 2025-12-24 for 2025-12-23 812    rogers   Overcast
+    '3ea53afd9ccde4442b1e2ee0c688b98a6aae974b', // 2025-12-24 for 2025-12-23 10796  charter  Overcast
+    '6354fc13fe4cdfa04e967e5a321b5fb9b344702f', // 2025-12-24 for 2025-12-23 33915  vodafone Overcast
+    '9d42d8d3809b86bcd46f6f599319f866d799dd7a', // 2025-12-24 for 2025-12-23 33915  vodafone Overcast
+    'b068f5610b4e29ce7007c8d3071d7130bd28d595', // 2025-12-24 for 2025-12-23 5089   virgin   Overcast
+    '825689c11e627f1c55f89702fa8fc089e1ee8749', // 2025-12-24 for 2025-12-23 16509  amazon   Chrome
+    '9dd5fba0062fa2d498d1b06aad72feb604f6d0ea', // 2025-12-24 for 2025-12-23 16509  amazon   Chrome
+    'ae8827467191b4a6429ccd0b2ba47d02b377d638', // 2025-12-24 for 2025-12-23 48090  dmzhost  Firefox
 ]);
