@@ -406,4 +406,9 @@ const botIpHashes = new Set([
     '2de5915386d7bbbb1f0fcd4779fed5bd4b844655', // 2025-12-26 for 2025-12-25 19881  valley   Overcast
     '3a298b08cb9c11ab6690342d6cfec63bb2f2eac8', // 2025-12-26 for 2025-12-25 14593  starlink iCatcher
     '58c1389bd140bef66efd11af83b5e19c39e836f8', // 2025-12-26 for 2025-12-25 812    rogers   Overcast
+    '150a25beccd674c131168db1babe7e46c03ed127', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
+    '85ddaf449f6646309ab7f88b8aac16f429c9d2ea', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
+    'd54b847cc9dc9015b749eee72c8d17f3dfc89502', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
+    'f0a61e3f88105f4df642af10bc4066d846a9191b', // 2025-12-27 for 2025-12-26 6167   verizon  Overcast
+    '61950b74bc8280fa6739f09b0ee37dcbac6f30fb', // 2025-12-27 for 2025-12-26 7018   att      Overcast
 ]);
