@@ -429,4 +429,5 @@ const botIpHashes = new Set([
     '6701dc5625150b60be7fdd9de28a8958c3bd947a', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
     'dde528417dd5e74299edc37080deceba98df7b34', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
     'eaabd23f6d4af9b3c8a849e32a9745515505925f', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
+    '4a7e626cf47e12c29b21b5d220082caf4b13bf14', // 2026-01-01 for 2025-12-31 812    rogers   Overcast
 ]);
