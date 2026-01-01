@@ -32,6 +32,11 @@ Deno.test({
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
 
+        assertEquals(computeChainEstimate('https://podcast-rss-prefix.spotify.com/track/CHRT123/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'chartable', url: 'https://podcast-rss-prefix.spotify.com/track/CHRT123/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
         assertEquals(computeChainEstimate('https://pdcn.co/e/a.com/path/to/episode.mp3'), [
             { kind: 'prefix', prefix: 'podcorn', url: 'https://pdcn.co/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
