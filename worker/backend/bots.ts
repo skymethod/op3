@@ -430,4 +430,9 @@ const botIpHashes = new Set([
     'dde528417dd5e74299edc37080deceba98df7b34', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
     'eaabd23f6d4af9b3c8a849e32a9745515505925f', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
     '4a7e626cf47e12c29b21b5d220082caf4b13bf14', // 2026-01-01 for 2025-12-31 812    rogers   Overcast
+    '01cba7d61c7b1fd27e4f361d0e6d3a9279534290', // 2026-01-02 for 2026-01-01 141039 packethub Overcast
+    '617826d2f191c91bb9f8963f7e432223c3793e2b', // 2026-01-02 for 2026-01-01 701    verizon  Overcast
+    'a96fa6893f5ea2604daf24beed94c29229cfca24', // 2026-01-02 for 2026-01-01 577    bellcan  Overcast
+    'f172bb4e08696bbdcceea0dc791714015c31f988', // 2026-01-02 for 2026-01-01 5089   virgin   Overcast
+    'f8998dc2470df52455093e9f6f0d8bf0f7ac707e', // 2026-01-02 for 2026-01-01 812    rogers   Overcast
 ]);
