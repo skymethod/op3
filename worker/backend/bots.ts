@@ -439,4 +439,9 @@ const botIpHashes = new Set([
     '84cf7c1cc68cf0e381674e8ae0e7fbd00865741a', // 2026-01-03 for 2026-01-02 199218 proton   Overcast, CastBox
     'cfc915db13ffb5d447e3ddcc4bb8e694435e12c9', // 2026-01-03 for 2026-01-02 577    bellcan  Chrome
     'e80d5d9e045cb57b27517e08cc7bc73f3090d037', // 2026-01-03 for 2026-01-02 812    rogers   Overcast
+    '2460f355d34559caad50e48a8409c7ca2e83a4ac', // 2026-01-04 for 2026-01-03 812    rogers   Overcast
+    '28f3821af5012fca9da256fe900732c91732ba8f', // 2026-01-04 for 2026-01-03 62240  clouvider Chrome
+    '66943f9487911434a9fbcb5de2b6ac6cb0e5402d', // 2026-01-04 for 2026-01-03 14638  liberty  Overcast
+    '8c65805f52db3ca4e5597befe98a1dcfb7f4a8d9', // 2026-01-04 for 2026-01-03 141039 packethub Overcast
+    '8e7c554117a91cb529d44a4cd9e251f7e48de173', // 2026-01-04 for 2026-01-03 29580  a1bulgaria Overcast
 ]);
