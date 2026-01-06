@@ -444,4 +444,28 @@ const botIpHashes = new Set([
     '66943f9487911434a9fbcb5de2b6ac6cb0e5402d', // 2026-01-04 for 2026-01-03 14638  liberty  Overcast
     '8c65805f52db3ca4e5597befe98a1dcfb7f4a8d9', // 2026-01-04 for 2026-01-03 141039 packethub Overcast
     '8e7c554117a91cb529d44a4cd9e251f7e48de173', // 2026-01-04 for 2026-01-03 29580  a1bulgaria Overcast
+    '015ed4ba190b9ab892e6db7d89486f6788d977df', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '10744986191785b186c026bf6a8343445dff345a', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '18a8290e19b3ac514dc75230d925318597195b2c', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '1bf60d00b144a89850964c2ece2cc57cba092e01', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '31f4ed5975826d557f85e810d1dd3e2d44a2a7f6', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '3adc46a902836fdf5019f54f64ddf0deb3790b73', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '555146195e1158bfa2d6cb5775d66016b7db30c1', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '573168815c866247698b188d1aa00d0ce81dacd6', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '6056edc674efd400304983536f8d684bfc61f79a', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '6440cbafe3c49f026d0b1fa8ac379e0329ab686e', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '6dcfbc30d0906547e7becf74270f4a7ccee5fe22', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '6f9209e9a5d245c2e601c3f9490ae1a988f76497', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '7ebabaa1a33f4f3afe82577b5a3a566ddfbe7f75', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '833892c5d81bf4ae537055fe50b0c30067e97f6b', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '84696259bdf679b969e53257452426b1b730cd13', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '8aeb1cf60d463925defaf31a415df0a27be8d495', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '8d3c471b795c712fa9625ad70d1ebc1d77c94f95', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'aa6ec1490785e128ea9c3605b334f71fef626210', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'b38f4c232855d14ed16546ff7c616d03eea1cbaa', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'd22b30f507ca46915153d6cc2f127d23465564ab', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'd25b1d10931af24b8e668c5ad7c2c9bb2b4ffd78', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'fab560e569ebad185e4505f3a4f314686b146a97', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    'fc5ef739a3b8a7fb81decffc3797d28f8349bae2', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
+    '6dc94d54441e7a956f2112a539d45081eacaa3ae', // 2026-01-06 for 2026-01-05 136787 packethub Overcast
 ]);
