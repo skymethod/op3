@@ -2,10 +2,11 @@
 import { Bytes } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/bytes.ts';
 import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/get_head_object.ts';
 import type { PutObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/put_object.ts';
-import type { AwsCallContext, CompletedPart } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/r2.ts';
+import type { AwsCallContext, AwsCredentials, CompletedPart } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/r2.ts';
 import type { ListBucketResult, ListObjectsOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/list_objects_v2.ts';
 import type { UploadPartOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/upload_part.ts';
 import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/r2.ts';
+import { verifyToken, VerifyTokenResult } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/cloudflare_api.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { Blobs, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from './blobs.ts';
@@ -65,13 +66,13 @@ export class R2ApiBlobs implements Blobs {
         throw new Error();
     }
 
-    async put(key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string): Promise<{ etag: string }> {
+    async put(key: string, body: ReadableStream<Uint8Array> | ArrayBuffer | string, { contentType }: { contentType?: string } = {}): Promise<{ etag: string }> {
         this.checkWritable('put');
         const bytes = body instanceof ReadableStream ? await Bytes.ofStream(body)
             : typeof body === 'string' ? Bytes.ofUtf8(body)
             : new Bytes(new Uint8Array(body));
         const { bucket, origin, region, context } = this.opts;
-        await putObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region, body: bytes }, context, 'r2-api-blobs-put');
+        await putObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region, body: bytes, contentType }, context, 'r2-api-blobs-put');
         const res = await headObjectWithRetries({ bucket, key: `${this.opts.prefix}${key}`, origin, region }, context, 'r2-api-blobs-put');
         if (!res) throw new Error();
         const etag = computeUnquotedEtag(res.headers);
@@ -175,6 +176,19 @@ function isRetryableR2(e: Error): boolean {
     return false;
 }
 
+async function verifyTokenWithRetries({ apiToken, tag }: { apiToken: string, tag: string }): Promise<VerifyTokenResult> {
+    return await executeWithRetries(() => verifyToken({ apiToken }), { tag, maxRetries: 3, isRetryable: e => {
+        const m = `${e.stack || e}`;
+        if (m.includes('status=500')) return true; // Error: verifyToken failed: status=500, errors=0 Failed to get an object from container: upstream failure
+        if (m.includes('status=503')) return true; // Error: verifyToken failed: status=503, errors=7010 Service unavailable
+        if (m.includes('connection error: connection reset')) return true; // TypeError: error sending request for url (https://api.cloudflare.com/client/v4/user/tokens/verify): connection error: connection reset
+        if (m.includes('Unexpected content-type: text/html') && m.includes('500 Internal Server')) return true; // Error: Unexpected content-type: text/html, fetchResponse=[object Response], body=<html>\n        <head><title>500 Internal Server Error</title></head>
+        if (m.includes('error sending request for url') && m.includes('user/tokens/verify)\n')) return true; // TypeError: error sending request for url (https://api.cloudflare.com/client/v4/user/tokens/verify)
+        if (m.includes('tls handshake eof')) return true; // TypeError: error sending request for url (https://api.cloudflare.com/client/v4/user/tokens/verify): client error (Connect): tls handshake eof
+        return false;
+    }});
+}
+
 //
 
 export async function putObjectWithRetries(opts: PutObjectOpts, context: AwsCallContext, tag: string): Promise<void> {
@@ -197,4 +211,12 @@ export async function listObjectsV2WithRetries(opts: ListObjectsOpts, context: A
 export async function uploadPartWithRetries(opts: UploadPartOpts, context: AwsCallContext, tag: string): Promise<{ etag: string }> {
     if (opts.body instanceof ReadableStream) return await uploadPart(opts, context);
     return await executeWithRetries(() => uploadPart(opts, context), { tag, maxRetries: 3, isRetryable: isRetryableR2 });
+}
+
+export async function loadAwsCredentialsForR2(apiToken: string): Promise<AwsCredentials> {
+    const apiTokenId = (await verifyTokenWithRetries({ apiToken, tag: 'load-aws-creds-for-r2' })).id;
+    return {
+        accessKey: apiTokenId,
+        secretKey: (await Bytes.ofUtf8(apiToken).sha256()).hex(),
+    };
 }
