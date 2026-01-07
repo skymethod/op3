@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8d68be890603a5d600819ded2f997bc0a34135dc (2025-12-10T22:41:51Z)
+// from user-agents-v2@4ba5a6ca6649778b2af8c35153caca092cda499b (2026-01-07T13:53:51Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -57,6 +57,7 @@ const botTests = {
     '(null)/(null) watchOS/5.0.1 model/Watch3,3 hwp/t8004 build/16R381 (6; dt:155)': { type: 'bot', name: `Apple Podcasts (Watch)` },
     'Mozilla/5.0 (compatible; archive.org_bot http://archive.org/details/archive.org_bot)': { type: 'bot', name: `Archive.org` },
     'atheerfm/1 CFNetwork/758.3.15 Darwin/15.3.0': { type: 'bot', name: `atheerfm` },
+    'Audacy Creator Lab Hosting/1.0': { type: 'bot', name: `Audacy Creator Lab Hosting` },
     'audioBoomBot/1.0; (+http://audioboom.com)': { type: 'bot', name: `Audioboom bot` },
     'Mozilla/5.0 (compatible; AudioFetcher/1.0; +https://example.invalid)': { type: 'bot', name: `AudioFetcher` },
     'Audiomack Podcast Processor/1.0 (https://audiomack.com/)': { type: 'bot', name: `Audiomack` },
@@ -508,6 +509,7 @@ const appTests = {
     'CoolerFM/1.0 iPhone/15 +https://cooler.fm': { type: 'app', name: `Cooler` },
     'Copied/142 CFNetwork/760.2.6 Darwin/15.2.0 (x86_64)': { type: 'app', name: `Copied` },
     'CoreDataPlayerSample/1 CFNetwork/975.0.3 Darwin/17.7.0': { type: 'app', name: `CoreDataPlayerSample` },
+    'Corefeed/1 CFNetwork/3860.300.31 Darwin/25.2.0': { type: 'app', name: `Corefeed` },
     'Corriere della Sera/7.49.0 (iPhone14,5; iOS 18.1.1;)': { type: 'app', name: `Corriere della Sera` },
     'Cosmicast/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Cosmicast` },
     'CPod/1.27.1 (github.com/z-------------)': { type: 'app', name: `CPod` },
@@ -895,6 +897,8 @@ const appTests = {
     'iPhone (compatible; Smartphone2.0) NRC Digitale Editie, nl.nrc.nrcapp 10.0.7 (197) / iOS 16.6': { type: 'app', name: `NRC` },
     'NRC-Nieuws/5.4.0 (com.twipemobile.nrc; build:540; Android:13; Sdk:33; Manufacturer:samsung; Model: SM-A528B) OkHttp/4.11.0': { type: 'app', name: `NRC` },
     'SM-T970 (compatible; Tablet2.0) HandelsbladProduction, com.twipemobile.nrc 5.1.4 (511) / Android 33': { type: 'app', name: `NRC` },
+    'OpenStream/1.3.0 (Self-Hosted Music Streaming; +https://github.com/geill/OpenStream)': { type: 'app', name: `OpenStream` },
+    'OpenStream/1.3.0': { type: 'app', name: `OpenStream` },
     'Outcast/1957 CFNetwork/889.7 Darwin/17.2.0': { type: 'app', name: `Outcast` },
     'Outcast 3.1.6': { type: 'app', name: `Outcast` },
     'Overcast/3.0 (+http://overcast.fm/; iOS podcast app)': { type: 'app', name: `Overcast` },

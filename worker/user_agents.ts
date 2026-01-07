@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@8d68be890603a5d600819ded2f997bc0a34135dc (2025-12-10T22:41:51Z)
+// from user-agents-v2@4ba5a6ca6649778b2af8c35153caca092cda499b (2026-01-07T13:53:51Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -42,6 +42,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Applebot\//.test(userAgent)) return { name: `Applebot`, type: 'bot' };
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
+    if (/^Audacy Creator Lab Hosting\//.test(userAgent)) return { name: `Audacy Creator Lab Hosting`, type: 'bot' };
     if (/^audioBoomBot\/\d/.test(userAgent)) return { name: `Audioboom bot`, type: 'bot' };
     if (/AudioFetcher\/\d.*\+http/.test(userAgent)) return { name: `AudioFetcher`, type: 'bot' };
     if (/^Audiomack Podcast Processor\//.test(userAgent)) return { name: `Audiomack`, type: 'bot' };
@@ -382,6 +383,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^CoolerFM\//.test(userAgent)) return { name: `Cooler`, type: 'app' };
     if (/^Copied\//.test(userAgent)) return { name: `Copied`, type: 'app' };
     if (/^CoreDataPlayerSample\//.test(userAgent)) return { name: `CoreDataPlayerSample`, type: 'app' };
+    if (/^Corefeed\//.test(userAgent)) return { name: `Corefeed`, type: 'app' };
     if (/^Corriere della Sera\/\d/.test(userAgent)) return { name: `Corriere della Sera`, type: 'app' };
     if (/^Cosmicast\//.test(userAgent)) return { name: `Cosmicast`, type: 'app' };
     if (/CPod\//.test(userAgent)) return { name: `CPod`, type: 'app' };
@@ -608,6 +610,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^NPR\/|^NPR%20One\/|^NPROneAndroid|nprone_android\//.test(userAgent)) return { name: `NPR`, type: 'app' };
     if (/^NRC( |%20)Audio\//.test(userAgent)) return { name: `NRC Audio`, type: 'app' };
     if (/nl\.nrc\.nrcapp|^NRC-Nieuws\/|com\.twipemobile\.nrc/.test(userAgent)) return { name: `NRC`, type: 'app' };
+    if (/^OpenStream\/\d/.test(userAgent)) return { name: `OpenStream`, type: 'app' };
     if (/^Outcast[\/ ]/.test(userAgent)) return { name: `Outcast`, type: 'app' };
     if (/^Overcast\/|^Overcast.*Apple Watch|^Overcast Player |^Watch\/\d+ CFNetwork\//.test(userAgent)) return { name: `Overcast`, type: 'app' };
     if (/^Podcast Overhaul\/|^Overhaul FM\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
