@@ -470,4 +470,5 @@ const botIpHashes = new Set([
     '6dc94d54441e7a956f2112a539d45081eacaa3ae', // 2026-01-06 for 2026-01-05 136787 packethub Overcast
     '2a3f7c346b84f1f903c6ccbad92a94caed6ebdd2', // 2026-01-07 for 2026-01-06 141039 packethub Overcast
     '8d9d007966e729f740cb64e5478e19341ac7ecdf', // 2026-01-07 for 2026-01-06 16509  amazon   Audacy Creator Lab Hosting/1.0
+    '1da5bc256dbcff0882bb5f82a5c405358ffad226', // 2026-01-08 for 2026-01-07 45102  alibaba  Chrome
 ]);
