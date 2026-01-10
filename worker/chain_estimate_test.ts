@@ -458,6 +458,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'soundstack', url: 'https://enrichment.soundstack.com/1wxyz2/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://analytics.podcastplusplus.com/e/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podcastplusplus', url: 'https://analytics.podcastplusplus.com/e/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

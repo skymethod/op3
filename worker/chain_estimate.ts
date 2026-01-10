@@ -339,6 +339,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'soundstack', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://analytics.podcastplusplus.com/e/a.com/path/to/episode.mp3
+    // no longer forwards, but did in the past
+    m = /^https?:\/\/analytics\.podcastplusplus\.com\/e\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podcastplusplus', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -377,6 +386,7 @@ export interface ChainItem {
         | 'magellan'
         | 'pfxes'
         | 'podcards'
+        | 'podcastplusplus'
         | 'podcorn'
         | 'podder'
         | 'podkite'
