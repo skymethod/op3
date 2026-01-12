@@ -475,4 +475,9 @@ const botIpHashes = new Set([
     'bf77e9d97f47aa7ecec5ab7fdf48206b2f0f2376', // 2026-01-11 for 2026-01-10 396982 google   Chrome, Safari, Firefox, Edge
     'c7e464985d69e73bb8fc2b4fc7c4c79456e9f2ed', // 2026-01-11 for 2026-01-10 30600  metronet Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
     'da26df1c478aa602719f1f729555a0767cb1fa03', // 2026-01-11 for 2026-01-10 30600  metronet Overcast
+    '512e4eb3598ba51492dbb982a842498c4a1597e3', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
+    'd25ce37fa5f9db2d1469fc37e34b2df733118f75', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
+    'd36e406f7d3fc711380b1ef74b94fc51cb030513', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
+    'e06a47e9d094a7f446c5e4117deb378bebad48f5', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
+    'f3b8f32ce0e20d5080063388d046bcd7ca6bf5d4', // 2026-01-12 for 2026-01-11 44050  petersburg Firefox
 ]);
