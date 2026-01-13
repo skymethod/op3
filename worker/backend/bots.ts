@@ -480,4 +480,9 @@ const botIpHashes = new Set([
     'd36e406f7d3fc711380b1ef74b94fc51cb030513', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
     'e06a47e9d094a7f446c5e4117deb378bebad48f5', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
     'f3b8f32ce0e20d5080063388d046bcd7ca6bf5d4', // 2026-01-12 for 2026-01-11 44050  petersburg Firefox
+    '31a49df551f386da4020af0e4efdb209d46c344e', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
+    'bab54812d0665d6a74ba42777c95a027af6fada9', // 2026-01-13 for 2026-01-12 13335  cloudflare Chrome
+    'c1abc720d39fdfbe1cc103ffe452c51795651811', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
+    'dfd58ddaf850aed7a4c22a5a92f0efe61ba6da3c', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
+    'e385079215cf6e934e950c7e23b5765526468d51', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
 ]);
