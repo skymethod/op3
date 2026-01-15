@@ -490,4 +490,5 @@ const botIpHashes = new Set([
     'a3a523d0f1e7381dd2d760f5fd405d01956f7108', // 2026-01-14 for 2026-01-13 14618  amazon   Safari
     '772a378f536b6fe21db7d5fc261e3efd5631305b', // 2026-01-14 for 2026-01-13 141039 packethub Overcast
     'b0974697e73cae16a206e104af1804c786197d3f', // 2026-01-14 for 2026-01-13 20115  charter  Overcast
+    '0a129011e63760dee52ca476204fd5ab3fa660f2', // 2026-01-15 for 2026-01-14 4837   chinauni Chrome
 ]);
