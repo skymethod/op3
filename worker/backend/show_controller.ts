@@ -1225,8 +1225,8 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
         // fine, assume we already have the title, podcastGuid from original (will do proper podcastGuid indexing later)
     } else {
         let podcastGuid = feedRecord.podcastGuid;
-        if (/^[a-z]{4}-0x[0-9a-fA-F]{40}$/.test(podcastGuid ?? '')) {
-            // ignore this found invalid guid style
+        if (/^[a-z]{4}-0x[0-9a-fA-F]{40}$/.test(podcastGuid ?? '') || podcastGuid?.startsWith('https://hubhopper.com/podcast/')) {
+            // ignore these found invalid guid styles
             podcastGuid = undefined;
         }
         if (podcastGuid === undefined) {
