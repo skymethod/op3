@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@4ba5a6ca6649778b2af8c35153caca092cda499b (2026-01-07T13:53:51Z)
+// from user-agents-v2@95d42c863876d3e4ed31c046a1bce7e8bc12dd4f (2026-01-16T17:01:43Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -112,6 +112,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; Feedspot/1.0 (+https://www.feedspot.com/fs/fetcher; like FeedFetcher-Google)': { type: 'bot', name: `Feedspot Fetcher` },
     'FlexGet/3.3.4 (www.flexget.com)': { type: 'bot', name: `FlexGet` },
     'Mozilla/5.0 (compatible; FlipboardProxy/1.1; +http://flipboard.com/browserproxy)': { type: 'bot', name: `Flipboard Proxy` },
+    'Freewheel/1.0 (Audio Processor)': { type: 'bot', name: `Freewheel Audio Processor` },
     'storagegw-v1-go': { type: 'bot', name: `Go Storage Gateway V1` },
     'Goodpods/2.2': { type: 'bot', name: `Goodpods Bot` },
     'Mediapartners-Google': { type: 'bot', name: `Google Adsense Bot` },
@@ -127,6 +128,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; ev-crawler/1.0;  https://headline.com/legal/crawler)': { type: 'bot', name: `Headline Crawler` },
     'Headliner/1.0.0 +https://headliner.app': { type: 'bot', name: `Headliner` },
     'Headliner/1.0.0  https://headliner.app': { type: 'bot', name: `Headliner` },
+    'Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)': { type: 'bot', name: `HTTrack website copier` },
     'Mozilla/5.0 (compatible; HubSpot Crawler; +https://www.hubspot.com)': { type: 'bot', name: `HubSpot Crawler` },
     'Mozilla/5.0 (compatible; special_archiver; Archive-It; http://archive-it.org/files/site-owners-special.html)': { type: 'bot', name: `Internet Archive` },
     'ia_archiver-web.archive.org': { type: 'bot', name: `Internet Archive` },
@@ -190,6 +192,7 @@ const botTests = {
     'Podbean Importer': { type: 'bot', name: `Podbean Importer` },
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
     'Aggrivator (PodcastIndex.org)/v0.1.7': { type: 'bot', name: `Podcastindex.org` },
+    'PodcastIndexManager/1.0': { type: 'bot', name: `Podcastindex.org` },
     'PodcastStandard/0.1.0 (+https://podcast-standard.org)': { type: 'bot', name: `Podcast de facto Standard` },
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
@@ -201,6 +204,7 @@ const botTests = {
     'PodcastBulkDownloader/0.10.1': { type: 'bot', name: `PodcastBulkDownloader` },
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
+    'Podcst/1.0': { type: 'bot', name: `Podcst` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
     'poddl - podcast downloader': { type: 'bot', name: `poddl - podcast downloader` },
     'poddl - https://github.com/freshe/poddl': { type: 'bot', name: `poddl - podcast downloader` },
@@ -270,9 +274,11 @@ const botTests = {
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
     'Mozilla/5.0+(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)': { type: 'bot', name: `UptimeRobot` },
+    'teeming-modal-podcast-transcriber/1.0': { type: 'bot', name: `Teeming modal podcast transcriber` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },
     'Transmission/2.77': { type: 'bot', name: `Transmission` },
     'Mozilla/5.0 (compatible; TTD-Content; +https://www.thetradedesk.com/general/ttd-content)': { type: 'bot', name: `theTradeDesk Content Web Scraper` },
+    'vercel-screenshot/1.0': { type: 'bot', name: `Vercel screenshot` },
     'veritone/engine-toolkit-3.0': { type: 'bot', name: `Veritone Engine Toolkit` },
     'Mozilla/5.0 https://vurbl.com VurblBot/1.0': { type: 'bot', name: `Vurbl` },
     'weborama-fetcher (+http://www.weborama.com)': { type: 'bot', name: `weborama` },
@@ -598,6 +604,7 @@ const appTests = {
     'FancyMusic/2 CFNetwork/758.1.6 Darwin/15.0.0': { type: 'app', name: `FancyMusic` },
     'Fathom/5 CFNetwork/1406.0.2 Darwin/22.4.0': { type: 'app', name: `Fathom` },
     'Feeder/2785 CFNetwork/720.5.7 Darwin/14.5.0 (x86_64)': { type: 'app', name: `Feeder` },
+    'FeedFlow/1 CFNetwork/3860.300.31 Darwin/25.2.0': { type: 'app', name: `FeedFlow` },
     'feedly/81.0.1 CFNetwork/1206 Darwin/20.1.0': { type: 'app', name: `Feedly` },
     'FeedStation/4.5 (http://www.newsgator.com/; Microsoft Windows)': { type: 'app', name: `FeedStation` },
     'Fellowship Bible Church Topeka/4.9.2 CFNetwork/811.5.4 Darwin/16.7.0': { type: 'app', name: `Fellowship Bible Church Topeka` },
@@ -914,6 +921,9 @@ const appTests = {
     'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/2009.2': { type: 'app', name: `Pandora` },
     'Mozilla/5.0 (iPad; CPU OS 12_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/1908.1': { type: 'app', name: `Pandora` },
     'Parler Staging/542 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Parler` },
+    'Patreon/125.38.0.5 (iPhone; iOS 26.1; Scale/3.00)': { type: 'app', name: `Patreon` },
+    'Patreon/125.37.0.15 (Android; Android 16; Scale/3.00)': { type: 'app', name: `Patreon` },
+    'Patreon/125.35.0.10 (iPhone; iOS 18.0.1; Scale/3.00)': { type: 'app', name: `Patreon` },
     'PeaCast/0.7': { type: 'app', name: `PeaCast` },
     'phonostar-Player/4.08': { type: 'app', name: `phonostar Radio-App` },
     'Playapod/2.4.11': { type: 'app', name: `Playapod` },

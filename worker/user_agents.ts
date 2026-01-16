@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@4ba5a6ca6649778b2af8c35153caca092cda499b (2026-01-07T13:53:51Z)
+// from user-agents-v2@95d42c863876d3e4ed31c046a1bce7e8bc12dd4f (2026-01-16T17:01:43Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -90,6 +90,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/https:\/\/www\.feedspot\.com\/fs\/fetcher/.test(userAgent)) return { name: `Feedspot Fetcher`, type: 'bot' };
     if (/^FlexGet\//.test(userAgent)) return { name: `FlexGet`, type: 'bot' };
     if (/FlipboardProxy\//.test(userAgent)) return { name: `Flipboard Proxy`, type: 'bot' };
+    if (/^Freewheel\//.test(userAgent)) return { name: `Freewheel Audio Processor`, type: 'bot' };
     if (/^fyyd-poll/.test(userAgent)) return { name: `Fyyd`, type: 'bot' };
     if (/^storagegw-v1-go$/.test(userAgent)) return { name: `Go Storage Gateway V1`, type: 'bot' };
     if (/Goodpods\/\d+\.\d+/.test(userAgent)) return { name: `Goodpods Bot`, type: 'bot' };
@@ -100,6 +101,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
     if (/https:\/\/headline\.com/.test(userAgent)) return { name: `Headline Crawler`, type: 'bot' };
     if (/^Headliner\/.*[+ ]https:\/\/headliner\.app$/.test(userAgent)) return { name: `Headliner`, type: 'bot' };
+    if (/ HTTrack /.test(userAgent)) return { name: `HTTrack website copier`, type: 'bot' };
     if (/HubSpot Crawler/.test(userAgent)) return { name: `HubSpot Crawler`, type: 'bot' };
     if (/Archive-It;|web\.archive\.org/.test(userAgent)) return { name: `Internet Archive`, type: 'bot' };
     if (/^iono\/feed_importer/.test(userAgent)) return { name: `iono.fm feed importer`, type: 'bot' };
@@ -149,7 +151,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/PlayerFM\/.* Podcast Sync/.test(userAgent)) return { name: `PlayerFM Podcast Sync`, type: 'bot' };
     if (/^PodbeanFeedReader/.test(userAgent)) return { name: `PodBean Feed Reader`, type: 'bot' };
     if (/^Podbean Importer/.test(userAgent)) return { name: `Podbean Importer`, type: 'bot' };
-    if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)/.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
+    if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)|PodcastIndexManager\//.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
     if (/^PodcastStandard\//.test(userAgent)) return { name: `Podcast de facto Standard`, type: 'bot' };
     if (/^Podcast%20Archiver\//.test(userAgent)) return { name: `Podcast Archiver`, type: 'bot' };
     if (/^podcast-archiver\/v\d/.test(userAgent)) return { name: `Podcast Archiver (janw)`, type: 'bot' };
@@ -161,6 +163,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ PodcastDownloader\//.test(userAgent)) return { name: `PodcastDownloader`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
+    if (/^Podcst\//.test(userAgent)) return { name: `Podcst`, type: 'bot' };
     if (/PodderBot\//.test(userAgent)) return { name: `PodderBot`, type: 'bot' };
     if (/poddl - (podcast downloader|https:\/\/github.com\/freshe\/poddl)/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'bot' };
     if (/podfollowbot\//.test(userAgent)) return { name: `Podfollow`, type: 'bot' };
@@ -229,9 +232,11 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Typhoeus/.test(userAgent)) return { name: `Typhoeus`, type: 'bot' };
     if (/^UCast\//.test(userAgent)) return { name: `UCast`, type: 'bot' };
     if (/UptimeRobot\/\d/.test(userAgent)) return { name: `UptimeRobot`, type: 'bot' };
+    if (/^teeming-modal-podcast-transcriber\//.test(userAgent)) return { name: `Teeming modal podcast transcriber`, type: 'bot' };
     if (/^TelegramBot /.test(userAgent)) return { name: `TelegramBot`, type: 'bot' };
     if (/^Transmission\/\d/.test(userAgent)) return { name: `Transmission`, type: 'bot' };
     if (/TTD-Content/.test(userAgent)) return { name: `theTradeDesk Content Web Scraper`, type: 'bot' };
+    if (/^vercel-screenshot\//.test(userAgent)) return { name: `Vercel screenshot`, type: 'bot' };
     if (/^veritone\/engine-toolkit/.test(userAgent)) return { name: `Veritone Engine Toolkit`, type: 'bot' };
     if (/VurblBot/.test(userAgent)) return { name: `Vurbl`, type: 'bot' };
     if (/Wget/.test(userAgent)) return { name: `Wget`, type: 'bot' };
@@ -445,6 +450,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^FancyMusic\//.test(userAgent)) return { name: `FancyMusic`, type: 'app' };
     if (/^Fathom\//.test(userAgent)) return { name: `Fathom`, type: 'app' };
     if (/^Feeder\//.test(userAgent)) return { name: `Feeder`, type: 'app' };
+    if (/^FeedFlow\//.test(userAgent)) return { name: `FeedFlow`, type: 'app' };
     if (/^feedly\//.test(userAgent)) return { name: `Feedly`, type: 'app' };
     if (/^FeedStation\/\d/.test(userAgent)) return { name: `FeedStation`, type: 'app' };
     if (/^Fellowship Bible Church Topeka\//.test(userAgent)) return { name: `Fellowship Bible Church Topeka`, type: 'app' };
@@ -617,6 +623,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Palco MP3/.test(userAgent)) return { name: `Palco MP3`, type: 'app' };
     if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
     if (/^Parler( Staging)?\//.test(userAgent)) return { name: `Parler`, type: 'app' };
+    if (/^Patreon\//.test(userAgent)) return { name: `Patreon`, type: 'app' };
     if (/^PeaCast\//.test(userAgent)) return { name: `PeaCast`, type: 'app' };
     if (/^phonostar-Player\/\d/.test(userAgent)) return { name: `phonostar Radio-App`, type: 'app' };
     if (/^Playapod/.test(userAgent)) return { name: `Playapod`, type: 'app' };
