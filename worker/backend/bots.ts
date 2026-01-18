@@ -491,4 +491,7 @@ const botIpHashes = new Set([
     '772a378f536b6fe21db7d5fc261e3efd5631305b', // 2026-01-14 for 2026-01-13 141039 packethub Overcast
     'b0974697e73cae16a206e104af1804c786197d3f', // 2026-01-14 for 2026-01-13 20115  charter  Overcast
     '0a129011e63760dee52ca476204fd5ab3fa660f2', // 2026-01-15 for 2026-01-14 4837   chinauni Chrome
+    'c26b7e4acd9d21905ebf79b16e400d834d6a7f88', // 2026-01-18 for 2026-01-17 53850  gorilla  Chrome
+    'cf77659ab7e7a8ef4ba82ccc976c46bf897e6db5', // 2026-01-18 for 2026-01-17 141039 packethub Overcast
+    'd111aef9de34722c51c92c3d40427346fcaf2119', // 2026-01-18 for 2026-01-17 7922   comcast  Overcast
 ]);
