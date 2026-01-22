@@ -506,4 +506,5 @@ const botIpHashes = new Set([
     '37d717d4e9a3e082274e56d8181a512c5077bdb0', // 2026-01-20 for 2026-01-19 396982 google   Chrome, Safari, Firefox, Edge
     '86f0d4bacaa620c90fc4ed0c2a14a651e579908f', // 2026-01-20 for 2026-01-19 136787 packethub Overcast
     '800a9a9f9ad900995305a91198aad9122b45390d', // 2026-01-21 for 2026-01-20 136787 packethub Overcast
+    'f5a8c99effaef725ee6c225f6f1d6b2d2e4a6dcd', // 2026-01-22 for 2026-01-21 136787 packethub Overcast
 ]);
