@@ -507,4 +507,5 @@ const botIpHashes = new Set([
     '86f0d4bacaa620c90fc4ed0c2a14a651e579908f', // 2026-01-20 for 2026-01-19 136787 packethub Overcast
     '800a9a9f9ad900995305a91198aad9122b45390d', // 2026-01-21 for 2026-01-20 136787 packethub Overcast
     'f5a8c99effaef725ee6c225f6f1d6b2d2e4a6dcd', // 2026-01-22 for 2026-01-21 136787 packethub Overcast
+    '8097882f1463fbe2508df5c0604656c387dfac4a', // 2026-01-24 for 2026-01-23 7922   comcast  Overcast
 ]);
