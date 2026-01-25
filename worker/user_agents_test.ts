@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@95d42c863876d3e4ed31c046a1bce7e8bc12dd4f (2026-01-16T17:01:43Z)
+// from user-agents-v2@8ae601e192696fc91cc2b9240135e96ec1fd664d (2026-01-25T16:36:40Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -38,6 +38,8 @@ const botTests = {
     'AliyunSecBot/Aliyun (AliyunSecBot@service.alibaba.com)': { type: 'bot', name: `AliyunSecBot` },
     'Alignabot 1.0 (https://www.alignable.com/)': { type: 'bot', name: `AlignaBot` },
     'AllEars/1.0; (+www.allears.ai)': { type: 'bot', name: `All Ears` },
+    'amazon-Quick-on-behalf-of-ab5a6944': { type: 'bot', name: `Amazon Quick` },
+    'amazon-Quick-on-behalf-of-8ba90c8d': { type: 'bot', name: `Amazon Quick` },
     'AnchorImport/1.0': { type: 'bot', name: `Anchor Importer` },
     'com.apple.mobilenotes.SharingExtension/2511 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'bot', name: `Apple Notes share extension` },
     'com.apple.Notes.SharingExtension/2812 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'bot', name: `Apple Notes share extension` },
@@ -110,6 +112,7 @@ const botTests = {
     '"meta-externalagent/1.1 ( https://developers.facebook.com/docs/sharing/webmasters/crawler)"': { type: 'bot', name: `Facebook Bot` },
     'Feedly/1.0 (+http://www.feedly.com/fetcher.html; like FeedFetcher-Google)': { type: 'bot', name: `Feedly` },
     'Mozilla/5.0 (compatible; Feedspot/1.0 (+https://www.feedspot.com/fs/fetcher; like FeedFetcher-Google)': { type: 'bot', name: `Feedspot Fetcher` },
+    'fetch-container/1.0': { type: 'bot', name: `Fetch Container` },
     'FlexGet/3.3.4 (www.flexget.com)': { type: 'bot', name: `FlexGet` },
     'Mozilla/5.0 (compatible; FlipboardProxy/1.1; +http://flipboard.com/browserproxy)': { type: 'bot', name: `Flipboard Proxy` },
     'Freewheel/1.0 (Audio Processor)': { type: 'bot', name: `Freewheel Audio Processor` },
@@ -196,6 +199,7 @@ const botTests = {
     'PodcastStandard/0.1.0 (+https://podcast-standard.org)': { type: 'bot', name: `Podcast de facto Standard` },
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
+    'podcast-downloader': { type: 'bot', name: `Podcast Downloader` },
     'podcast-go-audio-downloader/2.0': { type: 'bot', name: `Podcast Go Audio Downloader` },
     'Podcastics': { type: 'bot', name: `Podcastics` },
     'Podcatcher Bot 1.0': { type: 'bot', name: `Podcatcher Bot` },
@@ -573,6 +577,7 @@ const appTests = {
     'Earbud/0 CFNetwork/758.4.3 Darwin/15.5.0': { type: 'app', name: `Earbud` },
     'Earmark/1.0 Android': { type: 'app', name: `Earmark` },
     'Earmark/1.0 iOS': { type: 'app', name: `Earmark` },
+    'Earsay/1.0 CFNetwork/1568 Darwin/24.0': { type: 'app', name: `Earsay` },
     'EasyGet/1.0.70 CFNetwork/672.1.13 Darwin/14.0.0': { type: 'app', name: `EasyGet` },
     'TheEconomist-Darwin-android-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'TheEconomist-Darwin-ios-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
@@ -691,6 +696,7 @@ const appTests = {
     'Heard.FM  /18.2 CFNetwork/1.0 Darwin/24.2.0': { type: 'app', name: `Heard.FM` },
     'Heard.FM/1.0 (Linux; U; Android 13.0; samsung SM-A525F': { type: 'app', name: `Heard.FM` },
     'Heard.FM  /18.1.1 CFNetwork/1.0 Darwin/24.1.0': { type: 'app', name: `Heard.FM` },
+    'Herd/56 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `Herd` },
     'hermespod.com/v1.5.x': { type: 'app', name: `HermesPod` },
     'HiCast/1 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `HiCast` },
     'Highly/914 CFNetwork/758.5.3 Darwin/15.6.0': { type: 'app', name: `Highly` },
@@ -996,6 +1002,7 @@ const appTests = {
     'Procast (iOS)': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
+    'PurerPodcasts/52 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `PurerPodcasts` },
     'pypodder': { type: 'app', name: `Pypodder` },
     'Queue/1.9.1 (1) (iOS)': { type: 'app', name: `Queue` },
     'Podcast Provider 0.34-9e9009e7 for Radio Downloader 0.34-9e9009e7': { type: 'app', name: `Radio Downloader` },
@@ -1053,6 +1060,7 @@ const appTests = {
     'sxm-android/7.5.2 samsung/SM-S918U Android/14': { type: 'app', name: `SiriusXM` },
     'sxm-android/7.5.0 motorola/motorola-edge-plus-5G-UW-(2022) Android/13': { type: 'app', name: `SiriusXM` },
     'sxm-apple/7.8.1 iPhone14,5 iOS17.6.1': { type: 'app', name: `SiriusXM` },
+    'Skimr/1 CFNetwork/3860.300.31 Darwin/25.2.0': { type: 'app', name: `Skimr` },
     'Snipd/90 CFNetwork/1329 Darwin/21.3.0': { type: 'app', name: `Snipd` },
     'AppEngine-Google; (+http://code.google.com/appengine; appid: s~snapchat-proxy)': { type: 'app', name: `Snapchat` },
     'Sodes/1657 CFNetwork/1098.6 Darwin/19.0.0': { type: 'app', name: `Sodes` },
@@ -1285,6 +1293,7 @@ const libraryTests = {
     'python-urllib3/1.26.7': { type: 'library', name: `urllib (python)` },
     'yourApplicationName/2.21.9 (Linux;Android 11) ExoPlayerLib/2.14.0': { type: 'library', name: `ExoPlayer (Android)` },
     'ExoPlayerLib/2.14.0 (Linux; Android 12) ExoPlayerLib/2.14.0': { type: 'library', name: `ExoPlayer (Android)` },
+    'Exo2/4.12.0 (Linux;Android 9) AmznExoPlayerLib/2.18.7': { type: 'library', name: `ExoPlayer (Android)` },
     'ExoPlayerDemo/2.5.5 (Linux;Android 14) AndroidXMedia3/1.1.1': { type: 'library', name: `Jetpack Media3 (Android)` },
     'ExoPlayerDemo/2.3 (Linux;Android 14) AndroidXMedia3/1.1.1': { type: 'library', name: `Jetpack Media3 (Android)` },
     'ExoPlayer/11.2 (Linux;Android 13) AndroidXMedia3/1.4.1': { type: 'library', name: `Jetpack Media3 (Android)` },
