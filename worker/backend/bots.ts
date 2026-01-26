@@ -32,7 +32,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now') // google fiber
         || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
         || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
-        || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && (date === '2026-01-18' || date === '2026-01-19' || date === '2026-01-24') // google
+        || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && (date === '2026-01-18' || date === '2026-01-19' || date === '2026-01-24' || date === '2026-01-25') // google
         ;
 }
 
@@ -510,4 +510,5 @@ const botIpHashes = new Set([
     '8097882f1463fbe2508df5c0604656c387dfac4a', // 2026-01-24 for 2026-01-23 7922   comcast  Overcast
     '0db708f26067bac3746d32677e2d76a75d7113d7', // 2026-01-25 for 2026-01-24 3269   italia   podcast-downloader
     'e45163870b0d39c85135cdb07f70d449ef4c8ac8', // 2026-01-25 for 2026-01-24 7922   comcast  Overcast
+    'ba89aae6025e895b6d7f64b895b387182ea74d59', // 2026-01-26 for 2026-01-25 136787 packethub Overcast
 ]);
