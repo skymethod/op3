@@ -518,4 +518,9 @@ const botIpHashes = new Set([
     '420af5889dcf32ef3e2f3f402b4401e7ff0316ec', // 2026-01-29 for 2026-01-28 7922   comcast  Scott's Podcast Player
     'd724233d2875def57b07035098d643b65c0d36b9', // 2026-01-29 for 2026-01-28 35819  etihad   Overcast
     '93481f7c30f43ec9c0722d64a6de367c60a04002', // 2026-01-30 for 2026-01-29 35819  etihad   Overcast
+    '0e21c83ac4c69d573c7debc7ceb78b11a2dc4fca', // 2026-01-31 for 2026-01-30 35819  etihad   Overcast
+    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-01-31 for 2026-01-30 15704  xtra     Overcast
+    'a71693b53415216392d9070c4dd83b9e8e6b7e78', // 2026-01-31 for 2026-01-30 24940  hetzner  Chrome
+    'ddde53a4f7ad69c762523f0a02256a0c086511d7', // 2026-01-31 for 2026-01-30 15704  xtra     Overcast
+    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-02-01 for 2026-01-31 15704  xtra     Overcast
 ]);
