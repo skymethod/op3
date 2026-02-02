@@ -523,4 +523,8 @@ const botIpHashes = new Set([
     'a71693b53415216392d9070c4dd83b9e8e6b7e78', // 2026-01-31 for 2026-01-30 24940  hetzner  Chrome
     'ddde53a4f7ad69c762523f0a02256a0c086511d7', // 2026-01-31 for 2026-01-30 15704  xtra     Overcast
     '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-02-01 for 2026-01-31 15704  xtra     Overcast
+    '1b454eb0cdc9a3e960e5312865d929d74161e1ee', // 2026-02-02 for 2026-02-01 60068  datacamp Overcast
+    '4258e44df2eda07c6270282a6d5c36dbcaeead7a', // 2026-02-02 for 2026-02-01 29580  a1bulg   Overcast
+    '85d3d6fcdc8a2c0b61616c72ce9f4bc14ae1e7db', // 2026-02-02 for 2026-02-01 15704  xtra     Overcast
+    'e2e9ca9fc34611590b4d2516e1d0b3e04d049a11', // 2026-02-02 for 2026-02-01 7018   att      Overcast
 ]);
