@@ -527,4 +527,6 @@ const botIpHashes = new Set([
     '4258e44df2eda07c6270282a6d5c36dbcaeead7a', // 2026-02-02 for 2026-02-01 29580  a1bulg   Overcast
     '85d3d6fcdc8a2c0b61616c72ce9f4bc14ae1e7db', // 2026-02-02 for 2026-02-01 15704  xtra     Overcast
     'e2e9ca9fc34611590b4d2516e1d0b3e04d049a11', // 2026-02-02 for 2026-02-01 7018   att      Overcast
+    '61ac78181c228f1d73a63a36638244e97a7d0c39', // 2026-02-03 for 2026-02-02 7018   att      Overcast
+    'b6a0ce2a145dbc87214138914c55241b335475ef', // 2026-02-03 for 2026-02-02 136787 packethub Overcast
 ]);
