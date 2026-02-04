@@ -529,4 +529,10 @@ const botIpHashes = new Set([
     'e2e9ca9fc34611590b4d2516e1d0b3e04d049a11', // 2026-02-02 for 2026-02-01 7018   att      Overcast
     '61ac78181c228f1d73a63a36638244e97a7d0c39', // 2026-02-03 for 2026-02-02 7018   att      Overcast
     'b6a0ce2a145dbc87214138914c55241b335475ef', // 2026-02-03 for 2026-02-02 136787 packethub Overcast
+    '133c9294cb2fbe2b08f61bebfe9d3cea49492eb2', // 2026-02-04 for 2026-02-03 397303 welink   Overcast
+    '6b8df880c447c5b9825e6447912473070ff9c18a', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
+    'c28cd91fb1fb9f418981b0cde6c8299cbcd79bd7', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
+    '8dca6f12be0081a34dd782825a2f361b31793c44', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
+    'bfd6629e203ca66823bdee2838ab4ab8052c1769', // 2026-02-04 for 2026-02-03 5089   virgin   Overcast
+    'e1ebf8e346f5b74d84343d8cfb00a6a58ab7e663', // 2026-02-04 for 2026-02-03 19151  bbone    Overcast
 ]);
