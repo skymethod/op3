@@ -33,6 +33,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
         || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
         || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && date >= '2026-01-18' // google
+        || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
         ;
 }
 
@@ -535,4 +536,5 @@ const botIpHashes = new Set([
     '8dca6f12be0081a34dd782825a2f361b31793c44', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
     'bfd6629e203ca66823bdee2838ab4ab8052c1769', // 2026-02-04 for 2026-02-03 5089   virgin   Overcast
     'e1ebf8e346f5b74d84343d8cfb00a6a58ab7e663', // 2026-02-04 for 2026-02-03 19151  bbone    Overcast
+    '9e5a9e5a3e88a7187dd33a49fa131946ad15aebd', // 2026-02-05 for 2026-02-04 16509  amazon   Apple Podcasts, Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 ]);
