@@ -34,6 +34,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
         || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && date >= '2026-01-18' // google
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
+        || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         ;
 }
 
@@ -160,381 +161,388 @@ const botIpHashes = new Set([
     '7d6f02aaa2783269230b6bde0886a94a8e4b8906', // 2025-10-11 for 2025-10-10
     'efd3b56879c835a1d986893c0bb80de69fefec66', // 2025-10-11 for 2025-10-10
     'f7b8b173c662ce8d43e737ae9aba73c24afcc749', // 2025-10-11 for 2025-10-10
-    '06f676292c8d87007ec3ec79f63c87c1fd05d0f0', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '1bf55306666f3064ffa84a5c5d0caa249b3df6dd', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '35e193bb70d73097b16f98dd284e45c73b123bf1', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    '436e2b2c3f0e081249335e5861ea86d6d353bdc8', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    '5610c6f4409f62e6c9800bd7f71c84c42e6e4124', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    '56d538b9b548563f39da16d1dfdf23aa35786b6e', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
-    '7445432cc3b887d16924889f0387f437ea77b027', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    '74eb7c52d6b182f036ed60c9bb64552c793f9b63', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '7d2ff41411bb8ec9bf144371462b55faf5a63000', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
-    '7ec34b4cb6e8302fcf01f7592aeafa174468f773', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '815c4dbb996ddeac66ad61027f236baf9eae93bf', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '8dca93c9b69b1618b16249a917261002823de91f', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '9315a9cc0880a83b5ec88b66f668688569fb6220', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    'a4a11721f7f0bb216a763f1743e58de9a34e05f8', // 2025-10-12 for 2025-10-11 398465 rackdog  Chrome
-    'c60ee802f425a3b920059be546c2a602c755ae8e', // 2025-10-12 for 2025-10-11 396982 google   Chrome,Safari
-    'cd59ea79296cdc41db82e2d25cdb17c8e7ec5145', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    'df752bbf6661373ce93531c63a4b07f2e7a4d936', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    'f8545b85516ad67c513a56c2b8fd945950d2d004', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    'feb09ba8632f7ea2949006f7c02ea8a72bb7c400', // 2025-10-12 for 2025-10-11 399296 rackdog  Chrome
-    '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google   Chrome,Safari
-    'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google   Chrome,Safari
-    '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google   Chrome,Safari
-    '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen   Mozilla/5.0 (compatible; PodcastDownloader/1.0)
-    '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    century  Chrome
-    '1c2eceb20f01f649aa3d7d6ed4b4d79128152d15', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
-    '76933aa76d9d312492f453613075a769ba3eda65', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
-    'a047086d66d44f7051f874479f78e03b7ef04c05', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
-    'a0a823f7962ed7c912efcf174a64e80db50fb027', // 2025-10-20 for 2025-10-19 16509  amazon   Chrome
-    'fb5cf927d28adb1a940a551c0ea0f22d1d61d7ac', // 2025-10-20 for 2025-10-19 24940  hetzner  Chrome,Safari,Edge,Firefox
-    '30b64f29576d0239eb7d6c8f0ac4e7edcaebdf4f', // 2025-10-21 for 2025-10-20 12876  scaleway Mplayer, Windows Media Player
-    '3c8be3e51b6b81462bee716cc30728aeead1346e', // 2025-10-21 for 2025-10-20 48090  dmzhost  Firefox
-    'd69de8a319bd4b2b4d800b111ad0d7cb8e3ea5ee', // 2025-10-21 for 2025-10-20 16509  amazon   Chrome
-    'cae9d8515527a5c84fe36713b2b279e23b8400ec', // 2025-10-22 for 2025-10-21 16509  amazon   Chrome
-    '6259e266825587b0b4ce761925c2b02d9e0036b6', // 2025-10-22 for 2025-10-21 16509  amazon   Chrome
-    '9fa41cc8729f8f9d1e4254cd5ad720b8ea6b2ed3', // 2025-10-23 for 2025-10-22 16509  amazon   Chrome
-    'fe765bfd72275d6c22f60aa2b5f0c2039d7af0b7', // 2025-10-28 for 2025-10-27 396982 google   Chrome,Safari
-    '2516177353bc8cd6637685248975a0263c76d78c', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
-    '63640aea78cf162ee673ab7a4853099aef4ad9e1', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
-    '92ee8dc4db8dc0751172885bca749f21b4de588a', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
-    '97794061baa2ac7f9aef0446c892ddce2ea397c5', // 2025-10-30 for 2025-10-29 399296 rackdog  Chrome
-    'b9aea9d2f837a5f22cb473dd2a31d42ca8dcd556', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
-    'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon   poddl - podcast downloader
-    '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon   poddl - podcast downloader
-    '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon   poddl - podcast downloader
-    '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron   Chrome
-    '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google   Chrome,Safari
-    '402c9e27aa09039a1ecc51897f6c2426624c0e34', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
-    '6d70a6d5bbfbc5e5974a083cc6da3c1e29abd021', // 2025-11-02 for 2025-11-01 202662 hytron   Chrome
-    '91026456749015bcbeb9e2f265ed746bdbdcd6ed', // 2025-11-02 for 2025-11-01 7922   comcast  Chrome,Safari,Edge,Firefox,Opera
-    '99637dd8cc4969338f809ff7b9e15986b71d5cb3', // 2025-11-02 for 2025-11-01 396982 google   Chrome
-    'a312bf280cad74c81b35129c659900269851715d', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
-    'c626fb2d3b1bb93f6ca8c3e9a43f32cccbc1f426', // 2025-11-02 for 2025-11-01 396982 google   Chrome,Safari
-    'fe3aaf8e15a7247337745b97adda8f0e7ce8df03', // 2025-11-02 for 2025-11-01 24940  hetzner  Chrome,Safari,Edge,Firefox
-    '39bff10160c2268dc5941abca5e346bbe1b08cda', // 2025-11-05 for 2025-11-04 30600  metronet Overcast
-    '3cc81df3374645d8abfa259844428aa602e9e210', // 2025-11-05 for 2025-11-04 24940  hetzner  Chrome,Safari,Edge,Firefox
-    '442553039dedd201e0e750ac8fd446b74c19044a', // 2025-11-05 for 2025-11-04 812    rogers   Overcast
-    'c6de8def59101c25cda6d023a99558c4610e804d', // 2025-11-05 for 2025-11-04 7018   att      Overcast
-    'ea146eb5098e9e27b4822356965bdfe0ac1429cd', // 2025-11-05 for 2025-11-04 812    rogers   Overcast
-    '00d099300155e7ecd2555f71b16bb3c2d09002e7', // 2025-11-05 for 2025-11-02 577    bellcan  Overcast
-    '241c3e1717177e9005d5642701e682e64281c628', // 2025-11-05 for 2025-11-03 6167   vzbus    Overcast
-    '29bc149c6dcaa4d527ca3c8524baa8f5c5ad33d0', // 2025-11-05 for 2025-11-01 812    rogers   Overcast
-    '325a25afe3588d3a41098864eea6636b10371d9a', // 2025-11-05 for 2025-11-01 812    rogers   Overcast
-    '3d5c2df28ab2c1b5fb20bb3df535ae86432b7ce6', // 2025-11-05 for 2025-11-03 812    rogers   Overcast
-    '93f51ee9044fde0a8572f6e9435dd5997806de6a', // 2025-11-05 for 2025-11-02 812    rogers   Overcast
-    'c5a0b63ec8b838b8f169aea99a80fe26eb160459', // 2025-11-05 for 2025-11-02 812    rogers   Overcast
-    '54b278ee6585ed1b8e215b8f4d63779a54b2b54c', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
-    '5dc2ab340eb9359937ec7885015ba8d896975e56', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
-    'd79537b2e25cfb71eb3dee3a49889e5f000128d1', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
-    'dbc7c7a22fb21abb03945ec8c26ade17fcc9d890', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
-    'f619cac77bc8ca779510c60409d5493267f7245e', // 2025-11-06 for 2025-11-05 812    rogers   Overcast
+    '06f676292c8d87007ec3ec79f63c87c1fd05d0f0', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '1bf55306666f3064ffa84a5c5d0caa249b3df6dd', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '35e193bb70d73097b16f98dd284e45c73b123bf1', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    '436e2b2c3f0e081249335e5861ea86d6d353bdc8', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    '5610c6f4409f62e6c9800bd7f71c84c42e6e4124', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    '56d538b9b548563f39da16d1dfdf23aa35786b6e', // 2025-10-12 for 2025-10-11 396982 google     Chrome,Safari
+    '7445432cc3b887d16924889f0387f437ea77b027', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    '74eb7c52d6b182f036ed60c9bb64552c793f9b63', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '7d2ff41411bb8ec9bf144371462b55faf5a63000', // 2025-10-12 for 2025-10-11 396982 google     Chrome,Safari
+    '7ec34b4cb6e8302fcf01f7592aeafa174468f773', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '815c4dbb996ddeac66ad61027f236baf9eae93bf', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '8dca93c9b69b1618b16249a917261002823de91f', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '9315a9cc0880a83b5ec88b66f668688569fb6220', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    'a4a11721f7f0bb216a763f1743e58de9a34e05f8', // 2025-10-12 for 2025-10-11 398465 rackdog    Chrome
+    'c60ee802f425a3b920059be546c2a602c755ae8e', // 2025-10-12 for 2025-10-11 396982 google     Chrome,Safari
+    'cd59ea79296cdc41db82e2d25cdb17c8e7ec5145', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    'df752bbf6661373ce93531c63a4b07f2e7a4d936', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    'f8545b85516ad67c513a56c2b8fd945950d2d004', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    'feb09ba8632f7ea2949006f7c02ea8a72bb7c400', // 2025-10-12 for 2025-10-11 399296 rackdog    Chrome
+    '063a9d7e21093f8ab332570b02adcb539ca4e004', // 2025-10-13 for 2025-10-12 396982 google     Chrome,Safari
+    'dd515123a500b40589eaee72905a75c92ec32a5d', // 2025-10-13 for 2025-10-12 396982 google     Chrome,Safari
+    '2ad0ef923753591f8ecca3d0677ec08aaed98f93', // 2025-10-15 for 2025-10-14 396982 google     Chrome,Safari
+    '21068f1fdbaa356ef89759c376c202b75b441b3d', // 2025-10-18 for 2025-10-16 204415 nexgen     Mozilla/5.0 (compatible; PodcastDownloader/1.0)
+    '777956698b4b0f18d58d13f1eef8f61bd924b28f', // 2025-10-18 for 2025-10-16 209    century    Chrome
+    '1c2eceb20f01f649aa3d7d6ed4b4d79128152d15', // 2025-10-20 for 2025-10-19 16509  amazon     Chrome
+    '76933aa76d9d312492f453613075a769ba3eda65', // 2025-10-20 for 2025-10-19 16509  amazon     Chrome
+    'a047086d66d44f7051f874479f78e03b7ef04c05', // 2025-10-20 for 2025-10-19 16509  amazon     Chrome
+    'a0a823f7962ed7c912efcf174a64e80db50fb027', // 2025-10-20 for 2025-10-19 16509  amazon     Chrome
+    'fb5cf927d28adb1a940a551c0ea0f22d1d61d7ac', // 2025-10-20 for 2025-10-19 24940  hetzner    Chrome,Safari,Edge,Firefox
+    '30b64f29576d0239eb7d6c8f0ac4e7edcaebdf4f', // 2025-10-21 for 2025-10-20 12876  scaleway   Mplayer, Windows Media Player
+    '3c8be3e51b6b81462bee716cc30728aeead1346e', // 2025-10-21 for 2025-10-20 48090  dmzhost    Firefox
+    'd69de8a319bd4b2b4d800b111ad0d7cb8e3ea5ee', // 2025-10-21 for 2025-10-20 16509  amazon     Chrome
+    'cae9d8515527a5c84fe36713b2b279e23b8400ec', // 2025-10-22 for 2025-10-21 16509  amazon     Chrome
+    '6259e266825587b0b4ce761925c2b02d9e0036b6', // 2025-10-22 for 2025-10-21 16509  amazon     Chrome
+    '9fa41cc8729f8f9d1e4254cd5ad720b8ea6b2ed3', // 2025-10-23 for 2025-10-22 16509  amazon     Chrome
+    'fe765bfd72275d6c22f60aa2b5f0c2039d7af0b7', // 2025-10-28 for 2025-10-27 396982 google     Chrome,Safari
+    '2516177353bc8cd6637685248975a0263c76d78c', // 2025-10-30 for 2025-10-29 16509  amazon     poddl - podcast downloader
+    '63640aea78cf162ee673ab7a4853099aef4ad9e1', // 2025-10-30 for 2025-10-29 16509  amazon     poddl - podcast downloader
+    '92ee8dc4db8dc0751172885bca749f21b4de588a', // 2025-10-30 for 2025-10-29 16509  amazon     poddl - podcast downloader
+    '97794061baa2ac7f9aef0446c892ddce2ea397c5', // 2025-10-30 for 2025-10-29 399296 rackdog    Chrome
+    'b9aea9d2f837a5f22cb473dd2a31d42ca8dcd556', // 2025-10-30 for 2025-10-29 16509  amazon     poddl - podcast downloader
+    'fc6efc2765ae71e82b7f4dfde89bc3da7cd8fc31', // 2025-10-30 for 2025-10-29 16509  amazon     poddl - podcast downloader
+    '47192b18d73c54a44f2c107490342ec26f0e3491', // 2025-10-31 for 2025-10-30 16509  amazon     poddl - podcast downloader
+    '69cccd48a717e0f83da36391fb0b64c1ac9dda0b', // 2025-10-31 for 2025-10-30 16509  amazon     poddl - podcast downloader
+    '265eced116753bb7d47c903387d048d751190df0', // 2025-11-01 for 2025-10-31 202662 hytron     Chrome
+    '628dcad0c6abcfaaf39dd352f2bf4da819c34c75', // 2025-11-01 for 2025-10-31 396982 google     Chrome,Safari
+    '402c9e27aa09039a1ecc51897f6c2426624c0e34', // 2025-11-02 for 2025-11-01 396982 google     Chrome,Safari
+    '6d70a6d5bbfbc5e5974a083cc6da3c1e29abd021', // 2025-11-02 for 2025-11-01 202662 hytron     Chrome
+    '91026456749015bcbeb9e2f265ed746bdbdcd6ed', // 2025-11-02 for 2025-11-01 7922   comcast    Chrome,Safari,Edge,Firefox,Opera
+    '99637dd8cc4969338f809ff7b9e15986b71d5cb3', // 2025-11-02 for 2025-11-01 396982 google     Chrome
+    'a312bf280cad74c81b35129c659900269851715d', // 2025-11-02 for 2025-11-01 396982 google     Chrome,Safari
+    'c626fb2d3b1bb93f6ca8c3e9a43f32cccbc1f426', // 2025-11-02 for 2025-11-01 396982 google     Chrome,Safari
+    'fe3aaf8e15a7247337745b97adda8f0e7ce8df03', // 2025-11-02 for 2025-11-01 24940  hetzner    Chrome,Safari,Edge,Firefox
+    '39bff10160c2268dc5941abca5e346bbe1b08cda', // 2025-11-05 for 2025-11-04 30600  metronet   Overcast
+    '3cc81df3374645d8abfa259844428aa602e9e210', // 2025-11-05 for 2025-11-04 24940  hetzner    Chrome,Safari,Edge,Firefox
+    '442553039dedd201e0e750ac8fd446b74c19044a', // 2025-11-05 for 2025-11-04 812    rogers     Overcast
+    'c6de8def59101c25cda6d023a99558c4610e804d', // 2025-11-05 for 2025-11-04 7018   att        Overcast
+    'ea146eb5098e9e27b4822356965bdfe0ac1429cd', // 2025-11-05 for 2025-11-04 812    rogers     Overcast
+    '00d099300155e7ecd2555f71b16bb3c2d09002e7', // 2025-11-05 for 2025-11-02 577    bellcan    Overcast
+    '241c3e1717177e9005d5642701e682e64281c628', // 2025-11-05 for 2025-11-03 6167   vzbus      Overcast
+    '29bc149c6dcaa4d527ca3c8524baa8f5c5ad33d0', // 2025-11-05 for 2025-11-01 812    rogers     Overcast
+    '325a25afe3588d3a41098864eea6636b10371d9a', // 2025-11-05 for 2025-11-01 812    rogers     Overcast
+    '3d5c2df28ab2c1b5fb20bb3df535ae86432b7ce6', // 2025-11-05 for 2025-11-03 812    rogers     Overcast
+    '93f51ee9044fde0a8572f6e9435dd5997806de6a', // 2025-11-05 for 2025-11-02 812    rogers     Overcast
+    'c5a0b63ec8b838b8f169aea99a80fe26eb160459', // 2025-11-05 for 2025-11-02 812    rogers     Overcast
+    '54b278ee6585ed1b8e215b8f4d63779a54b2b54c', // 2025-11-06 for 2025-11-05 812    rogers     Overcast
+    '5dc2ab340eb9359937ec7885015ba8d896975e56', // 2025-11-06 for 2025-11-05 812    rogers     Overcast
+    'd79537b2e25cfb71eb3dee3a49889e5f000128d1', // 2025-11-06 for 2025-11-05 812    rogers     Overcast
+    'dbc7c7a22fb21abb03945ec8c26ade17fcc9d890', // 2025-11-06 for 2025-11-05 812    rogers     Overcast
+    'f619cac77bc8ca779510c60409d5493267f7245e', // 2025-11-06 for 2025-11-05 812    rogers     Overcast
     '8cb261c78dad3efcd48d940c3f5e77f263ea7bbf', // 2025-11-06 for 2025-11-05 3352   telefonica Overcast
-    '01b3e6295170048c5cd7b8cf547c969075a389ed', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
-    '0cd29ac1619162228d7803687a88073060284d10', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
-    '2e72a00adccf985b83df9de368d390da91b89b23', // 2025-11-07 for 2025-11-06 701    verizon  Overcast
-    '8b9ce9738c7647199a1240f6c41966ab7ad68243', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
-    '9b45aca69b1d61a927ad1dd0d8238ac801cda0c1', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
-    'a6da9f1f3aafd46d46dfc8a385397620d2c593c3', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
-    'dd0078339e6da6546348c0c954f6f60776bdb494', // 2025-11-07 for 2025-11-06 812    rogers   Overcast
-    'e198962f37bc5060f4bd9a8481a18e7047430523', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
-    'ecbcfb4f15bff76857bd65bcff5961b712486097', // 2025-11-07 for 2025-11-06 25820  it7      Chrome
-    '54112768e3f5823b6eb938c7993bcb4a7d194323', // 2025-11-08 for 2025-11-07 16509  amazon   Chrome
-    'a4f08a570d2f21b65a3f332651cc389043206ac8', // 2025-11-08 for 2025-11-07 12119  itv3     Overcast
-    'e49a3868aec3927e1914d51c09c27ec13f0e8083', // 2025-11-08 for 2025-11-07 812    rogers   Overcast
-    '80a88f03d467b5c3fb915f878fb23c13d82cf8a1', // 2025-11-09 for 2025-11-08 4837   chinauni Chrome
-    '8ece917829ad44ba694a723c9bec628fc8264520', // 2025-11-09 for 2025-11-08 11427  charter  Overcast
-    '0c8480fbbd158bce4b29fcc8889c128ee5abb16c', // 2025-11-10 for 2025-11-09 16509  amazon   Chrome
-    '97c764577483c41d7b1fd880cfaa33af898f88ec', // 2025-11-10 for 2025-11-09 16509  amazon   Chrome
-    '1303a5aea99bbf6aadea082e26cdae4586a5305d', // 2025-11-10 for 2025-11-09 812    rogers   Overcast
-    '486d0b1138fbf8633e538a8d2218fb0caea6a00d', // 2025-11-10 for 2025-11-09 812    rogers   Overcast
-    '98884dda13bf9e30cb6ce043707d606d6bcf43d1', // 2025-11-10 for 2025-11-09 18403  fpt      Dalvik
-    'b483d3d32f245a059398f81919216ea1950f4a73', // 2025-11-10 for 2025-11-09 132817 dzcrd    Chrome
-    '83ce17496be6b511df9c5c042348e35b3bf7ad1d', // 2025-11-11 for 2025-11-10 812    rogers   Overcast
-    'bc5c94a17370bb4cc09a7576a9f2cdcdded5b945', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
-    'd5c27f0f3b2b11915a71bd05b7d591897af2cde3', // 2025-11-11 for 2025-11-10 9009   m247     Chrome
-    'dfe9e983a7acd64f65482a018246cf0b05098992', // 2025-11-11 for 2025-11-10 812    rogers   Overcast
-    '109d1beeb592d4314ad31c8d5000ad4d064b0a42', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    '2c91f0c49c0e1795e08f75cbf34f471c128872dd', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    '31337704dcecc3999e59bf6c9f6e1be60cf378f2', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
-    '94748497c1fc9a916fad5b51710026140b126eba', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
-    'f32ecf774bab947b1adb5a07fde6a8107b55eb09', // 2025-11-12 for 2025-11-11 812    rogers   Overcast
-    '572e1028f4afefe97ad604225958282492f27699', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    '8a5aedf162d92d8d7439c89b1ea6870f2c4c5965', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    '991ecd570a2d55b489986f0fb124c3c88ecc8de8', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    'e284de463bf218a93031ecc6bc356cd05045909d', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    'f5e9f828393bfb80add6fbb8816634a05b9af012', // 2025-11-12 for 2025-11-11 16509  amazon   Chrome
-    '03f09f1673ba592cbe224bce0b0443773c086fd2', // 2025-11-13 for 2025-11-12 62874  web2obj  Chrome
-    '0d512f4c886c7045aa077213c8fb0a68a032fd32', // 2025-11-13 for 2025-11-12 16509  amazon   Chrome
-    '26208b6ae99780ba1a8d7c403b988abd92621de8', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
-    'c53a1ac8fa0f79764c016bdb725bf8cab51c25db', // 2025-11-13 for 2025-11-12 812    rogers   Overcast
-    'cf9657f886e0a050be8215e69d4bcbde752a65c0', // 2025-11-13 for 2025-11-12 12876  scaleway MPlayer, Windows Media Player
-    '4c4f0fb17f89fbf2fb69b2be8ef9c0030fa1753c', // 2025-11-14 for 2025-11-13 812    rogers   Overcast
-    '7cb4d07418e059efab22f05002e96ce6b4f635e2', // 2025-11-14 for 2025-11-13 812    rogers   Overcast
-    '31080a7abab9047e56ee06be96b98b8780beff83', // 2025-11-15 for 2025-11-14 212238 datacamp Chrome
+    '01b3e6295170048c5cd7b8cf547c969075a389ed', // 2025-11-07 for 2025-11-06 812    rogers     Overcast
+    '0cd29ac1619162228d7803687a88073060284d10', // 2025-11-07 for 2025-11-06 25820  it7        Chrome
+    '2e72a00adccf985b83df9de368d390da91b89b23', // 2025-11-07 for 2025-11-06 701    verizon    Overcast
+    '8b9ce9738c7647199a1240f6c41966ab7ad68243', // 2025-11-07 for 2025-11-06 812    rogers     Overcast
+    '9b45aca69b1d61a927ad1dd0d8238ac801cda0c1', // 2025-11-07 for 2025-11-06 25820  it7        Chrome
+    'a6da9f1f3aafd46d46dfc8a385397620d2c593c3', // 2025-11-07 for 2025-11-06 25820  it7        Chrome
+    'dd0078339e6da6546348c0c954f6f60776bdb494', // 2025-11-07 for 2025-11-06 812    rogers     Overcast
+    'e198962f37bc5060f4bd9a8481a18e7047430523', // 2025-11-07 for 2025-11-06 25820  it7        Chrome
+    'ecbcfb4f15bff76857bd65bcff5961b712486097', // 2025-11-07 for 2025-11-06 25820  it7        Chrome
+    '54112768e3f5823b6eb938c7993bcb4a7d194323', // 2025-11-08 for 2025-11-07 16509  amazon     Chrome
+    'a4f08a570d2f21b65a3f332651cc389043206ac8', // 2025-11-08 for 2025-11-07 12119  itv3       Overcast
+    'e49a3868aec3927e1914d51c09c27ec13f0e8083', // 2025-11-08 for 2025-11-07 812    rogers     Overcast
+    '80a88f03d467b5c3fb915f878fb23c13d82cf8a1', // 2025-11-09 for 2025-11-08 4837   chinauni   Chrome
+    '8ece917829ad44ba694a723c9bec628fc8264520', // 2025-11-09 for 2025-11-08 11427  charter    Overcast
+    '0c8480fbbd158bce4b29fcc8889c128ee5abb16c', // 2025-11-10 for 2025-11-09 16509  amazon     Chrome
+    '97c764577483c41d7b1fd880cfaa33af898f88ec', // 2025-11-10 for 2025-11-09 16509  amazon     Chrome
+    '1303a5aea99bbf6aadea082e26cdae4586a5305d', // 2025-11-10 for 2025-11-09 812    rogers     Overcast
+    '486d0b1138fbf8633e538a8d2218fb0caea6a00d', // 2025-11-10 for 2025-11-09 812    rogers     Overcast
+    '98884dda13bf9e30cb6ce043707d606d6bcf43d1', // 2025-11-10 for 2025-11-09 18403  fpt        Dalvik
+    'b483d3d32f245a059398f81919216ea1950f4a73', // 2025-11-10 for 2025-11-09 132817 dzcrd      Chrome
+    '83ce17496be6b511df9c5c042348e35b3bf7ad1d', // 2025-11-11 for 2025-11-10 812    rogers     Overcast
+    'bc5c94a17370bb4cc09a7576a9f2cdcdded5b945', // 2025-11-11 for 2025-11-10 9009   m247       Chrome
+    'd5c27f0f3b2b11915a71bd05b7d591897af2cde3', // 2025-11-11 for 2025-11-10 9009   m247       Chrome
+    'dfe9e983a7acd64f65482a018246cf0b05098992', // 2025-11-11 for 2025-11-10 812    rogers     Overcast
+    '109d1beeb592d4314ad31c8d5000ad4d064b0a42', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    '2c91f0c49c0e1795e08f75cbf34f471c128872dd', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    '31337704dcecc3999e59bf6c9f6e1be60cf378f2', // 2025-11-12 for 2025-11-11 812    rogers     Overcast
+    '94748497c1fc9a916fad5b51710026140b126eba', // 2025-11-12 for 2025-11-11 812    rogers     Overcast
+    'f32ecf774bab947b1adb5a07fde6a8107b55eb09', // 2025-11-12 for 2025-11-11 812    rogers     Overcast
+    '572e1028f4afefe97ad604225958282492f27699', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    '8a5aedf162d92d8d7439c89b1ea6870f2c4c5965', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    '991ecd570a2d55b489986f0fb124c3c88ecc8de8', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    'e284de463bf218a93031ecc6bc356cd05045909d', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    'f5e9f828393bfb80add6fbb8816634a05b9af012', // 2025-11-12 for 2025-11-11 16509  amazon     Chrome
+    '03f09f1673ba592cbe224bce0b0443773c086fd2', // 2025-11-13 for 2025-11-12 62874  web2obj    Chrome
+    '0d512f4c886c7045aa077213c8fb0a68a032fd32', // 2025-11-13 for 2025-11-12 16509  amazon     Chrome
+    '26208b6ae99780ba1a8d7c403b988abd92621de8', // 2025-11-13 for 2025-11-12 812    rogers     Overcast
+    'c53a1ac8fa0f79764c016bdb725bf8cab51c25db', // 2025-11-13 for 2025-11-12 812    rogers     Overcast
+    'cf9657f886e0a050be8215e69d4bcbde752a65c0', // 2025-11-13 for 2025-11-12 12876  scaleway   MPlayer, Windows Media Player
+    '4c4f0fb17f89fbf2fb69b2be8ef9c0030fa1753c', // 2025-11-14 for 2025-11-13 812    rogers     Overcast
+    '7cb4d07418e059efab22f05002e96ce6b4f635e2', // 2025-11-14 for 2025-11-13 812    rogers     Overcast
+    '31080a7abab9047e56ee06be96b98b8780beff83', // 2025-11-15 for 2025-11-14 212238 datacamp   Chrome
     '745da2ead0ca8146cb2e561d970b4d695afd48ae', // 2025-11-16 for 2025-11-15 13335  cloudflare Chrome
-    '239777f4527a31a5c21087cef90ba41b466d42cf', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
-    'd9df76bd6bd0c45e185ddb7bee18e2af3f2f6c04', // 2025-11-18 for 2025-11-17 16509  amazon   Chrome
-    'ae622ff3f5aaed93c4c14aa18c477d7a1f10d130', // 2025-11-18 for 2025-11-17 212238 datacamp Chrome
+    '239777f4527a31a5c21087cef90ba41b466d42cf', // 2025-11-18 for 2025-11-17 16509  amazon     Chrome
+    'd9df76bd6bd0c45e185ddb7bee18e2af3f2f6c04', // 2025-11-18 for 2025-11-17 16509  amazon     Chrome
+    'ae622ff3f5aaed93c4c14aa18c477d7a1f10d130', // 2025-11-18 for 2025-11-17 212238 datacamp   Chrome
     '3995b9d85cc005f77372d33d027a1b45861059ab', // 2025-11-19 for 2025-11-18 3352   telefonica Overcast
-    '9ae7320d4429af77566b2088f11afbed91d071d5', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
-    'd28da9aff1011e3d12202dd6e83ed5d2006f13cc', // 2025-11-19 for 2025-11-18 16509  amazon   Chrome
-    '14b92055924ca372fb04c94b052acf504132809b', // 2025-11-20 for 2025-11-19 14618  amazon   Chrome
+    '9ae7320d4429af77566b2088f11afbed91d071d5', // 2025-11-19 for 2025-11-18 16509  amazon     Chrome
+    'd28da9aff1011e3d12202dd6e83ed5d2006f13cc', // 2025-11-19 for 2025-11-18 16509  amazon     Chrome
+    '14b92055924ca372fb04c94b052acf504132809b', // 2025-11-20 for 2025-11-19 14618  amazon     Chrome
     '8726a14f3308d3f3cc4bbce289b08abb57ed653b', // 2025-11-20 for 2025-11-19 13335  cloudflare Chrome
-    'd35a967c93b3596be148f1803b246fb5538214c6', // 2025-11-20 for 2025-11-19 12479  orange   Overcast
-    'eedd2f9af3978baa73acb59a5c404b53e56fc63e', // 2025-11-20 for 2025-11-19 396982 google   Storytel
-    '251249e0e4150bc54003d258fc13b20646b5288a', // 2025-11-22 for 2025-11-21 48090  dmzhost  Firefox
-    'd3af17836ac94953b033f9e82001a2f343828b3a', // 2025-11-23 for 2025-11-22 7545   tpg      Overcast
-    'fcd523c1e93e1292807ce9a9a2965ce74c372a06', // 2025-11-23 for 2025-11-22 7545   tpg      Overcast
-    '262191ebfe7487d9bb6b084ffd47af3d34346d30', // 2025-11-24 for 2025-11-23 142125 capti    Overcast
-    '8fd7e80eec1b564caa8c8ae8dcc7b9d14bf01f90', // 2025-11-24 for 2025-11-23 137409 gsl      Overcast
-    'c01570708935959bea8d17fc0367d70c5ecefc08', // 2025-11-25 for 2025-11-24 7545   tpg      Overcast
-    'dc9590518199ba17630e1c0b5eead5ba4161dfe0', // 2025-11-25 for 2025-11-24 137409 gsl      Overcast
-    '3308a56a9e02f9aec00957bf93e3eb18ed336b9b', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
-    '50b4b15e5d5b9ad6dea564ff9af1d401aa591a19', // 2025-11-26 for 2025-11-25 396982 google   Storytel
-    '957a00e8f65fadbee02fdc74ac75c9e2882c59a2', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
-    'e5bdfeca1e3418a8426d63c1656d50609cfe518c', // 2025-11-26 for 2025-11-25 812    rogers   Overcast
-    'fdb339276e627b4b64acc1d88e5bf80f8434adbd', // 2025-11-26 for 2025-11-25 28573  claro    Overcast
-    '130da9fc2f59251d1099810353341079752c2900', // 2025-11-27 for 2025-11-26 931    hyonix   Chrome,Edge
-    '7a92e26c7f0cbbc6114e674896368e870cad6e28', // 2025-11-27 for 2025-11-26 132203 tencent  Chrome,Safari,Edge,Firefox,Google Podcasts
-    'a019e0da47c5d5b2aab22593b162fc8eda31e7ed', // 2025-11-27 for 2025-11-26 137409 gsl      Firefox
-    'a3c8685716597956d0a1fab0e0eddde35f5628b6', // 2025-11-27 for 2025-11-26 812    rogers   Overcast
-    '14401effc9138387d032813a861218a6fb571ce4', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    '3ce7002ff35ff798627cd2b6e72105bc6d900703', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    '928ae3f54ac4dba7b90a8834e286d2a1559cbea9', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    'b93a274b50849655002cb324608f5da9b1738184', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    'bea7c969885f217462b612769ade259ac9dc090a', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    'ff5ddebd318f6b7c6c756f161eca586d3e583638', // 2025-11-28 for 2025-11-27 33425  coreweave Mozilla/5.0 (compatible; V/1.0)
-    '5f9f65d90dddbe3148936fa090f438be00129897', // 2025-11-28 for 2025-11-27 137409 gsl      Overcast
-    'c8d43cefb0c7cbcdfff4772e299441c2adfd08ec', // 2025-11-28 for 2025-11-27 812    rogers   Overcast
-    'f068b46d977691bc25b923739895f14b690e3c9b', // 2025-11-28 for 2025-11-27 142125 capti    Overcast
-    '4b910e5aa623ab46ae6a64923a196e7b3fd832ce', // 2025-11-29 for 2025-11-28 4713   docomo   Chrome
-    'affc2652097ddb641731bae94b3bee621dec88cf', // 2025-11-30 for 2025-11-29 812    rogers   Overcast
-    '758f87aab95732a9bd7c0fb69facce5f6abaa91e', // 2025-12-01 for 2025-11-30 812    rogers   Overcast
-    '39df19da3ce608e6c5ef496b489738d520714543', // 2025-12-02 for 2025-12-01 6167   verizon  Overcast
-    '76fc5e3c62d4d406b49ecc97248302ea5459352d', // 2025-12-02 for 2025-12-01 212238 datacamp Chrome
-    'e241555d5ba98fb9545e215523a1f3e0fdd4f127', // 2025-12-02 for 2025-12-01 30600  metronet Overcast
+    'd35a967c93b3596be148f1803b246fb5538214c6', // 2025-11-20 for 2025-11-19 12479  orange     Overcast
+    'eedd2f9af3978baa73acb59a5c404b53e56fc63e', // 2025-11-20 for 2025-11-19 396982 google     Storytel
+    '251249e0e4150bc54003d258fc13b20646b5288a', // 2025-11-22 for 2025-11-21 48090  dmzhost    Firefox
+    'd3af17836ac94953b033f9e82001a2f343828b3a', // 2025-11-23 for 2025-11-22 7545   tpg        Overcast
+    'fcd523c1e93e1292807ce9a9a2965ce74c372a06', // 2025-11-23 for 2025-11-22 7545   tpg        Overcast
+    '262191ebfe7487d9bb6b084ffd47af3d34346d30', // 2025-11-24 for 2025-11-23 142125 capti      Overcast
+    '8fd7e80eec1b564caa8c8ae8dcc7b9d14bf01f90', // 2025-11-24 for 2025-11-23 137409 gsl        Overcast
+    'c01570708935959bea8d17fc0367d70c5ecefc08', // 2025-11-25 for 2025-11-24 7545   tpg        Overcast
+    'dc9590518199ba17630e1c0b5eead5ba4161dfe0', // 2025-11-25 for 2025-11-24 137409 gsl        Overcast
+    '3308a56a9e02f9aec00957bf93e3eb18ed336b9b', // 2025-11-26 for 2025-11-25 812    rogers     Overcast
+    '50b4b15e5d5b9ad6dea564ff9af1d401aa591a19', // 2025-11-26 for 2025-11-25 396982 google     Storytel
+    '957a00e8f65fadbee02fdc74ac75c9e2882c59a2', // 2025-11-26 for 2025-11-25 812    rogers     Overcast
+    'e5bdfeca1e3418a8426d63c1656d50609cfe518c', // 2025-11-26 for 2025-11-25 812    rogers     Overcast
+    'fdb339276e627b4b64acc1d88e5bf80f8434adbd', // 2025-11-26 for 2025-11-25 28573  claro      Overcast
+    '130da9fc2f59251d1099810353341079752c2900', // 2025-11-27 for 2025-11-26 931    hyonix     Chrome,Edge
+    '7a92e26c7f0cbbc6114e674896368e870cad6e28', // 2025-11-27 for 2025-11-26 132203 tencent    Chrome,Safari,Edge,Firefox,Google Podcasts
+    'a019e0da47c5d5b2aab22593b162fc8eda31e7ed', // 2025-11-27 for 2025-11-26 137409 gsl        Firefox
+    'a3c8685716597956d0a1fab0e0eddde35f5628b6', // 2025-11-27 for 2025-11-26 812    rogers     Overcast
+    '14401effc9138387d032813a861218a6fb571ce4', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    '3ce7002ff35ff798627cd2b6e72105bc6d900703', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    '928ae3f54ac4dba7b90a8834e286d2a1559cbea9', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    'b93a274b50849655002cb324608f5da9b1738184', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    'bea7c969885f217462b612769ade259ac9dc090a', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    'ff5ddebd318f6b7c6c756f161eca586d3e583638', // 2025-11-28 for 2025-11-27 33425  coreweave  Mozilla/5.0 (compatible; V/1.0)
+    '5f9f65d90dddbe3148936fa090f438be00129897', // 2025-11-28 for 2025-11-27 137409 gsl        Overcast
+    'c8d43cefb0c7cbcdfff4772e299441c2adfd08ec', // 2025-11-28 for 2025-11-27 812    rogers     Overcast
+    'f068b46d977691bc25b923739895f14b690e3c9b', // 2025-11-28 for 2025-11-27 142125 capti      Overcast
+    '4b910e5aa623ab46ae6a64923a196e7b3fd832ce', // 2025-11-29 for 2025-11-28 4713   docomo     Chrome
+    'affc2652097ddb641731bae94b3bee621dec88cf', // 2025-11-30 for 2025-11-29 812    rogers     Overcast
+    '758f87aab95732a9bd7c0fb69facce5f6abaa91e', // 2025-12-01 for 2025-11-30 812    rogers     Overcast
+    '39df19da3ce608e6c5ef496b489738d520714543', // 2025-12-02 for 2025-12-01 6167   verizon    Overcast
+    '76fc5e3c62d4d406b49ecc97248302ea5459352d', // 2025-12-02 for 2025-12-01 212238 datacamp   Chrome
+    'e241555d5ba98fb9545e215523a1f3e0fdd4f127', // 2025-12-02 for 2025-12-01 30600  metronet   Overcast
     'fa63872fc57d794b7249767c4c5f2b1ecebf6173', // 2025-12-02 for 2025-12-01 3352   telefonica Overcast
-    '2703e00f5fe808d6a6206dc22db6efc214beebd5', // 2025-12-03 for 2025-12-02 57269  digispain Overcast
-    '9978c2a27ee141b9240ba5f4922c92a43edb6343', // 2025-12-03 for 2025-12-02 7922   comcast  Overcast
-    'fb8667ae5695a51fbe2d8d7d68762a8058422532', // 2025-12-03 for 2025-12-02 12119  itv3     Overcast
-    'd5d958d04449f1c55f574162cb5489f9589165dc', // 2025-12-03 for 2025-12-02 137409 gsl      Firefox, Safari, Podcast Addict, stagefright
-    '686ea059441592dd280628f1a1485769cca3f7c3', // 2025-12-04 for 2025-12-03 7922   comcast  Overcast
-    '77ff6109958918afd0d64efe1279aace1cbbae6a', // 2025-12-04 for 2025-12-03 12479  orange   Overcast
-    '97b66f73ee04089c87234c72c82590bce3881a66', // 2025-12-04 for 2025-12-03 136787 packethub Overcast
+    '2703e00f5fe808d6a6206dc22db6efc214beebd5', // 2025-12-03 for 2025-12-02 57269  digispain  Overcast
+    '9978c2a27ee141b9240ba5f4922c92a43edb6343', // 2025-12-03 for 2025-12-02 7922   comcast    Overcast
+    'fb8667ae5695a51fbe2d8d7d68762a8058422532', // 2025-12-03 for 2025-12-02 12119  itv3       Overcast
+    'd5d958d04449f1c55f574162cb5489f9589165dc', // 2025-12-03 for 2025-12-02 137409 gsl        Firefox, Safari, Podcast Addict, stagefright
+    '686ea059441592dd280628f1a1485769cca3f7c3', // 2025-12-04 for 2025-12-03 7922   comcast    Overcast
+    '77ff6109958918afd0d64efe1279aace1cbbae6a', // 2025-12-04 for 2025-12-03 12479  orange     Overcast
+    '97b66f73ee04089c87234c72c82590bce3881a66', // 2025-12-04 for 2025-12-03 136787 packethub  Overcast
     'a45f1cc2c2dd1af85607000c18da89aa0c44f203', // 2025-12-04 for 2025-12-03 4812   chinatelecom Firefox
     'b1e9780e3591310b55c76a811312d6c5c15da296', // 2025-12-04 for 2025-12-03 9299   philippine Podurama
-    'c5bbd13c52a17f4c1f67850c653ebd8b694617ba', // 2025-12-04 for 2025-12-03 48090  dmzhost  Firefox
-    'b715605af60070cc40d82bb19b3274f71f5e7a59', // 2025-12-05 for 2025-12-04 16509  amazon   Chrome
-    '1ee1b2aa3b8d64efe15e53be2efff7da3236d391', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
-    'a332cbc244ac45016020e171f73d5fe287283450', // 2025-12-06 for 2025-12-05 16509  amazon   Chrome
-    '5398eb8adac2422ca7767abbb1295d16678bc61f', // 2025-12-07 for 2025-12-06 58065  packet   Chrome, Firefox
-    '55dade2ad5ecc7069efb6a63409611ccc7d7813f', // 2025-12-08 for 2025-12-07 803    sasktel  Firefox
-    'b5cbf4655cbde3b1e2d5cb55409a3b3473199c5b', // 2025-12-09 for 2025-12-08 141039 packethub Overcast
-    '50b6824775f84f9922e04827f739592ebf321e73', // 2025-12-10 for 2025-12-09 141039 packethub Overcast
-    '6d82a3fedf63363b27d9647858b43b13498a74a9', // 2025-12-10 for 2025-12-09 53850  gorilla  Chrome
-    '8f325e94eb4880753526c8724f50eae5d9628752', // 2025-12-10 for 2025-12-09 16509  amazon   Chrome
-    'ee0302cd473b235dbfcca4a42dda66856760c644', // 2025-12-10 for 2025-12-09 141039 packethub Overcast
-    '7c54589378df3adc8bf5b1d661d513174cf51de9', // 2025-12-11 for 2025-12-10 11351  charter  Chrome
-    'cf3112fe57a843c46e728a5ddbe2d5089951fd35', // 2025-12-11 for 2025-12-10 45090  tencent  Chrome, Firefox, Edge, Safari
-    '8668d7a3b43fa110eade86a3360b6df56094955b', // 2025-12-13 for 2025-12-12 48090  techoff  Firefox
-    'c0c3813ce46dc86e5903d419b3be8345a6698516', // 2025-12-13 for 2025-12-12 395965 carrytel Chrome
-    '236f05b2102ab54b9b7e5675ba5092e5f217501e', // 2025-12-16 for 2025-12-15 7018   att      Overcast
-    '7ccc558874175988e511afde0ea5ba4668845862', // 2025-12-16 for 2025-12-15 812    rogers   Overcast
-    'd366c427875f90e64cfb16d5a61981a47832ed6a', // 2025-12-16 for 2025-12-15 812    rogers   Overcast
-    'faff1fe55396bb4a3f4646845d8d1b860d7665fa', // 2025-12-16 for 2025-12-15 3320   telekom  Overcast
-    '7257f838209fb68d70e1416123be77939ce5e82e', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    '970a932a73589af8fdccabae89e5d6ec05ee2411', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    'a3d5c705fd8a658c29dffc9a0a73088bfb31e976', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    'be184ea32738ff68930a08a437146b6811c6d109', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    'e57239eb5a9731c9729880787c3878188548ad5b', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    'eee8bad0865d3740d9ff7d76c38ece95e6752b17', // 2025-12-17 for 2025-12-16 812    rogers   Overcast
-    '7b135c897236a039f4f5d0b0cfe5c69dffb97fa3', // 2025-12-17 for 2025-12-16 136787 packethub Overcast
-    '06509fa1b0ad4dcc6ece1fd5ee11ea3c14c7bfa9', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    '69a25c78acf8a89147b94c2fea18831b7394e932', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    '73238592035cd081c6f42e70aec59bc21591f9f2', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    '74bceb64e32d15ff244216cd85f2b17beadc8892', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    'd0324308a0cbfd944cae0ecd53443d3478aa1047', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    'e5f4fd09355da80bdd45e68df6274e37aaa66dc1', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    'ebfe7d1ba3f3aee90178881eebd4c3541219a047', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome
-    'c74e4942c52b56214ab307a94c599a8e2ba02b15', // 2025-12-18 for 2025-12-17 396982 google   Safari, Chrome, feedparser/6.0.11 +https://github.com/kurtmckee/feedparser/
-    '4a1a5328c28f04a1297502df016ba28b10f23155', // 2025-12-18 for 2025-12-17 812    rogers   Overcast
-    '4c411f183456460e6ebf166144430d674560407a', // 2025-12-18 for 2025-12-17 812    rogers   Overcast
-    'be579bf37339f127f71a236be73026ce9ef1b4d9', // 2025-12-18 for 2025-12-17 136787 packethub Overcast
-    'ab1a376685d5be76db10d2440e65e2fdb1a5fb14', // 2025-12-18 for 2025-12-17 7018   att      Chrome, Safari, Edge
-    '59439b110921e0a4dc1c7e8085cde7c626659528', // 2025-12-19 for 2025-12-18 701    verizon  Overcast
-    '946609890b912f71cdb0d3f9c9716e1c6e57d3eb', // 2025-12-19 for 2025-12-18 701    verizon  Overcast
-    'd6f7d90305749ba2ee83683c6a48fb810299f338', // 2025-12-19 for 2025-12-18 812    rogers   Overcast
-    'a890565ec59220220026f4e092afe05201c95d83', // 2025-12-19 for 2025-12-18 16509  amazon   Chrome
-    '0da080c7fca448d9848d1a33a9df88efac8fa7c6', // 2025-12-20 for 2025-12-19 7922   comcast  node
-    '39b8478b4aca67ab2a72b31be123f44cc37dd185', // 2025-12-20 for 2025-12-19 812    rogers   Overcast
-    '7aa0102ea37ea7806d7f846aa5017f82795c0133', // 2025-12-20 for 2025-12-19 812    rogers   Overcast
-    'd2e5baefd78214b33c6cb945198f795b257232e7', // 2025-12-20 for 2025-12-19 812    rogers   Overcast
-    'e75e4c4128e0624579e3a84c8ad682ea6162ea29', // 2025-12-20 for 2025-12-19 812    rogers   Overcast
-    '3c5386a16e2cce26d0d7b23e3b16a9c7af85f5d8', // 2025-12-20 for 2025-12-19 577    bellcan  Overcast
-    '018d6bf6cd0e4683de78d435a161c8c2e5c89310', // 2025-12-21 for 2025-12-20 14618  amazon   Chrome
-    '0c4a2dab197492741b90a7ff25a2eecedce87acc', // 2025-12-21 for 2025-12-20 14618  amazon   Chrome
-    'c0594373423ac15f264237f6d9b2bc9d261a59c0', // 2025-12-21 for 2025-12-20 14618  amazon   Chrome
-    'cd49a7007b115760a3c1059a374c801619fd699a', // 2025-12-21 for 2025-12-20 14618  amazon   Chrome
-    'dac6f43062faba6923c7d502987a263f8e94a966', // 2025-12-21 for 2025-12-20 14618  amazon   Chrome
-    '076d2f532523d54495c1db694e1b5ccb68c382b1', // 2025-12-21 for 2025-12-20 141039 packethub Overcast
+    'c5bbd13c52a17f4c1f67850c653ebd8b694617ba', // 2025-12-04 for 2025-12-03 48090  dmzhost    Firefox
+    'b715605af60070cc40d82bb19b3274f71f5e7a59', // 2025-12-05 for 2025-12-04 16509  amazon     Chrome
+    '1ee1b2aa3b8d64efe15e53be2efff7da3236d391', // 2025-12-06 for 2025-12-05 16509  amazon     Chrome
+    'a332cbc244ac45016020e171f73d5fe287283450', // 2025-12-06 for 2025-12-05 16509  amazon     Chrome
+    '5398eb8adac2422ca7767abbb1295d16678bc61f', // 2025-12-07 for 2025-12-06 58065  packet     Chrome, Firefox
+    '55dade2ad5ecc7069efb6a63409611ccc7d7813f', // 2025-12-08 for 2025-12-07 803    sasktel    Firefox
+    'b5cbf4655cbde3b1e2d5cb55409a3b3473199c5b', // 2025-12-09 for 2025-12-08 141039 packethub  Overcast
+    '50b6824775f84f9922e04827f739592ebf321e73', // 2025-12-10 for 2025-12-09 141039 packethub  Overcast
+    '6d82a3fedf63363b27d9647858b43b13498a74a9', // 2025-12-10 for 2025-12-09 53850  gorilla    Chrome
+    '8f325e94eb4880753526c8724f50eae5d9628752', // 2025-12-10 for 2025-12-09 16509  amazon     Chrome
+    'ee0302cd473b235dbfcca4a42dda66856760c644', // 2025-12-10 for 2025-12-09 141039 packethub  Overcast
+    '7c54589378df3adc8bf5b1d661d513174cf51de9', // 2025-12-11 for 2025-12-10 11351  charter    Chrome
+    'cf3112fe57a843c46e728a5ddbe2d5089951fd35', // 2025-12-11 for 2025-12-10 45090  tencent    Chrome, Firefox, Edge, Safari
+    '8668d7a3b43fa110eade86a3360b6df56094955b', // 2025-12-13 for 2025-12-12 48090  techoff    Firefox
+    'c0c3813ce46dc86e5903d419b3be8345a6698516', // 2025-12-13 for 2025-12-12 395965 carrytel   Chrome
+    '236f05b2102ab54b9b7e5675ba5092e5f217501e', // 2025-12-16 for 2025-12-15 7018   att        Overcast
+    '7ccc558874175988e511afde0ea5ba4668845862', // 2025-12-16 for 2025-12-15 812    rogers     Overcast
+    'd366c427875f90e64cfb16d5a61981a47832ed6a', // 2025-12-16 for 2025-12-15 812    rogers     Overcast
+    'faff1fe55396bb4a3f4646845d8d1b860d7665fa', // 2025-12-16 for 2025-12-15 3320   telekom    Overcast
+    '7257f838209fb68d70e1416123be77939ce5e82e', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    '970a932a73589af8fdccabae89e5d6ec05ee2411', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    'a3d5c705fd8a658c29dffc9a0a73088bfb31e976', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    'be184ea32738ff68930a08a437146b6811c6d109', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    'e57239eb5a9731c9729880787c3878188548ad5b', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    'eee8bad0865d3740d9ff7d76c38ece95e6752b17', // 2025-12-17 for 2025-12-16 812    rogers     Overcast
+    '7b135c897236a039f4f5d0b0cfe5c69dffb97fa3', // 2025-12-17 for 2025-12-16 136787 packethub  Overcast
+    '06509fa1b0ad4dcc6ece1fd5ee11ea3c14c7bfa9', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    '69a25c78acf8a89147b94c2fea18831b7394e932', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    '73238592035cd081c6f42e70aec59bc21591f9f2', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    '74bceb64e32d15ff244216cd85f2b17beadc8892', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    'd0324308a0cbfd944cae0ecd53443d3478aa1047', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    'e5f4fd09355da80bdd45e68df6274e37aaa66dc1', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    'ebfe7d1ba3f3aee90178881eebd4c3541219a047', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome
+    'c74e4942c52b56214ab307a94c599a8e2ba02b15', // 2025-12-18 for 2025-12-17 396982 google     Safari, Chrome, feedparser/6.0.11 +https://github.com/kurtmckee/feedparser/
+    '4a1a5328c28f04a1297502df016ba28b10f23155', // 2025-12-18 for 2025-12-17 812    rogers     Overcast
+    '4c411f183456460e6ebf166144430d674560407a', // 2025-12-18 for 2025-12-17 812    rogers     Overcast
+    'be579bf37339f127f71a236be73026ce9ef1b4d9', // 2025-12-18 for 2025-12-17 136787 packethub  Overcast
+    'ab1a376685d5be76db10d2440e65e2fdb1a5fb14', // 2025-12-18 for 2025-12-17 7018   att        Chrome, Safari, Edge
+    '59439b110921e0a4dc1c7e8085cde7c626659528', // 2025-12-19 for 2025-12-18 701    verizon    Overcast
+    '946609890b912f71cdb0d3f9c9716e1c6e57d3eb', // 2025-12-19 for 2025-12-18 701    verizon    Overcast
+    'd6f7d90305749ba2ee83683c6a48fb810299f338', // 2025-12-19 for 2025-12-18 812    rogers     Overcast
+    'a890565ec59220220026f4e092afe05201c95d83', // 2025-12-19 for 2025-12-18 16509  amazon     Chrome
+    '0da080c7fca448d9848d1a33a9df88efac8fa7c6', // 2025-12-20 for 2025-12-19 7922   comcast    node
+    '39b8478b4aca67ab2a72b31be123f44cc37dd185', // 2025-12-20 for 2025-12-19 812    rogers     Overcast
+    '7aa0102ea37ea7806d7f846aa5017f82795c0133', // 2025-12-20 for 2025-12-19 812    rogers     Overcast
+    'd2e5baefd78214b33c6cb945198f795b257232e7', // 2025-12-20 for 2025-12-19 812    rogers     Overcast
+    'e75e4c4128e0624579e3a84c8ad682ea6162ea29', // 2025-12-20 for 2025-12-19 812    rogers     Overcast
+    '3c5386a16e2cce26d0d7b23e3b16a9c7af85f5d8', // 2025-12-20 for 2025-12-19 577    bellcan    Overcast
+    '018d6bf6cd0e4683de78d435a161c8c2e5c89310', // 2025-12-21 for 2025-12-20 14618  amazon     Chrome
+    '0c4a2dab197492741b90a7ff25a2eecedce87acc', // 2025-12-21 for 2025-12-20 14618  amazon     Chrome
+    'c0594373423ac15f264237f6d9b2bc9d261a59c0', // 2025-12-21 for 2025-12-20 14618  amazon     Chrome
+    'cd49a7007b115760a3c1059a374c801619fd699a', // 2025-12-21 for 2025-12-20 14618  amazon     Chrome
+    'dac6f43062faba6923c7d502987a263f8e94a966', // 2025-12-21 for 2025-12-20 14618  amazon     Chrome
+    '076d2f532523d54495c1db694e1b5ccb68c382b1', // 2025-12-21 for 2025-12-20 141039 packethub  Overcast
     'a88758e87fe2a6d4dd57ee80d4e203bcfe72bbf0', // 2025-12-21 for 2025-12-20 26599  telefonica Overcast
-    'f5734ed3cb316e6b13854f477ce8135848dd159d', // 2025-12-21 for 2025-12-20 812    rogers   Overcast
+    'f5734ed3cb316e6b13854f477ce8135848dd159d', // 2025-12-21 for 2025-12-20 812    rogers     Overcast
     '30ae21febe928f417c82e7354db3ce37487244f2', // 2025-12-22 for 2025-12-21 26599  telefonica Overcast
-    '973ae5d59878393d15c22918dacff2af89f5d606', // 2025-12-22 for 2025-12-21 33915  vodafone Overcast
-    'c6870bff35698fff7326783308b00a35462798d0', // 2025-12-22 for 2025-12-21 33915  vodafone Overcast
-    'e476320fdbcfb5a7134f9d3d2dfca07bed7172d5', // 2025-12-22 for 2025-12-21 812    rogers   Overcast
-    'e76387da2432d71872c60afbb33f574f7834f7c2', // 2025-12-22 for 2025-12-21 812    rogers   Overcast
-    'f08547159f6a248c50e1813c109ae1eefce45068', // 2025-12-22 for 2025-12-21 812    rogers   Overcast
-    '5138d288a2712a68a18689db1d2bee9ba4db296f', // 2025-12-23 for 2025-12-22 812    rogers   Overcast
-    'bb3a0792b826da7209b5cdd30270f9bfc0055df0', // 2025-12-23 for 2025-12-22 812    rogers   Overcast
-    '6f0bc0558e3eecbc3118f058942842febe783dd7', // 2025-12-23 for 2025-12-22 28573  claro    Overcast
-    '230c8b3986b9b65cd03a2ba55a6c2b629e0d2014', // 2025-12-24 for 2025-12-23 812    rogers   Overcast
-    '294e063b84af83399acee4a0168e0d9a8faffb68', // 2025-12-24 for 2025-12-23 812    rogers   Overcast
-    '3ea53afd9ccde4442b1e2ee0c688b98a6aae974b', // 2025-12-24 for 2025-12-23 10796  charter  Overcast
-    '6354fc13fe4cdfa04e967e5a321b5fb9b344702f', // 2025-12-24 for 2025-12-23 33915  vodafone Overcast
-    '9d42d8d3809b86bcd46f6f599319f866d799dd7a', // 2025-12-24 for 2025-12-23 33915  vodafone Overcast
-    'b068f5610b4e29ce7007c8d3071d7130bd28d595', // 2025-12-24 for 2025-12-23 5089   virgin   Overcast
-    '825689c11e627f1c55f89702fa8fc089e1ee8749', // 2025-12-24 for 2025-12-23 16509  amazon   Chrome
-    '9dd5fba0062fa2d498d1b06aad72feb604f6d0ea', // 2025-12-24 for 2025-12-23 16509  amazon   Chrome
-    'ae8827467191b4a6429ccd0b2ba47d02b377d638', // 2025-12-24 for 2025-12-23 48090  dmzhost  Firefox
-    '3dc134e4c7104a481f42d9efd5ca922dba455aa2', // 2025-12-25 for 2025-12-24 812    rogers   Overcast
-    '48d14f2608532758b3cfc93f04df93f7b5ef9326', // 2025-12-25 for 2025-12-24 812    rogers   Overcast
-    '8a5123d1ea0b82a1cf7fa816df39cb7c60554790', // 2025-12-25 for 2025-12-24 812    rogers   Overcast
-    '56fa305488e494a220dbf991db98482cb9fcbc70', // 2025-12-25 for 2025-12-24 19881  valley   Overcast
-    'e215933d7e3b3d18909b02bb7368ad03cad08dc7', // 2025-12-25 for 2025-12-24 7018   att      Overcast
-    'fd3dc0702b15f9d2ae4e03a0ee647e84d727d367', // 2025-12-25 for 2025-12-24 6167   verizon  Overcast
-    '2de5915386d7bbbb1f0fcd4779fed5bd4b844655', // 2025-12-26 for 2025-12-25 19881  valley   Overcast
-    '3a298b08cb9c11ab6690342d6cfec63bb2f2eac8', // 2025-12-26 for 2025-12-25 14593  starlink iCatcher
-    '58c1389bd140bef66efd11af83b5e19c39e836f8', // 2025-12-26 for 2025-12-25 812    rogers   Overcast
-    '150a25beccd674c131168db1babe7e46c03ed127', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
-    '85ddaf449f6646309ab7f88b8aac16f429c9d2ea', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
-    'd54b847cc9dc9015b749eee72c8d17f3dfc89502', // 2025-12-27 for 2025-12-26 812    rogers   Overcast
-    'f0a61e3f88105f4df642af10bc4066d846a9191b', // 2025-12-27 for 2025-12-26 6167   verizon  Overcast
-    '61950b74bc8280fa6739f09b0ee37dcbac6f30fb', // 2025-12-27 for 2025-12-26 7018   att      Overcast
-    '20756d1acf6de0cc032a014ffa81ce07241c7a9e', // 2025-12-28 for 2025-12-27 701    verizon  Overcast
-    '3406c4b86d0f9fe13ef5b345d8d9e0d0a6520177', // 2025-12-28 for 2025-12-27 701    verizon  Overcast
-    '6a892b6cbc6090a0ff80d824bfee223d4a537bb2', // 2025-12-28 for 2025-12-27 141039 packethub Overcast
-    '83c8003cda7d33fc083579e835e95710c7daa2e7', // 2025-12-28 for 2025-12-27 812    rogers   Overcast
-    'bd7c747ca077df47c576e96d82aeee2168678b7a', // 2025-12-28 for 2025-12-27 7922   comcast  Overcast
-    '308af7305743f2f19411120dfd26ad1a0afbfd91', // 2025-12-29 for 2025-12-28 701    verizon  Overcast
-    'a16141acf2fac24cfe8bef9018c9b6fafc4f5f8b', // 2025-12-29 for 2025-12-28 812    rogers   Overcast
-    'e720a66517c0660884f5c4e9801f94bbf0a0860b', // 2025-12-29 for 2025-12-28 812    rogers   Overcast
-    'f004e0148076a09344ab4cf7d6f8bdd032171edb', // 2025-12-29 for 2025-12-28 9009   m247     Chrome, Edge
+    '973ae5d59878393d15c22918dacff2af89f5d606', // 2025-12-22 for 2025-12-21 33915  vodafone   Overcast
+    'c6870bff35698fff7326783308b00a35462798d0', // 2025-12-22 for 2025-12-21 33915  vodafone   Overcast
+    'e476320fdbcfb5a7134f9d3d2dfca07bed7172d5', // 2025-12-22 for 2025-12-21 812    rogers     Overcast
+    'e76387da2432d71872c60afbb33f574f7834f7c2', // 2025-12-22 for 2025-12-21 812    rogers     Overcast
+    'f08547159f6a248c50e1813c109ae1eefce45068', // 2025-12-22 for 2025-12-21 812    rogers     Overcast
+    '5138d288a2712a68a18689db1d2bee9ba4db296f', // 2025-12-23 for 2025-12-22 812    rogers     Overcast
+    'bb3a0792b826da7209b5cdd30270f9bfc0055df0', // 2025-12-23 for 2025-12-22 812    rogers     Overcast
+    '6f0bc0558e3eecbc3118f058942842febe783dd7', // 2025-12-23 for 2025-12-22 28573  claro      Overcast
+    '230c8b3986b9b65cd03a2ba55a6c2b629e0d2014', // 2025-12-24 for 2025-12-23 812    rogers     Overcast
+    '294e063b84af83399acee4a0168e0d9a8faffb68', // 2025-12-24 for 2025-12-23 812    rogers     Overcast
+    '3ea53afd9ccde4442b1e2ee0c688b98a6aae974b', // 2025-12-24 for 2025-12-23 10796  charter    Overcast
+    '6354fc13fe4cdfa04e967e5a321b5fb9b344702f', // 2025-12-24 for 2025-12-23 33915  vodafone   Overcast
+    '9d42d8d3809b86bcd46f6f599319f866d799dd7a', // 2025-12-24 for 2025-12-23 33915  vodafone   Overcast
+    'b068f5610b4e29ce7007c8d3071d7130bd28d595', // 2025-12-24 for 2025-12-23 5089   virgin     Overcast
+    '825689c11e627f1c55f89702fa8fc089e1ee8749', // 2025-12-24 for 2025-12-23 16509  amazon     Chrome
+    '9dd5fba0062fa2d498d1b06aad72feb604f6d0ea', // 2025-12-24 for 2025-12-23 16509  amazon     Chrome
+    'ae8827467191b4a6429ccd0b2ba47d02b377d638', // 2025-12-24 for 2025-12-23 48090  dmzhost    Firefox
+    '3dc134e4c7104a481f42d9efd5ca922dba455aa2', // 2025-12-25 for 2025-12-24 812    rogers     Overcast
+    '48d14f2608532758b3cfc93f04df93f7b5ef9326', // 2025-12-25 for 2025-12-24 812    rogers     Overcast
+    '8a5123d1ea0b82a1cf7fa816df39cb7c60554790', // 2025-12-25 for 2025-12-24 812    rogers     Overcast
+    '56fa305488e494a220dbf991db98482cb9fcbc70', // 2025-12-25 for 2025-12-24 19881  valley     Overcast
+    'e215933d7e3b3d18909b02bb7368ad03cad08dc7', // 2025-12-25 for 2025-12-24 7018   att        Overcast
+    'fd3dc0702b15f9d2ae4e03a0ee647e84d727d367', // 2025-12-25 for 2025-12-24 6167   verizon    Overcast
+    '2de5915386d7bbbb1f0fcd4779fed5bd4b844655', // 2025-12-26 for 2025-12-25 19881  valley     Overcast
+    '3a298b08cb9c11ab6690342d6cfec63bb2f2eac8', // 2025-12-26 for 2025-12-25 14593  starlink   iCatcher
+    '58c1389bd140bef66efd11af83b5e19c39e836f8', // 2025-12-26 for 2025-12-25 812    rogers     Overcast
+    '150a25beccd674c131168db1babe7e46c03ed127', // 2025-12-27 for 2025-12-26 812    rogers     Overcast
+    '85ddaf449f6646309ab7f88b8aac16f429c9d2ea', // 2025-12-27 for 2025-12-26 812    rogers     Overcast
+    'd54b847cc9dc9015b749eee72c8d17f3dfc89502', // 2025-12-27 for 2025-12-26 812    rogers     Overcast
+    'f0a61e3f88105f4df642af10bc4066d846a9191b', // 2025-12-27 for 2025-12-26 6167   verizon    Overcast
+    '61950b74bc8280fa6739f09b0ee37dcbac6f30fb', // 2025-12-27 for 2025-12-26 7018   att        Overcast
+    '20756d1acf6de0cc032a014ffa81ce07241c7a9e', // 2025-12-28 for 2025-12-27 701    verizon    Overcast
+    '3406c4b86d0f9fe13ef5b345d8d9e0d0a6520177', // 2025-12-28 for 2025-12-27 701    verizon    Overcast
+    '6a892b6cbc6090a0ff80d824bfee223d4a537bb2', // 2025-12-28 for 2025-12-27 141039 packethub  Overcast
+    '83c8003cda7d33fc083579e835e95710c7daa2e7', // 2025-12-28 for 2025-12-27 812    rogers     Overcast
+    'bd7c747ca077df47c576e96d82aeee2168678b7a', // 2025-12-28 for 2025-12-27 7922   comcast    Overcast
+    '308af7305743f2f19411120dfd26ad1a0afbfd91', // 2025-12-29 for 2025-12-28 701    verizon    Overcast
+    'a16141acf2fac24cfe8bef9018c9b6fafc4f5f8b', // 2025-12-29 for 2025-12-28 812    rogers     Overcast
+    'e720a66517c0660884f5c4e9801f94bbf0a0860b', // 2025-12-29 for 2025-12-28 812    rogers     Overcast
+    'f004e0148076a09344ab4cf7d6f8bdd032171edb', // 2025-12-29 for 2025-12-28 9009   m247       Chrome, Edge
     '713de35dacdc093af3115ca99b9dcb5e7a74b55a', // 2025-12-30 for 2025-12-29 46887  crowncastle Overcast
-    '79faf594ddb4ac0c691fa4f82eb85a338c889df1', // 2025-12-30 for 2025-12-29 6167   verizon  Overcast
-    '88e56e10bb9da07d36787ad459c27a781cd7889b', // 2025-12-30 for 2025-12-29 136787 packethub Overcast
-    'b89d4b35862d6af9379a0fe2c652479d5e4a4eb9', // 2025-12-30 for 2025-12-29 812    rogers   Overcast
-    '4a5d24ae5c32e2dac656bbaa0cd69e98a742388d', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
-    '6146abda8c80d70cb38313109e2483666d7c7e6f', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
-    '6701dc5625150b60be7fdd9de28a8958c3bd947a', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
-    'dde528417dd5e74299edc37080deceba98df7b34', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
-    'eaabd23f6d4af9b3c8a849e32a9745515505925f', // 2025-12-31 for 2025-12-30 812    rogers   Overcast
-    '4a7e626cf47e12c29b21b5d220082caf4b13bf14', // 2026-01-01 for 2025-12-31 812    rogers   Overcast
-    '01cba7d61c7b1fd27e4f361d0e6d3a9279534290', // 2026-01-02 for 2026-01-01 141039 packethub Overcast
-    '617826d2f191c91bb9f8963f7e432223c3793e2b', // 2026-01-02 for 2026-01-01 701    verizon  Overcast
-    'a96fa6893f5ea2604daf24beed94c29229cfca24', // 2026-01-02 for 2026-01-01 577    bellcan  Overcast
-    'f172bb4e08696bbdcceea0dc791714015c31f988', // 2026-01-02 for 2026-01-01 5089   virgin   Overcast
-    'f8998dc2470df52455093e9f6f0d8bf0f7ac707e', // 2026-01-02 for 2026-01-01 812    rogers   Overcast
-    '0dce4faf6d27d9c4e2a89fd9b11784df530c5b7d', // 2026-01-03 for 2026-01-02 701    verizon  Overcast
-    '84cf7c1cc68cf0e381674e8ae0e7fbd00865741a', // 2026-01-03 for 2026-01-02 199218 proton   Overcast, CastBox
-    'cfc915db13ffb5d447e3ddcc4bb8e694435e12c9', // 2026-01-03 for 2026-01-02 577    bellcan  Chrome
-    'e80d5d9e045cb57b27517e08cc7bc73f3090d037', // 2026-01-03 for 2026-01-02 812    rogers   Overcast
-    '2460f355d34559caad50e48a8409c7ca2e83a4ac', // 2026-01-04 for 2026-01-03 812    rogers   Overcast
-    '28f3821af5012fca9da256fe900732c91732ba8f', // 2026-01-04 for 2026-01-03 62240  clouvider Chrome
-    '66943f9487911434a9fbcb5de2b6ac6cb0e5402d', // 2026-01-04 for 2026-01-03 14638  liberty  Overcast
-    '8c65805f52db3ca4e5597befe98a1dcfb7f4a8d9', // 2026-01-04 for 2026-01-03 141039 packethub Overcast
+    '79faf594ddb4ac0c691fa4f82eb85a338c889df1', // 2025-12-30 for 2025-12-29 6167   verizon    Overcast
+    '88e56e10bb9da07d36787ad459c27a781cd7889b', // 2025-12-30 for 2025-12-29 136787 packethub  Overcast
+    'b89d4b35862d6af9379a0fe2c652479d5e4a4eb9', // 2025-12-30 for 2025-12-29 812    rogers     Overcast
+    '4a5d24ae5c32e2dac656bbaa0cd69e98a742388d', // 2025-12-31 for 2025-12-30 812    rogers     Overcast
+    '6146abda8c80d70cb38313109e2483666d7c7e6f', // 2025-12-31 for 2025-12-30 812    rogers     Overcast
+    '6701dc5625150b60be7fdd9de28a8958c3bd947a', // 2025-12-31 for 2025-12-30 812    rogers     Overcast
+    'dde528417dd5e74299edc37080deceba98df7b34', // 2025-12-31 for 2025-12-30 812    rogers     Overcast
+    'eaabd23f6d4af9b3c8a849e32a9745515505925f', // 2025-12-31 for 2025-12-30 812    rogers     Overcast
+    '4a7e626cf47e12c29b21b5d220082caf4b13bf14', // 2026-01-01 for 2025-12-31 812    rogers     Overcast
+    '01cba7d61c7b1fd27e4f361d0e6d3a9279534290', // 2026-01-02 for 2026-01-01 141039 packethub  Overcast
+    '617826d2f191c91bb9f8963f7e432223c3793e2b', // 2026-01-02 for 2026-01-01 701    verizon    Overcast
+    'a96fa6893f5ea2604daf24beed94c29229cfca24', // 2026-01-02 for 2026-01-01 577    bellcan    Overcast
+    'f172bb4e08696bbdcceea0dc791714015c31f988', // 2026-01-02 for 2026-01-01 5089   virgin     Overcast
+    'f8998dc2470df52455093e9f6f0d8bf0f7ac707e', // 2026-01-02 for 2026-01-01 812    rogers     Overcast
+    '0dce4faf6d27d9c4e2a89fd9b11784df530c5b7d', // 2026-01-03 for 2026-01-02 701    verizon    Overcast
+    '84cf7c1cc68cf0e381674e8ae0e7fbd00865741a', // 2026-01-03 for 2026-01-02 199218 proton     Overcast, CastBox
+    'cfc915db13ffb5d447e3ddcc4bb8e694435e12c9', // 2026-01-03 for 2026-01-02 577    bellcan    Chrome
+    'e80d5d9e045cb57b27517e08cc7bc73f3090d037', // 2026-01-03 for 2026-01-02 812    rogers     Overcast
+    '2460f355d34559caad50e48a8409c7ca2e83a4ac', // 2026-01-04 for 2026-01-03 812    rogers     Overcast
+    '28f3821af5012fca9da256fe900732c91732ba8f', // 2026-01-04 for 2026-01-03 62240  clouvider  Chrome
+    '66943f9487911434a9fbcb5de2b6ac6cb0e5402d', // 2026-01-04 for 2026-01-03 14638  liberty    Overcast
+    '8c65805f52db3ca4e5597befe98a1dcfb7f4a8d9', // 2026-01-04 for 2026-01-03 141039 packethub  Overcast
     '8e7c554117a91cb529d44a4cd9e251f7e48de173', // 2026-01-04 for 2026-01-03 29580  a1bulgaria Overcast
-    '015ed4ba190b9ab892e6db7d89486f6788d977df', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '10744986191785b186c026bf6a8343445dff345a', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '18a8290e19b3ac514dc75230d925318597195b2c', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '1bf60d00b144a89850964c2ece2cc57cba092e01', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '31f4ed5975826d557f85e810d1dd3e2d44a2a7f6', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '3adc46a902836fdf5019f54f64ddf0deb3790b73', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '555146195e1158bfa2d6cb5775d66016b7db30c1', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '573168815c866247698b188d1aa00d0ce81dacd6', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '6056edc674efd400304983536f8d684bfc61f79a', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '6440cbafe3c49f026d0b1fa8ac379e0329ab686e', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '6dcfbc30d0906547e7becf74270f4a7ccee5fe22', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '6f9209e9a5d245c2e601c3f9490ae1a988f76497', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '7ebabaa1a33f4f3afe82577b5a3a566ddfbe7f75', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '833892c5d81bf4ae537055fe50b0c30067e97f6b', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '84696259bdf679b969e53257452426b1b730cd13', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '8aeb1cf60d463925defaf31a415df0a27be8d495', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '8d3c471b795c712fa9625ad70d1ebc1d77c94f95', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'aa6ec1490785e128ea9c3605b334f71fef626210', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'b38f4c232855d14ed16546ff7c616d03eea1cbaa', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'd22b30f507ca46915153d6cc2f127d23465564ab', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'd25b1d10931af24b8e668c5ad7c2c9bb2b4ffd78', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'fab560e569ebad185e4505f3a4f314686b146a97', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    'fc5ef739a3b8a7fb81decffc3797d28f8349bae2', // 2026-01-06 for 2026-01-05 2907   sinet    Chrome, Safari, Firefox
-    '6dc94d54441e7a956f2112a539d45081eacaa3ae', // 2026-01-06 for 2026-01-05 136787 packethub Overcast
-    '2a3f7c346b84f1f903c6ccbad92a94caed6ebdd2', // 2026-01-07 for 2026-01-06 141039 packethub Overcast
-    '8d9d007966e729f740cb64e5478e19341ac7ecdf', // 2026-01-07 for 2026-01-06 16509  amazon   Audacy Creator Lab Hosting/1.0
-    '1da5bc256dbcff0882bb5f82a5c405358ffad226', // 2026-01-08 for 2026-01-07 45102  alibaba  Chrome
-    '063eba0bbe9d0963e10648fe8be8b74fcd4c4359', // 2026-01-11 for 2026-01-10 45102  alibaba  Chrome
-    'bf77e9d97f47aa7ecec5ab7fdf48206b2f0f2376', // 2026-01-11 for 2026-01-10 396982 google   Chrome, Safari, Firefox, Edge
-    'c7e464985d69e73bb8fc2b4fc7c4c79456e9f2ed', // 2026-01-11 for 2026-01-10 30600  metronet Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
-    'da26df1c478aa602719f1f729555a0767cb1fa03', // 2026-01-11 for 2026-01-10 30600  metronet Overcast
-    '512e4eb3598ba51492dbb982a842498c4a1597e3', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
-    'd25ce37fa5f9db2d1469fc37e34b2df733118f75', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
-    'd36e406f7d3fc711380b1ef74b94fc51cb030513', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
-    'e06a47e9d094a7f446c5e4117deb378bebad48f5', // 2026-01-12 for 2026-01-11 396982 google   Chrome, Safari, Firefox, Edge
+    '015ed4ba190b9ab892e6db7d89486f6788d977df', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '10744986191785b186c026bf6a8343445dff345a', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '18a8290e19b3ac514dc75230d925318597195b2c', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '1bf60d00b144a89850964c2ece2cc57cba092e01', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '31f4ed5975826d557f85e810d1dd3e2d44a2a7f6', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '3adc46a902836fdf5019f54f64ddf0deb3790b73', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '555146195e1158bfa2d6cb5775d66016b7db30c1', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '573168815c866247698b188d1aa00d0ce81dacd6', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '6056edc674efd400304983536f8d684bfc61f79a', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '6440cbafe3c49f026d0b1fa8ac379e0329ab686e', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '6dcfbc30d0906547e7becf74270f4a7ccee5fe22', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '6f9209e9a5d245c2e601c3f9490ae1a988f76497', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '7ebabaa1a33f4f3afe82577b5a3a566ddfbe7f75', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '833892c5d81bf4ae537055fe50b0c30067e97f6b', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '84696259bdf679b969e53257452426b1b730cd13', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '8aeb1cf60d463925defaf31a415df0a27be8d495', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '8d3c471b795c712fa9625ad70d1ebc1d77c94f95', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'aa6ec1490785e128ea9c3605b334f71fef626210', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'b38f4c232855d14ed16546ff7c616d03eea1cbaa', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'd22b30f507ca46915153d6cc2f127d23465564ab', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'd25b1d10931af24b8e668c5ad7c2c9bb2b4ffd78', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'fab560e569ebad185e4505f3a4f314686b146a97', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    'fc5ef739a3b8a7fb81decffc3797d28f8349bae2', // 2026-01-06 for 2026-01-05 2907   sinet      Chrome, Safari, Firefox
+    '6dc94d54441e7a956f2112a539d45081eacaa3ae', // 2026-01-06 for 2026-01-05 136787 packethub  Overcast
+    '2a3f7c346b84f1f903c6ccbad92a94caed6ebdd2', // 2026-01-07 for 2026-01-06 141039 packethub  Overcast
+    '8d9d007966e729f740cb64e5478e19341ac7ecdf', // 2026-01-07 for 2026-01-06 16509  amazon     Audacy Creator Lab Hosting/1.0
+    '1da5bc256dbcff0882bb5f82a5c405358ffad226', // 2026-01-08 for 2026-01-07 45102  alibaba    Chrome
+    '063eba0bbe9d0963e10648fe8be8b74fcd4c4359', // 2026-01-11 for 2026-01-10 45102  alibaba    Chrome
+    'bf77e9d97f47aa7ecec5ab7fdf48206b2f0f2376', // 2026-01-11 for 2026-01-10 396982 google     Chrome, Safari, Firefox, Edge
+    'c7e464985d69e73bb8fc2b4fc7c4c79456e9f2ed', // 2026-01-11 for 2026-01-10 30600  metronet   Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    'da26df1c478aa602719f1f729555a0767cb1fa03', // 2026-01-11 for 2026-01-10 30600  metronet   Overcast
+    '512e4eb3598ba51492dbb982a842498c4a1597e3', // 2026-01-12 for 2026-01-11 396982 google     Chrome, Safari, Firefox, Edge
+    'd25ce37fa5f9db2d1469fc37e34b2df733118f75', // 2026-01-12 for 2026-01-11 396982 google     Chrome, Safari, Firefox, Edge
+    'd36e406f7d3fc711380b1ef74b94fc51cb030513', // 2026-01-12 for 2026-01-11 396982 google     Chrome, Safari, Firefox, Edge
+    'e06a47e9d094a7f446c5e4117deb378bebad48f5', // 2026-01-12 for 2026-01-11 396982 google     Chrome, Safari, Firefox, Edge
     'f3b8f32ce0e20d5080063388d046bcd7ca6bf5d4', // 2026-01-12 for 2026-01-11 44050  petersburg Firefox
-    '31a49df551f386da4020af0e4efdb209d46c344e', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
+    '31a49df551f386da4020af0e4efdb209d46c344e', // 2026-01-13 for 2026-01-12 396982 google     Chrome, Safari, Firefox, Edge
     'bab54812d0665d6a74ba42777c95a027af6fada9', // 2026-01-13 for 2026-01-12 13335  cloudflare Chrome
-    'c1abc720d39fdfbe1cc103ffe452c51795651811', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
-    'dfd58ddaf850aed7a4c22a5a92f0efe61ba6da3c', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
-    'e385079215cf6e934e950c7e23b5765526468d51', // 2026-01-13 for 2026-01-12 396982 google   Chrome, Safari, Firefox, Edge
-    '4cd6b76ee6f8721fc7796858fcf932dd0e741d93', // 2026-01-14 for 2026-01-13 14618  amazon   Safari
-    '530b1f3a38861516232d5e25a7f7a6a5e19920cb', // 2026-01-14 for 2026-01-13 14618  amazon   Safari
-    'a3a523d0f1e7381dd2d760f5fd405d01956f7108', // 2026-01-14 for 2026-01-13 14618  amazon   Safari
-    '772a378f536b6fe21db7d5fc261e3efd5631305b', // 2026-01-14 for 2026-01-13 141039 packethub Overcast
-    'b0974697e73cae16a206e104af1804c786197d3f', // 2026-01-14 for 2026-01-13 20115  charter  Overcast
-    '0a129011e63760dee52ca476204fd5ab3fa660f2', // 2026-01-15 for 2026-01-14 4837   chinauni Chrome
-    'c26b7e4acd9d21905ebf79b16e400d834d6a7f88', // 2026-01-18 for 2026-01-17 53850  gorilla  Chrome
-    'cf77659ab7e7a8ef4ba82ccc976c46bf897e6db5', // 2026-01-18 for 2026-01-17 141039 packethub Overcast
-    'd111aef9de34722c51c92c3d40427346fcaf2119', // 2026-01-18 for 2026-01-17 7922   comcast  Overcast
-    '1e5b5acd69aa63826f4c738497cc003b0c3eb83e', // 2026-01-19 for 2026-01-18 7922   comcast  Overcast
-    '33900d722296e267682fd2a33deb4eeb8fd1a796', // 2026-01-19 for 2026-01-18 7922   comcast  Overcast
-    'a23be086037967361bdd7417c02009d2bbf41bd8', // 2026-01-19 for 2026-01-18 35819  etihad   Overcast
-    'c2181fdc4934318ed12e53f833503bf8fd190191', // 2026-01-19 for 2026-01-18 399898 conexon  Overcast
-    '8dcf107607e4bf91253d832cc68bcbfc07ba19bd', // 2026-01-19 for 2026-01-18 1136   kpn      Firefox
-    '91c5363b65b8648cb04a8dbfc131ee59bd6eb347', // 2026-01-19 for 2026-01-18 396982 google   Chrome, Safari, Firefox, Edge
-    '1076e1f193dff931c9731b86a311eb0cbb3b1b22', // 2026-01-20 for 2026-01-19 141039 packethub Overcast
-    '30eff86537e27584e99e4635fd13b11a828840df', // 2026-01-20 for 2026-01-19 35819  etihad   Overcast
-    '37d717d4e9a3e082274e56d8181a512c5077bdb0', // 2026-01-20 for 2026-01-19 396982 google   Chrome, Safari, Firefox, Edge
-    '86f0d4bacaa620c90fc4ed0c2a14a651e579908f', // 2026-01-20 for 2026-01-19 136787 packethub Overcast
-    '800a9a9f9ad900995305a91198aad9122b45390d', // 2026-01-21 for 2026-01-20 136787 packethub Overcast
-    'f5a8c99effaef725ee6c225f6f1d6b2d2e4a6dcd', // 2026-01-22 for 2026-01-21 136787 packethub Overcast
-    '8097882f1463fbe2508df5c0604656c387dfac4a', // 2026-01-24 for 2026-01-23 7922   comcast  Overcast
-    '0db708f26067bac3746d32677e2d76a75d7113d7', // 2026-01-25 for 2026-01-24 3269   italia   podcast-downloader
-    'e45163870b0d39c85135cdb07f70d449ef4c8ac8', // 2026-01-25 for 2026-01-24 7922   comcast  Overcast
-    'ba89aae6025e895b6d7f64b895b387182ea74d59', // 2026-01-26 for 2026-01-25 136787 packethub Overcast
-    '4764b753812d4b77426f98258fb6348761da8954', // 2026-01-27 for 2026-01-26 35819  etihad   Overcast
-    'a43c6374e4978f9fb0ff122cb893fd7e7c0f5a3b', // 2026-01-28 for 2026-01-27 136787 packethub Overcast
-    'ae92fe8db94910f4305686003e6468688ce995e8', // 2026-01-28 for 2026-01-27 136787 packethub Overcast
-    'af622668cd5f11d1acd9f8f1076cf40cea8278c5', // 2026-01-28 for 2026-01-27 35819  etihad   Overcast
-    '420af5889dcf32ef3e2f3f402b4401e7ff0316ec', // 2026-01-29 for 2026-01-28 7922   comcast  Scott's Podcast Player
-    'd724233d2875def57b07035098d643b65c0d36b9', // 2026-01-29 for 2026-01-28 35819  etihad   Overcast
-    '93481f7c30f43ec9c0722d64a6de367c60a04002', // 2026-01-30 for 2026-01-29 35819  etihad   Overcast
-    '0e21c83ac4c69d573c7debc7ceb78b11a2dc4fca', // 2026-01-31 for 2026-01-30 35819  etihad   Overcast
-    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-01-31 for 2026-01-30 15704  xtra     Overcast
-    'a71693b53415216392d9070c4dd83b9e8e6b7e78', // 2026-01-31 for 2026-01-30 24940  hetzner  Chrome
-    'ddde53a4f7ad69c762523f0a02256a0c086511d7', // 2026-01-31 for 2026-01-30 15704  xtra     Overcast
-    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-02-01 for 2026-01-31 15704  xtra     Overcast
-    '1b454eb0cdc9a3e960e5312865d929d74161e1ee', // 2026-02-02 for 2026-02-01 60068  datacamp Overcast
-    '4258e44df2eda07c6270282a6d5c36dbcaeead7a', // 2026-02-02 for 2026-02-01 29580  a1bulg   Overcast
-    '85d3d6fcdc8a2c0b61616c72ce9f4bc14ae1e7db', // 2026-02-02 for 2026-02-01 15704  xtra     Overcast
-    'e2e9ca9fc34611590b4d2516e1d0b3e04d049a11', // 2026-02-02 for 2026-02-01 7018   att      Overcast
-    '61ac78181c228f1d73a63a36638244e97a7d0c39', // 2026-02-03 for 2026-02-02 7018   att      Overcast
-    'b6a0ce2a145dbc87214138914c55241b335475ef', // 2026-02-03 for 2026-02-02 136787 packethub Overcast
-    '133c9294cb2fbe2b08f61bebfe9d3cea49492eb2', // 2026-02-04 for 2026-02-03 397303 welink   Overcast
-    '6b8df880c447c5b9825e6447912473070ff9c18a', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
-    'c28cd91fb1fb9f418981b0cde6c8299cbcd79bd7', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
-    '8dca6f12be0081a34dd782825a2f361b31793c44', // 2026-02-04 for 2026-02-03 16509  amazon   Chrome
-    'bfd6629e203ca66823bdee2838ab4ab8052c1769', // 2026-02-04 for 2026-02-03 5089   virgin   Overcast
-    'e1ebf8e346f5b74d84343d8cfb00a6a58ab7e663', // 2026-02-04 for 2026-02-03 19151  bbone    Overcast
-    '9e5a9e5a3e88a7187dd33a49fa131946ad15aebd', // 2026-02-05 for 2026-02-04 16509  amazon   Apple Podcasts, Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    'c1abc720d39fdfbe1cc103ffe452c51795651811', // 2026-01-13 for 2026-01-12 396982 google     Chrome, Safari, Firefox, Edge
+    'dfd58ddaf850aed7a4c22a5a92f0efe61ba6da3c', // 2026-01-13 for 2026-01-12 396982 google     Chrome, Safari, Firefox, Edge
+    'e385079215cf6e934e950c7e23b5765526468d51', // 2026-01-13 for 2026-01-12 396982 google     Chrome, Safari, Firefox, Edge
+    '4cd6b76ee6f8721fc7796858fcf932dd0e741d93', // 2026-01-14 for 2026-01-13 14618  amazon     Safari
+    '530b1f3a38861516232d5e25a7f7a6a5e19920cb', // 2026-01-14 for 2026-01-13 14618  amazon     Safari
+    'a3a523d0f1e7381dd2d760f5fd405d01956f7108', // 2026-01-14 for 2026-01-13 14618  amazon     Safari
+    '772a378f536b6fe21db7d5fc261e3efd5631305b', // 2026-01-14 for 2026-01-13 141039 packethub  Overcast
+    'b0974697e73cae16a206e104af1804c786197d3f', // 2026-01-14 for 2026-01-13 20115  charter    Overcast
+    '0a129011e63760dee52ca476204fd5ab3fa660f2', // 2026-01-15 for 2026-01-14 4837   chinauni   Chrome
+    'c26b7e4acd9d21905ebf79b16e400d834d6a7f88', // 2026-01-18 for 2026-01-17 53850  gorilla    Chrome
+    'cf77659ab7e7a8ef4ba82ccc976c46bf897e6db5', // 2026-01-18 for 2026-01-17 141039 packethub  Overcast
+    'd111aef9de34722c51c92c3d40427346fcaf2119', // 2026-01-18 for 2026-01-17 7922   comcast    Overcast
+    '1e5b5acd69aa63826f4c738497cc003b0c3eb83e', // 2026-01-19 for 2026-01-18 7922   comcast    Overcast
+    '33900d722296e267682fd2a33deb4eeb8fd1a796', // 2026-01-19 for 2026-01-18 7922   comcast    Overcast
+    'a23be086037967361bdd7417c02009d2bbf41bd8', // 2026-01-19 for 2026-01-18 35819  etihad     Overcast
+    'c2181fdc4934318ed12e53f833503bf8fd190191', // 2026-01-19 for 2026-01-18 399898 conexon    Overcast
+    '8dcf107607e4bf91253d832cc68bcbfc07ba19bd', // 2026-01-19 for 2026-01-18 1136   kpn        Firefox
+    '91c5363b65b8648cb04a8dbfc131ee59bd6eb347', // 2026-01-19 for 2026-01-18 396982 google     Chrome, Safari, Firefox, Edge
+    '1076e1f193dff931c9731b86a311eb0cbb3b1b22', // 2026-01-20 for 2026-01-19 141039 packethub  Overcast
+    '30eff86537e27584e99e4635fd13b11a828840df', // 2026-01-20 for 2026-01-19 35819  etihad     Overcast
+    '37d717d4e9a3e082274e56d8181a512c5077bdb0', // 2026-01-20 for 2026-01-19 396982 google     Chrome, Safari, Firefox, Edge
+    '86f0d4bacaa620c90fc4ed0c2a14a651e579908f', // 2026-01-20 for 2026-01-19 136787 packethub  Overcast
+    '800a9a9f9ad900995305a91198aad9122b45390d', // 2026-01-21 for 2026-01-20 136787 packethub  Overcast
+    'f5a8c99effaef725ee6c225f6f1d6b2d2e4a6dcd', // 2026-01-22 for 2026-01-21 136787 packethub  Overcast
+    '8097882f1463fbe2508df5c0604656c387dfac4a', // 2026-01-24 for 2026-01-23 7922   comcast    Overcast
+    '0db708f26067bac3746d32677e2d76a75d7113d7', // 2026-01-25 for 2026-01-24 3269   italia     podcast-downloader
+    'e45163870b0d39c85135cdb07f70d449ef4c8ac8', // 2026-01-25 for 2026-01-24 7922   comcast    Overcast
+    'ba89aae6025e895b6d7f64b895b387182ea74d59', // 2026-01-26 for 2026-01-25 136787 packethub  Overcast
+    '4764b753812d4b77426f98258fb6348761da8954', // 2026-01-27 for 2026-01-26 35819  etihad     Overcast
+    'a43c6374e4978f9fb0ff122cb893fd7e7c0f5a3b', // 2026-01-28 for 2026-01-27 136787 packethub  Overcast
+    'ae92fe8db94910f4305686003e6468688ce995e8', // 2026-01-28 for 2026-01-27 136787 packethub  Overcast
+    'af622668cd5f11d1acd9f8f1076cf40cea8278c5', // 2026-01-28 for 2026-01-27 35819  etihad     Overcast
+    '420af5889dcf32ef3e2f3f402b4401e7ff0316ec', // 2026-01-29 for 2026-01-28 7922   comcast    Scott's Podcast Player
+    'd724233d2875def57b07035098d643b65c0d36b9', // 2026-01-29 for 2026-01-28 35819  etihad     Overcast
+    '93481f7c30f43ec9c0722d64a6de367c60a04002', // 2026-01-30 for 2026-01-29 35819  etihad     Overcast
+    '0e21c83ac4c69d573c7debc7ceb78b11a2dc4fca', // 2026-01-31 for 2026-01-30 35819  etihad     Overcast
+    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-01-31 for 2026-01-30 15704  xtra       Overcast
+    'a71693b53415216392d9070c4dd83b9e8e6b7e78', // 2026-01-31 for 2026-01-30 24940  hetzner    Chrome
+    'ddde53a4f7ad69c762523f0a02256a0c086511d7', // 2026-01-31 for 2026-01-30 15704  xtra       Overcast
+    '244b76f09e81bf3f9dff0297ffcfa7470dde6815', // 2026-02-01 for 2026-01-31 15704  xtra       Overcast
+    '1b454eb0cdc9a3e960e5312865d929d74161e1ee', // 2026-02-02 for 2026-02-01 60068  datacamp   Overcast
+    '4258e44df2eda07c6270282a6d5c36dbcaeead7a', // 2026-02-02 for 2026-02-01 29580  a1bulg     Overcast
+    '85d3d6fcdc8a2c0b61616c72ce9f4bc14ae1e7db', // 2026-02-02 for 2026-02-01 15704  xtra       Overcast
+    'e2e9ca9fc34611590b4d2516e1d0b3e04d049a11', // 2026-02-02 for 2026-02-01 7018   att        Overcast
+    '61ac78181c228f1d73a63a36638244e97a7d0c39', // 2026-02-03 for 2026-02-02 7018   att        Overcast
+    'b6a0ce2a145dbc87214138914c55241b335475ef', // 2026-02-03 for 2026-02-02 136787 packethub  Overcast
+    '133c9294cb2fbe2b08f61bebfe9d3cea49492eb2', // 2026-02-04 for 2026-02-03 397303 welink     Overcast
+    '6b8df880c447c5b9825e6447912473070ff9c18a', // 2026-02-04 for 2026-02-03 16509  amazon     Chrome
+    'c28cd91fb1fb9f418981b0cde6c8299cbcd79bd7', // 2026-02-04 for 2026-02-03 16509  amazon     Chrome
+    '8dca6f12be0081a34dd782825a2f361b31793c44', // 2026-02-04 for 2026-02-03 16509  amazon     Chrome
+    'bfd6629e203ca66823bdee2838ab4ab8052c1769', // 2026-02-04 for 2026-02-03 5089   virgin     Overcast
+    'e1ebf8e346f5b74d84343d8cfb00a6a58ab7e663', // 2026-02-04 for 2026-02-03 19151  bbone      Overcast
+    '9e5a9e5a3e88a7187dd33a49fa131946ad15aebd', // 2026-02-05 for 2026-02-04 16509  amazon     Apple Podcasts, Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '25b8bebb9a5206cc9dba43809fe1e03fa33d9138', // 2026-02-06 for 2026-02-05 6614   uscell     Overcast
+    '2711a92a8070a9a94fb0001f0e4662329decd934', // 2026-02-06 for 2026-02-05 9009   m247       Chrome, Edge
+    '5397ff231fb1aea9bc8259c9a6be5252fb500e7f', // 2026-02-06 for 2026-02-05 207847 cloudblast Chrome
+    '772bbfaa519273923833da8b6519e7466f52b572', // 2026-02-06 for 2026-02-05 24940  hetzner    Chrome
+    '875c2054f5fe55d29d3016714506487e07b5a5b6', // 2026-02-06 for 2026-02-05 24940  hetzner    Chrome
+    'cd62a6928b6cdc11b1ac777b97a1d813f9ee6e75', // 2026-02-06 for 2026-02-05 24940  hetzner    Chrome
+    'db003b1089bc15a9cd2510a83e0164faa0576497', // 2026-02-06 for 2026-02-05 24940  hetzner    Chrome
 ]);
