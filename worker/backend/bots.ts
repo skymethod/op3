@@ -547,4 +547,7 @@ const botIpHashes = new Set([
     'db003b1089bc15a9cd2510a83e0164faa0576497', // 2026-02-06 for 2026-02-05 24940  hetzner    Chrome
     '64bd7b6d4fe9592ef222055a69580b84a4195916', // 2026-02-07 for 2026-02-06 5650   frontier   Alexa-enabled device
     '663f59ba87a1c5fe3d67b6d5f2a4e48a8773fd25', // 2026-02-07 for 2026-02-06 7922   comcast    Overcast
+    '07714a28e1fa854d9b9ad63685eda4531e080606', // 2026-02-08 for 2026-02-07 30600  metronet   Overcast
+    '3626f0e092caa09fc018530ab84ca0ec44d4260b', // 2026-02-08 for 2026-02-07 132203 tencent    Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    'b89ab5dab5318abee0379e639a4d8a82958cd184', // 2026-02-08 for 2026-02-07 11664  techtel    Firefox, Chrome
 ]);
