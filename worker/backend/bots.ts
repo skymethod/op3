@@ -550,4 +550,6 @@ const botIpHashes = new Set([
     '07714a28e1fa854d9b9ad63685eda4531e080606', // 2026-02-08 for 2026-02-07 30600  metronet   Overcast
     '3626f0e092caa09fc018530ab84ca0ec44d4260b', // 2026-02-08 for 2026-02-07 132203 tencent    Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
     'b89ab5dab5318abee0379e639a4d8a82958cd184', // 2026-02-08 for 2026-02-07 11664  techtel    Firefox, Chrome
+    '4b5b20a8103bbdc226f96a67a99afdbf00c3dbc8', // 2026-02-09 for 2026-02-08 7922   comcast    Edge, Chrome
+    'b85116c7b3fd610aa2a28c490e16806f7d5d026c', // 2026-02-09 for 2026-02-08 9121   turktelekom RadyoImporter/3.0
 ]);
