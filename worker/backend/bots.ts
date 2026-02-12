@@ -552,4 +552,5 @@ const botIpHashes = new Set([
     'b89ab5dab5318abee0379e639a4d8a82958cd184', // 2026-02-08 for 2026-02-07 11664  techtel    Firefox, Chrome
     '4b5b20a8103bbdc226f96a67a99afdbf00c3dbc8', // 2026-02-09 for 2026-02-08 7922   comcast    Edge, Chrome
     'b85116c7b3fd610aa2a28c490e16806f7d5d026c', // 2026-02-09 for 2026-02-08 9121   turktelekom RadyoImporter/3.0
+    'db7c346f042c7d05f8323e22148036327b745385', // 2026-02-12 for 2026-02-11 16276  ovh        Chrome
 ]);
