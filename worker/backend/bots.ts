@@ -553,4 +553,6 @@ const botIpHashes = new Set([
     '4b5b20a8103bbdc226f96a67a99afdbf00c3dbc8', // 2026-02-09 for 2026-02-08 7922   comcast    Edge, Chrome
     'b85116c7b3fd610aa2a28c490e16806f7d5d026c', // 2026-02-09 for 2026-02-08 9121   turktelekom RadyoImporter/3.0
     'db7c346f042c7d05f8323e22148036327b745385', // 2026-02-12 for 2026-02-11 16276  ovh        Chrome
+    'cee8e467b014f96644bdb673316179ab222e3d91', // 2026-02-13 for 2026-02-12 701    verizon    Overcast
+    'd67d4e7939d8f308b79845234fd7072f8270206a', // 2026-02-13 for 2026-02-12 396982 google     Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 ]);
