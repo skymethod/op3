@@ -555,4 +555,9 @@ const botIpHashes = new Set([
     'db7c346f042c7d05f8323e22148036327b745385', // 2026-02-12 for 2026-02-11 16276  ovh        Chrome
     'cee8e467b014f96644bdb673316179ab222e3d91', // 2026-02-13 for 2026-02-12 701    verizon    Overcast
     'd67d4e7939d8f308b79845234fd7072f8270206a', // 2026-02-13 for 2026-02-12 396982 google     Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '0b80950a259fd47b8e032c01e01069b1355b4f25', // 2026-02-14 for 2026-02-13 16276  ovh        Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '26e4685a2c9b2dd95ab31ceb0afbaded5e02a4e6', // 2026-02-14 for 2026-02-13 197540 netcup     Chrome
+    '68308697de65abdeda9dd1526e2e3eb334a69c76', // 2026-02-14 for 2026-02-13 3816   columbia   Overcast
+    '995dc9b48b597d9ee15c8b5c678f1076ebeed1d6', // 2026-02-14 for 2026-02-13 209    century    Overcast
+    'd4df9b003ad434005af239f4d001773cc9446996', // 2026-02-14 for 2026-02-13 197540 netcup     Chrome
 ]);
