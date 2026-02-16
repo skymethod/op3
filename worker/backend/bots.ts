@@ -560,4 +560,7 @@ const botIpHashes = new Set([
     '68308697de65abdeda9dd1526e2e3eb334a69c76', // 2026-02-14 for 2026-02-13 3816   columbia   Overcast
     '995dc9b48b597d9ee15c8b5c678f1076ebeed1d6', // 2026-02-14 for 2026-02-13 209    century    Overcast
     'd4df9b003ad434005af239f4d001773cc9446996', // 2026-02-14 for 2026-02-13 197540 netcup     Chrome
+    '3df3e6b5c03aa9c34adb0ef19e41b42146807cd4', // 2026-02-16 for 2026-02-15 20115  charter    Overcast
+    'c94ccffe6e85cfca75e3096413bd7817c9684d25', // 2026-02-16 for 2026-02-15 3352   telefonica Overcast
+    'de84b4f64f2f3b3126a9469486a5ddd2747636ad', // 2026-02-16 for 2026-02-15 7018   att        acast-tester/1.0
 ]);
