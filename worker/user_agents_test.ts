@@ -24,11 +24,12 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8ae601e192696fc91cc2b9240135e96ec1fd664d (2026-01-25T16:36:40Z)
+// from user-agents-v2@b426781962ba286f9fd009d1af94f7620b2e0099 (2026-02-16T16:21:50Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
     'AAABot': { type: 'bot', name: `AAABot - unknown bot` },
+    'acast-tester/1.0': { type: 'bot', name: `Acast Tester` },
     'AIS VirtualListener': { type: 'bot', name: `Adswizz` },
     'agma/1.0': { type: 'bot', name: `ma Podcast (agma) Bot` },
     'Mozilla/5.0 (compatible; AhrefsBot/7.0; http://ahrefs.com/robot/)': { type: 'bot', name: `AhrefsBot` },
@@ -804,6 +805,8 @@ const appTests = {
     'KREAFUNK/1.7 CFNetwork/711.3.18 Darwin/14.0.0': { type: 'app', name: `KREAFUNK` },
     'labs/0.1.1.5 CFNetwork/711.2.23 Darwin/14.0.0': { type: 'app', name: `labs` },
     'Laughable/2.1.6.1 CFNetwork/808.1.4 Darwin/16.1.0': { type: 'app', name: `Laughable` },
+    'lesechos/Android': { type: 'app', name: `LesEchos` },
+    'lesechos/iOS': { type: 'app', name: `LesEchos` },
     'AEC/9.16 (free; fr; ABTest 123) iOS/26.0 (phone; iPhone18,1)': { type: 'app', name: `Le Monde` },
     'AEC/9.15.2 (free; fr; ABTest 427) Android/14/34 (phone; Pixel 7a)': { type: 'app', name: `Le Monde` },
     'leparisien/Android': { type: 'app', name: `LeParisien` },

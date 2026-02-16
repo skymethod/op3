@@ -19,13 +19,14 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@8ae601e192696fc91cc2b9240135e96ec1fd664d (2026-01-25T16:36:40Z)
+// from user-agents-v2@b426781962ba286f9fd009d1af94f7620b2e0099 (2026-02-16T16:21:50Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
     // bots
     if (/^7Siters/.test(userAgent)) return { name: `7Siters Crawler`, type: 'bot' };
     if (/AAABot/.test(userAgent)) return { name: `AAABot - unknown bot`, type: 'bot' };
+    if (/^acast-tester\//.test(userAgent)) return { name: `Acast Tester`, type: 'bot' };
     if (/^AIS VirtualListener/.test(userAgent)) return { name: `Adswizz`, type: 'bot' };
     if (/^agma\//.test(userAgent)) return { name: `ma Podcast (agma) Bot`, type: 'bot' };
     if (/AhrefsBot\//.test(userAgent)) return { name: `AhrefsBot`, type: 'bot' };
@@ -565,6 +566,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^KREAFUNK\//.test(userAgent)) return { name: `KREAFUNK`, type: 'app' };
     if (/^labs\//.test(userAgent)) return { name: `labs`, type: 'app' };
     if (/^Laughable.+iOS|^Laughable\//.test(userAgent)) return { name: `Laughable`, type: 'app' };
+    if (/^lesechos\//.test(userAgent)) return { name: `LesEchos`, type: 'app' };
     if (/^AEC\//.test(userAgent)) return { name: `Le Monde`, type: 'app' };
     if (/^leparisien\//.test(userAgent)) return { name: `LeParisien`, type: 'app' };
     if (/^Leaf\//.test(userAgent)) return { name: `Leaf`, type: 'app' };
