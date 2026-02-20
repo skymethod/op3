@@ -77,6 +77,8 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                     const language = attributes.get('language');
                     const rel = attributes.get('rel');
 
+                    if (url !== undefined && type === undefined && url.startsWith('https://calvarychapelbremerton.com/')) return; // found invalid
+
                     if (url === undefined || type === undefined) throw new Error(`Invalid transcript in item ${itemGuid}: ${JSON.stringify(Object.fromEntries(attributes))}`);
                     transcripts.push({ url, type, language, rel });
                 }
