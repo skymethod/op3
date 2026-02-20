@@ -569,4 +569,7 @@ const botIpHashes = new Set([
     '42cfd830a15eba5cfe3a406ae71d6d2186ad685f', // 2026-02-18 for 2026-02-17 214996 netcup     Chrome
     '5260015983f408ce172e29dcf05f755d4432729f', // 2026-02-18 for 2026-02-17 214996 netcup     Chrome
     '8e3c3c9baa43a89aa44e5fc543d0ca09b08605af', // 2026-02-18 for 2026-02-17 20115  charter    Overcast
+    '74b8612450ffd22545ed8cc1deb609674ead9d27', // 2026-02-20 for 2026-02-19 3209   vodafone   Chrome
+    'a6aa17d87064c62b0e2f6a9c90f234f8456f546e', // 2026-02-20 for 2026-02-19 34471  excom      Overcast
+    'f956c9ed013d7fccb5b2fa3f4d85493745e8f3d0', // 2026-02-20 for 2026-02-19 396982 google     Storytel
 ]);
