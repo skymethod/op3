@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@b426781962ba286f9fd009d1af94f7620b2e0099 (2026-02-16T16:21:50Z)
+// from user-agents-v2@a12e5f2c3f4e0cae6debbb89d16055a993b22073 (2026-02-21T15:38:35Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -64,6 +64,7 @@ const botTests = {
     'audioBoomBot/1.0; (+http://audioboom.com)': { type: 'bot', name: `Audioboom bot` },
     'Mozilla/5.0 (compatible; AudioFetcher/1.0; +https://example.invalid)': { type: 'bot', name: `AudioFetcher` },
     'Audiomack Podcast Processor/1.0 (https://audiomack.com/)': { type: 'bot', name: `Audiomack` },
+    'Mozilla/5.0 (compatible; Audioscrape/1.0; +https://audioscrape.com)': { type: 'bot', name: `Audioscrape` },
     'AudioWaveBot/1.0': { type: 'bot', name: `AudioWave feed parser` },
     'AutoHotkey': { type: 'bot', name: `AutoHotkey` },
     'AwarioSmartBot/1.0 (+https://awario.com/bots.html; bots@awario.com)': { type: 'bot', name: `AwarioSmartBot` },
@@ -177,6 +178,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)': { type: 'bot', name: `Netcraft Survey Agent` },
     'newspaper/0.3.0': { type: 'bot', name: `Newspaper` },
     'Mozilla/5.0 (compatible; NL-Israel_IAHarvester2025/3.3.0;  https://www.nli.org.il/he/research-and-teach/internet-archive/law-and-order)': { type: 'bot', name: `NL Israel Internet Archiver` },
+    'Google-NotebookLM': { type: 'bot', name: `Google NotebookLM` },
     'NovaStreamLive/1.0 (Podcast Import)': { type: 'bot', name: `NovaStream Live Importer` },
     'OgScrper': { type: 'bot', name: `OgScrper` },
     'OmnyStudio/1.0': { type: 'bot', name: `OmniStudio` },
@@ -202,6 +204,8 @@ const botTests = {
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
     'podcast-downloader': { type: 'bot', name: `Podcast Downloader` },
     'podcast-go-audio-downloader/2.0': { type: 'bot', name: `Podcast Go Audio Downloader` },
+    'Mozilla/5.0 (compatible; PodcastTranslator/1.0)': { type: 'bot', name: `PodcastTranslator` },
+    'Podcast Transcriber 2.0 (https://example.com/podcast-transcriber)': { type: 'bot', name: `Podcast Transcriber` },
     'Podcastics': { type: 'bot', name: `Podcastics` },
     'Podcatcher Bot 1.0': { type: 'bot', name: `Podcatcher Bot` },
     'Podcatcher Bot 1.0 (1 subscribers; +https://podcatcher.net)': { type: 'bot', name: `Podcatcher Bot` },
@@ -219,6 +223,7 @@ const botTests = {
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
     'PodlexiconDownloader/1.0': { type: 'bot', name: `Podlexicon Downloader` },
     'Podmonbot/1.0': { type: 'bot', name: `Podmon Bot` },
+    'PodOracle/1.0 (Podcast Search Engine)': { type: 'bot', name: `PodOracle` },
     'Podplay-Podcast-Sync/1.0 (+https://podplay.com/articles/contact)': { type: 'bot', name: `Podplay Podcast Sync` },
     'pod-rank-downloader/1.0': { type: 'bot', name: `PodRank Downloader` },
     'pdrl.fm Analyzer / 1.0.0': { type: 'bot', name: `Podroll Analyzer` },
@@ -251,6 +256,7 @@ const botTests = {
     'WWW-Mechanize/1.72': { type: 'bot', name: `Ruby Mechanize` },
     'runpod-python/0.0.0 (https://runpod.io; support@runpod.io)': { type: 'bot', name: `RunPod` },
     'SB Intuitions Crawler ( https://sbintuitions.co.jp)': { type: 'bot', name: `SB Intuitions Crawler` },
+    'sciis-media-fetch/0.1': { type: 'bot', name: `Sciis media fetch` },
     'Screaming Frog SEO Spider/5.1': { type: 'bot', name: `Screaming Frog SEO Spider` },
     'SearchAtlas.com SEO Crawler': { type: 'bot', name: `SearchAtlas.com SEO Crawler` },
     'Mozilla/5.0 (compatible; SemrushBot/6~bl; http://www.semrush.com/bot.html)': { type: 'bot', name: `SEMrushBot` },
@@ -289,6 +295,7 @@ const botTests = {
     'weborama-fetcher (+http://www.weborama.com)': { type: 'bot', name: `weborama` },
     'ZDM/4.0; Windows Mobile 7.0;': { type: 'bot', name: `Windows Crawler` },
     'Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.2673': { type: 'bot', name: `Windows PowerShell` },
+    'Mozilla/5.0 (Windows NT 10.0; Microsoft Windows 10.0.26200; en-NZ) PowerShell/7.5.4': { type: 'bot', name: `Windows PowerShell` },
     'Mozilla/5.0 (compatible; ImageFetcher/9.0; +http://wsrv.nl/)': { type: 'bot', name: `wsrv.nl` },
     'yacybot (/global; amd64 Linux 5.9.8-zen1-1-zen; java 1.8.0_265; Europe/de) http://yacy.net/bot.html': { type: 'bot', name: `YaCy` },
     'Crawler Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)': { type: 'bot', name: `Yahoo Crawler` },
@@ -935,6 +942,7 @@ const appTests = {
     'Patreon/125.35.0.10 (iPhone; iOS 18.0.1; Scale/3.00)': { type: 'app', name: `Patreon` },
     'PeaCast/0.7': { type: 'app', name: `PeaCast` },
     'phonostar-Player/4.08': { type: 'app', name: `phonostar Radio-App` },
+    'Pinepods/0.8.1 b20252203 (phone;android BP2A.250605.031.A3.S931U1UES7BYLR) https://github.com/madeofpendletonwool/pinepods': { type: 'app', name: `Pinepods` },
     'Playapod/2.4.11': { type: 'app', name: `Playapod` },
     'PlaydioCast/272 CFNetwork/1496.0.7 Darwin/23.5.0': { type: 'app', name: `PlaydioCast Podcast Radio` },
     'Player%20FM/588 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `Player FM` },
