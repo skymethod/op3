@@ -572,4 +572,6 @@ const botIpHashes = new Set([
     '74b8612450ffd22545ed8cc1deb609674ead9d27', // 2026-02-20 for 2026-02-19 3209   vodafone   Chrome
     'a6aa17d87064c62b0e2f6a9c90f234f8456f546e', // 2026-02-20 for 2026-02-19 34471  excom      Overcast
     'f956c9ed013d7fccb5b2fa3f4d85493745e8f3d0', // 2026-02-20 for 2026-02-19 396982 google     Storytel
+    '739d51dedddcda9e389f2b0b31848384fbbcfa04', // 2026-02-21 for 2026-02-20 209    century    sciis-media-fetch/0.1
+    '76806a02d9b4888af285d55a5b9e14a0ed1402de', // 2026-02-21 for 2026-02-20 212238 datacamp   Overcast
 ]);
