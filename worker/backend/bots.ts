@@ -575,4 +575,14 @@ const botIpHashes = new Set([
     'f956c9ed013d7fccb5b2fa3f4d85493745e8f3d0', // 2026-02-20 for 2026-02-19 396982 google     Storytel
     '739d51dedddcda9e389f2b0b31848384fbbcfa04', // 2026-02-21 for 2026-02-20 209    century    sciis-media-fetch/0.1
     '76806a02d9b4888af285d55a5b9e14a0ed1402de', // 2026-02-21 for 2026-02-20 212238 datacamp   Overcast
+    '4de86d64054c6eeb409b449d370100db8ad28c70', // 2026-02-23 for 2026-02-21 3209   vodafone   Chrome
+    '744dcac63adc35f1c8448a41e8116d09c723760d', // 2026-02-23 for 2026-02-21 62240  clouvider  Chrome, Edge
+    '7e2af0e4c5872cbb9f77dae518a9ded357000bbc', // 2026-02-23 for 2026-02-21 31898  oracle     Chrome
+    '85f6e8b637649132ad5e59a13cd09d412fca7da8', // 2026-02-23 for 2026-02-21 9231   chinamobile Overcast
+    'dc0f25ee4d7445869de3867d642a4e8fedcb8c7c', // 2026-02-23 for 2026-02-21 4609   macau      Overcast
+    'f07d950a038b8a25b8bbb358a2467f166bbd2739', // 2026-02-23 for 2026-02-21 15943  wilhelm    Chrome
+    '15844fca7aedd992d0d85ca5e86a5d1f23c308ee', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
+    'bfdd9e94e24b6095e939b461ab9a6f35e49b9a37', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
+    'd63d46588680dd9e4b634d4018d35aa71e0f1462', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
+    'e37969af06dee56b8b784a177adc18c1cc62c2e7', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
 ]);
