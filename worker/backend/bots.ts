@@ -585,4 +585,5 @@ const botIpHashes = new Set([
     'bfdd9e94e24b6095e939b461ab9a6f35e49b9a37', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
     'd63d46588680dd9e4b634d4018d35aa71e0f1462', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
     'e37969af06dee56b8b784a177adc18c1cc62c2e7', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
+    '26cb35e77ec87b8a9401587f9b9547b1fd0b3db1', // 2026-02-24 for 2026-02-23 979    netlab     Xiao Yu Zhou
 ]);
