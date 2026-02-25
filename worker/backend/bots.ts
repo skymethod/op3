@@ -36,6 +36,25 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
+        || agentType === 'browser' && (
+               asn === '19148'  // leaseweb
+            || asn === '7203'   // leaseweb
+            || asn === '395954' // leaseweb
+            || asn === '27411'  // leaseweb
+            || asn === '393886' // leaseweb
+            || asn === '150436' // byteplus
+            || asn === '201341' // centurian
+            || asn === '203020' // hostroyale
+            || asn === '203062' // alexroux
+            || asn === '204646' // web2obj
+            || asn === '62874'  // web2obj
+            || asn === '209709' // code200
+            || asn === '30058'  // fdcservers
+            || asn === '3257'   // gtt
+            || asn === '401152' // acedatacenters
+            || asn === '64249'  // endoffice
+            || asn === '9009'   // m247
+        )
         ;
 }
 
@@ -586,4 +605,7 @@ const botIpHashes = new Set([
     'd63d46588680dd9e4b634d4018d35aa71e0f1462', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
     'e37969af06dee56b8b784a177adc18c1cc62c2e7', // 2026-02-23 for 2026-02-22 212238 datacamp   iHeartRadio
     '26cb35e77ec87b8a9401587f9b9547b1fd0b3db1', // 2026-02-24 for 2026-02-23 979    netlab     Xiao Yu Zhou
+    '8ef543af2f79f84209ee25ff956a84de2e5f21d2', // 2026-02-25 for 2026-02-24 7922   comcast    audiobookshelf, Apple Podcasts automated checks
+    'dd1f82bf7fd6a4eff6092136cd6503070bc59e09', // 2026-02-25 for 2026-02-24 5650   frontier   Overcast
+    'e2bad6d13ace90a2eb542698d7b2fcbf20142a65', // 2026-02-25 for 2026-02-24 48090  dmzhost    Firefox
 ]);
