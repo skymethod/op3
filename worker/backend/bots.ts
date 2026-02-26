@@ -54,6 +54,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '401152' // acedatacenters
             || asn === '64249'  // endoffice
             || asn === '9009'   // m247
+            || asn === '42366'  // terratransit
         )
         ;
 }
@@ -608,4 +609,6 @@ const botIpHashes = new Set([
     '8ef543af2f79f84209ee25ff956a84de2e5f21d2', // 2026-02-25 for 2026-02-24 7922   comcast    audiobookshelf, Apple Podcasts automated checks
     'dd1f82bf7fd6a4eff6092136cd6503070bc59e09', // 2026-02-25 for 2026-02-24 5650   frontier   Overcast
     'e2bad6d13ace90a2eb542698d7b2fcbf20142a65', // 2026-02-25 for 2026-02-24 48090  dmzhost    Firefox
+    '093691f825721b35499d21476b40ecfb1bd977d6', // 2026-02-26 for 2026-02-25 701    verizon    Overcast
+    'd739d91bdc923b60f7e6afe740c2c7c515921296', // 2026-02-26 for 2026-02-25 48090  dmzhost    Firefox
 ]);
