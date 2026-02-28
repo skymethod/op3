@@ -53,6 +53,7 @@ export function isRedirectFetchingRequired({ generator, enclosureUrl }: { genera
         || /\/s\.gum\.fm\//.test(enclosureUrl ?? '') // https://s.gum.fm/s-123123213/pdst.fm/e/traffic.omny.fm/d/clips/123123123/audio.mp3?amp;in_playlist=123123123123
         || /transistor\.fm/i.test(generator ?? '') // Transistor (https://transistor.fm)
         || /\/dgt\.fm\//.test(enclosureUrl ?? '') // https://dgt.fm/703.mp3 - https://digitalia.fm/feeds/digitalia.xml
+        || /\/feedpress\.me\/link\//.test(enclosureUrl ?? '') // https://feedpress.me/link/21386/17285538/1323.mp3 - https://op3.dev/e/api.spreaker.com/download/episode/70195349/1323.mp3
         ;
 }
 
