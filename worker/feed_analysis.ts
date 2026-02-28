@@ -3,8 +3,9 @@ import { hasOp3InRedirectChain, hasOp3Reference, isRedirectFetchingRequired } fr
 import { parsePubdate } from './pubdates.ts';
 import { isXfetchCandidate, Xfetcher, XResponse} from './xfetcher.ts';
 
-export async function computeFeedAnalysis(feed: string, opts: { userAgent: string, xfetcher?: Xfetcher }): Promise<FeedAnalysis> {
-    const { userAgent, xfetcher } = opts;
+export async function computeFeedAnalysis(feed: string, opts: { userAgent: string, xfetcher?: Xfetcher, maxRedirectFetches?: number }): Promise<FeedAnalysis> {
+    const { userAgent, xfetcher, maxRedirectFetches = 10 } = opts;
+    let remainingRedirectFetches = maxRedirectFetches;
     const res = await fetchAndHandleRedirects(feed, { headers: { 'user-agent': userAgent }, xfetcher });
     let items = 0;
     let itemsWithEnclosures = 0;
@@ -60,8 +61,11 @@ export async function computeFeedAnalysis(feed: string, opts: { userAgent: strin
                                             if (hasOp3Reference(url)) {
                                                 hasOp3Enclosure = true;
                                             } else if (isRedirectFetchingRequired({ generator: channelGenerator, enclosureUrl: url })) {
-                                                if (!hasOp3Enclosure && await hasOp3InRedirectChain(url, opts)) {
-                                                    hasOp3Enclosure = true;
+                                                if (!hasEnclosure && remainingRedirectFetches > 0) {
+                                                    if (await hasOp3InRedirectChain(url, opts)) {
+                                                        hasOp3Enclosure = true;
+                                                    }
+                                                    remainingRedirectFetches--;
                                                 }
                                             }
                                         }
