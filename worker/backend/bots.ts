@@ -614,4 +614,28 @@ const botIpHashes = new Set([
     '5439c929f918c1e7efe5f96cbb6305be49682c58', // 2026-02-27 for 2026-02-26 12271  charter    Chrome
     'a060cc8ad3366f44933948d1dcdfdb596d3ad755', // 2026-02-27 for 2026-02-26 7018   att        Overcast
     'a98c46b84cc36f9788166667c3d6c3c9a567e03c', // 2026-02-27 for 2026-02-26 701    verizon    Overcast
+    '15a6ec4c2dad13b9cee619a9e0c86bba3575058f', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '35d803dee850631d3165383de7ec38d2833bc0a6', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '42a29e9e5b8722e7dbd157ed423f6c6b4cb6575a', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '5225a467513cc2dc2469dffe9235154cfa4b3291', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '5a20843b942c3023b99746c7a5bf5b62dbeed40d', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '75caef5ad4a9151d2326f76d85227a44552275b7', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '7dc2e57e411f0a893fd4fb580b2ae04e48ff1dc3', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '8517baff84c429b6e4a3618a4671593163c287de', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    'bb28903cd345cb94c42c79c9ec019123f5dc44f2', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    'd3ce93b3b572349a833f6aaa0426de536028bef8', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    'd65f7ebf777371eaef9dec9a5e30faaf9abeac89', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    'e9093a3d2b6e8c20dabd58e2c7825fbd8e522ccb', // 2026-03-02 for 2026-03-01 9808   chinamobile Chrome
+    '507bf8c29dccd9e2987408f3476d4e9a660db0b3', // 2026-03-02 for 2026-03-01 139080 chinamobile Chrome
+    '9f4308580c88b46bfd85e023b10ac5f4899f903e', // 2026-03-02 for 2026-03-01 139080 chinamobile Chrome
+    'e53e565162538a07d764467121da04e49f75d847', // 2026-03-02 for 2026-03-01 139080 chinamobile Chrome
+    '27e13914811298e9982ebc9164a5e84d9a371bb9', // 2026-03-02 for 2026-03-01 56046  chinamobile Chrome
+    'a2136031f2d8d159d0c71cc6d175053a3d1fa6fa', // 2026-03-02 for 2026-03-01 56047  chinamobile Chrome
+    '827b1384c6124e8eed3ca7753c946609b936b9fd', // 2026-03-02 for 2026-03-01 24547  chinamobile Chrome
+    '8bf58ecf57e8ff941e21c7b446f217fa995947a7', // 2026-03-02 for 2026-03-01 132525 chinamobile Chrome
+    '64e6d795b6a6f90a802407cf0028ca1f34c3803c', // 2026-03-02 for 2026-03-01 701    verizon    Overcast
+    '869c2a4e1754e1ffd30a96b6883c30f722b7d7b2', // 2026-03-02 for 2026-03-01 395965 carrytel   Chrome
+    'c49efc88caa6035756cf3a025a7a55f821610f18', // 2026-03-02 for 2026-03-01 4764   wideband   Firefox
+    'c5bfd78c8532d3b328b17863076daf29af196120', // 2026-03-02 for 2026-03-01 5650   frontier   Overcast
+    'dbceb88a951abfaee04220f4a5601621d4f60686', // 2026-03-02 for 2026-03-01 19151  bbone      Overcast
 ]);
