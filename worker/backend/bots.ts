@@ -34,6 +34,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
         || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && date >= '2026-01-18' // google
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
+        || asn === '396982' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-02' // google
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || agentType === 'browser' && (
@@ -638,4 +639,11 @@ const botIpHashes = new Set([
     'c49efc88caa6035756cf3a025a7a55f821610f18', // 2026-03-02 for 2026-03-01 4764   wideband   Firefox
     'c5bfd78c8532d3b328b17863076daf29af196120', // 2026-03-02 for 2026-03-01 5650   frontier   Overcast
     'dbceb88a951abfaee04220f4a5601621d4f60686', // 2026-03-02 for 2026-03-01 19151  bbone      Overcast
+    '06462eecde7c69d3129d7931772ee2fff85b82f1', // 2026-03-03 for 2026-03-02 9808   chinamobile Chrome
+    '1cccc8f91e8bff3ef1d902ae4ce1acd118caf8fc', // 2026-03-03 for 2026-03-02 11664  techtel    Chrome
+    '5e9cb987e8743552291ae0426ef6ff70517651e8', // 2026-03-03 for 2026-03-02 2907   techtel    sinet
+    '6005deb6aa09b58d56c1ca0450bdc7c8ca69ab03', // 2026-03-03 for 2026-03-02 396982 google     Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '67466ede7758367fd7c3dff08809e102d4585141', // 2026-03-03 for 2026-03-02 132203 tencent    Chrome
+    '825e27478bee9e9cc20f1d3db9f4fece84c3aa4a', // 2026-03-03 for 2026-03-02 7922   comcast    Overcast
+    '88549448dd62b5de743d91770657ae64d7f12eaf', // 2026-03-03 for 2026-03-02 701    verizon    Overcast
 ]);
