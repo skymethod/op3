@@ -646,4 +646,7 @@ const botIpHashes = new Set([
     '67466ede7758367fd7c3dff08809e102d4585141', // 2026-03-03 for 2026-03-02 132203 tencent    Chrome
     '825e27478bee9e9cc20f1d3db9f4fece84c3aa4a', // 2026-03-03 for 2026-03-02 7922   comcast    Overcast
     '88549448dd62b5de743d91770657ae64d7f12eaf', // 2026-03-03 for 2026-03-02 701    verizon    Overcast
+    '56193b2e3b494600fa20e69ec9fd9bd3697beab4', // 2026-03-04 for 2026-03-03 20115  charter    Overcast
+    '62d00692395595850bdad5b71230ce86d97fe095', // 2026-03-04 for 2026-03-03 14593  starlink   Rhythmbox
+    '8af9b25b4b8685bc9458d2de3f89a938f2d5a3f2', // 2026-03-04 for 2026-03-03 701    verizon    Overcast
 ]);
