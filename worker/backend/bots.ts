@@ -649,4 +649,8 @@ const botIpHashes = new Set([
     '56193b2e3b494600fa20e69ec9fd9bd3697beab4', // 2026-03-04 for 2026-03-03 20115  charter    Overcast
     '62d00692395595850bdad5b71230ce86d97fe095', // 2026-03-04 for 2026-03-03 14593  starlink   Rhythmbox
     '8af9b25b4b8685bc9458d2de3f89a938f2d5a3f2', // 2026-03-04 for 2026-03-03 701    verizon    Overcast
+    '0acc1cd1c1e3621ef42edb55ced8c6c4ce764366', // 2026-03-05 for 2026-03-04 209    centurylink Overcast
+    '221545f42c91c6e93512fb18d038377a6f5d07e9', // 2026-03-05 for 2026-03-04 1759   telia      Overcast
+    'b4d80e057a312df5cff38347598e5c4daab1f398', // 2026-03-05 for 2026-03-04 19108  optimum    Overcast
+    'b74ce0fe5fd3bcf77fcf8bfacd469cbc11e1aa5d', // 2026-03-05 for 2026-03-04 396982 google     Chrome, AppleCoreMedia
 ]);
