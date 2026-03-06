@@ -653,4 +653,11 @@ const botIpHashes = new Set([
     '221545f42c91c6e93512fb18d038377a6f5d07e9', // 2026-03-05 for 2026-03-04 1759   telia      Overcast
     'b4d80e057a312df5cff38347598e5c4daab1f398', // 2026-03-05 for 2026-03-04 19108  optimum    Overcast
     'b74ce0fe5fd3bcf77fcf8bfacd469cbc11e1aa5d', // 2026-03-05 for 2026-03-04 396982 google     Chrome, AppleCoreMedia
+    '0327eb1e27cc5cced2ed60cfaf7b66df90b1ac4f', // 2026-03-06 for 2026-03-05 7922   comcast    Overcast
+    '0d7c742d7fc71b7b9b934fc372bfc769b1d35743', // 2026-03-06 for 2026-03-05 7922   comcast    Overcast
+    '4445eebce25cadc60f4b5d70b1838881b80a1ee4', // 2026-03-06 for 2026-03-05 701    verizon    Overcast
+    '4ce53043c88c879ea145b8b50379982be3826657', // 2026-03-06 for 2026-03-05 701    verizon    Overcast
+    '83202703e223d40c0f0c34dcc42828ae7615f7f0', // 2026-03-06 for 2026-03-05 701    verizon    Overcast
+    'd41d0672645b28cd1318894693b7e4e16b17c7c3', // 2026-03-06 for 2026-03-05 701    verizon    Overcast
+    '785919185299559fabb6a2845232bbf79a415858', // 2026-03-06 for 2026-03-05 16509  amazon     Chrome
 ]);
