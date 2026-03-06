@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@a12e5f2c3f4e0cae6debbb89d16055a993b22073 (2026-02-21T15:38:35Z)
+// from user-agents-v2@914c02e7249dfadea941f000335a98379b1f43e9 (2026-03-06T13:04:56Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -169,6 +169,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PodchaserParser\//.test(userAgent)) return { name: `Podchaser Parser`, type: 'bot' };
     if (/^PodcastBulkDownloader\//.test(userAgent)) return { name: `PodcastBulkDownloader`, type: 'bot' };
     if (/ PodcastDownloader\//.test(userAgent)) return { name: `PodcastDownloader`, type: 'bot' };
+    if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
     if (/^Podcst\//.test(userAgent)) return { name: `Podcst`, type: 'bot' };
@@ -391,6 +392,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Cinemo\/\d| Cinemo\/\d/.test(userAgent)) return { name: `Cinemo Infotainment System`, type: 'app' };
     if (/^Clammr\//.test(userAgent)) return { name: `Clammr`, type: 'app' };
     if (/^Claro Musica iOS\/\d/.test(userAgent)) return { name: `Claro música radio`, type: 'app' };
+    if (/^cliamp\//.test(userAgent)) return { name: `Cliamp`, type: 'app' };
     if (/^Client\//.test(userAgent)) return { name: `Client`, type: 'app' };
     if (/^Clementine /.test(userAgent)) return { name: `Clementine Music Player`, type: 'app' };
     if (/^Club\//.test(userAgent)) return { name: `Club`, type: 'app' };

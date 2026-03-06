@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@a12e5f2c3f4e0cae6debbb89d16055a993b22073 (2026-02-21T15:38:35Z)
+// from user-agents-v2@914c02e7249dfadea941f000335a98379b1f43e9 (2026-03-06T13:04:56Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -212,6 +212,7 @@ const botTests = {
     'PodchaserParser/2.0 (https://podchaser.com)': { type: 'bot', name: `Podchaser Parser` },
     'PodcastBulkDownloader/0.10.1': { type: 'bot', name: `PodcastBulkDownloader` },
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
+    'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'Podcst/1.0': { type: 'bot', name: `Podcst` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
@@ -521,6 +522,7 @@ const appTests = {
     'gcc_linux_wayland_aarch64_pcc_mib3_eu/1.0 Cinemo/1.252.7.100516': { type: 'app', name: `Cinemo Infotainment System` },
     'Clammr/5 CFNetwork/758.3.15 Darwin/15.4.0': { type: 'app', name: `Clammr` },
     'Claro Musica iOS/13.2.18-13.2.18 CFNetwork/1.0 Darwin/24.1.0': { type: 'app', name: `Claro música radio` },
+    'cliamp/1.0 (https://github.com/bjarneo/cliamp)': { type: 'app', name: `Cliamp` },
     'Client/16042 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Client` },
     'Club/126 CFNetwork/672.1.15 Darwin/14.0.0': { type: 'app', name: `Club` },
     'Commotion/3.0.79 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `Commotion` },
