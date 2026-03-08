@@ -664,4 +664,7 @@ const botIpHashes = new Set([
     '6faf64a585b2699f71689d2c01767dd13d6ed912', // 2026-03-07 for 2026-03-06 976    corenet    Xiao Yu Zhou
     '8e09056e2fb88da78ec840206bbd9fda07245da7', // 2026-03-07 for 2026-03-06 719    elisaoyj   Overcast
     'ce62a92463fe01f3d4485822a668feee47f326d2', // 2026-03-07 for 2026-03-06 7922   comcast    Overcast
+    '3634431f45c315ff7c4669d4dd7944c01412c6a9', // 2026-03-08 for 2026-03-07 7018   att        castget
+    '3de9cc37f1a33f9fe700e44196d8d195c5635e72', // 2026-03-08 for 2026-03-07 2527   sony       Chrome
+    'c9a3edfb53500faa2e303d51254c40c513b5375c', // 2026-03-08 for 2026-03-07 701    verizon    Overcast
 ]);
