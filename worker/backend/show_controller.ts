@@ -1228,6 +1228,7 @@ async function setShowUuid(feedUrlOrRecord: string | FeedRecord, showUuid: strin
         if (/^[a-z]{4}-0x[0-9a-fA-F]{40}$/.test(podcastGuid ?? '')
             || podcastGuid?.startsWith('https://hubhopper.com/podcast/')
             || podcastGuid === 'de.musicalschule-ahrensburg.podcast.msa'
+            || podcastGuid?.startsWith('rss-feed-daily-rosary-guid-')
         ) {
             // ignore these found invalid guid styles
             podcastGuid = undefined;
