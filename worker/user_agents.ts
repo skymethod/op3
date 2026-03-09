@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@914c02e7249dfadea941f000335a98379b1f43e9 (2026-03-06T13:04:56Z)
+// from user-agents-v2@c600b0bcf86558b504d3315564cce31858c662f7 (2026-03-09T12:07:20Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -202,6 +202,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/python-requests/.test(userAgent)) return { name: `python-requests`, type: 'bot' };
     if (/qiniu.*spider/.test(userAgent)) return { name: `Qiniu spider`, type: 'bot' };
     if (/^Radioline Stream Monitoring/.test(userAgent)) return { name: `Radioline Stream Monitoring`, type: 'bot' };
+    if (/^RadyoImporter\//.test(userAgent)) return { name: `RadyoImporter`, type: 'bot' };
     if (/RedCircle/.test(userAgent)) return { name: `RedCircle`, type: 'bot' };
     if (/^Rephonic\/\d/.test(userAgent)) return { name: `Rephonic`, type: 'bot' };
     if (/^req\/\d/.test(userAgent)) return { name: `Req`, type: 'bot' };

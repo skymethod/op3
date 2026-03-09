@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@914c02e7249dfadea941f000335a98379b1f43e9 (2026-03-06T13:04:56Z)
+// from user-agents-v2@c600b0bcf86558b504d3315564cce31858c662f7 (2026-03-09T12:07:20Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -246,6 +246,7 @@ const botTests = {
     'pyannoteAI/2025.19.1-021f79d.production': { type: 'bot', name: `Pyannote` },
     'z0-qiniu-imgstg-spider-1.0': { type: 'bot', name: `Qiniu spider` },
     'Radioline Stream Monitoring (tech@radioline.co)': { type: 'bot', name: `Radioline Stream Monitoring` },
+    'RadyoImporter/3.0': { type: 'bot', name: `RadyoImporter` },
     'RedCircle': { type: 'bot', name: `RedCircle` },
     'Rephonic/1.0': { type: 'bot', name: `Rephonic` },
     'req/0.5.10': { type: 'bot', name: `Req` },
