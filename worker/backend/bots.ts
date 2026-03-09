@@ -667,4 +667,7 @@ const botIpHashes = new Set([
     '3634431f45c315ff7c4669d4dd7944c01412c6a9', // 2026-03-08 for 2026-03-07 7018   att        castget
     '3de9cc37f1a33f9fe700e44196d8d195c5635e72', // 2026-03-08 for 2026-03-07 2527   sony       Chrome
     'c9a3edfb53500faa2e303d51254c40c513b5375c', // 2026-03-08 for 2026-03-07 701    verizon    Overcast
+    '07b8a713e79805f6b145fc0801a2e2c861f5b63d', // 2026-03-09 for 2026-03-08 701    verizon    Overcast
+    '1c446ed3a86f28abce89e01db1840de5ddfc9691', // 2026-03-09 for 2026-03-08 24940  hetzner    RadyoImporter/3.0
+    '2e1fd87e959655e17ff013b033fa951f1c4c69b1', // 2026-03-09 for 2026-03-08 24940  hetzner    RadyoImporter/3.0
 ]);
