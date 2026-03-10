@@ -670,4 +670,14 @@ const botIpHashes = new Set([
     '07b8a713e79805f6b145fc0801a2e2c861f5b63d', // 2026-03-09 for 2026-03-08 701    verizon    Overcast
     '1c446ed3a86f28abce89e01db1840de5ddfc9691', // 2026-03-09 for 2026-03-08 24940  hetzner    RadyoImporter/3.0
     '2e1fd87e959655e17ff013b033fa951f1c4c69b1', // 2026-03-09 for 2026-03-08 24940  hetzner    RadyoImporter/3.0
+    '0baa04ccd7a97172215c585f3c33b352992f2f58', // 2026-03-10 for 2026-03-09 62240  cloudiver  Overcast
+    '4f06622dc7eb16ee154e5c8da6a7deb5852dbce7', // 2026-03-10 for 2026-03-09 701    verizon    Overcast
+    '544aac8488ca3abfeed78da03db72e034ec08296', // 2026-03-10 for 2026-03-09 207790 swn        Chrome
+    '6069e7120fa29c9ba9cd0d03c7fe6c0e96b947eb', // 2026-03-10 for 2026-03-09 6848   telenet    Dalvik, AndroidDownloadManager
+    '7514f3bfdf0e6092beed2a8755be334c45cd4955', // 2026-03-10 for 2026-03-09 6848   telenet    Dalvik
+    '85ea9889505023b3c304cb9aad2df77a7b5a3c96', // 2026-03-10 for 2026-03-09 8374   polkomtel  Chrome, Fountain
+    'c177e9ed7dc15f47cf2e92daa4666a22ea6bb5f6', // 2026-03-10 for 2026-03-09 7922   comcast    Overcast
+    'e06800fc97b35e9ab2cc94e568cb9015accaf2a8', // 2026-03-10 for 2026-03-09 3255   eksintech  Chrome
+    '93b89966b482e0bc9e7510e518384d2e411d2d42', // 2026-03-10 for 2026-03-09 215305 mastersoft Chrome
+    'd930a9011fe07277e9001f1ce896e8daa15ea75b', // 2026-03-10 for 2026-03-09 215305 mastersoft Chrome
 ]);
