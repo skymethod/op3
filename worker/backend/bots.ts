@@ -680,4 +680,7 @@ const botIpHashes = new Set([
     'e06800fc97b35e9ab2cc94e568cb9015accaf2a8', // 2026-03-10 for 2026-03-09 3255   eksintech  Chrome
     '93b89966b482e0bc9e7510e518384d2e411d2d42', // 2026-03-10 for 2026-03-09 215305 mastersoft Chrome
     'd930a9011fe07277e9001f1ce896e8daa15ea75b', // 2026-03-10 for 2026-03-09 215305 mastersoft Chrome
+    '218f79c3df91b5ff2122ded231cfa2e94bd76e12', // 2026-03-11 for 2026-03-10 10796  charter    Overcast
+    '675c303130cb7c5464b8d2245e60f5299333697f', // 2026-03-11 for 2026-03-10 36180  ciscoiot   Overcast
+    'd9c90443166350ea8b91a78fff6908cf92cd7220', // 2026-03-11 for 2026-03-10 701    verizon    Overcast
 ]);
