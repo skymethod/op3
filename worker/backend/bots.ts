@@ -683,4 +683,5 @@ const botIpHashes = new Set([
     '218f79c3df91b5ff2122ded231cfa2e94bd76e12', // 2026-03-11 for 2026-03-10 10796  charter    Overcast
     '675c303130cb7c5464b8d2245e60f5299333697f', // 2026-03-11 for 2026-03-10 36180  ciscoiot   Overcast
     'd9c90443166350ea8b91a78fff6908cf92cd7220', // 2026-03-11 for 2026-03-10 701    verizon    Overcast
+    '698a51414e2abab5ab0fb1bac2674bef1220bbb3', // 2026-03-12 for 2026-03-11 701    verizon    Overcast
 ]);
