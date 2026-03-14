@@ -92,8 +92,16 @@ export class HitsController {
         }
 
         // save changed minutefiles, sequentially for now...
-        for (const minuteTimestamp of minuteTimestampsChanged) {
-            await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
+        // for (const minuteTimestamp of minuteTimestampsChanged) {
+        //     await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
+        // }
+        
+        // save changed minutefiles, in batches
+        for (const minuteTimestamps of chunk([...minuteTimestampsChanged], 4)) {
+            const results = await timed(times, 'saveMinuteFile', () => Promise.allSettled(minuteTimestamps.map(minuteTimestamp => this.saveMinuteFile(minuteTimestamp, attNums))));
+            for (const result of results) {
+                if (result.status === 'rejected') throw new Error(`saveMinuteFile batch item failed: ${result.reason}`);
+            }
         }
 
         // save index records
