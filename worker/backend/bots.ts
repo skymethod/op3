@@ -35,6 +35,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && date >= '2026-01-18' // google
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
         || asn === '396982' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-02' // google
+        || asn === '132203' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-13' // tencent
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || agentType === 'browser' && (
@@ -686,4 +687,10 @@ const botIpHashes = new Set([
     '698a51414e2abab5ab0fb1bac2674bef1220bbb3', // 2026-03-12 for 2026-03-11 701    verizon    Overcast
     '0065588e581f6ab3375795eb605e5befbe3e03d8', // 2026-03-13 for 2026-03-12 701    verizon    Overcast
     '5f48fbad0a9cc508a423d571f2e4cb15b2f18329', // 2026-03-13 for 2026-03-12 701    verizon    Overcast
+    '79e2d2316ef806b3848583ba143edda4c0a250a3', // 2026-03-14 for 2026-03-13 3352   telefonica Overcast
+    'b04bb20aa4194027d5041a8fca931ef750293e91', // 2026-03-14 for 2026-03-13 3352   telefonica Overcast
+    '83d08bd65d8150f91a42cd55a015d503dbe9d352', // 2026-03-14 for 2026-03-13 132203 tencent    Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    'a556d85d33979e1b4c32b272c80e426e273aa583', // 2026-03-14 for 2026-03-13 40021  contabo    8903a96d6c264c75b7345bba924574c6 (and others)
+    'fa81eac09264967992d06d9ce7ac75bdd3748cbf', // 2026-03-14 for 2026-03-13 40021  contabo    3dbf0115270c4b1cb0b67fe51b6deb75 (and others)
+    'b073c4a7dad69459648c3785cd4ae344901f097c', // 2026-03-14 for 2026-03-13 16509  amazon     Chrome, Edge
 ]);
