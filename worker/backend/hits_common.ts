@@ -236,6 +236,10 @@ export function computeIndexWindowStartInstant(now = Date.now()): string {
     return maxString(`${startDate}T00:00:00.000Z`, minIndexInstant);
 }
 
+export function computeMinuteTimestamp(timestamp: string): string {
+    return `${timestamp.substring(0, 10)}00000`;
+}
+
 //
 
 const hitsEpochMinute = `2024-03-13T00:00:00.000Z`;
@@ -245,7 +249,3 @@ const maxBackupHour = `2024-04-14T23:00:00.000Z`; // up to the official switchov
 const minIndexInstant = '2024-04-15T00:00:00.000Z'; // data started during the day 4/13, but 4/15 is the official switchover date
 
 const maxMinutefileReadsPerRequest = 100;
-
-function computeMinuteTimestamp(timestamp: string): string {
-    return `${timestamp.substring(0, 10)}00000`;
-}

@@ -6,7 +6,7 @@ import { executeWithRetries } from '../sleep.ts';
 import { consoleError, consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
-import { computeMinuteFileKey, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
+import { computeMinuteFileKey, computeMinuteTimestamp, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
 import { computeIndexRecords, queryHitsIndexFromStorage, trimIndexRecords } from './hits_indexes.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
@@ -62,6 +62,22 @@ export class HitsController {
         const indexRecords: Record<string, string> = {};
         const serverUrlFoundTimestamps: Record<string /* serverUrl */ , string /* found timestamp */> = {};
         const hlsRecords: Record<string, string> = {}; // uuid -> record
+        // begin optimization: ensureMinuteFileLoaded can be expensive when there is a wide timestamp range, try to parallelize
+        const minuteTimestampsToLoad = new Set<string>();
+        for (const { rawRedirects } of Object.values(rawRedirectsByMessageId)) {
+            for (const { time, other } of rawRedirects) {
+                if (typeof other?.subrequest === 'string') continue;
+                if (typeof time === 'number') {
+                    const timestamp = computeTimestamp(time);
+                    const minuteTimestamp = computeMinuteTimestamp(timestamp);
+                    minuteTimestampsToLoad.add(minuteTimestamp);
+                }
+            }
+        }
+        for (const minuteTimestamps of chunk([...minuteTimestampsToLoad], 4)) {
+            await timed(times, 'ensureMinuteFileLoaded', () => Promise.allSettled(minuteTimestamps.map(minuteTimestamp => this.ensureMinuteFileLoaded(minuteTimestamp, attNums))));
+        }
+        // end optimzation
         for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
             for (const rawRedirect of rawRedirects) {
                 const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));
@@ -95,7 +111,7 @@ export class HitsController {
         // for (const minuteTimestamp of minuteTimestampsChanged) {
         //     await timed(times, 'saveMinuteFile', () => this.saveMinuteFile(minuteTimestamp, attNums));
         // }
-        
+
         // save changed minutefiles, in batches
         for (const minuteTimestamps of chunk([...minuteTimestampsChanged], 4)) {
             const results = await timed(times, 'saveMinuteFile', () => Promise.allSettled(minuteTimestamps.map(minuteTimestamp => this.saveMinuteFile(minuteTimestamp, attNums))));
