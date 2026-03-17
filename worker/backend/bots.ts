@@ -44,6 +44,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '395954' // leaseweb
             || asn === '27411'  // leaseweb
             || asn === '393886' // leaseweb
+            || asn === '60781'  // leaseweb
             || asn === '150436' // byteplus
             || asn === '201341' // centurian
             || asn === '203020' // hostroyale
@@ -57,6 +58,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '64249'  // endoffice
             || asn === '9009'   // m247
             || asn === '42366'  // terratransit
+            || asn === '132203' // tencent
         )
         ;
 }
@@ -698,4 +700,8 @@ const botIpHashes = new Set([
     '6179d9ecc95b1092bdbee515cc93f87c81fb6780', // 2026-03-15 for 2026-03-14 4213   krypt      Chrome
     '16f2079a5101baf5e05eb2f186c67d4f9e4cbaf3', // 2026-03-16 for 2026-03-15 701    verizon    Overcast
     '7b8b81d8038b14bee9c02ab6dc48edd2e637e0f2', // 2026-03-16 for 2026-03-15 701    verizon    Overcast
+    '7b38b364179f17bb72777ceb2fbdbfde9d495f5f', // 2026-03-17 for 2026-03-16 3255   eksintech  Chrome
+    '85121f55fec43499e272d2ddaebb55731c8b5620', // 2026-03-17 for 2026-03-16 701    verizon    Overcast
+    'e03475f795a51bce521ccb6d368083ebb8db78af', // 2026-03-17 for 2026-03-16 57269  digispain  Overcast
+    'e27072494794ed51a76aaaad77630360d1003cb5', // 2026-03-17 for 2026-03-16 199218 proton     Overcast
 ]);
