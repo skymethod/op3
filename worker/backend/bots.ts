@@ -704,4 +704,10 @@ const botIpHashes = new Set([
     '85121f55fec43499e272d2ddaebb55731c8b5620', // 2026-03-17 for 2026-03-16 701    verizon    Overcast
     'e03475f795a51bce521ccb6d368083ebb8db78af', // 2026-03-17 for 2026-03-16 57269  digispain  Overcast
     'e27072494794ed51a76aaaad77630360d1003cb5', // 2026-03-17 for 2026-03-16 199218 proton     Overcast
+    '4eb2d04e89f51061c66d955a9477103d86c463ff', // 2026-03-18 for 2026-03-17 205775 neoncore   Chrome
+    '5f66412a7d2b1a7fbaab34a18b9cce92ff37a308', // 2026-03-18 for 2026-03-17 701    verizon    Overcast
+    '97ba4a08e3961118ce4ed7a764477e8b0d3d0da7', // 2026-03-18 for 2026-03-17 701    verizon    Overcast
+    'e79abc372bc3b82a2eb5f9b61aa5bea34c791466', // 2026-03-18 for 2026-03-17 20001  charter    Overcast
+    'ecb6dc8e51defc18bc9507ae09aba86ba8a3be80', // 2026-03-18 for 2026-03-17 19108  optimum    Overcast
+    'f336e5e4674ee5a9533aa53ef24ab7b1d6e241dc', // 2026-03-18 for 2026-03-17 701    verizon    Overcast
 ]);
