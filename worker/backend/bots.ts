@@ -59,6 +59,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '9009'   // m247
             || asn === '42366'  // terratransit
             || asn === '132203' // tencent
+            || asn === '4213'   // krypt
         )
         ;
 }
@@ -710,4 +711,8 @@ const botIpHashes = new Set([
     'e79abc372bc3b82a2eb5f9b61aa5bea34c791466', // 2026-03-18 for 2026-03-17 20001  charter    Overcast
     'ecb6dc8e51defc18bc9507ae09aba86ba8a3be80', // 2026-03-18 for 2026-03-17 19108  optimum    Overcast
     'f336e5e4674ee5a9533aa53ef24ab7b1d6e241dc', // 2026-03-18 for 2026-03-17 701    verizon    Overcast
+    '4c727f3c471ccdbd3e12cfacef5b294ff6e42d75', // 2026-03-19 for 2026-03-18 62240  clouvider  Overcast
+    '5d5fd4acfbf4cc20f13da82289a55d773ed4463c', // 2026-03-19 for 2026-03-18 701    verizon    Overcast
+    '83ce6a7b42448f27abc96db8b8019ffc5397cc1b', // 2026-03-19 for 2026-03-18 4213   krypt      Chrome
+    'f4734120290a3c852ef27294624bebf95053e64e', // 2026-03-19 for 2026-03-18 3352   telefonica Overcast
 ]);
