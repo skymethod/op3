@@ -733,4 +733,12 @@ const botIpHashes = new Set([
     'ff284692b8c51141742c7289336b111480ca9e04', // 2026-03-25 for 2026-03-24 2856   bt         Overcast
     '232810f401057ef5e5ab063b4e1ea0d504c7cde1', // 2026-03-26 for 2026-03-25 12479  orange     Overcast
     '6571c178b79ca1a1fff3fb5dbbda3e6d91d3ef28', // 2026-03-26 for 2026-03-25 20115  charter    Overcast
+    '03e995dd0e86591487f77ab1c7c97b9753761613', // 2026-03-27 for 2026-03-26 6848   telenet    Overcast
+    '17af82f46cc7f2295f52fd3c7991b2774aff8978', // 2026-03-27 for 2026-03-26 20115  charter    Overcast
+    '3c052961ba0270159d944e301fc88727fe379468', // 2026-03-27 for 2026-03-26 701    verizon    Overcast
+    '3c052961ba0270159d944e301fc88727fe379468', // 2026-03-27 for 2026-03-26 701    verizon    Overcast
+    '3c910e90acc250f9c6dafea3727154dbd46285f9', // 2026-03-27 for 2026-03-26 7922   comcast    Mozilla/5.0 (compatible; public-episode-downloader/1.0)
+    '6a85c65b225ee3eff8cf973eeaa2bfa80be73f4f', // 2026-03-27 for 2026-03-26 20115  charter    Overcast
+    '90637c7b53a9239c9916fb521bc81c5bc028fc44', // 2026-03-27 for 2026-03-26 3352   telefonica Overcast
+    'b2fd587c24131018d42f5c70a4ef3e651dce7398', // 2026-03-27 for 2026-03-26 16509  amazon     Chrome
 ]);
