@@ -741,4 +741,18 @@ const botIpHashes = new Set([
     '6a85c65b225ee3eff8cf973eeaa2bfa80be73f4f', // 2026-03-27 for 2026-03-26 20115  charter    Overcast
     '90637c7b53a9239c9916fb521bc81c5bc028fc44', // 2026-03-27 for 2026-03-26 3352   telefonica Overcast
     'b2fd587c24131018d42f5c70a4ef3e651dce7398', // 2026-03-27 for 2026-03-26 16509  amazon     Chrome
+    '14ce2d2a498fe72eebe67ae055567143087deb9b', // 2026-03-28 for 2026-03-27 396356 latitude   PodcastWorker/1.0
+    '241835feb600ded5be6b8f5d7264a2fbc63e456c', // 2026-03-28 for 2026-03-27 396356 latitude   PodcastWorker/1.0
+    '84b37d4c9a3628e266151cd4ad9075d87a550e6d', // 2026-03-28 for 2026-03-27 396356 latitude   PodcastWorker/1.0
+    'a730aed423735d6905bf7807a9a8399850507a47', // 2026-03-28 for 2026-03-27 396356 latitude   PodcastWorker/1.0
+    'ea318d0eee508df4f38427faf468d4ff435b6ef2', // 2026-03-28 for 2026-03-27 396356 latitude   PodcastWorker/1.0
+    'ae7d9a85b536d70b12c69004fb4f3d21d63dda8d', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'c945ae590f72d33c80d8c4b51b7c4062e1a8b542', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'cdcac4ec878bb69ff002f6bf0fbbc2d47949fabd', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'cf5c15df9fc14732585d051f9229dfae5f1928d6', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'e5aeb9fb6b42fdbb6d15d11caaf814c5c18bdc4a', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'f4730f1eefdeaba38d46a0a1b76c10bc957b22cd', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    'fab1aea2f3e6d44d1d6f834493ff8eb7967edbf7', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
+    '184ce37e674955f212b0e3c66e66fe43d8962b8e', // 2026-03-28 for 2026-03-27 701    verizon    Overcast
+    '812230c48601acea3a627bd129e483207db1bf7f', // 2026-03-28 for 2026-03-27 20115  charter    Overcast
 ]);
