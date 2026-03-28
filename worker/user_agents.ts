@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@1c30d1aafbb8b12946b0a6b1f870666e509888a5 (2026-03-27T18:04:43Z)
+// from user-agents-v2@00023a7055f1433c5c19557c8f81ea59d5368712 (2026-03-28T13:46:53Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -175,6 +175,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ PodcastDownloader\//.test(userAgent)) return { name: `PodcastDownloader`, type: 'bot' };
     if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
     if (/ PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
+    if (/^PodcastWorker\//.test(userAgent)) return { name: `PodcastWorker`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
     if (/^Podcst\//.test(userAgent)) return { name: `Podcst`, type: 'bot' };

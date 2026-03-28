@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@1c30d1aafbb8b12946b0a6b1f870666e509888a5 (2026-03-27T18:04:43Z)
+// from user-agents-v2@00023a7055f1433c5c19557c8f81ea59d5368712 (2026-03-28T13:46:53Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -219,6 +219,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
     'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'Mozilla/5.0 (compatible; PodcastTranscriber/1.0)': { type: 'bot', name: `PodcastTranscriber` },
+    'PodcastWorker/1.0': { type: 'bot', name: `PodcastWorker` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'Podcst/1.0': { type: 'bot', name: `Podcst` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
