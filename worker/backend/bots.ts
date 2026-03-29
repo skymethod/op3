@@ -755,4 +755,8 @@ const botIpHashes = new Set([
     'fab1aea2f3e6d44d1d6f834493ff8eb7967edbf7', // 2026-03-28 for 2026-03-27 30081  cachefly   PodcastWorker/1.0
     '184ce37e674955f212b0e3c66e66fe43d8962b8e', // 2026-03-28 for 2026-03-27 701    verizon    Overcast
     '812230c48601acea3a627bd129e483207db1bf7f', // 2026-03-28 for 2026-03-27 20115  charter    Overcast
+    '3b642821e101981b3c5176d06c8c60aa945786e9', // 2026-03-29 for 2026-03-28 8551   bezeq      (various browsers, no show urls)
+    '92ac097e8b727b055309a1e417a8cafb588d605d', // 2026-03-29 for 2026-03-28 701    verizon    Overcast
+    'a61c508b423120f16b456a1819c923c831882527', // 2026-03-29 for 2026-03-28 1257   tele2      Chrome
+    'b1031f65e5daeea1ccc6b0ad3f16309b770fa212', // 2026-03-29 for 2026-03-28 3352   telefonica Overcast, Pocket Casts
 ]);
