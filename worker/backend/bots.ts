@@ -759,4 +759,8 @@ const botIpHashes = new Set([
     '92ac097e8b727b055309a1e417a8cafb588d605d', // 2026-03-29 for 2026-03-28 701    verizon    Overcast
     'a61c508b423120f16b456a1819c923c831882527', // 2026-03-29 for 2026-03-28 1257   tele2      Chrome
     'b1031f65e5daeea1ccc6b0ad3f16309b770fa212', // 2026-03-29 for 2026-03-28 3352   telefonica Overcast, Pocket Casts
+    '3421003e81e5a423717336ad964eedc0a3a19474', // 2026-03-31 for 2026-03-30 3352   telefonica Overcast
+    '6a13d7f449ff8f2f617b6a16f76febf22d67207d', // 2026-03-31 for 2026-03-30 48090  techoff    Firefox
+    '93201072109a110a3e4c6902f0389b4cfe747c6e', // 2026-03-31 for 2026-03-30 151390 rutilea    Chrome
+    'dad6e7bb1e020ec3c15981c5a1a145685efbf85f', // 2026-03-31 for 2026-03-30 62240  cloudvider Overcast
 ]);
