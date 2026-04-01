@@ -763,4 +763,9 @@ const botIpHashes = new Set([
     '6a13d7f449ff8f2f617b6a16f76febf22d67207d', // 2026-03-31 for 2026-03-30 48090  techoff    Firefox
     '93201072109a110a3e4c6902f0389b4cfe747c6e', // 2026-03-31 for 2026-03-30 151390 rutilea    Chrome
     'dad6e7bb1e020ec3c15981c5a1a145685efbf85f', // 2026-03-31 for 2026-03-30 62240  cloudvider Overcast
+    '190859493c26ca896f4774c62614392f6c16077b', // 2026-04-01 for 2026-03-31 31898  oracle     Chrome
+    '41bc1c6947a7fb01b012f82beb4aa3614d29cab8', // 2026-04-01 for 2026-03-31 62240  cloudvider Overcast
+    '969d522a4ac9cb14b85c3da5940207c9fb4a11d7', // 2026-04-01 for 2026-03-31 701    verizon    Overcast
+    'a3c68fa25b7d1a7e73d0ca8aa3ff6d077065bc31', // 2026-04-01 for 2026-03-31 12479  orange     Chrome
+    'cab33e005209bf16570a00cc7c26ad56763a8d6a', // 2026-04-01 for 2026-03-31 401243 komi       Chrome
 ]);
