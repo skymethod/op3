@@ -768,4 +768,16 @@ const botIpHashes = new Set([
     '969d522a4ac9cb14b85c3da5940207c9fb4a11d7', // 2026-04-01 for 2026-03-31 701    verizon    Overcast
     'a3c68fa25b7d1a7e73d0ca8aa3ff6d077065bc31', // 2026-04-01 for 2026-03-31 12479  orange     Chrome
     'cab33e005209bf16570a00cc7c26ad56763a8d6a', // 2026-04-01 for 2026-03-31 401243 komi       Chrome
+    '0876fbeb039bc21e1d3fc1e7fb96446d93737da5', // 2026-04-02 for 2026-04-01 3352   telefonica Overcast
+    '2ee7d3f1a03bdced985652fea59df5e04d79a12d', // 2026-04-02 for 2026-04-01 701    verizon    Overcast
+    '56c7888ac2ae7718f2bb11330ca20a5ebcd3c710', // 2026-04-02 for 2026-04-01 60068  datacamp   Firefox
+    '5fd3980cf2406ee4ff2fb223580eea951a331114', // 2026-04-02 for 2026-04-01 395965 carrytel   Chrome
+    '7526a81b9398c223fe3e0ce62b9d563dda245acd', // 2026-04-02 for 2026-04-01 12302  vodafone   Go Http Client, Chrome
+    '76bb3c97d024d5ba03aa030b86caf3a9b64918fc', // 2026-04-02 for 2026-04-01 11664  techtel    Chrome
+    'ab325d2f56d6a77b8e38447f2c6a316e99cc6084', // 2026-04-02 for 2026-04-01 396356 latitude   Firefox
+    'c207bf1e5bbff3ebb85757d67781339737695c58', // 2026-04-02 for 2026-04-01 19151  bbone      Overcast
+    'd4f2fd44bdd5bfeb707f8559075d746ab6f58294', // 2026-04-02 for 2026-04-01 30081  cachefly   Firefox
+    'd5365bce8d989dc9ef6af91a9d150cb74ac0f269', // 2026-04-02 for 2026-04-01 30081  cachefly   Firefox
+    'ed913e623e2cdaa9658aa5b5bc2344255537127a', // 2026-04-02 for 2026-04-01 5650   frontier   Overcast
+    'f1cde804f5a7d50acd50976f40eec657fb1309e7', // 2026-04-02 for 2026-04-01 30081  cachefly   Firefox
 ]);
