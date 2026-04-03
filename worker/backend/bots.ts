@@ -780,4 +780,12 @@ const botIpHashes = new Set([
     'd5365bce8d989dc9ef6af91a9d150cb74ac0f269', // 2026-04-02 for 2026-04-01 30081  cachefly   Firefox
     'ed913e623e2cdaa9658aa5b5bc2344255537127a', // 2026-04-02 for 2026-04-01 5650   frontier   Overcast
     'f1cde804f5a7d50acd50976f40eec657fb1309e7', // 2026-04-02 for 2026-04-01 30081  cachefly   Firefox
+    '0c2bbf8c4486bd62b8c3aea62f77edbe29c771c7', // 2026-04-03 for 2026-04-02 136787 packethub  Apple Podcasts, IPTVSmarters Pro, Winamp
+    '3713c83d1d33586465f6bc383f0cc06991eee84b', // 2026-04-03 for 2026-04-02 701    verizon    Overcast
+    '487474e2b4c89e530b9f6d05c6dff6dbfe16f18e', // 2026-04-03 for 2026-04-02 396356 latitude   Firefox
+    'aa6e37c2697c4464bf45ad419de42cfc217f6a7c', // 2026-04-03 for 2026-04-02 396356 latitude   Firefox
+    'ab5d6a150c557cb7ef8f7a6d0d632e0fc122d63f', // 2026-04-03 for 2026-04-02 20115  charter    Overcast
+    'b785894138545ba66189bfbeb3fb261b79a5cdd0', // 2026-04-03 for 2026-04-02 701    verizon    Overcast
+    'c6f8da392d56cc7ec1f4441cf72816a3191e6119', // 2026-04-03 for 2026-04-02 396356 latitude   Firefox
+    'e64726dffc87cc4360c84aa09b3204382428a802', // 2026-04-03 for 2026-04-02 3352   telefonica Overcast
 ]);
