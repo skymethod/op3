@@ -60,6 +60,10 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '42366'  // terratransit
             || asn === '132203' // tencent
             || asn === '4213'   // krypt
+            || asn === '14618' && regionCode === 'VA' // amazon
+            || asn === '45899'  // vnpt corp
+            || asn === '25820'  // it7 networks
+            || asn === '30081'  // cachefly
         )
         ;
 }
@@ -788,4 +792,10 @@ const botIpHashes = new Set([
     'b785894138545ba66189bfbeb3fb261b79a5cdd0', // 2026-04-03 for 2026-04-02 701    verizon    Overcast
     'c6f8da392d56cc7ec1f4441cf72816a3191e6119', // 2026-04-03 for 2026-04-02 396356 latitude   Firefox
     'e64726dffc87cc4360c84aa09b3204382428a802', // 2026-04-03 for 2026-04-02 3352   telefonica Overcast
+    '510755c01189f10524d08924e93198cc031a5ce8', // 2026-04-04 for 2026-04-03 20115  charter    Overcast
+    '74ffebdf1a24ad8f2d8f2f9b685341fe375f0286', // 2026-04-04 for 2026-04-03 20115  charter    Overcast
+    '830eff6f38f2d186bdaea12d0e82352f5c927016', // 2026-04-04 for 2026-04-03 20115  charter    Overcast
+    '7d58b7b3cdebf4ce2a88ff745f9e063221a184a1', // 2026-04-04 for 2026-04-03 701    verizon    Overcast
+    'afd7faf544f770febac5bdfa74747b371983c64a', // 2026-04-04 for 2026-04-03 6848   telenet    Overcast
+    'e03d1c7bac46b255225fdd1b2a3516c2a50661e3', // 2026-04-04 for 2026-04-03 1257   tele2      Chrome
 ]);
