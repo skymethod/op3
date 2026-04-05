@@ -798,4 +798,6 @@ const botIpHashes = new Set([
     '7d58b7b3cdebf4ce2a88ff745f9e063221a184a1', // 2026-04-04 for 2026-04-03 701    verizon    Overcast
     'afd7faf544f770febac5bdfa74747b371983c64a', // 2026-04-04 for 2026-04-03 6848   telenet    Overcast
     'e03d1c7bac46b255225fdd1b2a3516c2a50661e3', // 2026-04-04 for 2026-04-03 1257   tele2      Chrome
+    '48cf1fed197c6f07ae4cf8128df3952b879664e1', // 2026-04-05 for 2026-04-04 3255   eksintech  Chrome
+    'ee7ecb5b12ddeedb8f879b323ee95772e0872d49', // 2026-04-05 for 2026-04-04 701    verizon    Overcast
 ]);
