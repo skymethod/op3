@@ -801,4 +801,6 @@ const botIpHashes = new Set([
     '48cf1fed197c6f07ae4cf8128df3952b879664e1', // 2026-04-05 for 2026-04-04 3255   eksintech  Chrome
     'ee7ecb5b12ddeedb8f879b323ee95772e0872d49', // 2026-04-05 for 2026-04-04 701    verizon    Overcast
     'e1f47f1497713268ef1087adfcf386ca6aac258b', // 2026-04-06 for 2026-04-05 701    verizon    Overcast
+    'a16d98f8aac7f602756cfc189ea8fb499284fa25', // 2026-04-07 for 2026-04-06 701    verizon    Overcast
+    'cc5c982dfe240e186ec7ff61b11a2c783c78c365', // 2026-04-07 for 2026-04-06 701    verizon    Overcast, Apple Podcasts, AppleCoreMedia
 ]);
