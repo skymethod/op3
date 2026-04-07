@@ -61,6 +61,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '132203' // tencent
             || asn === '4213'   // krypt
             || asn === '14618' && regionCode === 'VA' // amazon
+            || asn === '16509' && regionCode === 'OH' // amazon
             || asn === '45899'  // vnpt corp
             || asn === '25820'  // it7 networks
             || asn === '30081'  // cachefly
@@ -803,4 +804,5 @@ const botIpHashes = new Set([
     'e1f47f1497713268ef1087adfcf386ca6aac258b', // 2026-04-06 for 2026-04-05 701    verizon    Overcast
     'a16d98f8aac7f602756cfc189ea8fb499284fa25', // 2026-04-07 for 2026-04-06 701    verizon    Overcast
     'cc5c982dfe240e186ec7ff61b11a2c783c78c365', // 2026-04-07 for 2026-04-06 701    verizon    Overcast, Apple Podcasts, AppleCoreMedia
+    '2c502b7b00ce2b014ece4b7601d98643626704dc', // 2026-04-07 for 2026-04-06 17676  softbank   iOS WebView
 ]);
