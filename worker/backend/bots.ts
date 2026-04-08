@@ -805,4 +805,9 @@ const botIpHashes = new Set([
     'a16d98f8aac7f602756cfc189ea8fb499284fa25', // 2026-04-07 for 2026-04-06 701    verizon    Overcast
     'cc5c982dfe240e186ec7ff61b11a2c783c78c365', // 2026-04-07 for 2026-04-06 701    verizon    Overcast, Apple Podcasts, AppleCoreMedia
     '2c502b7b00ce2b014ece4b7601d98643626704dc', // 2026-04-07 for 2026-04-06 17676  softbank   iOS WebView
+    '50c3617a3fa4649a59af0b75405d48150d36906e', // 2026-04-08 for 2026-04-07 3352   telefonica Pocket Casts, AppleCoreMedia
+    '5f4a1a16fca87e0635e362998968ced4a997980d', // 2026-04-08 for 2026-04-07 7922   comcast    Overcast
+    'bdac79ba2cebf662d9dd84be54e220cd6e013846', // 2026-04-08 for 2026-04-07 701    verizon    Overcast
+    'c80245a8be0f585b991ef8dcad886276d06424a6', // 2026-04-08 for 2026-04-07 3352   telefonica Overcast
+    'f075f93b7b1071c25113f8d1814dd86535ef217e', // 2026-04-08 for 2026-04-07 701    verizon    Overcast
 ]);
