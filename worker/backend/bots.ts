@@ -65,6 +65,8 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '45899'  // vnpt corp
             || asn === '25820'  // it7 networks
             || asn === '30081'  // cachefly
+            || asn === '714'    // apple
+            || asn === '45102'  // alibaba
         )
         ;
 }
