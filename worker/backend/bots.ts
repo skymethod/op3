@@ -822,4 +822,9 @@ const botIpHashes = new Set([
     'dc1e3d69808270ed86f5cb3f1ca4c73dfc858000', // 2026-04-10 for 2026-04-09 51500  servisnet  Chrome
     '25ec8becab4c32ef5e37893c342a3b2a5aabd591', // 2026-04-11 for 2026-04-10 111    bu         Chrome
     '6b990992a03198e5e1011a06d5bbfb720550e5a6', // 2026-04-11 for 2026-04-10 40785  omniva     Podnews, iTunes
+    '95f68b72578b390f3e0179b704ed480ef4528060', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
+    'e671c815a70d56beeb4ea222c712d7b16f989d45', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
+    'f977084e45120e1f57b97de33895afa4e0fba2c4', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
+    'fc0283a40140c9a3e2b1ff39d18f265f0152e6a8', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
+    'c306a046404d34077c42b08060b5c53293e00354', // 2026-04-12 for 2026-04-11 3209   vodafone   Edge
 ]);
