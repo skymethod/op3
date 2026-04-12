@@ -820,4 +820,6 @@ const botIpHashes = new Set([
     'ba7258fe96e4ccb99053c9cc47091f29eaee92dd', // 2026-04-10 for 2026-04-09 7018   att        castget
     'c28bbaf32413581fab3bd709781d44221f589e16', // 2026-04-10 for 2026-04-09 48090  techoff    Firefox
     'dc1e3d69808270ed86f5cb3f1ca4c73dfc858000', // 2026-04-10 for 2026-04-09 51500  servisnet  Chrome
+    '25ec8becab4c32ef5e37893c342a3b2a5aabd591', // 2026-04-11 for 2026-04-10 111    bu         Chrome
+    '6b990992a03198e5e1011a06d5bbfb720550e5a6', // 2026-04-11 for 2026-04-10 40785  omniva     Podnews, iTunes
 ]);
