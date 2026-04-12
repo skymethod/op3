@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@5fc03639cfe6460aa4e43a53fd60532f69be610b (2026-04-10T14:21:28Z)
+// from user-agents-v2@60838d663692fba95778badc85b5594581c56147 (2026-04-12T13:54:01Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -108,6 +108,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/AdsBot-Google|Google-AdWords-Express/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
     if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
+    if (/^gpt-in-mind-podcasts/.test(userAgent)) return { name: `gpt-in-mind-podcasts`, type: 'bot' };
     if (/^GuestPrimer\//.test(userAgent)) return { name: `GuestPrimer`, type: 'bot' };
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
     if (/https:\/\/headline\.com/.test(userAgent)) return { name: `Headline Crawler`, type: 'bot' };
@@ -227,6 +228,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^RSStT/.test(userAgent)) return { name: `RSS to Telegram`, type: 'bot' };
     if (/^rssfeedfetcher /.test(userAgent)) return { name: `rssfeedfetcher`, type: 'bot' };
     if (/^RSSRadio \(/.test(userAgent)) return { name: `RSSRadio`, type: 'bot' };
+    if (/^RStudio Desktop/.test(userAgent)) return { name: `Rstudio`, type: 'bot' };
     if (/^Mechanize|[ -]Mechanize\//.test(userAgent)) return { name: `Ruby Mechanize`, type: 'bot' };
     if (/^runpod-python\//.test(userAgent)) return { name: `RunPod`, type: 'bot' };
     if (/https:\/\/sbintuitions\.co\.jp/.test(userAgent)) return { name: `SB Intuitions Crawler`, type: 'bot' };
@@ -799,6 +801,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iOS VG Hermes\//.test(userAgent)) return { name: `VG iOS app`, type: 'app' };
     if (/^VictorReader Stream|^VictorReader_/.test(userAgent)) return { name: `VictorReader`, type: 'app' };
     if (/^VLC\/\d/.test(userAgent)) return { name: `VLC media player`, type: 'app' };
+    if (/^Vo\//.test(userAgent)) return { name: `Vo`, type: 'app' };
     if (/^Vodacast/.test(userAgent)) return { name: `Vodacast`, type: 'app' };
     if (/^Voiz FM\//.test(userAgent)) return { name: `Voiz FM`, type: 'app' };
     if (/^Wavlake\//.test(userAgent)) return { name: `Wavlake`, type: 'app' };

@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@5fc03639cfe6460aa4e43a53fd60532f69be610b (2026-04-10T14:21:28Z)
+// from user-agents-v2@60838d663692fba95778badc85b5594581c56147 (2026-04-12T13:54:01Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -136,6 +136,7 @@ const botTests = {
     'Googlebot-News Audio': { type: 'bot', name: `Googlebot` },
     'Google-Safety': { type: 'bot', name: `Googlebot` },
     'FeedFetcher-Google; (+http://www.google.com/feedfetcher.html)': { type: 'bot', name: `Googlebot` },
+    'gpt-in-mind-podcasts-v2/0.1 (research)': { type: 'bot', name: `gpt-in-mind-podcasts` },
     'GuestPrimer/1.0': { type: 'bot', name: `GuestPrimer` },
     'Gumball.fm Analytics Prefix Checker': { type: 'bot', name: `Gumball` },
     'Mozilla/5.0 (compatible; ev-crawler/1.0;  https://headline.com/legal/crawler)': { type: 'bot', name: `Headline Crawler` },
@@ -273,6 +274,7 @@ const botTests = {
     'rss-audio-downloader/1.1 (+https://example.invalid)': { type: 'bot', name: `RSS Audio Downloader` },
     'RSStT/2.2.1 RSS Reader': { type: 'bot', name: `RSS to Telegram` },
     'rssfeedfetcher libfetch/2.0': { type: 'bot', name: `rssfeedfetcher` },
+    'RStudio Desktop (2025.5.1.513); R (4.5.1 aarch64-apple-darwin20 aarch64 darwin20)': { type: 'bot', name: `Rstudio` },
     'Mozilla/5.0 (compatible; Mechanize/2.7.4)': { type: 'bot', name: `Ruby Mechanize` },
     'WWW-Mechanize/1.72': { type: 'bot', name: `Ruby Mechanize` },
     'runpod-python/0.0.0 (https://runpod.io; support@runpod.io)': { type: 'bot', name: `RunPod` },
@@ -1204,6 +1206,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS VG Hermes/90.0.0 _app_': { type: 'app', name: `VG iOS app` },
     'VictorReader_4-4-2': { type: 'app', name: `VictorReader` },
     'VLC/3.0.8 LibVLC/3.0.8': { type: 'app', name: `VLC media player` },
+    'Vo/1.0 (Podcast Player; +https://vo.fm)': { type: 'app', name: `Vo` },
     'Voiz FM/10.1.0 (Linux;Android 8.1.0) ExoPlayerLib/2.9.3': { type: 'app', name: `Voiz FM` },
     'Wavlake/0.0.2 iPhone 11/35 https://wavlake.com': { type: 'app', name: `Wavlake` },
     'Wavlake/0.0.1 Android 18/34 https://wavlake.com': { type: 'app', name: `Wavlake` },
