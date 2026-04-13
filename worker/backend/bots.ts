@@ -827,4 +827,7 @@ const botIpHashes = new Set([
     'f977084e45120e1f57b97de33895afa4e0fba2c4', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
     'fc0283a40140c9a3e2b1ff39d18f265f0152e6a8', // 2026-04-12 for 2026-04-11 24940  hetzner    gpt-in-mind-podcasts-v2/0.1 (research)
     'c306a046404d34077c42b08060b5c53293e00354', // 2026-04-12 for 2026-04-11 3209   vodafone   Edge
+    '32aeb56c8011b08561d4cc22941255d5ddf623ef', // 2026-04-13 for 2026-04-12 20412  clarity    Overcast
+    '6646eb665a009a3f3259c70250633e04261da78a', // 2026-04-13 for 2026-04-12 9808   chinamobile Chrome
+    'b732e0b79fb2888960219afd8a8ce45d91be1d18', // 2026-04-13 for 2026-04-12 1257   tele2      Chrome
 ]);
