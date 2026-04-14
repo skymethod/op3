@@ -38,6 +38,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '132203' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-13' // tencent
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
+        || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
@@ -61,7 +62,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '132203' // tencent
             || asn === '4213'   // krypt
             || asn === '14618' && regionCode === 'VA' // amazon
-            || asn === '16509' && regionCode === 'OH' // amazon
+            || asn === '16509' && (regionCode === 'OH' || regionCode === 'HE') // amazon
             || asn === '45899'  // vnpt corp
             || asn === '25820'  // it7 networks
             || asn === '30081'  // cachefly
@@ -830,4 +831,6 @@ const botIpHashes = new Set([
     '32aeb56c8011b08561d4cc22941255d5ddf623ef', // 2026-04-13 for 2026-04-12 20412  clarity    Overcast
     '6646eb665a009a3f3259c70250633e04261da78a', // 2026-04-13 for 2026-04-12 9808   chinamobile Chrome
     'b732e0b79fb2888960219afd8a8ce45d91be1d18', // 2026-04-13 for 2026-04-12 1257   tele2      Chrome
+    '200020169ad990527987b4169dd3d80ae440a669', // 2026-04-14 for 2026-04-13 976    corenet    Xiao Yu Zhou
+    '91f0942a394f166b3ea460b22fda408ba13455e8', // 2026-04-14 for 2026-04-13 39647  enreach    AppleCoreMedia
 ]);
