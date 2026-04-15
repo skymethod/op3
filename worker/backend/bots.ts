@@ -833,4 +833,5 @@ const botIpHashes = new Set([
     'b732e0b79fb2888960219afd8a8ce45d91be1d18', // 2026-04-13 for 2026-04-12 1257   tele2      Chrome
     '200020169ad990527987b4169dd3d80ae440a669', // 2026-04-14 for 2026-04-13 976    corenet    Xiao Yu Zhou
     '91f0942a394f166b3ea460b22fda408ba13455e8', // 2026-04-14 for 2026-04-13 39647  enreach    AppleCoreMedia
+    '81df59e903464a27fe4912334e692527471849e7', // 2026-04-15 for 2026-04-14 20412  overcast   Overcast
 ]);
