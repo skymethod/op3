@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@60838d663692fba95778badc85b5594581c56147 (2026-04-12T13:54:01Z)
+// from user-agents-v2@cd065c6e9ae74a05cec4b264be0245d5dad10e23 (2026-04-16T22:45:03Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -157,6 +157,7 @@ const botTests = {
     'Libsyn4-Download': { type: 'bot', name: `Libsyn` },
     'LWP::Simple/6.34 libwww-perl/6.34': { type: 'bot', name: `libwww-perl` },
     'LinkPreview/1.6 (https://www.linkpreview.net)': { type: 'bot', name: `LinkPreview` },
+    'LinuxGetUrl/2.0 closedaiengine@umich.edu (Linux)': { type: 'bot', name: `LinuxGetUrl` },
     'ListenNotes/3.0 (id=c1ef144e30174bf6ba1fedf9174ed908; +https://www.listennotes.com/about/)': { type: 'bot', name: `ListenNotes` },
     'ltx71 - (http://ltx71.com/)': { type: 'bot', name: `LTX71` },
     'ShareSheetUI/1 CFNetwork/1399.4 Darwin/22.1.0': { type: 'bot', name: `MacOS share menu` },
@@ -228,6 +229,7 @@ const botTests = {
     'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'Mozilla/5.0 (compatible; PodcastTranscriber/1.0)': { type: 'bot', name: `PodcastTranscriber` },
     'PodcastWorker/1.0': { type: 'bot', name: `PodcastWorker` },
+    'podcasts-ai-local-transcribe/1.0': { type: 'bot', name: `podcasts ai local transcribe` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
     'Podcst/1.0': { type: 'bot', name: `Podcst` },
     'PodderBot/1.0': { type: 'bot', name: `PodderBot` },
@@ -289,11 +291,13 @@ const botTests = {
     'SiriusXM/RSS-Scanner/1.0': { type: 'bot', name: `SiriusXM Bot` },
     'SiriusXM/STT-Processor/1.0': { type: 'bot', name: `SiriusXM Bot` },
     'Slackbot 1.0 ( https://api.slack.com/robots)': { type: 'bot', name: `Slack Bot` },
+    'slopsearch/1.0 (+https://search.sloppy.at/about)': { type: 'bot', name: `slopsearch` },
     'Snap URL Preview Service; bot; snapchat; https://developers.snap.com/robots': { type: 'bot', name: `Snapchat Bot` },
     'SoundMadeSeen/1.0 +https://soundmadeseen.com': { type: 'bot', name: `SoundMadeSeen` },
     'Speechmatics-API/2.0': { type: 'bot', name: `Speechmatics ASR` },
     'To be transcribed with Speech is Cheap (https://speechischeap.com)': { type: 'bot', name: `Speech is Cheap` },
     'speechischeap.com': { type: 'bot', name: `Speech is Cheap` },
+    'SPoRC-Research-Downloader/1.0': { type: 'bot', name: `SPoRC Research Downloader` },
     'Spotify/1.0': { type: 'bot', name: `Spotify cache service` },
     'SubstackContentFetch/1.0 (https://substack.com/)': { type: 'bot', name: `Substack Content Fetcher` },
     'Mozilla/5.0 (compatible; SummarizeCasts-Worker/1.0)': { type: 'bot', name: `SummarizeCasts` },
@@ -306,6 +310,7 @@ const botTests = {
     'TranscribeServer/1.0 (com.xiao.TranscribeServer; build:1; macOS 15.2.0) Alamofire/5.10.2': { type: 'bot', name: `TranscribeServer` },
     'Transistor.fm/1.0': { type: 'bot', name: `Transistor` },
     'Triton Digital Podcast Sync': { type: 'bot', name: `Triton Digital Podcast Sync` },
+    'truename-podcast-transcriber/1.0': { type: 'bot', name: `truename podcast transcriber` },
     'Turnitin (https://bit.ly/2UvnfoQ)': { type: 'bot', name: `TurnitinBot` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },

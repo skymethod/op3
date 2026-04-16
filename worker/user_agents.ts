@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@60838d663692fba95778badc85b5594581c56147 (2026-04-12T13:54:01Z)
+// from user-agents-v2@cd065c6e9ae74a05cec4b264be0245d5dad10e23 (2026-04-16T22:45:03Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -126,6 +126,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Libsyn4/.test(userAgent)) return { name: `Libsyn`, type: 'bot' };
     if (/^libwww-perl| libwww-perl/.test(userAgent)) return { name: `libwww-perl`, type: 'bot' };
     if (/^LinkPreview\/\d/.test(userAgent)) return { name: `LinkPreview`, type: 'bot' };
+    if (/^LinuxGetUrl\/\d/.test(userAgent)) return { name: `LinuxGetUrl`, type: 'bot' };
     if (/LivelapBot/.test(userAgent)) return { name: `Livelap Crawler`, type: 'bot' };
     if (/^ListenNotes\/3\.0 \(/.test(userAgent)) return { name: `ListenNotes`, type: 'bot' };
     if (/^ltx71 /.test(userAgent)) return { name: `LTX71`, type: 'bot' };
@@ -183,6 +184,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
     if (/ PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
     if (/^PodcastWorker\//.test(userAgent)) return { name: `PodcastWorker`, type: 'bot' };
+    if (/^podcasts-ai-local-transcribe\//.test(userAgent)) return { name: `podcasts ai local transcribe`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
     if (/Podcorn\//.test(userAgent)) return { name: `Podcorn`, type: 'bot' };
     if (/^Podcst\//.test(userAgent)) return { name: `Podcst`, type: 'bot' };
@@ -240,11 +242,13 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Simplecast$/.test(userAgent)) return { name: `Simplecast`, type: 'bot' };
     if (/^SiriusXM\/(RSS|STT)/.test(userAgent)) return { name: `SiriusXM Bot`, type: 'bot' };
     if (/^Slackbot 1\.0/.test(userAgent)) return { name: `Slack Bot`, type: 'bot' };
+    if (/^slopsearch\//.test(userAgent)) return { name: `slopsearch`, type: 'bot' };
     if (/:\/\/developers\.snap\.com\/robots/.test(userAgent)) return { name: `Snapchat Bot`, type: 'bot' };
     if (/^SoundMadeSeen\/\d/.test(userAgent)) return { name: `SoundMadeSeen`, type: 'bot' };
     if (/^SoundOn\/[\d.]+\s+\(bot/.test(userAgent)) return { name: `SoundOn Bot`, type: 'bot' };
     if (/^Speechmatics-API\//.test(userAgent)) return { name: `Speechmatics ASR`, type: 'bot' };
     if (/speechischeap\.com/.test(userAgent)) return { name: `Speech is Cheap`, type: 'bot' };
+    if (/^SPoRC-Research-Downloader\//.test(userAgent)) return { name: `SPoRC Research Downloader`, type: 'bot' };
     if (/^Spotify\/1\.0$/.test(userAgent)) return { name: `Spotify cache service`, type: 'bot' };
     if (/^StitcherBot/.test(userAgent)) return { name: `Stitcher Bot`, type: 'bot' };
     if (/^SubstackContentFetch\//.test(userAgent)) return { name: `Substack Content Fetcher`, type: 'bot' };
@@ -258,6 +262,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Transistor\.fm\//.test(userAgent)) return { name: `Transistor`, type: 'bot' };
     if (/TrendsmapResolver\//.test(userAgent)) return { name: `Trendsmap Resolver`, type: 'bot' };
     if (/^Triton Digital Podcast Sync$/.test(userAgent)) return { name: `Triton Digital Podcast Sync`, type: 'bot' };
+    if (/^truename-podcast-transcriber\//.test(userAgent)) return { name: `truename podcast transcriber`, type: 'bot' };
     if (/^Turnitin \(/.test(userAgent)) return { name: `TurnitinBot`, type: 'bot' };
     if (/Twingly Recon;/.test(userAgent)) return { name: `Twingly Bot`, type: 'bot' };
     if (/^Twitterbot/.test(userAgent)) return { name: `Twitterbot`, type: 'bot' };
