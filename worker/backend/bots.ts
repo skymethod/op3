@@ -835,4 +835,5 @@ const botIpHashes = new Set([
     '91f0942a394f166b3ea460b22fda408ba13455e8', // 2026-04-14 for 2026-04-13 39647  enreach    AppleCoreMedia
     '81df59e903464a27fe4912334e692527471849e7', // 2026-04-15 for 2026-04-14 20412  overcast   Overcast
     '7c6953f54d09d6a7f72777e6f6f72b293544077d', // 2026-04-16 for 2026-04-15 9808   chinamobile Chrome
+    '89c14f46835cb3580f3cc35473fa6c46c31ae9a0', // 2026-04-17 for 2026-04-16 701    verizon    Overcast
 ]);
