@@ -59,7 +59,12 @@ export class R2ApiBlobs implements Blobs {
         if (as === 'stream') return res.body;
         if (as === 'stream-and-meta')  return { stream: res.body, etag };
         if (as === 'text') return await res.text();
-        if (as === 'text-and-meta') return { text: await res.text(), etag };
+        if (as === 'text-and-meta') return { text: await (async () => {
+            try {
+                return await res.text();
+            } catch (e) {
+                throw new Error('Catchable', { cause: e });
+            } } )(), etag };
         if (as === 'buffer') return await res.arrayBuffer();
         if (as === 'json') return await res.json();
                   

@@ -113,11 +113,7 @@ export async function computeShowSummaryAggregate({ showUuid, inputKeys, outputP
     const sources: Record<string, string> = {};
     const episodes: Record<string, EpisodeSummary> = {};
     const dimensionDownloads: Record<string, Record<string, number>> = {};
-    const results = await Promise.all(inputKeys.map(async v => ({ key: v, result: await executeWithRetries(async () => await statsBlobs.get(v, 'text-and-meta'), { tag: `stats-blobs-get-text-meta-${v}`, maxRetries: 3, isRetryable: e => {
-        const m = `${(e as Error).stack ?? e}`;
-        if (m.includes('TypeError: error reading a body from connection')) return true; // TypeError: error reading a body from connection
-        return false;
-    } }) })));
+    const results = await Promise.all(inputKeys.map(async v => ({ key: v, result: await statsBlobs.get(v, 'text-and-meta') })));
     for (const { key, result } of results) {
         if (result === undefined) continue;
         const { text, etag } = result;
