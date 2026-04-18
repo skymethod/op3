@@ -836,4 +836,13 @@ const botIpHashes = new Set([
     '81df59e903464a27fe4912334e692527471849e7', // 2026-04-15 for 2026-04-14 20412  overcast   Overcast
     '7c6953f54d09d6a7f72777e6f6f72b293544077d', // 2026-04-16 for 2026-04-15 9808   chinamobile Chrome
     '89c14f46835cb3580f3cc35473fa6c46c31ae9a0', // 2026-04-17 for 2026-04-16 701    verizon    Overcast
+    '01cf541fd0cb795f31d9dbe6d54edf3eccb61b50', // 2026-04-18 for 2026-04-17 15997  intelligent Overcast
+    '388be4a30f8eb8d0fd83cd0c865e5d5b6f2309b5', // 2026-04-18 for 2026-04-17 20115  charter    Overcast
+    '40e51b8b227e651ba18caef81d396a118f4cda74', // 2026-04-18 for 2026-04-17 202779 evobits    Chrome
+    '7841f350e1342332286921881afcf5bdaf8a3085', // 2026-04-18 for 2026-04-17 701    verizon    Overcast
+    'a53263d5a7f64f9c7f67391960fe594a9bacfb58', // 2026-04-18 for 2026-04-17 701    verizon    Overcast
+    'a7ffa2c51741470a55472138e862b7e191da8632', // 2026-04-18 for 2026-04-17 20115  charter    Overcast
+    'aa01844d65ecbc8b77b2128d44308a904af3af6e', // 2026-04-18 for 2026-04-17 9141   p4         Overcast
+    'bbb967c61161841150ceb1c6d4184994e1630fc0', // 2026-04-18 for 2026-04-17 212238 datacamp   Chrome
+    'e06eb6a9231b15812c8be77dfac1960c2eda6dfb', // 2026-04-18 for 2026-04-17 20115  charter    Overcast
 ]);
