@@ -845,4 +845,5 @@ const botIpHashes = new Set([
     'aa01844d65ecbc8b77b2128d44308a904af3af6e', // 2026-04-18 for 2026-04-17 9141   p4         Overcast
     'bbb967c61161841150ceb1c6d4184994e1630fc0', // 2026-04-18 for 2026-04-17 212238 datacamp   Chrome
     'e06eb6a9231b15812c8be77dfac1960c2eda6dfb', // 2026-04-18 for 2026-04-17 20115  charter    Overcast
+    '0ae63af5d0c7eea4a129d4fe9d7818619ad72944', // 2026-04-19 for 2026-04-18 20115  charter    Overcast
 ]);
