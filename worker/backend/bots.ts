@@ -846,4 +846,9 @@ const botIpHashes = new Set([
     'bbb967c61161841150ceb1c6d4184994e1630fc0', // 2026-04-18 for 2026-04-17 212238 datacamp   Chrome
     'e06eb6a9231b15812c8be77dfac1960c2eda6dfb', // 2026-04-18 for 2026-04-17 20115  charter    Overcast
     '0ae63af5d0c7eea4a129d4fe9d7818619ad72944', // 2026-04-19 for 2026-04-18 20115  charter    Overcast
+    '20c0a5f890a95402b06a7d98976b61a518500a5a', // 2026-04-20 for 2026-04-19 400238 pieg       Chrome
+    '24f73762c3953be73d2e2cc48c1b385a181ef3da', // 2026-04-20 for 2026-04-19 20115  charter    Overcast
+    '4492221dad6eb8c632176bdf70c96ce3e544b68e', // 2026-04-20 for 2026-04-19 4788   tm         Internet Explorer
+    '7a1f43a880809575e76b0ae79354d9bc61511f0c', // 2026-04-20 for 2026-04-19 701    verizon    Overcast
+    'e4d4d27ae86dccf3d78ab2f941823268835c0cf8', // 2026-04-20 for 2026-04-19 20115  charter    Overcast
 ]);
