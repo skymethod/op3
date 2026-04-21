@@ -851,4 +851,6 @@ const botIpHashes = new Set([
     '4492221dad6eb8c632176bdf70c96ce3e544b68e', // 2026-04-20 for 2026-04-19 4788   tm         Internet Explorer
     '7a1f43a880809575e76b0ae79354d9bc61511f0c', // 2026-04-20 for 2026-04-19 701    verizon    Overcast
     'e4d4d27ae86dccf3d78ab2f941823268835c0cf8', // 2026-04-20 for 2026-04-19 20115  charter    Overcast
+    '1a303aa3a8fa9c155a589750182f45346a9edb87', // 2026-04-21 for 2026-04-20 6327   shaw       Mozilla/5.0 (compatible; PlayNext/1.0; +https://playnext.fm)
+    '368c8f6434f3add062026d259a2e8ea39966a829', // 2026-04-21 for 2026-04-20 20412  clarity    Overcast
 ]);
