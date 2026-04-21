@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@cd065c6e9ae74a05cec4b264be0245d5dad10e23 (2026-04-16T22:45:03Z)
+// from user-agents-v2@2dc0f1fcc59e3f650601a2c035ae42970cf8665c (2026-04-21T13:07:26Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -87,12 +87,14 @@ const botTests = {
     'CastFeedValidator/3.0.5 (https://castfeedvalidator.com)': { type: 'bot', name: `CastFeedValidator` },
     'castget 1.2.4 (castget rss enclosure downloader)': { type: 'bot', name: `castget` },
     'castget': { type: 'bot', name: `castget` },
+    'Castnews-Topiker/1.0 (+https://index.castnews.com.br)': { type: 'bot', name: `Castnews` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
     'TerraCotta https://github.com/CeramicTeam/CeramicTerracotta': { type: 'bot', name: `Ceramic Terracotta Crawler` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)': { type: 'bot', name: `Claudebot` },
     'Cloudflare-SSLDetector': { type: 'bot', name: `Cloudflare SSL detector` },
     'Mozilla/5.0 (compatible; proximic;  https://www.comscore.com/Web-Crawler)': { type: 'bot', name: `Comscore Crawler` },
+    'ContentFlow/1.0 (Podcast Audio Downloader)': { type: 'bot', name: `ContentFlow` },
     'Podcast-CriticalMention/1.0': { type: 'bot', name: `Critical Mention` },
     'Mozilla/5.0 (compatible; Crowli/1.0; +http://www.miniradioplayer.net/crowli.html)': { type: 'bot', name: `Crowli` },
     'libcurl/7.65.1': { type: 'bot', name: `curl` },
@@ -206,6 +208,7 @@ const botTests = {
     'Mozilla/5.0 (Linux; Android 7.0;) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; PetalBot; https://aspiegel.com/petalbot)': { type: 'bot', name: `PetalBot` },
     'Pinecast/Importer 1.1': { type: 'bot', name: `Pinecast Importer` },
     'PlayerFM/1.0 Podcast Sync (0 subscribers; url=https://player.fm/series/series-2567872)': { type: 'bot', name: `PlayerFM Podcast Sync` },
+    'Mozilla/5.0 (compatible; PlayNext/1.0; +https://playnext.fm)': { type: 'bot', name: `PlayNext` },
     'PodbeanFeedReader/6.0 (Feed Parser; http://www.podbean.com/; Allow like Gecko) Build/20251103053444': { type: 'bot', name: `PodBean Feed Reader` },
     'Podbean Importer': { type: 'bot', name: `Podbean Importer` },
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
@@ -215,7 +218,9 @@ const botTests = {
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
     'podcast-downloader': { type: 'bot', name: `Podcast Downloader` },
+    'Mozilla/5.0 (compatible; podcast-downloader/1.0)': { type: 'bot', name: `Podcast Downloader` },
     'podcast-go-audio-downloader/2.0': { type: 'bot', name: `Podcast Go Audio Downloader` },
+    'Mozilla/5.0 (compatible; PodcastIndexer/1.0)': { type: 'bot', name: `PodcastIndexer` },
     'Mozilla/5.0 (compatible; PodcastTranslator/1.0)': { type: 'bot', name: `PodcastTranslator` },
     'Podcast Transcriber 2.0 (https://example.com/podcast-transcriber)': { type: 'bot', name: `Podcast Transcriber` },
     'Podcastics': { type: 'bot', name: `Podcastics` },
@@ -225,6 +230,7 @@ const botTests = {
     'PodchaserParser/2.0 (https://podchaser.com)': { type: 'bot', name: `Podchaser Parser` },
     'PodcastBulkDownloader/0.10.1': { type: 'bot', name: `PodcastBulkDownloader` },
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
+    'podcast-grabber/0.1.0': { type: 'bot', name: `podcast-grabber` },
     'PodcastPipeline/1.0': { type: 'bot', name: `PodcastPipeline` },
     'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'Mozilla/5.0 (compatible; PodcastTranscriber/1.0)': { type: 'bot', name: `PodcastTranscriber` },
@@ -897,6 +903,7 @@ const appTests = {
     'Metacast/0.73.5 (ios)': { type: 'app', name: `Metacast` },
     'Metacast/1.2.0 (android)': { type: 'app', name: `Metacast` },
     'Mozilla/5.0 (compatible; Metacast/1.0 +metacast.app)': { type: 'app', name: `Metacast` },
+    'Micropod/839 CFNetwork/3860.500.112 Darwin/25.4.0': { type: 'app', name: `Micropod` },
     'Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.16130; Pro)': { type: 'app', name: `Microsoft Outlook` },
     'Outlook-Android/2.0': { type: 'app', name: `Microsoft Outlook` },
     'microsoft;xbox_one;1fc2d01aa9074dde950e8d3dc0eb1729;;tpapi;3.167.55': { type: 'app', name: `Microsoft Xbox` },
