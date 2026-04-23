@@ -855,4 +855,10 @@ const botIpHashes = new Set([
     '368c8f6434f3add062026d259a2e8ea39966a829', // 2026-04-21 for 2026-04-20 20412  clarity    Overcast
     '5c1515d5921c0a03fa7d031a53ce48d9791f375d', // 2026-04-22 for 2026-04-21 3320   telekom    Overcast
     'f03abefb0feb257b9af68f39f95745118692112f', // 2026-04-22 for 2026-04-21 701    verizon    Overcast
+    '006d511a9962b749ee23612a974ded4f6c971f00', // 2026-04-23 for 2026-04-22 3209   vodafone   Chrome
+    '3c1f127d5c202d7708763728a375dbfede2f9a9f', // 2026-04-23 for 2026-04-22 4788   tm         Mozilla/5.0 (compatible; podcast-renamer/1.0)
+    '5f6c7552fc97af591d3fd46b6ac3d6202f0d9ae9', // 2026-04-23 for 2026-04-22 57269  digispain  Overcast
+    '7ecfbcd911e7dbefcfc125713c91c9b49d37c246', // 2026-04-23 for 2026-04-22 3320   telekom    Overcast
+    'cdc50419a92198c46c7d38355530bfcf138a37ee', // 2026-04-23 for 2026-04-22 7922   comcast    gPodder
+    'fc294d51925fd0cb05cb78fad03610733b5a0be8', // 2026-04-23 for 2026-04-22 7922   comcast    gPodder
 ]);
