@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@2dc0f1fcc59e3f650601a2c035ae42970cf8665c (2026-04-21T13:07:26Z)
+// from user-agents-v2@73558f5e8d04637f09ea5b3b7e1b53593b57f9b1 (2026-04-23T17:09:54Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -166,7 +166,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Pinecast\/Importer/.test(userAgent)) return { name: `Pinecast Importer`, type: 'bot' };
     if (/^Pingdom/.test(userAgent)) return { name: `Pingdom`, type: 'bot' };
     if (/PlayerFM\/.* Podcast Sync/.test(userAgent)) return { name: `PlayerFM Podcast Sync`, type: 'bot' };
-    if (/ PlayNext\//.test(userAgent)) return { name: `PlayNext`, type: 'bot' };
+    if (/ PlayNext\/|^playnext-/.test(userAgent)) return { name: `PlayNext`, type: 'bot' };
     if (/^PodbeanFeedReader/.test(userAgent)) return { name: `PodBean Feed Reader`, type: 'bot' };
     if (/^Podbean Importer/.test(userAgent)) return { name: `Podbean Importer`, type: 'bot' };
     if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)|PodcastIndexManager\//.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
@@ -186,6 +186,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ PodcastDownloader\//.test(userAgent)) return { name: `PodcastDownloader`, type: 'bot' };
     if (/^podcast-grabber\//.test(userAgent)) return { name: `podcast-grabber`, type: 'bot' };
     if (/^PodcastPipeline\//.test(userAgent)) return { name: `PodcastPipeline`, type: 'bot' };
+    if (/ podcast-renamer\//.test(userAgent)) return { name: `podcast-renamer`, type: 'bot' };
     if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
     if (/ PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
     if (/^PodcastWorker\//.test(userAgent)) return { name: `PodcastWorker`, type: 'bot' };
@@ -255,6 +256,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/speechischeap\.com/.test(userAgent)) return { name: `Speech is Cheap`, type: 'bot' };
     if (/^SPoRC-Research-Downloader\//.test(userAgent)) return { name: `SPoRC Research Downloader`, type: 'bot' };
     if (/^Spotify\/1\.0$/.test(userAgent)) return { name: `Spotify cache service`, type: 'bot' };
+    if (/^spotify-rss-whisper-pipeline\//.test(userAgent)) return { name: `spotify-rss-whisper-pipeline`, type: 'bot' };
     if (/^StitcherBot/.test(userAgent)) return { name: `Stitcher Bot`, type: 'bot' };
     if (/^SubstackContentFetch\//.test(userAgent)) return { name: `Substack Content Fetcher`, type: 'bot' };
     if (/SummarizeCasts-Worker\//.test(userAgent)) return { name: `SummarizeCasts`, type: 'bot' };

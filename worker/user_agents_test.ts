@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2dc0f1fcc59e3f650601a2c035ae42970cf8665c (2026-04-21T13:07:26Z)
+// from user-agents-v2@73558f5e8d04637f09ea5b3b7e1b53593b57f9b1 (2026-04-23T17:09:54Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -209,6 +209,8 @@ const botTests = {
     'Pinecast/Importer 1.1': { type: 'bot', name: `Pinecast Importer` },
     'PlayerFM/1.0 Podcast Sync (0 subscribers; url=https://player.fm/series/series-2567872)': { type: 'bot', name: `PlayerFM Podcast Sync` },
     'Mozilla/5.0 (compatible; PlayNext/1.0; +https://playnext.fm)': { type: 'bot', name: `PlayNext` },
+    'playnext-tier1/0.1': { type: 'bot', name: `PlayNext` },
+    'playnext-t3/0.1': { type: 'bot', name: `PlayNext` },
     'PodbeanFeedReader/6.0 (Feed Parser; http://www.podbean.com/; Allow like Gecko) Build/20251103053444': { type: 'bot', name: `PodBean Feed Reader` },
     'Podbean Importer': { type: 'bot', name: `Podbean Importer` },
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
@@ -232,6 +234,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; PodcastDownloader/1.0)': { type: 'bot', name: `PodcastDownloader` },
     'podcast-grabber/0.1.0': { type: 'bot', name: `podcast-grabber` },
     'PodcastPipeline/1.0': { type: 'bot', name: `PodcastPipeline` },
+    'Mozilla/5.0 (compatible; podcast-renamer/1.0)': { type: 'bot', name: `podcast-renamer` },
     'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'Mozilla/5.0 (compatible; PodcastTranscriber/1.0)': { type: 'bot', name: `PodcastTranscriber` },
     'PodcastWorker/1.0': { type: 'bot', name: `PodcastWorker` },
@@ -305,6 +308,7 @@ const botTests = {
     'speechischeap.com': { type: 'bot', name: `Speech is Cheap` },
     'SPoRC-Research-Downloader/1.0': { type: 'bot', name: `SPoRC Research Downloader` },
     'Spotify/1.0': { type: 'bot', name: `Spotify cache service` },
+    'spotify-rss-whisper-pipeline/0.1 (Windows local batch downloader/transcriber)': { type: 'bot', name: `spotify-rss-whisper-pipeline` },
     'SubstackContentFetch/1.0 (https://substack.com/)': { type: 'bot', name: `Substack Content Fetcher` },
     'Mozilla/5.0 (compatible; SummarizeCasts-Worker/1.0)': { type: 'bot', name: `SummarizeCasts` },
     'SupportingCast/1.0': { type: 'bot', name: `SupportingCast` },
