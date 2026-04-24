@@ -861,4 +861,39 @@ const botIpHashes = new Set([
     '7ecfbcd911e7dbefcfc125713c91c9b49d37c246', // 2026-04-23 for 2026-04-22 3320   telekom    Overcast
     'cdc50419a92198c46c7d38355530bfcf138a37ee', // 2026-04-23 for 2026-04-22 7922   comcast    gPodder
     'fc294d51925fd0cb05cb78fad03610733b5a0be8', // 2026-04-23 for 2026-04-22 7922   comcast    gPodder
+    '0c206b3898ff48c38b5f97f1148a19e4bae1e5ff', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '0f4a1de7f49134cec456c82d0f4701aa3aca1e96', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '30cb0ff30968e9f8b74ad5378e521910aee71e29', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '3cb38638505fa1522ff696d3d71f7f05d7e4c870', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '3f88206bf1175700303f14e9a10857b34ec030f7', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '57665dd92674ffe6b11509b6236a76fd6b94f502', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '6794463f28c9985020b8175dcc0ddcabf0b5c6c7', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '6e373e4be974548bab5d9370995cfe9e73da0c06', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '6fe2466feb03b43fc4105df8342cab0b6f3669b4', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '74d4db0f95735edf939b1ad699c102220bc406bf', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '790c9b5423ad27d09fc8fc5f31bee06db4739a36', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '7b6ededd647ccd289e08e3cc186b1c7bf355e5d3', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '7c100abfc0cf24b614e466e12d5962d70fc429d1', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '8d3bce4d9b3a5e1ceda704dd3133d5d56471f127', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '91b0452dc969afedcdafc4fbdb54c5737a092667', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '91c9d27c0645c8fb8647cfa152ecf9d1c0b75873', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '97214076e26301fe9ceeb940becc8dfbc973304c', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '9b1e5f0a1f7a574a3c7ab555cc8de713fcdca47a', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'ad63dcb26c4a72288fa07f897b2965dfe81471f2', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'b19a655667fe3b5579895d4810cd1ff7077f54f2', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'b642ab62bc3e0622ef6b87e9e660c4ae64139722', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'b7484bb9f271da05d81793b7022edd688758caf4', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'b9816183e8107591de2d4550d9d3cb082572dc6e', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'bad618b2e4c3f937e2152a8704b12bb0f9ff478f', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'ca9f7889028715ad373edf6eef57681c956c043f', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'cc355c543053861fb10bdaff203dc35f6a34f4ef', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'dedb1fa516889ad3bd7fe914b78f2220d72da432', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'df2b6d45d73ade09689ed0ceb97d419bcde837ea', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'e591d53eb0a0e93eb5d6fd6319b538799f33b067', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'e8bebfe9fa8609b320612b94f460d3b14b254fa2', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'ec8332dc93db25d9bdc13bf9a258fc667dc0eedc', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'ecb29ef63a51dedc15085e8c1b4c1fb668066f05', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'f443565f6a0376cf702d924d01d36ecf94fc749a', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'fb6abfc6f418d6c09e8a063d43a532b9b5ebef62', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    'fd250e48488911de380b6b69cdc16e0abecc824d', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
 ]);
