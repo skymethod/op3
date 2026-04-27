@@ -897,4 +897,20 @@ const botIpHashes = new Set([
     'f443565f6a0376cf702d924d01d36ecf94fc749a', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
     'fb6abfc6f418d6c09e8a063d43a532b9b5ebef62', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
     'fd250e48488911de380b6b69cdc16e0abecc824d', // 2026-04-24 for 2026-04-23 2907   sinet      Chrome, Firefox, Safari
+    '46eb8c0618350e0f6e51e3d88ff82b5254c0cfc9', // 2026-04-27 for 2026-04-24 3320   telekom    Firefox
+    '85936616ce1cc94811de217f78d5a5a49bdd3e50', // 2026-04-27 for 2026-04-24 25776  okla       Chrome
+    '9f59e426caef3836341ce64fac910578de59c4aa', // 2026-04-27 for 2026-04-24 3209   vodafone   Firefox, Chrome
+    'b66c7055a759469fd8853855328ba6ccb617cfa0', // 2026-04-27 for 2026-04-24 4922   shenandoah  Overcast
+    'fdb4febd4979924b591f7a62e2ed213f399af551', // 2026-04-27 for 2026-04-24 701    verizon    Overcast
+    '0de4833c627591557ff38c2b4efaaf73e5080984', // 2026-04-27 for 2026-04-25 20001  charter    llmfeed/2.0 (+https://github.com/llmfeed)
+    '1a62392dfc852a9523677c8b8a38ec28f1088aa4', // 2026-04-27 for 2026-04-25 701    verizon    Overcast
+    '564665fb967f8f15d2b0b4313f42278400d1cabe', // 2026-04-27 for 2026-04-25 701    verizon    Overcast
+    '9fe6edc39e004644d1265dcbd72f4f4f3436188b', // 2026-04-27 for 2026-04-25 6057   nacional   Overcast
+    'faeb2bc17d8facc9d016ffbc00ff37105270058f', // 2026-04-27 for 2026-04-25 6057   nacional   Overcast
+    '6216bedb928080a295bea3487904a1869ec84767', // 2026-04-27 for 2026-04-26 25776  okla       Chrome
+    '8473f022912415ea43bcf22a88d8a1307470708c', // 2026-04-27 for 2026-04-26 701    verizon    Overcast
+    '9cbb74597121b2aa6abf3cfca1a8b4a325c4b75a', // 2026-04-27 for 2026-04-26 701    verizon    Overcast
+    'a593f0fe662777001dd763c4a5046dd5a4cd92da', // 2026-04-27 for 2026-04-26 6461   zayo       Overcast
+    'cb704296639910ec3bac240f940b400739b16150', // 2026-04-27 for 2026-04-26 34471  freetech   Overcast
+    'cb831f525ee01fe131407a74930e175e508848ae', // 2026-04-27 for 2026-04-26 6057   nacional   Overcast
 ]);
