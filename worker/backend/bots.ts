@@ -913,4 +913,11 @@ const botIpHashes = new Set([
     'a593f0fe662777001dd763c4a5046dd5a4cd92da', // 2026-04-27 for 2026-04-26 6461   zayo       Overcast
     'cb704296639910ec3bac240f940b400739b16150', // 2026-04-27 for 2026-04-26 34471  freetech   Overcast
     'cb831f525ee01fe131407a74930e175e508848ae', // 2026-04-27 for 2026-04-26 6057   nacional   Overcast
+    '25320c112825913e5e6547cc681608454c63676c', // 2026-04-28 for 2026-04-27 6057   nacional   Overcast
+    'ab2f1c5c46caffab7d636b0332d471caadbf8bc3', // 2026-04-28 for 2026-04-27 6057   nacional   Overcast
+    '527611823173da3dc1a8fdf136bfb46128d42cd7', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
+    'a38c88f6ba15de6116a7c4f60035b02454defc81', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
+    'a8b45be587ce545a3cfd8fec0b8eab1bb83b4cac', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
+    'f7acda1b3fd8b7db275506b5b05015da0a8937de', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
+    '9e279905ae8a5a7bedddab6706f1bc3854742bee', // 2026-04-28 for 2026-04-27 3352   telefonica Overcast
 ]);
