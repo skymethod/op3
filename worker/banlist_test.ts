@@ -8,7 +8,7 @@ Deno.test({
     fn: async () => {
 
         const namespace = new StubKVNamespace();
-        const cache = new TestCfCache([ 'banned.sus' ]);
+        const cache = new TestCfCache([ 'banned.sus', '*.wildcard.sus' ]);
         const banlist = new Banlist(namespace, cache);
 
         const ban = [
@@ -16,6 +16,8 @@ Deno.test({
             'https://example.test',
             'https://example.localhost/a.txt',
             'https://banned.sus/a',
+            'https://a.wildcard.sus/a',
+            'https://asdf-123.wildcard.sus/a',
             'https://https',
         ];
 
