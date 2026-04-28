@@ -31,7 +31,9 @@ export class Banlist {
             if (isReservedForTesting(targetHostname)) return true;
             if (!targetHostname.includes('.')) return true; // ban /e/whatever/path/to/file.mp3
             if (!this.bannedHostnames) this.bannedHostnames = await loadBannedHostnames(namespace, cache);
-            return this.bannedHostnames.has(targetHostname);
+            if (this.bannedHostnames.has(targetHostname)) return true;
+            if (this.bannedHostnames.has(`*.${targetHostname.split('.').slice(1).join('.')}`)) return true;
+            return false;
         } catch (e) {
             consoleWarn('banlist', `Unexpected error inside banlist.isBanned(${targetUrl}): ${(e as Error).stack || e}`);
             return false;
