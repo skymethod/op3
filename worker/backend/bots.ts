@@ -920,4 +920,12 @@ const botIpHashes = new Set([
     'a8b45be587ce545a3cfd8fec0b8eab1bb83b4cac', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
     'f7acda1b3fd8b7db275506b5b05015da0a8937de', // 2026-04-28 for 2026-04-27 8075   microsoft  Chrome
     '9e279905ae8a5a7bedddab6706f1bc3854742bee', // 2026-04-28 for 2026-04-27 3352   telefonica Overcast
+    '0e0e07cd54ed709ea9ed84b0f20829a28262a2ed', // 2026-04-29 for 2026-04-28 202779  evobits   Chrome
+    '49a3d6c1e8eb5af755a91b3df24595f9201d58d9', // 2026-04-29 for 2026-04-28 701    verizon    Overcast
+    '6848d908edc53a03cf6c6187bf2b670abf057a77', // 2026-04-29 for 2026-04-28 6057   nacional   Overcast
+    '823d67a40e154258b2b4ac522f6e414b55edb73c', // 2026-04-29 for 2026-04-28 6057   nacional   Overcast
+    'ac9df7262099834b851c776ff4d69222a1b82b5f', // 2026-04-29 for 2026-04-28 20115  charter    Overcast
+    'dae09a506b96970a66660b6f763e3cd05cc8b5bb', // 2026-04-29 for 2026-04-28 20115  charter    Overcast
+    'c3271b1eef8f5bb3369a94c6f20d27c684750d59', // 2026-04-29 for 2026-04-28 701    verizon    Overcast
+    'dc69f5ddc58fba51a0bc4ab48ce05d83d968ced2', // 2026-04-29 for 2026-04-28 7922   comcast    ConduitMCP/1.0 (+Lab36)
 ]);
