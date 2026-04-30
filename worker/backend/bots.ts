@@ -928,4 +928,17 @@ const botIpHashes = new Set([
     'dae09a506b96970a66660b6f763e3cd05cc8b5bb', // 2026-04-29 for 2026-04-28 20115  charter    Overcast
     'c3271b1eef8f5bb3369a94c6f20d27c684750d59', // 2026-04-29 for 2026-04-28 701    verizon    Overcast
     'dc69f5ddc58fba51a0bc4ab48ce05d83d968ced2', // 2026-04-29 for 2026-04-28 7922   comcast    ConduitMCP/1.0 (+Lab36)
+    '0ec725b568b0dcab78ca1f81d1e07f7775bdb52a', // 2026-04-30 for 2026-04-29 20001  charter    Overcast
+    '1487bf8215fb60ff71ac75679c61e012628c93f2', // 2026-04-30 for 2026-04-29 6057   nacional   Overcast
+    'e5fea21fba0a574aab4eab41612f902ea45cab7e', // 2026-04-30 for 2026-04-29 6057   nacional   Overcast
+    '22a33268ea26741d329bfde3386aa073be8cf301', // 2026-04-30 for 2026-04-29 20412  clarity    Overcast
+    '80184bb89478dff5e77e4616eb6ba6c04b9c20b2', // 2026-04-30 for 2026-04-29 20412  clarity    Overcast
+    'bf01e7092ebdeb038f596d8fd26dc2cea1cd017e', // 2026-04-30 for 2026-04-29 20412  clarity    Overcast
+    '2aa8024b2748912e166da3574cd17e03495b4544', // 2026-04-30 for 2026-04-29 701    verizon    Overcast
+    '3fcd8ef4f8efa141fac04e2c33bf494f7bba7160', // 2026-04-30 for 2026-04-29 701    verizon    Overcast
+    '40e0a602222948da3ce3ac007fcd27fef4cc69a2', // 2026-04-30 for 2026-04-29 701    verizon    Overcast
+    '6f2ecd483418ddf30739a16905fd1b6049c72f3a', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
+    '98816856d16457c8d1c6957d71cf1fe3735e708c', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
+    'bdf1c67499afd4de7a43ee164388597f30ffc8aa', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
+    'e7cecf812199dbf76e8d4a3ee1dd129add122e27', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
 ]);
