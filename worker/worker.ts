@@ -304,7 +304,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
     try {
         const times: Record<string, number> = {};
         const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
-        if (!res.ok) { consoleWarn('tryComputeHlsResult', `${res.status} response fetching ${u?.toString()}, headers[${[...res.headers].map(v => v.join('=')).join(',')}]`); return undefined; }
+        if (!res.ok) { consoleWarn('tryComputeHlsResult', `${res.status} response fetching ${u?.toString()}, headers[${[...res.headers].map(v => v.join('=')).join(',')}] body[${await res.text()}]`); return undefined; }
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
         if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') { consoleWarn('tryComputeHlsResult', `Unexpected content-type ${contentType} fetching ${u?.toString()}`); return undefined; }
         if (!res.body) { consoleWarn('tryComputeHlsResult', `No response body fetching ${u?.toString()}`); return undefined; }
