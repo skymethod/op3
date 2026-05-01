@@ -304,10 +304,10 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
     try {
         const times: Record<string, number> = {};
         const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
-        if (!res.ok) return undefined; // unexpected response status, log these?
+        if (!res.ok) { consoleWarn('tryComputeHlsResult', `${res.status} response fetching ${u?.toString()}`); return undefined; }
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
-        if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') return undefined;  // unexpected content-type, log these?
-        if (!res.body) return undefined;  // no response body, log these?
+        if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') { consoleWarn('tryComputeHlsResult', `Unexpected content-type ${contentType} fetching ${u?.toString()}`); return undefined; }
+        if (!res.body) { consoleWarn('tryComputeHlsResult', `No response body fetching ${u?.toString()}`); return undefined; }
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
         const timestamp = computeTimestamp();
@@ -354,8 +354,8 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
             return { hash };
         }
         return { response: new Response(newLines.join('\n'), { headers }), sid, pid, pendingWork };
-    } catch {
-        // we tried, log these?
+    } catch (e) {
+        consoleWarn('tryComputeHlsResult', `Unhandled error for ${u?.toString()}: ${(e as Error).stack || e}`);
         return undefined;
     }
 }
