@@ -941,4 +941,12 @@ const botIpHashes = new Set([
     '98816856d16457c8d1c6957d71cf1fe3735e708c', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
     'bdf1c67499afd4de7a43ee164388597f30ffc8aa', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
     'e7cecf812199dbf76e8d4a3ee1dd129add122e27', // 2026-04-30 for 2026-04-29 20115  charter    Overcast
+    '9a3bcc8528ff86c15e5c30fd6b82e9b4a8096a32', // 2026-05-01 for 2026-04-30 20115  charter    Overcast
+    'd4cdf1a4971a7ed5a9e30aa1cb5f57e6bde61a04', // 2026-05-01 for 2026-04-30 20115  charter    Overcast
+    'd610cb8fde7d07b97324038faafa59a57052cf5d', // 2026-05-01 for 2026-04-30 20115  charter    Overcast
+    'db4a76727740d40fa9a58ee5b6b45819897b9b96', // 2026-05-01 for 2026-04-30 20115  charter    Overcast
+    'e1246181cbefdd37ac2652858a79fa052b1b513d', // 2026-05-01 for 2026-04-30 20115  charter    Overcast
+    'a87ae7d975c169ebcc8e2de4a0a4ee8e0f0d453c', // 2026-05-01 for 2026-04-30 2907   sinet      Chrome
+    'c236607978d4ab7096d0b66bf86700f4c159134e', // 2026-05-01 for 2026-04-30 6057   nacional   Overcast
+    'cdc07d31d000ec1065dd08e83e3833b8c4d541d7', // 2026-05-01 for 2026-04-30 15704  xtra       Overcast
 ]);
