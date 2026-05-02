@@ -39,7 +39,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
-        || asn === '2907' && agentType === 'browser' && date === '2026-04-23' // sinet
+        || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01') // sinet
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
@@ -949,4 +949,35 @@ const botIpHashes = new Set([
     'a87ae7d975c169ebcc8e2de4a0a4ee8e0f0d453c', // 2026-05-01 for 2026-04-30 2907   sinet      Chrome
     'c236607978d4ab7096d0b66bf86700f4c159134e', // 2026-05-01 for 2026-04-30 6057   nacional   Overcast
     'cdc07d31d000ec1065dd08e83e3833b8c4d541d7', // 2026-05-01 for 2026-04-30 15704  xtra       Overcast
+    '16fd46783e98874ac98ce7a49ff9ee28d382a0e5', // 2026-05-02 for 2026-05-01 701    verizon    Overcast
+    '17749b121bc6287eb54c7519a86248cd5e52cee9', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '18425bf70d1aa02e96dd36f6fc9b579529e89f55', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '18aaadc2dd5854165e3fca0344ba94b269254dc6', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '296315b2364d1bf2533e724094477f273631aded', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '2e41133102be928b2323388ed1960d4f3dd99918', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '43404b679b1d6a2e531fc093b1ed10489133b1f7', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '603534291ff3b8eb244d88954b6b8252459674ab', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '660b18a72d86b1995005454ffc392bf448c1e229', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '73ac8a25c50aee79b0ab1dcd4b24079e380376bb', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '7b2b15523191e5afc8bd5bfa63d26c5dcd336536', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '7ef94c17c7cab7326512a5b461a2e117f365d665', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '87fa6748a4322e8a83f82563eda81ea19af831a3', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '8e0846472b73d6ac8c88bb823917c11b85248c94', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '9e6d737a419390b0b099eaa4b9fd111ed0368b0f', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    'ca833e36b371bd0b3baaa22cd754bd8ec3c91e3f', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    'e011308b4d97c357525e2b1071aa4af64fb733ae', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    'e2825c3e21a97aa64dac0c218a147b54dcb5bc1f', // 2026-05-02 for 2026-05-01 2907   sinet      Chrome, Safari, Firefox
+    '234159ca9485b30fe36ec0f558ca11cf948884da', // 2026-05-02 for 2026-05-01 11664  techtel    Firefox, Chrome
+    '2c7e67d58f95f456592d81f8bb0a08c62df1e061', // 2026-05-02 for 2026-05-01 6057   nacional   Overcast
+    '3ecfe5ba389105add8c8f0503a4734f9247d0d93', // 2026-05-02 for 2026-05-01 6057   nacional   Overcast
+    '35f3990fd75837355af040a8d6aae717465f765d', // 2026-05-02 for 2026-05-01 202779 evobits    Chrome
+    '4064301f2b6c11d3daaec75675c61f9a65b49da2', // 2026-05-02 for 2026-05-01 15704  xtra       Overcast
+    '5883b1cbfd1758adb4f24fbba17deb522e7962c1', // 2026-05-02 for 2026-05-01 20115  charter    Overcast
+    '592269fcec22781c66096a521f13b64144cd2b25', // 2026-05-02 for 2026-05-01 20115  charter    Overcast
+    '6a52fa31c8207c1c0853367104497102d46b699d', // 2026-05-02 for 2026-05-01 20115  charter    Overcast
+    '91e341d78d515e847b71f151e76555fb1f4b3130', // 2026-05-02 for 2026-05-01 20115  charter    Overcast
+    'd4992b892685a1e2026b64d9c83596d4bc2c708b', // 2026-05-02 for 2026-05-01 20115  charter    Overcast
+    '7246bd2da8a3924163e237004abb3088ed945936', // 2026-05-02 for 2026-05-01 19151  bbone      Overcast
+    'bf0518627077f0f79793bb0b51521513c7da31d2', // 2026-05-02 for 2026-05-01 20001  charter    Overcast
+    'c0ff02d1d7dc29817be484f25030a0d1876d019d', // 2026-05-02 for 2026-05-01 3352   telefonica Overcast
 ]);
