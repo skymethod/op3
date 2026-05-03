@@ -980,4 +980,11 @@ const botIpHashes = new Set([
     '7246bd2da8a3924163e237004abb3088ed945936', // 2026-05-02 for 2026-05-01 19151  bbone      Overcast
     'bf0518627077f0f79793bb0b51521513c7da31d2', // 2026-05-02 for 2026-05-01 20001  charter    Overcast
     'c0ff02d1d7dc29817be484f25030a0d1876d019d', // 2026-05-02 for 2026-05-01 3352   telefonica Overcast
+    '4b1eba26047264cb95c5d7950d4e31448983d5ef', // 2026-05-03 for 2026-05-02 20001  charter    Overcast
+    '5a2385dd18d55c98f1e6da5a1ada1129ef9ebc9b', // 2026-05-03 for 2026-05-02 2907   sinet      Chrome, Safari, Firefox
+    '5ce530107b3e259e9a42d36c8c75486967bdbfd3', // 2026-05-03 for 2026-05-02 2907   sinet      Chrome, Safari, Firefox
+    '6e70e638e7a82872ec11b1ddf52d32259488838d', // 2026-05-03 for 2026-05-02 15704  xtra       Overcast
+    'b9c80b8d611830d17ce8a3eaffba4406921b32fe', // 2026-05-03 for 2026-05-02 701    verizon    Overcast
+    'c97ed19c930d8b93028c4afaccd47778cadfda3a', // 2026-05-03 for 2026-05-02 209    centurylink Overcast
+    'f102dbe17ad966a39ba5d9104221b6db58d752a4', // 2026-05-03 for 2026-05-02 25776  okla       Chrome
 ]);
