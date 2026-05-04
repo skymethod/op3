@@ -77,7 +77,7 @@ export class HitsController {
         for (const minuteTimestamps of chunk([...minuteTimestampsToLoad], 4)) {
             await timed(times, 'ensureMinuteFileLoaded', () => Promise.allSettled(minuteTimestamps.map(minuteTimestamp => this.ensureMinuteFileLoaded(minuteTimestamp, attNums))));
         }
-        // end optimzation
+        // end optimization
         for (const [ _messageId, { rawRedirects, timestamp: _ } ] of Object.entries(rawRedirectsByMessageId)) {
             for (const rawRedirect of rawRedirects) {
                 const record = await timed(times, 'packRawRedirects', () => packRawRedirect(rawRedirect, attNums, colo, 'hits', encryptIpAddress, hashIpAddress));

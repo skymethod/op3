@@ -134,6 +134,11 @@ export class HlsController {
         if (targetPath === '/hls/query' && operationKind === 'update') {
             const { q, ...rest } = parameters ?? {};
             if (typeof q !== 'string') throw new Error(`Param 'q' is required`);
+            if (q === 'size') {
+                const { databaseSize } = sql;
+                const message = JSON.stringify({ rowsRead: 0, rowsWritten: 0 });
+                return { results: [ { databaseSize }], message };
+            }
             const params: unknown[] = [];
             for (let i = 1; i < 10; i++) {
                 const v = rest[`p${i}`];
