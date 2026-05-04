@@ -205,9 +205,9 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     let hlsResult: HlsResult | undefined;
     if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket && env.podcastIndexCredentials) {
         const { origin, blobsBucket, podcastIndexCredentials: secret } = env;
-        const { method } = request;
+        const { method, headers } = request;
         const { prefixArgs } = redirectRequest;
-        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, origin, blobsBucket, prefixArgs, secret });
+        hlsResult = await tryComputeHlsResult(redirectRequest.targetUrl, { method, headers, origin, blobsBucket, prefixArgs, secret });
     }
 
     // do the expensive work after quickly returning the redirect response
@@ -295,7 +295,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
     }
 }
 
-async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket, prefixArgs, secret }: { method: string, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string>, secret: string }): Promise<HlsResult | undefined> {
+async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders, origin, blobsBucket, prefixArgs, secret }: { method: string, headers: Headers, origin: string, blobsBucket: R2Bucket, prefixArgs: Record<string, string>, secret: string }): Promise<HlsResult | undefined> {
     const u = tryParseUrl(hlsUrl);
     if (!u?.pathname.endsWith('.m3u8')) return undefined;
     if (method === 'OPTIONS') return { response: new Response(undefined, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-methods': '*', 'access-control-allow-headers': '*' } }) }; // cors pre-flight
@@ -303,11 +303,13 @@ async function tryComputeHlsResult(hlsUrl: string, { method, origin, blobsBucket
     u.searchParams.set('_t', Date.now().toString());
     try {
         const times: Record<string, number> = {};
-        const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': computeUserAgent({ origin }) } }));
-        if (!res.ok) { consoleWarn('tryComputeHlsResult', `${res.status} response fetching ${u?.toString()}, headers[${[...res.headers].map(v => v.join('=')).join(',')}] body[${await res.text()}]`); return undefined; }
+        const xForwardedFor = reqHeaders.get('cf-connecting-ip');
+        const userAgent = u.hostname.endsWith('.buzzsprout.com') ? 'op3-buzzsprout-hls-test' : (reqHeaders.get('user-agent') ?? computeUserAgent({ origin }));
+        const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': userAgent, ...xForwardedFor && { 'x-forwarded-for': xForwardedFor } } }));
+        if (!res.ok) { consoleWarn('tryComputeHlsResult', `${res.status} response fetching ${u?.toString()} with ${userAgent}, headers[${[...res.headers].map(v => v.join('=')).join(',')}] body[${await res.text()}]`); return undefined; }
         const { 'content-type': contentType, server } = Object.fromEntries(res.headers);
-        if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') { consoleWarn('tryComputeHlsResult', `Unexpected content-type ${contentType} fetching ${u?.toString()}`); return undefined; }
-        if (!res.body) { consoleWarn('tryComputeHlsResult', `No response body fetching ${u?.toString()}`); return undefined; }
+        if (contentType !== 'application/vnd.apple.mpegurl' && contentType !== 'application/x-mpegURL') { consoleWarn('tryComputeHlsResult', `Unexpected content-type ${contentType} fetching ${u?.toString()} with ${userAgent}`); return undefined; }
+        if (!res.body) { consoleWarn('tryComputeHlsResult', `No response body fetching ${u?.toString()} with ${userAgent}`); return undefined; }
         const sid = prefixArgs.s ?? generateUuid();
         const pid = generateUuid(); // we don't know the hash yet, and don't want to wait for it
         const timestamp = computeTimestamp();
