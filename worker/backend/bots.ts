@@ -987,4 +987,13 @@ const botIpHashes = new Set([
     'b9c80b8d611830d17ce8a3eaffba4406921b32fe', // 2026-05-03 for 2026-05-02 701    verizon    Overcast
     'c97ed19c930d8b93028c4afaccd47778cadfda3a', // 2026-05-03 for 2026-05-02 209    centurylink Overcast
     'f102dbe17ad966a39ba5d9104221b6db58d752a4', // 2026-05-03 for 2026-05-02 25776  okla       Chrome
+    '45e3fa0ec4f61fad90de2f6835af10351467c1d1', // 2026-05-04 for 2026-05-03 2907   sinet      Chrome, Safari, Firefox
+    '88348a118b45135784b91f7a8fec82ed80858e45', // 2026-05-04 for 2026-05-03 2907   sinet      Chrome, Safari, Firefox
+    '8a80e28dffe44366caaeed17469ebf509d31b1bd', // 2026-05-04 for 2026-05-03 2907   sinet      Chrome, Safari, Firefox
+    'ca04bade2a6da8f853880b55e90ccf7f8477eb72', // 2026-05-04 for 2026-05-03 2907   sinet      Chrome, Safari, Firefox
+    '6bff70446d81708a748202df215d9809b961dd73', // 2026-05-04 for 2026-05-03 401243 komi       Chrome
+    '94f7587100b87749418f6c0501ee3281aac3f053', // 2026-05-04 for 2026-05-03 701    verizon    Overcast
+    'a941b39797e0e8dbd0966587dd240bc0a43421af', // 2026-05-04 for 2026-05-03 701    verizon    Overcast
+    'b7c0919eb9736b9c6c16af38bfa3a8d00a13b06e', // 2026-05-04 for 2026-05-03 701    verizon    Overcast
+    'f547c2fb1153848616045ae42f298af0f1e0664a', // 2026-05-04 for 2026-05-03 7922   comcast    Overcast
 ]);
