@@ -131,26 +131,6 @@ export class HlsController {
         await Promise.resolve();
         const { sql, origin } = this;
         const { operationKind, targetPath, parameters } = req;
-        if (targetPath === '/hls/query' && operationKind === 'update') {
-            const { q, ...rest } = parameters ?? {};
-            if (typeof q !== 'string') throw new Error(`Param 'q' is required`);
-            if (q === 'size') {
-                const { databaseSize } = sql;
-                const message = JSON.stringify({ rowsRead: 0, rowsWritten: 0 });
-                return { results: [ { databaseSize }], message };
-            }
-            const params: unknown[] = [];
-            for (let i = 1; i < 10; i++) {
-                const v = rest[`p${i}`];
-                if (typeof v !== 'string') break;
-                params.push(v);
-            }
-            const c = sql.exec(q, ...params);
-            const { rowsRead, rowsWritten } = c;
-            const results = c.toArray();
-            const message = JSON.stringify({ rowsRead, rowsWritten });
-            return { results, message };
-        }
         if (targetPath === '/hls/reinit' && operationKind === 'update') {
             if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
             [ 'request', 'pid_hls_hash', 'hls_variant' ].forEach(v => sql.exec(`drop table if exists ${v}`));
@@ -167,10 +147,15 @@ export class HlsController {
         const rt: Unkinded<ExecuteSqlResponse> = { results: [] };
         storage.transactionSync(() => {
             for (const { q, params = [] } of req.statements) {
-                const c = sql.exec(q, ...params);
-                const { rowsRead, rowsWritten } = c;
-                const rows = c.toArray();
-                rt.results.push({ rows, rowsRead, rowsWritten });
+                if (q === 'size') {
+                    const { databaseSize } = sql;
+                    rt.results.push({ rows: [ { databaseSize } ], rowsRead: 0, rowsWritten: 0 });
+                } else {
+                    const c = sql.exec(q, ...params);
+                    const { rowsRead, rowsWritten } = c;
+                    const rows = c.toArray();
+                    rt.results.push({ rows, rowsRead, rowsWritten });
+                }
             }
         });
         return rt;
