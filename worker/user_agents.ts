@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@73558f5e8d04637f09ea5b3b7e1b53593b57f9b1 (2026-04-23T17:09:54Z)
+// from user-agents-v2@46043984247629edd06ec9fad41541afc3226cdf (2026-05-04T16:14:26Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -45,10 +45,12 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Applebot\//.test(userAgent)) return { name: `Applebot`, type: 'bot' };
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
+    if (/^atlas-transcribe\//.test(userAgent)) return { name: `atlas-transcribe`, type: 'bot' };
     if (/^Audacy Creator Lab Hosting\//.test(userAgent)) return { name: `Audacy Creator Lab Hosting`, type: 'bot' };
     if (/^audioBoomBot\/\d/.test(userAgent)) return { name: `Audioboom bot`, type: 'bot' };
     if (/AudioFetcher\/\d.*\+http/.test(userAgent)) return { name: `AudioFetcher`, type: 'bot' };
     if (/^Audiomack Podcast Processor\//.test(userAgent)) return { name: `Audiomack`, type: 'bot' };
+    if (/^audio-sanity-check\//.test(userAgent)) return { name: `audio-sanity-check`, type: 'bot' };
     if (/ Audioscrape\//.test(userAgent)) return { name: `Audioscrape`, type: 'bot' };
     if (/^AudioWaveBot\/1\.0/.test(userAgent)) return { name: `AudioWave feed parser`, type: 'bot' };
     if (/^AutoHotkey/.test(userAgent)) return { name: `AutoHotkey`, type: 'bot' };
@@ -76,9 +78,11 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Trackable\//.test(userAgent)) return { name: `Chartable`, type: 'bot' };
     if (/^clark-crawler2/.test(userAgent)) return { name: `Clark-Crawler, unknown`, type: 'bot' };
     if (/ClaudeBot\//.test(userAgent)) return { name: `Claudebot`, type: 'bot' };
+    if (/^clipgenie-service-worker$/.test(userAgent)) return { name: `clipgenie-service-worker`, type: 'bot' };
     if (/^Cloudflare-SSLDetector/.test(userAgent)) return { name: `Cloudflare SSL detector`, type: 'bot' };
     if (/https:\/\/www\.comscore\.com/.test(userAgent)) return { name: `Comscore Crawler`, type: 'bot' };
     if (/^ContentFlow\//.test(userAgent)) return { name: `ContentFlow`, type: 'bot' };
+    if (/^ConduitMCP\//.test(userAgent)) return { name: `ConduitMCP`, type: 'bot' };
     if (/^Podcast-CriticalMention\//.test(userAgent)) return { name: `Critical Mention`, type: 'bot' };
     if (/ Crowli\//.test(userAgent)) return { name: `Crowli`, type: 'bot' };
     if (/^curl|^libcurl\/|^PycURL\/| curl\//.test(userAgent)) return { name: `curl`, type: 'bot' };
@@ -131,6 +135,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^LinuxGetUrl\/\d/.test(userAgent)) return { name: `LinuxGetUrl`, type: 'bot' };
     if (/LivelapBot/.test(userAgent)) return { name: `Livelap Crawler`, type: 'bot' };
     if (/^ListenNotes\/3\.0 \(/.test(userAgent)) return { name: `ListenNotes`, type: 'bot' };
+    if (/^llmfeed\//.test(userAgent)) return { name: `llmfeed`, type: 'bot' };
     if (/^ltx71 /.test(userAgent)) return { name: `LTX71`, type: 'bot' };
     if (/^ShareSheetUI\//.test(userAgent)) return { name: `MacOS share menu`, type: 'bot' };
     if (/^MagellanAI\//.test(userAgent)) return { name: `MagellanAI`, type: 'bot' };
@@ -169,25 +174,29 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ PlayNext\/|^playnext-/.test(userAgent)) return { name: `PlayNext`, type: 'bot' };
     if (/^PodbeanFeedReader/.test(userAgent)) return { name: `PodBean Feed Reader`, type: 'bot' };
     if (/^Podbean Importer/.test(userAgent)) return { name: `Podbean Importer`, type: 'bot' };
-    if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)|PodcastIndexManager\//.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
+    if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)|PodcastIndexManager\/|^PodcastIndex Classifier\//.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
     if (/^PodcastStandard\//.test(userAgent)) return { name: `Podcast de facto Standard`, type: 'bot' };
     if (/^Podcast%20Archiver\//.test(userAgent)) return { name: `Podcast Archiver`, type: 'bot' };
     if (/^podcast-archiver\/v\d/.test(userAgent)) return { name: `Podcast Archiver (janw)`, type: 'bot' };
     if (/^podcast-downloader$| podcast-downloader\//.test(userAgent)) return { name: `Podcast Downloader`, type: 'bot' };
+    if (/^PodcastFeedAnalyzer\//.test(userAgent)) return { name: `PodcastFeedAnalyzer`, type: 'bot' };
     if (/^podcast-go-audio-downloader\//.test(userAgent)) return { name: `Podcast Go Audio Downloader`, type: 'bot' };
     if (/ PodcastIndexer\/\d/.test(userAgent)) return { name: `PodcastIndexer`, type: 'bot' };
     if (/ PodcastTranslator\/\d/.test(userAgent)) return { name: `PodcastTranslator`, type: 'bot' };
     if (/^Podcast Transcriber \d/.test(userAgent)) return { name: `Podcast Transcriber`, type: 'bot' };
     if (/^Podcastics$/.test(userAgent)) return { name: `Podcastics`, type: 'bot' };
     if (/^Podcatcher Bot 1.0/.test(userAgent)) return { name: `Podcatcher Bot`, type: 'bot' };
-    if (/^PodcastDL\//.test(userAgent)) return { name: `PodcastDL`, type: 'bot' };
+    if (/^(PodcastDL|podcastdl)\//.test(userAgent)) return { name: `PodcastDL`, type: 'bot' };
     if (/^PodchaserParser\//.test(userAgent)) return { name: `Podchaser Parser`, type: 'bot' };
     if (/^PodcastBulkDownloader\//.test(userAgent)) return { name: `PodcastBulkDownloader`, type: 'bot' };
     if (/ PodcastDownloader\//.test(userAgent)) return { name: `PodcastDownloader`, type: 'bot' };
+    if (/^podcast-download-worker\//.test(userAgent)) return { name: `podcast-download-worker`, type: 'bot' };
     if (/^podcast-grabber\//.test(userAgent)) return { name: `podcast-grabber`, type: 'bot' };
     if (/^PodcastPipeline\//.test(userAgent)) return { name: `PodcastPipeline`, type: 'bot' };
+    if (/^podcast-preflight\//.test(userAgent)) return { name: `podcast-preflight`, type: 'bot' };
     if (/ podcast-renamer\//.test(userAgent)) return { name: `podcast-renamer`, type: 'bot' };
     if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
+    if (/^podcast-stt\//.test(userAgent)) return { name: `podcast-stt`, type: 'bot' };
     if (/ PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
     if (/^PodcastWorker\//.test(userAgent)) return { name: `PodcastWorker`, type: 'bot' };
     if (/^podcasts-ai-local-transcribe\//.test(userAgent)) return { name: `podcasts ai local transcribe`, type: 'bot' };
@@ -724,6 +733,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^[Pp]odverse\//.test(userAgent)) return { name: `Podverse`, type: 'app' };
     if (/Podyssey App|com\.toysinboxes\.Echo|fm\.podyssey\.podcasts|^Podyssey/.test(userAgent)) return { name: `Podyssey`, type: 'app' };
     if (/^Pratilipi FM\/\d/.test(userAgent)) return { name: `Pratilipi FM`, type: 'app' };
+    if (/^PrestoCast\//.test(userAgent)) return { name: `PrestoCast`, type: 'app' };
     if (/^Pro[Cc]ast\/\d|^com\.podflitzer\.android\/\d|^Procast \(/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
     if (/^PurerPodcasts\//.test(userAgent)) return { name: `PurerPodcasts`, type: 'app' };
