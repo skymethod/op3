@@ -343,7 +343,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
         headers.set('x-times', JSON.stringify(times)); // TODO use Server-Timing ?
         headers.set('x-sid', sid);
         headers.set('x-pid', pid);
-        headers.set('x-timestatmp', timestamp);
+        headers.set('x-timestamp', timestamp);
         const pendingWork = async () => {
             const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
             const hash = (await originalBytes.sha1()).hex();
