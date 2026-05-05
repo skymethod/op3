@@ -996,4 +996,9 @@ const botIpHashes = new Set([
     'a941b39797e0e8dbd0966587dd240bc0a43421af', // 2026-05-04 for 2026-05-03 701    verizon    Overcast
     'b7c0919eb9736b9c6c16af38bfa3a8d00a13b06e', // 2026-05-04 for 2026-05-03 701    verizon    Overcast
     'f547c2fb1153848616045ae42f298af0f1e0664a', // 2026-05-04 for 2026-05-03 7922   comcast    Overcast
+    '11f6d2741ec5fa63c79b7f7860f3bae52fa07b85', // 2026-05-05 for 2026-05-04 701    verizon    Overcast
+    'a536a60d3066c47dc923f620cc083ae013e15be7', // 2026-05-05 for 2026-05-04 701    verizon    Overcast
+    '7abdd8c30462e10cff88dfa712cb24df3a4f24fe', // 2026-05-05 for 2026-05-04 16863  hometele   Overcast
+    'c58059306c203a4b85ca74657d70502fe4e1f86b', // 2026-05-05 for 2026-05-04 2907   sinet      Chrome, Safari, Firefox
+    'e80863fbb5d0bc7a30872b1e8f1435d691c865f2', // 2026-05-05 for 2026-05-04 2907   sinet      Chrome, Safari, Firefox
 ]);
