@@ -228,11 +228,14 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
                 if (secret) await addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl });
-
-                const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
-                console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                rawRedirects.push(rawRedirect);
-                validRawRedirect = rawRedirect;
+                if (other.subrequest === 'hls') {
+                    // temporarily exclude, don't overwhelm hits controller!
+                } else {
+                    const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
+                    console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                    rawRedirects.push(rawRedirect);
+                    validRawRedirect = rawRedirect;
+                }
             }
             
             if (rawRedirects.length > 0) {
