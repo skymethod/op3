@@ -31,7 +31,7 @@ export class HitsController {
     private state: State | undefined;
     private recentMinuteTimestamps: string[] = [];
 
-    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, colo: string, rpcClient: RpcClient | undefined, durableObjectName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn, ) {
+    constructor(storage: DurableObjectStorage, hitsBlobs: Blobs, colo: string, rpcClient: RpcClient | undefined, durableObjectName: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn) {
         this.storage = storage;
         this.hitsBlobs = hitsBlobs;
         this.colo = colo;

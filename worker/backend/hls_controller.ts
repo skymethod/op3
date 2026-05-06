@@ -8,6 +8,7 @@ import { isValidTimestamp } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
 import { AttNums } from './att_nums.ts';
 import { tryParsePrefixArguments } from './prefix_arguments.ts';
+import { executeSqlCommon } from './sql_common.ts';
 
 export class HlsController {
 
@@ -142,23 +143,7 @@ export class HlsController {
     }
 
     async executeSql(req: Unkinded<ExecuteSqlRequest>): Promise<Unkinded<ExecuteSqlResponse>> {
-        await Promise.resolve();
-        const { sql, storage } = this;
-        const rt: Unkinded<ExecuteSqlResponse> = { results: [] };
-        storage.transactionSync(() => {
-            for (const { q, params = [] } of req.statements) {
-                if (q === 'size') {
-                    const { databaseSize } = sql;
-                    rt.results.push({ rows: [ { databaseSize } ], rowsRead: 0, rowsWritten: 0 });
-                } else {
-                    const c = sql.exec(q, ...params);
-                    const { rowsRead, rowsWritten } = c;
-                    const rows = c.toArray();
-                    rt.results.push({ rows, rowsRead, rowsWritten });
-                }
-            }
-        });
-        return rt;
+        return await executeSqlCommon(req, this.storage);
     }
 
 }

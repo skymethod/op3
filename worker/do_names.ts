@@ -1,4 +1,4 @@
-import { checkMatches } from './check.ts';
+import { checkMatches, check, isValidGuid } from './check.ts';
 
 export class DoNames {
     static readonly combinedRedirectLog = 'combined-redirect-log';
@@ -17,4 +17,11 @@ export class DoNames {
     }
 
     static readonly isStorageless = (name: string) => name.startsWith('storageless-');
+
+    static readonly hlsInstanceForPodcastGuid = (pg: string): string => {
+        check('pg', pg, isValidGuid);
+        return `hls-instance-pg-${pg}`;
+    }
+
+    static readonly isHlsInstance = (name: string) => name.startsWith('hls-instance-');
 }

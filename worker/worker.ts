@@ -40,7 +40,7 @@ import { computeFaviconSvgResponse } from './routes/favicons.ts';
 import { makeBaselimeFromWorkerContext } from './baselime.ts';
 import { makeCloudflareLimiter } from './limiter.ts';
 import { computeRawRedirect } from './backend/raw_redirects.ts';
-import { tryParseInt, tryParseUrl } from './check.ts';
+import { isValidGuid, tryParseInt, tryParseUrl } from './check.ts';
 import { computeUserAgent } from './outbound.ts';
 import { computeLinestream } from './streams.ts';
 import { timed } from './async.ts';
@@ -203,7 +203,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
 
     // proxy hls playlist requests (if opted in)
     let hlsResult: HlsResult | undefined;
-    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && env.origin && env.blobsBucket && env.podcastIndexCredentials) {
+    if (!banned && redirectRequest.kind === 'valid' && redirectRequest.prefixArgs?.hls === '1' && typeof redirectRequest.prefixArgs?.pg === 'string' && env.origin && env.blobsBucket && env.podcastIndexCredentials) {
         const { origin, blobsBucket, podcastIndexCredentials: secret } = env;
         const { method, headers } = request;
         const { prefixArgs } = redirectRequest;
@@ -222,19 +222,29 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
             if (!backendNamespace) throw new Error(`backendNamespace not defined!`);
             
             rawIpAddress = computeRawIpAddress(request.headers) ?? '<missing>';
+            let sendHlsData: Promise<void> | undefined;
             if (redirectRequest.kind === 'valid' && !banned) {
                 const { prefixArgs = {}, targetUrl } = redirectRequest;
                 const other = computeOther(request) ?? {};
                 colo = (other ?? {}).colo ?? colo;
                 other.isolateId = IsolateId.get();
                 if (secret) await addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl });
-                if (other.subrequest === 'hls') {
-                    // temporarily exclude, don't overwhelm hits controller!
-                } else {
-                    const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
-                    console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
+                console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
+                if (other.subrequest !== 'hls') { // all "top-level" redirect requests, including master hls
                     rawRedirects.push(rawRedirect);
                     validRawRedirect = rawRedirect;
+                }
+                if (typeof prefixArgs.pg === 'string' && prefixArgs.hls === '1' && (other.subrequest === 'hls' || hlsResult)) { // all hls requests and subrequests
+                    const { pg } = prefixArgs;
+                    sendHlsData = (async () => {
+                        const rpcClient = new CloudflareRpcClient(backendNamespace, backendSqlNamespace, 5);
+                        try {
+                            await rpcClient.logRawRedirects({ rawRedirects: [ rawRedirect ] }, DoNames.hlsInstanceForPodcastGuid(pg));
+                        } catch {
+                            // TODO retry? log somewhere without overwhelming logs?
+                        }
+                    })();
                 }
             }
             
@@ -267,6 +277,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                     await rpcClient.logRawRedirects({ rawRedirects }, doName);
                 }
             }
+            if (sendHlsData) await sendHlsData;
         } catch (e) {
             consoleError('worker-sending-redirects', `Error sending raw redirects: ${(e as Error).stack || e}`);
             // we'll retry if this isolate gets hit again, otherwise lost
@@ -306,6 +317,8 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
     u.searchParams.set('_t', Date.now().toString());
     try {
         const times: Record<string, number> = {};
+        const { pg } = prefixArgs;
+        if (!isValidGuid(pg)) { consoleWarn('tryComputeHlsResult', `Unexpected pg prefix arg: ${pg} in ${u?.toString()}`); return undefined; };
         const xForwardedFor = reqHeaders.get('cf-connecting-ip');
         const userAgent = u.hostname.endsWith('.buzzsprout.com') ? 'op3-buzzsprout-hls-test' : (reqHeaders.get('user-agent') ?? computeUserAgent({ origin }));
         const res = await timed(times, 'fetch', () => fetch(u?.toString(), { cache: 'no-store', headers: { 'user-agent': userAgent, ...xForwardedFor && { 'x-forwarded-for': xForwardedFor } } }));
@@ -328,8 +341,8 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
                     const absUrl = new URL(trimmed, u);
                     const absUrlStr = absUrl.toString();
                     if (!absUrlStr.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
-                    const sig = (await hmac(Bytes.ofUtf8([ 's', sid, 'p', pid, 't', timestamp, 'hn', absUrl.hostname, 'pn', absUrl.pathname ].join(',')), hmacKey)).hex();
-                    const transformedLine = `${origin}/e,hls=1,s=${sid},p=${pid},t=${timestamp},g=${sig}/${absUrlStr.substring('https://'.length)}`;
+                    const sig = (await hmac(Bytes.ofUtf8([ 'pg', pg, 's', sid, 'p', pid, 't', timestamp, 'hn', absUrl.hostname, 'pn', absUrl.pathname ].join(',')), hmacKey)).hex();
+                    const transformedLine = `${origin}/e,hls=1,pg=${pg},s=${sid},p=${pid},t=${timestamp},g=${sig}/${absUrlStr.substring('https://'.length)}`;
                     newLines.push(transformedLine);
                 } else {
                     newLines.push(line);
@@ -373,12 +386,12 @@ async function addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl }: 
     if (typeof prefixArgs.p === 'string') other.ppid = prefixArgs.p;
     if (typeof prefixArgs.s === 'string') {
         other.subrequest = 'hls';
-        const { s, p, t, g } = prefixArgs;
-        if ([ s, p, t, g ].every(v => typeof v === 'string')) {
+        const { pg, s, p, t, g } = prefixArgs;
+        if ([ pg, s, p, t, g ].every(v => typeof v === 'string')) {
             const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
             const u = tryParseUrl(targetUrl);
             if (u) {
-                const sig = (await hmac(Bytes.ofUtf8([ 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
+                const sig = (await hmac(Bytes.ofUtf8([ 'pg', pg, 's', s, 'p', p, 't', t, 'hn', u.hostname, 'pn', u.pathname ].join(',')), hmacKey)).hex();
                 if (sig === g) {
                     other.verifiedTimestamp = t;
                 }

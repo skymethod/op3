@@ -39,19 +39,7 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof time !== 'number') throw new Error(`Bad rawRedirect ${uuid}: no time!`);
     const timestamp = computeTimestamp(time);
     rt.timestamp = timestamp;
-    if (typeof rawIpAddress === 'string') {
-        rt.encryptedIpAddress = await encryptIpAddress(rawIpAddress, { timestamp });
-        rt.hashedIpAddress = await hashIpAddress(rawIpAddress, { timestamp });
-        const ipAddressForDownload = (() => {
-            try {
-                return computeIpAddressForDownload(rawIpAddress);
-            } catch (e) {
-                consoleWarn(`${callerTag}-pack-raw-redirect`, `Error in computeIpAddressForDownload: ${(e as Error).stack || e}`);
-                return rawIpAddress;
-            }
-        })(); 
-        rt.hashedIpAddressForDownload = await hashIpAddress(ipAddressForDownload, { timestamp });
-    }
+    await computeIpAddressAttributes(rt, rawIpAddress, timestamp, callerTag, encryptIpAddress, hashIpAddress);
     if (typeof method === 'string') rt.method = method;
     if (typeof url === 'string') rt.url = url;
     if (typeof userAgent === 'string') rt.userAgent = userAgent;
@@ -70,6 +58,22 @@ export async function packRawRedirect(rawRedirect: RawRedirect, attNums: AttNums
     if (typeof doColo === 'string') rt.doColo = doColo;
     
     return attNums.packRecord(rt);
+}
+
+export async function computeIpAddressAttributes(rt: Record<string, string>, rawIpAddress: string, timestamp: string, callerTag: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn): Promise<void> {
+    if (typeof rawIpAddress === 'string') {
+        rt.encryptedIpAddress = await encryptIpAddress(rawIpAddress, { timestamp });
+        rt.hashedIpAddress = await hashIpAddress(rawIpAddress, { timestamp });
+        const ipAddressForDownload = (() => {
+            try {
+                return computeIpAddressForDownload(rawIpAddress);
+            } catch (e) {
+                consoleWarn(`${callerTag}-pack-raw-redirect`, `Error in computeIpAddressForDownload: ${(e as Error).stack || e}`);
+                return rawIpAddress;
+            }
+        })(); 
+        rt.hashedIpAddressForDownload = await hashIpAddress(ipAddressForDownload, { timestamp });
+    }
 }
 
 export function computeRawRedirect(request: Request, opts: { time: number, method: string, rawIpAddress: string, other?: Record<string, string> }): RawRedirect {

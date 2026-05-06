@@ -1,6 +1,7 @@
 import { tryParseInt } from './check.ts';
 import { isDurableObjectFetchErrorRetryable } from './cloudflare_errors.ts';
 import { DurableObjectNamespace } from './deps.ts';
+import { DoNames } from './do_names.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest, SendPackedRecordsRequest, ExecuteSqlRequest, ExecuteSqlResponse } from './rpc_model.ts';
 import { executeWithRetries } from './sleep.ts';
 
@@ -28,7 +29,7 @@ export class CloudflareRpcClient implements RpcClient {
     }
 
     async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target));
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target)));
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse> {

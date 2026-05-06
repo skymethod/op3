@@ -27,6 +27,7 @@ import { computeShowDailyDownloads, tryParseComputeShowDailyDownloadsRequest } f
 import { computeQueryDownloadsResponse } from './query_downloads.ts';
 import { HitsController } from './hits_controller.ts';
 import { HlsController } from './hls_controller.ts';
+import { HlsInstanceController } from './hls_instance_controller.ts';
 
 export class BackendDO {
     private readonly state: DurableObjectState;
@@ -43,6 +44,7 @@ export class BackendDO {
     private showController?: ShowController;
     private hitsController?: HitsController;
     private hlsController?: HlsController;
+    private hlsInstanceController?: HlsInstanceController;
 
     constructor(state: DurableObjectState, env: WorkerEnv) {
         this.state = state;
@@ -151,9 +153,19 @@ export class BackendDO {
                         return this.hlsController;
                     }
 
+                    const getOrLoadHlsInstanceController = () => {
+                        if (this.info?.sql !== true) throw new Error(`HlsInstanceController must use sql backend!`);
+                        if (typeof origin !== 'string') throw new Error(`Valid 'origin' is required to init HlsInstanceController: ${JSON.stringify(origin)}`);
+                        const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
+                        if (!this.hlsInstanceController) this.hlsInstanceController = new HlsInstanceController({ storage, origin, encryptIpAddress, hashIpAddress });
+                        return this.hlsInstanceController;
+                    }
+
                     if (obj.kind === 'log-raw-redirects') {
                         // save raw requests to storage
-                        if (obj.saveForLater) {
+                        if (DoNames.isHlsInstance(durableObjectName)) {
+                            await getOrLoadHlsInstanceController().process(obj.rawRedirects);
+                        } else if (obj.saveForLater) {
                             await getOrLoadRedirectLogController().saveForLater(obj.rawRedirects);
                         } else {
                             await getOrLoadRedirectLogController().save(obj.rawRedirects);
