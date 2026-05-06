@@ -40,6 +40,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
         || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01') // sinet
+        || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
@@ -1001,4 +1002,6 @@ const botIpHashes = new Set([
     '7abdd8c30462e10cff88dfa712cb24df3a4f24fe', // 2026-05-05 for 2026-05-04 16863  hometele   Overcast
     'c58059306c203a4b85ca74657d70502fe4e1f86b', // 2026-05-05 for 2026-05-04 2907   sinet      Chrome, Safari, Firefox
     'e80863fbb5d0bc7a30872b1e8f1435d691c865f2', // 2026-05-05 for 2026-05-04 2907   sinet      Chrome, Safari, Firefox
+    '2cfa1b6959c8f0bfdb9fcd3a40ac968cc9b93986', // 2026-05-06 for 2026-05-05 401243 komi       Chrome
+    'd0c34a5caba7536ce7c1ce03dc209fe9a87ae2d4', // 2026-05-06 for 2026-05-05 2907   sinet      Chrome, Safari, Firefox
 ]);
