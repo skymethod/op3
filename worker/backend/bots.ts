@@ -1004,4 +1004,7 @@ const botIpHashes = new Set([
     'e80863fbb5d0bc7a30872b1e8f1435d691c865f2', // 2026-05-05 for 2026-05-04 2907   sinet      Chrome, Safari, Firefox
     '2cfa1b6959c8f0bfdb9fcd3a40ac968cc9b93986', // 2026-05-06 for 2026-05-05 401243 komi       Chrome
     'd0c34a5caba7536ce7c1ce03dc209fe9a87ae2d4', // 2026-05-06 for 2026-05-05 2907   sinet      Chrome, Safari, Firefox
+    '6397613a8ff41ed64bfd18d51c4a3d8328a569f6', // 2026-05-07 for 2026-05-06 701    verizon    Overcast
+    '7ba5b4f869301e23fe74d771c33659649b8434d0', // 2026-05-07 for 2026-05-06 400238 pieg       Chrome
+    'c8ec312425bd405af0be6b1ed70c5e62ae87f736', // 2026-05-07 for 2026-05-06 7922   comcast    Overcast, Apple Podcasts, AppleCoreMedia
 ]);
