@@ -35,7 +35,7 @@ export class HlsInstanceController {
 
         for (const rawRedirect of rawRedirects) {
             const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, ipSource, other = {} } = rawRedirect;
-            const timestamp = computeTimestamp(time); // guarantees fixed length 24-char
+            const timestamp = computeTimestamp(time);
             const rt: Record<string, string> = {};
             await computeIpAddressAttributes(rt, rawIpAddress, timestamp, 'hls', encryptIpAddress, hashIpAddress);
             const { hashedIpAddress, hashedIpAddressForDownload } = rt;
@@ -126,7 +126,7 @@ export class HlsInstanceController {
 
 const REQUEST_COLUMNS = [
     // mandatory
-    'time_uuid text primary key', // <fixed-width-24-char-timestamp>_<uuid> 
+    'time_uuid text primary key', // <15-char-timestamp>_<uuid> 
     'method text not null',
     'url text not null',
     'sid text not null',

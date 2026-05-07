@@ -332,20 +332,29 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
         const hmacKey = hmacKeys.get(secret) ?? await importHmacKey(Bytes.ofUtf8(secret)); hmacKeys.set(secret, hmacKey);
         const oldLines: string[] = [];
         const newLines: string[] = [];
+        const computeTransformedUrl = async (relative: string): Promise<string> => {
+            const absUrl = new URL(relative, u);
+            const absUrlStr = absUrl.toString();
+            if (!absUrlStr.startsWith('https://')) throw new Error(`Unexpected URI: ${relative}`);
+            const sig = (await hmac(Bytes.ofUtf8([ 'pg', pg, 's', sid, 'p', pid, 't', timestamp, 'hn', absUrl.hostname, 'pn', absUrl.pathname ].join(',')), hmacKey)).hex();
+            return `${origin}/e,hls=1,pg=${pg},s=${sid},p=${pid},t=${timestamp},g=${sig}/${absUrlStr.substring('https://'.length)}`;
+        }
         await timed(times, 'read', async () => {
             for await (const line of computeLinestream(res.body!)) {
                 oldLines.push(line);
                 const trimmed = line.trim();
                 if (trimmed.length > 0 && !trimmed.startsWith('#')) {
                     // uri line, transform!
-                    const absUrl = new URL(trimmed, u);
-                    const absUrlStr = absUrl.toString();
-                    if (!absUrlStr.startsWith('https://')) throw new Error(`Unexpected URI line: ${trimmed}`);
-                    const sig = (await hmac(Bytes.ofUtf8([ 'pg', pg, 's', sid, 'p', pid, 't', timestamp, 'hn', absUrl.hostname, 'pn', absUrl.pathname ].join(',')), hmacKey)).hex();
-                    const transformedLine = `${origin}/e,hls=1,pg=${pg},s=${sid},p=${pid},t=${timestamp},g=${sig}/${absUrlStr.substring('https://'.length)}`;
-                    newLines.push(transformedLine);
+                    newLines.push(await computeTransformedUrl(trimmed));
                 } else {
-                    newLines.push(line);
+                    // known subplaylist tag with a uri, transform!
+                    const m = /^#(EXT-X-MEDIA|EXT-X-I-FRAME-STREAM-INF):(.+,)?URI="(.*?)"/.exec(trimmed);
+                    if (m) {
+                        const relative = m[3];
+                        newLines.push(trimmed.replace(`URI="${relative}"`, `URI="${await computeTransformedUrl(relative)}"`));
+                    } else {
+                        newLines.push(line);
+                    }
                 }
             }
         });
