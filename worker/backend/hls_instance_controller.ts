@@ -94,7 +94,7 @@ export class HlsInstanceController {
         }
         storage.transactionSync(() => {
             for (const bindings of requestRows.values()) {
-                sql.exec(`insert or ignore into request(${REQUEST_COLUMN_NAMES.join(', ')}) values (${REQUEST_COLUMN_NAMES.map(_ => '?').join(', ')})`, ...bindings);
+                sql.exec(`insert or ignore into request(${REQUEST_COLUMN_NAMES.join(', ')}) values (${REQUEST_COLUMN_NAMES.map(v => v === 'atts' ? 'jsonb(?)' : '?').join(', ')})`, ...bindings);
             }
             for (const bindings of pidHlsHashRows.values()) {
                 sql.exec(`insert or ignore into pid_hls_hash(pid, hls_hash) values (?, ?)`, ...bindings);
@@ -104,9 +104,14 @@ export class HlsInstanceController {
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         await Promise.resolve();
+        const { origin, sql } = this;
         const { operationKind, targetPath, parameters } = req;
 
-        // TODO if any
+        if (targetPath === '/hlsi/init' && operationKind === 'update') {
+            if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
+            initSql(sql);
+            return { message: 'init!' };
+        }
        
         throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters })}`);
     }
