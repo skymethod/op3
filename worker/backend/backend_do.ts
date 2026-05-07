@@ -205,6 +205,9 @@ export class BackendDO {
                         } else if (targetPath.startsWith('/hls/') && durableObjectName === DoNames.hlsServer) {
                             const { results, message } = await getOrLoadHlsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });
+                        } else if (targetPath.startsWith('/hlsi/') && DoNames.isHlsInstance(durableObjectName)) {
+                            const { results, message } = await getOrLoadHlsInstanceController().adminExecuteDataQuery(obj);
+                            return newRpcResponse({ kind: 'admin-data', results, message });
                         } 
 
                         const csddr = tryParseComputeShowDailyDownloadsRequest({ operationKind, targetPath, parameters });

@@ -123,7 +123,8 @@ export class HlsInstanceController {
                 return { message: `reinit! size=${sql.databaseSize}` };
             }
             if (targetPath === '/state' && operationKind === 'select') {
-                return { results: [ { durableObjectName, origin, colo }] };
+                const { databaseSize } = sql;
+                return { results: [ { durableObjectName, origin, colo, databaseSize }] };
             }
         }
        
