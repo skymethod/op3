@@ -348,7 +348,7 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
                     newLines.push(await computeTransformedUrl(trimmed));
                 } else {
                     // known subplaylist tag with a uri, transform!
-                    const m = /^#(EXT-X-MEDIA|EXT-X-I-FRAME-STREAM-INF):(.+,)?URI="(.*?)"/.exec(trimmed);
+                    const m = /^#(EXT-X-MEDIA|EXT-X-I-FRAME-STREAM-INF|EXT-X-MAP):(.+,)?URI="(.*?)"/.exec(trimmed);
                     if (m) {
                         const relative = m[3];
                         newLines.push(trimmed.replace(`URI="${relative}"`, `URI="${await computeTransformedUrl(relative)}"`));

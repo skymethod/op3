@@ -107,10 +107,11 @@ export class HlsInstanceController {
         const { origin, sql } = this;
         const { operationKind, targetPath, parameters } = req;
 
-        if (targetPath === '/hlsi/init' && operationKind === 'update') {
+        if (targetPath === '/hlsi/reinit' && operationKind === 'update') {
             if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
+            [ 'request', 'pid_hls_hash' ].forEach(v => sql.exec(`drop table if exists ${v}`));
             initSql(sql);
-            return { message: 'init!' };
+            return { message: `reinit! size=${sql.databaseSize}` };
         }
        
         throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters })}`);
