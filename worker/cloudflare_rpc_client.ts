@@ -29,7 +29,7 @@ export class CloudflareRpcClient implements RpcClient {
     }
 
     async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target), DoNames.isHlsInstance(target) ? 'enam' : undefined));
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target), computeLocationHint(target)));
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse> {
@@ -91,7 +91,7 @@ export class CloudflareRpcClient implements RpcClient {
     //
 
     async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters, sql));
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters, sql, computeLocationHint(target)));
     }
 
     async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
@@ -139,4 +139,8 @@ async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, 
     if (obj.kind !== expectedResponseKind) throw new Error(`Unexpected rpc response: ${JSON.stringify(obj)}`);
     // deno-lint-ignore no-explicit-any
     return obj as any;
+}
+
+function computeLocationHint(target: string): LocationHint | undefined {
+    return DoNames.isHlsInstance(target) ? 'enam' : undefined
 }

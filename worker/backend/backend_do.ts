@@ -157,7 +157,7 @@ export class BackendDO {
                         if (this.info?.sql !== true) throw new Error(`HlsInstanceController must use sql backend!`);
                         if (typeof origin !== 'string') throw new Error(`Valid 'origin' is required to init HlsInstanceController: ${JSON.stringify(origin)}`);
                         const { encryptIpAddress, hashIpAddress } = getOrLoadHashingFns();
-                        if (!this.hlsInstanceController) this.hlsInstanceController = new HlsInstanceController({ storage, origin, colo, encryptIpAddress, hashIpAddress });
+                        if (!this.hlsInstanceController) this.hlsInstanceController = new HlsInstanceController({ durableObjectName, storage, origin, colo, encryptIpAddress, hashIpAddress });
                         return this.hlsInstanceController;
                     }
 

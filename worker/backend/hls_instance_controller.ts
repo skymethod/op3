@@ -1,6 +1,7 @@
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
 import { isValidHttpUrl } from '../check.ts';
 import { DurableObjectStorage, SqlStorage } from '../deps.ts';
+import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { AdminDataRequest, AdminDataResponse, ExecuteSqlRequest, ExecuteSqlResponse, RawRedirect, Unkinded } from '../rpc_model.ts';
 import { computeTimestamp, isValidTimestamp, timestampToInstant } from '../timestamp.ts';
 import { isValidUuid } from '../uuid.ts';
@@ -9,6 +10,7 @@ import { executeSqlCommon } from './sql_common.ts';
 
 export class HlsInstanceController {
 
+    private readonly durableObjectName: string;
     private readonly storage: DurableObjectStorage;
     private readonly sql: SqlStorage;
     private readonly origin: string;
@@ -16,7 +18,8 @@ export class HlsInstanceController {
     private readonly encryptIpAddress: IpAddressEncryptionFn;
     private readonly hashIpAddress: IpAddressHashingFn;
 
-    constructor({ storage, origin, colo, encryptIpAddress, hashIpAddress }: { storage: DurableObjectStorage, origin: string, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn }) {
+    constructor({ durableObjectName, storage, origin, colo, encryptIpAddress, hashIpAddress }: { durableObjectName: string, storage: DurableObjectStorage, origin: string, colo: string, encryptIpAddress: IpAddressEncryptionFn, hashIpAddress: IpAddressHashingFn }) {
+        this.durableObjectName = durableObjectName;
         this.storage = storage;
         const { sql } = storage;
         this.sql = sql;
@@ -34,11 +37,14 @@ export class HlsInstanceController {
         const pidHlsHashRows = new Map<string, (string | undefined)[]>(); // binding values by pid
 
         for (const rawRedirect of rawRedirects) {
-            const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid, xpsId, ipSource, other = {} } = rawRedirect;
+            const { uuid, time, rawIpAddress, method, url, userAgent, referer, range, ulid: _, xpsId, ipSource, other = {} } = rawRedirect;
             const timestamp = computeTimestamp(time);
             const rt: Record<string, string> = {};
             await computeIpAddressAttributes(rt, rawIpAddress, timestamp, 'hls', encryptIpAddress, hashIpAddress);
-            const { hashedIpAddress, hashedIpAddressForDownload } = rt;
+            const { hashedIpAddress: packedHashedIpAddress, hashedIpAddressForDownload: packedHashedIpAddressForDownload } = rt;
+
+            const hashedIpAddress = unpackHashedIpAddressHash(packedHashedIpAddress);
+            const hashedIpAddressForDownload = unpackHashedIpAddressHash(packedHashedIpAddressForDownload);
 
             const { sid, isolateId, pid, ppid, verifiedTimestamp, hlsHash, continent, country, region, colo, timezone, regionCode, metroCode, asn: asnStr, subrequest, ...rest } = other;
             if (!isValidUuid(sid)) throw new Error(`Bad sid: ${sid}`);
@@ -104,17 +110,24 @@ export class HlsInstanceController {
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         await Promise.resolve();
-        const { origin, sql } = this;
+        const { origin, sql, durableObjectName, colo } = this;
         const { operationKind, targetPath, parameters } = req;
 
-        if (targetPath === '/hlsi/reinit' && operationKind === 'update') {
-            if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
-            [ 'request', 'pid_hls_hash' ].forEach(v => sql.exec(`drop table if exists ${v}`));
-            initSql(sql);
-            return { message: `reinit! size=${sql.databaseSize}` };
+        const m = /^\/hlsi\/[0-9a-f-]+(\/.*?)$/.exec(targetPath);
+        if (m) {
+            const targetPath = m[1];
+            if (targetPath === `/reinit` && operationKind === 'update') {
+                if (!origin.startsWith('https://ci.')) throw new Error(`Only allowed on ci!`);
+                [ 'request', 'pid_hls_hash' ].forEach(v => sql.exec(`drop table if exists ${v}`));
+                initSql(sql);
+                return { message: `reinit! size=${sql.databaseSize}` };
+            }
+            if (targetPath === '/state' && operationKind === 'select') {
+                return { results: [ { durableObjectName, origin, colo }] };
+            }
         }
        
-        throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters })}`);
+        throw new Error(`Unsupported hls query: ${JSON.stringify({ operationKind, targetPath, parameters, durableObjectName })}`);
     }
 
     async executeSql(req: Unkinded<ExecuteSqlRequest>): Promise<Unkinded<ExecuteSqlResponse>> {
