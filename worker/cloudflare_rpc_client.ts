@@ -1,6 +1,6 @@
 import { tryParseInt } from './check.ts';
 import { isDurableObjectFetchErrorRetryable } from './cloudflare_errors.ts';
-import { DurableObjectNamespace } from './deps.ts';
+import { DurableObjectNamespace, LocationHint } from './deps.ts';
 import { DoNames } from './do_names.ts';
 import { AdminDataRequest, AdminDataResponse, AlarmRequest, GetKeyRequest, GetKeyResponse, GetNewRedirectLogsRequest, PackedRedirectLogsResponse, isRpcResponse, OkResponse, RedirectLogsNotificationRequest, RegisterDORequest, RpcClient, RpcRequest, LogRawRedirectsRequest, Unkinded, QueryRedirectLogsRequest, AdminRebuildIndexRequest, AdminRebuildIndexResponse, AdminGetMetricsRequest, ResolveApiTokenRequest, ResolveApiTokenResponse, ApiKeyResponse, GenerateNewApiKeyRequest, GetApiKeyRequest, ModifyApiKeyRequest, ExternalNotificationRequest, QueryPackedRedirectLogsRequest, QueryDownloadsRequest, LogRawRedirectsBatchResponse, LogRawRedirectsBatchRequest, QueryHitsIndexRequest, SendPackedRecordsRequest, ExecuteSqlRequest, ExecuteSqlResponse } from './rpc_model.ts';
 import { executeWithRetries } from './sleep.ts';
@@ -29,7 +29,7 @@ export class CloudflareRpcClient implements RpcClient {
     }
 
     async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target)));
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target), DoNames.isHlsInstance(target) ? 'enam' : undefined));
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse> {
@@ -104,26 +104,28 @@ export class CloudflareRpcClient implements RpcClient {
 
     //
 
-    private computeOpts(target: string, parameters?: Record<string, string>, sql?: boolean): { doName: string, backendOrSqlNamespace: DurableObjectNamespace, maxRetries: number } {
+    private computeOpts(target: string, parameters?: Record<string, string>, sql?: boolean, locationHint?: LocationHint): RpcOpts {
         const { backendNamespace, backendSqlNamespace } = this;
         const maxRetries = tryParseInt(parameters?.maxRetries) ?? this.maxRetries;
         const backendOrSqlNamespace = sql ? backendSqlNamespace : backendNamespace;
-        return { doName: target, backendOrSqlNamespace, maxRetries };
+        return { doName: target, backendOrSqlNamespace, maxRetries, locationHint };
     }
 
 }
 
 //
 
-async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendOrSqlNamespace: DurableObjectNamespace, maxRetries: number }): Promise<T> {
+type RpcOpts = { doName: string, backendOrSqlNamespace: DurableObjectNamespace, maxRetries: number, locationHint?: LocationHint };
+
+async function sendRpc<T>(request: RpcRequest, expectedResponseKind: string, opts: RpcOpts): Promise<T> {
     const { maxRetries } = opts;
     return await executeWithRetries(() => sendSingleRpc(request, expectedResponseKind, opts), { tag: 'sendRpc', isRetryable: isDurableObjectFetchErrorRetryable, maxRetries });
 }
 
-async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: { doName: string, backendOrSqlNamespace: DurableObjectNamespace }) {
-    const { doName, backendOrSqlNamespace } = opts;
+async function sendSingleRpc(request: RpcRequest, expectedResponseKind: string, opts: Omit<RpcOpts, 'maxRetries'>) {
+    const { doName, backendOrSqlNamespace, locationHint } = opts;
 
-    const stub = backendOrSqlNamespace.get(backendOrSqlNamespace.idFromName(doName));
+    const stub = backendOrSqlNamespace.get(backendOrSqlNamespace.idFromName(doName), { locationHint });
     const res = await stub.fetch('https://backend/rpc', { method: 'POST', body: JSON.stringify(request), headers: { 'do-name': doName } });
 
     if (res.status !== 200) throw new Error(`Bad rpc status: ${res.status}, body=${await res.text()}`);
