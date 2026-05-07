@@ -307,7 +307,7 @@ export class BackendDO {
                     } else if (obj.kind === 'send-packed-records' && durableObjectName === DoNames.hlsServer) {
                         await getOrLoadHlsController().sendPackedRecords(obj);
                         return newRpcResponse({ kind: 'ok' });
-                    } else if (obj.kind === 'execute-sql' && durableObjectName === DoNames.hlsServer) {
+                    } else if (obj.kind === 'execute-sql' && (durableObjectName === DoNames.hlsServer || DoNames.isHlsInstance(durableObjectName))) {
                         return newRpcResponse({ kind: 'execute-sql', ...await getOrLoadHlsController().executeSql(obj) });
                     } else {
                         throw new Error(`Unsupported rpc request: ${JSON.stringify(obj)}`);
