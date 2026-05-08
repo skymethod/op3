@@ -1007,4 +1007,9 @@ const botIpHashes = new Set([
     '6397613a8ff41ed64bfd18d51c4a3d8328a569f6', // 2026-05-07 for 2026-05-06 701    verizon    Overcast
     '7ba5b4f869301e23fe74d771c33659649b8434d0', // 2026-05-07 for 2026-05-06 400238 pieg       Chrome
     'c8ec312425bd405af0be6b1ed70c5e62ae87f736', // 2026-05-07 for 2026-05-06 7922   comcast    Overcast, Apple Podcasts, AppleCoreMedia
+    '4781fe01bf3bdc2a27c72f688457ec1e18af1af6', // 2026-05-08 for 2026-05-07 7922   comcast    Overcast, Apple Podcasts, Apple Podcasts (Watch)
+    '871106240f97ad3837d65d351af5957101d5d0ec', // 2026-05-08 for 2026-05-07 20412  clarity    Overcast
+    'bcb8aafb1899cf9b37593a4153308dcb0a9e3de3', // 2026-05-08 for 2026-05-07 20115  charter    Overcast
+    'd40e453365858248a02e64cec8567c157b958b27', // 2026-05-08 for 2026-05-07 7922   comcast    Overcast
+    'e9c8aa3ab7824b29e251d96b229c37d2ec9e353a', // 2026-05-08 for 2026-05-07 20412  clarity    Overcast
 ]);
