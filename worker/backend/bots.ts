@@ -1014,4 +1014,6 @@ const botIpHashes = new Set([
     'e9c8aa3ab7824b29e251d96b229c37d2ec9e353a', // 2026-05-08 for 2026-05-07 20412  clarity    Overcast
     '34447ce6a72ae4137be5d38da40362c1436b4a60', // 2026-05-09 for 2026-05-08 151390 rutilea    Chrome
     '933e4742d521ba86db20b63858c6333d48e8f075', // 2026-05-09 for 2026-05-08 701    verizon    Overcast
+    'd9e194cf4b034ca7238534de3014dd4a562008b2', // 2026-05-10 for 2026-05-09 2907   sinet      Chrome
+    'fe04ec4d9be77d31109e411500a6882e2d34bfce', // 2026-05-10 for 2026-05-09 7018   att        Pocket Casts, Podcast Guru, Podverse, Castamatic, Overcast
 ]);
