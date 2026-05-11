@@ -1016,4 +1016,5 @@ const botIpHashes = new Set([
     '933e4742d521ba86db20b63858c6333d48e8f075', // 2026-05-09 for 2026-05-08 701    verizon    Overcast
     'd9e194cf4b034ca7238534de3014dd4a562008b2', // 2026-05-10 for 2026-05-09 2907   sinet      Chrome
     'fe04ec4d9be77d31109e411500a6882e2d34bfce', // 2026-05-10 for 2026-05-09 7018   att        Pocket Casts, Podcast Guru, Podverse, Castamatic, Overcast
+    '7d3479ceb0ff25163f5dcf6d882003d96312a8c4', // 2026-05-11 for 2026-05-10 701    verizon    Overcast
 ]);
