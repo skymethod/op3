@@ -39,7 +39,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
-        || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01') // sinet
+        || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date === '2026-05-11') // sinet
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
@@ -1017,4 +1017,10 @@ const botIpHashes = new Set([
     'd9e194cf4b034ca7238534de3014dd4a562008b2', // 2026-05-10 for 2026-05-09 2907   sinet      Chrome
     'fe04ec4d9be77d31109e411500a6882e2d34bfce', // 2026-05-10 for 2026-05-09 7018   att        Pocket Casts, Podcast Guru, Podverse, Castamatic, Overcast
     '7d3479ceb0ff25163f5dcf6d882003d96312a8c4', // 2026-05-11 for 2026-05-10 701    verizon    Overcast
+    '05007b9f9959b90f859077817b4b1f5af8d6adef', // 2026-05-12 for 2026-05-11 47790  netfala    Overcast
+    '10c774343ff6788d7351d225f51abd6cd9f2f23d', // 2026-05-12 for 2026-05-11 15997  intelligent Overcast
+    '14e58514497465711a3ae6c228ab29b63d84871f', // 2026-05-12 for 2026-05-11 701    verizon    Overcast
+    '62d670a1ae0e051f657248fdc6aa62b267745c42', // 2026-05-12 for 2026-05-11 3320   telekom    Mozilla/5.0 (compatible; kidou-downloader/1.0)
+    'a1c78ee7d843f1a50dea5ac1794e56f8c5b13dcb', // 2026-05-12 for 2026-05-11 11427  charter    Podcast Addict, Chrome
+    'bf32dee96870b47dd37085c74fc7ede187951e8b', // 2026-05-12 for 2026-05-11 7018   att        Downcast
 ]);
