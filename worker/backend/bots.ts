@@ -39,7 +39,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
-        || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date === '2026-05-11') // sinet
+        || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date >= '2026-05-11') // sinet
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
@@ -1023,4 +1023,7 @@ const botIpHashes = new Set([
     '62d670a1ae0e051f657248fdc6aa62b267745c42', // 2026-05-12 for 2026-05-11 3320   telekom    Mozilla/5.0 (compatible; kidou-downloader/1.0)
     'a1c78ee7d843f1a50dea5ac1794e56f8c5b13dcb', // 2026-05-12 for 2026-05-11 11427  charter    Podcast Addict, Chrome
     'bf32dee96870b47dd37085c74fc7ede187951e8b', // 2026-05-12 for 2026-05-11 7018   att        Downcast
+    '02dcddbb880e0641e482488830ebaad0a9bd4c19', // 2026-05-13 for 2026-05-12 2907   sinet      Chrome, Safari, Firefox
+    '6b98b5cd002d59df30223013614c820e70032ec6', // 2026-05-13 for 2026-05-12 2907   sinet      Chrome, Safari, Firefox
+    'affb1d7b737ccbb5b99c7a0984bc3915d13a06ec', // 2026-05-13 for 2026-05-12 11427  charter    KutPod-Importer/1.0 (+https://kutpod.io)
 ]);
