@@ -539,8 +539,8 @@ export interface LogRawRedirectsBatchResponse {
     }
 }
 
-export interface SqlStatementResult {
-    readonly rows: unknown[];
+export interface SqlStatementResult<TRow = unknown> {
+    readonly rows: TRow[];
     readonly rowsRead: number;
     readonly rowsWritten: number;
 }

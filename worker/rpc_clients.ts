@@ -154,7 +154,9 @@ export class RemoteRpcClient extends StubRpcClient {
     
     private async executeRpc<TResponse extends RpcResponse>(request: RpcRequest, target: string): Promise<TResponse> {
         const res = await this.execute(request, target);
-        return await res.json() as TResponse;
+        const rpcRes = await res.json() as RpcResponse;
+        if (rpcRes.kind === 'error') throw new Error(`Rpc error: ${rpcRes.message}`);
+        return rpcRes as TResponse;
     }
 
     private async execute(request: RpcRequest, target: string): Promise<Response> {
