@@ -1026,4 +1026,5 @@ const botIpHashes = new Set([
     '02dcddbb880e0641e482488830ebaad0a9bd4c19', // 2026-05-13 for 2026-05-12 2907   sinet      Chrome, Safari, Firefox
     '6b98b5cd002d59df30223013614c820e70032ec6', // 2026-05-13 for 2026-05-12 2907   sinet      Chrome, Safari, Firefox
     'affb1d7b737ccbb5b99c7a0984bc3915d13a06ec', // 2026-05-13 for 2026-05-12 11427  charter    KutPod-Importer/1.0 (+https://kutpod.io)
+    '0cd3f69c24fc8a76130340abd9d1081d0bb344e4', // 2026-05-14 for 2026-05-13 701    verizon    Overcast
 ]);
