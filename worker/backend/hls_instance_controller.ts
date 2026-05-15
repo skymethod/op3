@@ -139,7 +139,7 @@ export class HlsInstanceController {
 
 //
 
-const REQUEST_COLUMNS = [
+export const REQUEST_COLUMNS = [
     // mandatory
     'time_uuid text primary key', // <15-char-timestamp>_<uuid> 
     'method text not null',
@@ -177,7 +177,7 @@ const REQUEST_COLUMNS = [
     'errors blob', // string array
 ];
 
-const REQUEST_COLUMN_NAMES = REQUEST_COLUMNS.map(v => v.split(' ')[0]);
+export const REQUEST_COLUMN_NAMES = REQUEST_COLUMNS.map(v => v.split(' ')[0]);
 
 function initSql(sql: SqlStorage) {
     sql.exec(`create table if not exists request(${REQUEST_COLUMNS.join(', ')}) without rowid`);
