@@ -1027,4 +1027,9 @@ const botIpHashes = new Set([
     '6b98b5cd002d59df30223013614c820e70032ec6', // 2026-05-13 for 2026-05-12 2907   sinet      Chrome, Safari, Firefox
     'affb1d7b737ccbb5b99c7a0984bc3915d13a06ec', // 2026-05-13 for 2026-05-12 11427  charter    KutPod-Importer/1.0 (+https://kutpod.io)
     '0cd3f69c24fc8a76130340abd9d1081d0bb344e4', // 2026-05-14 for 2026-05-13 701    verizon    Overcast
+    '027735bc1293e91386c91f48d968b363df920960', // 2026-05-15 for 2026-05-14 5607   skyuk      Overcast
+    '83b060d5cd43345f9afc47f1162f3fe794e10834', // 2026-05-15 for 2026-05-14 48090  techoff    Firefox
+    '881fc9092f3c8c96e4be5a65bfdc5ceacd08f23a', // 2026-05-15 for 2026-05-14 20412  clarity    Overcast
+    'af4df70386bd345fe376f64ef15ef60fbc2f7e0b', // 2026-05-15 for 2026-05-14 701    verizon    Overcast
+    'd8bc26fde80f598df360a38780f390529ef23eda', // 2026-05-15 for 2026-05-14 4808   unicom     Chrome
 ]);
