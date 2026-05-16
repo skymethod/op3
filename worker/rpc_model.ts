@@ -265,6 +265,7 @@ export interface QueryDownloadsRequest {
     readonly episodeId?: string;
     readonly bots?: 'include' | 'exclude';
     readonly ro?: boolean;
+    readonly includeAsn?: boolean;
 }
 
 export interface AdminGetMetricsRequest {
@@ -437,11 +438,11 @@ export interface PackedRedirectLogsResponse extends PackedRedirectLogs {
     readonly kind: 'packed-redirect-logs';
 }
 
-export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics' | 'read-show';
+export type SettableApiTokenPermission = 'preview' | 'read-data' | 'notification' | 'admin-metrics' | 'read-show' | 'read-extra';
 export type ApiTokenPermission = 'admin' | SettableApiTokenPermission;
 
 export function isSettableApiTokenPermission(value: string): value is SettableApiTokenPermission {
-    return value === 'preview' || value === 'read-data' || value === 'notification' || value === 'admin-metrics' || value === 'read-show';
+    return value === 'preview' || value === 'read-data' || value === 'notification' || value === 'admin-metrics' || value === 'read-show' || value === 'read-extra';
 }
 
 export function hasPermission(permissions: ReadonlySet<ApiTokenPermission>, ...allowablePermissions: ApiTokenPermission[]): boolean {

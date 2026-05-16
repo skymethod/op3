@@ -32,7 +32,7 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
         const admin = permissions.has('admin');
-        request = await parseRequest(searchParams, rawIpAddress, admin);
+        request = await parseRequest(searchParams, rawIpAddress, permissions);
         if (!admin) writeTraceEvent({ kind: 'generic', type: 'qhits', ...computeEventPayload(request, permissions.has('preview')) });
     } catch (e) {
         const { message } = packError(e);
@@ -108,7 +108,7 @@ const computeHeaders = (includeAsn: boolean, includeHashedIpAddressForDownload: 
     ...(includeIpSource ? [ 'ipSource' ] : []),
 ];
 
-async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined, admin: boolean): Promise<Unkinded<QueryRedirectLogsRequest>> {
+async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string | undefined, permissions: ReadonlySet<ApiTokenPermission>): Promise<Unkinded<QueryRedirectLogsRequest>> {
     await Promise.resolve();
     let request: Unkinded<QueryRedirectLogsRequest> = { ...computeApiQueryCommonParameters(searchParams, QUERY_HITS) };
     const { url, urlSha256, userAgent, referer, hashedIpAddress, edgeColo, ulid, xpsId, method, include } = Object.fromEntries(searchParams);
@@ -148,7 +148,7 @@ async function parseRequest(searchParams: URLSearchParams, rawIpAddress: string 
             request = { ...request, hashedIpAddress };
         }
     }
-    if (typeof include === 'string' && admin) {
+    if (typeof include === 'string' && (permissions.has('admin') || permissions.has('read-extra') && include === 'asn')) {
         request = { ...request, include };
     }
     return request;

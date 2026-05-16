@@ -9,7 +9,7 @@ import { addDaysToDateString } from '../timestamp.ts';
 import { newQueryResponse } from '../routes/api_query_common.ts';
 
 export async function computeQueryDownloadsResponse(request: QueryDownloadsRequest, { statsBlobs: rwStatsBlobs, roStatsBlobs }: { statsBlobs?: Blobs, roStatsBlobs?: Blobs }): Promise<Response> {
-    const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv', continuationToken: continuationTokenFilter, skipHeaders, ro} = request;
+    const { showUuid, bots = 'exclude', episodeId: episodeIdFilter, limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, format = 'tsv', continuationToken: continuationTokenFilter, skipHeaders, ro, includeAsn } = request;
 
     console.log(`computeQueryDownloadsResponse: ${JSON.stringify(request)}`);
 
@@ -43,7 +43,7 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
             if (stream) {
                 for await (const obj of yieldTsvFromStream(stream)) {
                     rowNumber++;
-                    const { time, serverUrl: url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode } = obj;
+                    const { time, serverUrl: url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode, asn } = obj;
                     if (time === undefined) throw new Error(`Undefined time`);
                     latestTime = time;
                     if (unpackedContinuationTokenFilter && date === unpackedContinuationTokenFilter.date && rowNumber <= unpackedContinuationTokenFilter.rowNumber) continue;
@@ -54,10 +54,10 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
                     if (episodeIdFilter && episodeIdFilter !== episodeId) continue;
 
                     if (format === 'tsv' || format === 'json-a') {
-                        const arr = [ time, url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode ];
+                        const arr = [ time, url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode, ...(includeAsn ? [ asn ] : []) ];
                         rows.push(format === 'tsv' ? arr.join('\t') : arr);
                     } else {
-                        rows.push({ time, url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode });
+                        rows.push({ time, url, audienceId, showUuid, episodeId, hashedIpAddress, agentType, agentName, deviceType, deviceName, referrerType, referrerName, botType, countryCode, continentCode, regionCode, regionName, timezone, metroCode, ...(includeAsn ? { asn } : {}) });
                     }
                     if (rows.length >= limit) break;
                 }
@@ -67,12 +67,13 @@ export async function computeQueryDownloadsResponse(request: QueryDownloadsReque
     }
     const continuationToken = rows.length >= limit && date ? packContinuationToken({ date, rowNumber }) : undefined;
     const progress = rows.length >= limit && latestTime && startTimeInclusive && endTimeExclusive ? computeProgress(latestTime, startTimeInclusive, endTimeExclusive) : undefined;
+    const headers = includeAsn ? [ ...DEFAULT_HEADERS, 'asn' ] : DEFAULT_HEADERS;
     return newQueryResponse({ startTime, format, headers, rows, continuationToken, skipHeaders, progress })
 }
 
 //
 
-const headers = [ 'time', 'url', 'audienceId', 'showUuid', 'episodeId', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'botType', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ];
+const DEFAULT_HEADERS = [ 'time', 'url', 'audienceId', 'showUuid', 'episodeId', 'hashedIpAddress', 'agentType', 'agentName', 'deviceType', 'deviceName', 'referrerType', 'referrerName', 'botType', 'countryCode', 'continentCode', 'regionCode', 'regionName', 'timezone', 'metroCode' ];
 
 async function computeEarliestShowDownloadDate(showUuid: string, statsBlobs: Blobs): Promise<string | undefined> {
     const { keys } = await statsBlobs.list({ keyPrefix: computeShowDailyKeyPrefix({ showUuid })});

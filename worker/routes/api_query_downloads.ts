@@ -16,7 +16,7 @@ export async function computeApiQueryDownloadsResponse(permissions: ReadonlySet<
 
     let req: QueryDownloadsRequest;
     try {
-        req = parseRequest(path, searchParams);
+        req = parseRequest(path, searchParams, permissions);
     } catch (e) {
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
@@ -33,7 +33,7 @@ export async function computeApiQueryDownloadsResponse(permissions: ReadonlySet<
 
 //
 
-function parseRequest(path: string, searchParams: URLSearchParams): QueryDownloadsRequest {
+function parseRequest(path: string, searchParams: URLSearchParams, permissions: ReadonlySet<ApiTokenPermission>): QueryDownloadsRequest {
     const m = /^\/downloads\/show\/(.*?)$/.exec(path);
     if (!m) throw new Error(`Bad api path: ${path}`);
     
@@ -41,7 +41,7 @@ function parseRequest(path: string, searchParams: URLSearchParams): QueryDownloa
     check('showUuid', showUuid, isValidUuid);
 
     let request: QueryDownloadsRequest = { kind: 'query-downloads', showUuid, ...computeApiQueryCommonParameters(searchParams, QUERY_DOWNLOADS) };
-    const { bots, episodeId } = Object.fromEntries(searchParams);
+    const { bots, episodeId, include } = Object.fromEntries(searchParams);
     if (typeof bots === 'string') {
         checkMatches('bots', bots, /^(include|exclude)$/);
         request = { ...request, bots: bots as 'include' | 'exclude' };
@@ -52,6 +52,9 @@ function parseRequest(path: string, searchParams: URLSearchParams): QueryDownloa
     }
     if (searchParams.has('ro')) {
         request = { ...request, ro: true };
+    }
+    if (include === 'asn' && (permissions.has('admin') || permissions.has('read-extra'))) {
+        request = { ...request, includeAsn: true };
     }
     return request;
 }
