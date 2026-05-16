@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@46043984247629edd06ec9fad41541afc3226cdf (2026-05-04T16:14:26Z)
+// from user-agents-v2@2b5f51dac91f70782df717c2ec9361d0a16301fd (2026-05-16T14:48:14Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -159,6 +159,8 @@ const botTests = {
     'IPFS Podcasting Node/0.7p,u,s (+https://ipfspodcasting.net)': { type: 'bot', name: `IPFS Podcasting Node` },
     'Jaunt/1.5': { type: 'bot', name: `Jaunt` },
     'Jamit/1.0': { type: 'bot', name: `Jamit bot` },
+    'Mozilla/5.0 (compatible; kidou-downloader/1.0)': { type: 'bot', name: `kidou-downloader` },
+    'KutPod-Importer/1.0 (+https://kutpod.io)': { type: 'bot', name: `KutPod Importer` },
     'Mozilla/5.0 (compatible; LAC_IAHarvester/3.3.0; +https://library-archives.canada.ca/eng/services/government-canada/web-social-media-preservation-program/Pages/web-archive.aspx)': { type: 'bot', name: `Library and Archives Canada` },
     'Libsyn4-Download': { type: 'bot', name: `Libsyn` },
     'LWP::Simple/6.34 libwww-perl/6.34': { type: 'bot', name: `libwww-perl` },
@@ -228,6 +230,7 @@ const botTests = {
     'podcast-downloader': { type: 'bot', name: `Podcast Downloader` },
     'Mozilla/5.0 (compatible; podcast-downloader/1.0)': { type: 'bot', name: `Podcast Downloader` },
     'PodcastFeedAnalyzer/1.0': { type: 'bot', name: `PodcastFeedAnalyzer` },
+    'Mozilla/5.0 (compatible; PodcastFetcher/1.0)': { type: 'bot', name: `PodcastFetcher` },
     'podcast-go-audio-downloader/2.0': { type: 'bot', name: `Podcast Go Audio Downloader` },
     'Mozilla/5.0 (compatible; PodcastIndexer/1.0)': { type: 'bot', name: `PodcastIndexer` },
     'Mozilla/5.0 (compatible; PodcastTranslator/1.0)': { type: 'bot', name: `PodcastTranslator` },
@@ -335,6 +338,7 @@ const botTests = {
     'Turnitin (https://bit.ly/2UvnfoQ)': { type: 'bot', name: `TurnitinBot` },
     'Mozilla/5.0 (compatible; Twingly Recon; twingly.com)': { type: 'bot', name: `Twingly Bot` },
     'UCast/1.0 Podcast Sync (1 subscribers; feed-id=aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yMDg0OTQucnNzEAEBAD32-0242-42AC-8583-21E9BAD8C544; +http://www.ucastapp.com/)': { type: 'bot', name: `UCast` },
+    'UniversalFeedParser/3.3 +http://feedparser.org/': { type: 'bot', name: `UniversalFeedParser` },
     'Mozilla/5.0+(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)': { type: 'bot', name: `UptimeRobot` },
     'teeming-modal-podcast-transcriber/1.0': { type: 'bot', name: `Teeming modal podcast transcriber` },
     'TelegramBot (like TwitterBot)': { type: 'bot', name: `TelegramBot` },
@@ -1009,6 +1013,7 @@ const appTests = {
     'Shifty Jelly Pocket Casts, iOS v4.2': { type: 'app', name: `Pocket Casts` },
     'Pocket%20Casts/7.96.0.4 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `Pocket Casts` },
     'Pocket%20Casts/7.95.0.4 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `Pocket Casts` },
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) PocketCasts/2.2.0 Chrome/144.0.7559.220 Electron/40.6.1 Safari/537.36': { type: 'app', name: `Pocket Casts` },
     'Podbay/21 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Podbay` },
     'Podbean/Android App 7.6.4 (http://podbean.com),1927526fe23b5acf535b3e91b64cee95': { type: 'app', name: `Podbean` },
     'Podbean/Android App 8.1.5 (http://podbean.com),4f6852f59091d32475ef75a53325a4fe': { type: 'app', name: `Podbean` },
@@ -1067,6 +1072,7 @@ const appTests = {
     'Podyssey': { type: 'app', name: `Podyssey` },
     'Pratilipi FM/6.3.2 (Linux;Android 14) AndroidXMedia3/1.2.1': { type: 'app', name: `Pratilipi FM` },
     'PrestoCast/26 CFNetwork/3860.500.112 Darwin/25.4.0': { type: 'app', name: `PrestoCast` },
+    'PrestoCastDev/1 CFNetwork/3860.400.51 Darwin/25.3.0': { type: 'app', name: `PrestoCast` },
     'ProCast/1 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `ProCast` },
     'com.podflitzer.android/1.8.1 (Linux;Android 10) AndroidXMedia3/1.4.1': { type: 'app', name: `ProCast` },
     'Procast (iOS)': { type: 'app', name: `ProCast` },
@@ -1228,6 +1234,8 @@ const appTests = {
     'Ubook Player': { type: 'app', name: `Ubook Player` },
     'Upcast/1.0 (+https://getupcast.app/; iOS podcast app)': { type: 'app', name: `Upcast` },
     'Updates/1.10 (+https://getupdates.app/; iOS podcast app)': { type: 'app', name: `Updates` },
+    'UpNext/18 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `Up Next` },
+    'UpNext/15 CFNetwork/3860.500.112 Darwin/25.4.0': { type: 'app', name: `Up Next` },
     'BTWebClient/1870(43938)': { type: 'app', name: `uTorrent` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Vestnytt Hermes/90.0.0 _app_': { type: 'app', name: `Vestnytt iOS app` },
     'Android VG Hermes/1000094692 app vg_app_ VG/Snarvei/1000094692 VG-App': { type: 'app', name: `VG Android app` },
