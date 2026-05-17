@@ -124,11 +124,12 @@ export interface Feed {
     readonly image: string; // url ("The channel-level image element")
     readonly artwork: string; // url ("The seemingly best artwork we can find for the feed. Might be the same as image in most instances")
     readonly podcastGuid?: string; // not set in search!
+    readonly itunesId: number | null;
 }
 
 function checkFeed(obj: unknown): obj is Feed {
     if (!isStringRecord(obj)) throw new StatusError(`Unexpected Feed obj: ${JSON.stringify(obj)}`);
-    const { id, title, author, ownerName, url, originalUrl, image, artwork } = obj;
+    const { id, title, author, ownerName, url, originalUrl, image, artwork, itunesId } = obj;
     if (typeof id !== 'number') throw new StatusError(`Unexpected id: ${JSON.stringify(id)}`);
     if (typeof title !== 'string') throw new StatusError(`Unexpected title: ${JSON.stringify(title)}`);
     if (!(author === null || typeof author === 'string')) throw new StatusError(`Unexpected author: ${JSON.stringify(author)}`);
@@ -137,6 +138,7 @@ function checkFeed(obj: unknown): obj is Feed {
     if (typeof originalUrl !== 'string') throw new StatusError(`Unexpected originalUrl: ${JSON.stringify(originalUrl)}`);
     if (typeof image !== 'string') throw new StatusError(`Unexpected image: ${JSON.stringify(image)}`);
     if (typeof artwork !== 'string') throw new StatusError(`Unexpected artwork: ${JSON.stringify(artwork)}`);
+    if (!(itunesId === null || typeof itunesId === 'number')) throw new StatusError(`Unexpected itunesId: ${JSON.stringify(itunesId)}`);
     return true;
 }
 
