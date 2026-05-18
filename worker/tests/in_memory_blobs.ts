@@ -14,10 +14,11 @@ export class InMemoryBlobs implements Blobs {
     get(key: string, as: 'stream-and-meta', opts?: GetOpts): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
     get(key: string, as: 'stream', opts?: GetOpts): Promise<ReadableStream<Uint8Array> | undefined>;
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'buffer-and-meta'): Promise<{ buffer: ArrayBuffer, etag: string } | undefined>;
     get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
     get(key: string, as: 'json', opts?: GetOpts): Promise<unknown | undefined>;
-    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'text' | 'text-and-meta' | 'json', opts: GetOpts = {}): Promise<string | { text: string, etag: string } | ArrayBuffer | ReadableStream<Uint8Array> | { stream: ReadableStream<Uint8Array>, etag: string } | unknown | undefined> {
+    async get(key: string, as: 'stream-and-meta' | 'stream' | 'buffer' | 'buffer-and-meta' | 'text' | 'text-and-meta' | 'json', opts: GetOpts = {}): Promise<string | { text: string, etag: string } | ArrayBuffer | ReadableStream<Uint8Array> | { stream: ReadableStream<Uint8Array>, etag: string } | unknown | undefined> {
         await Promise.resolve();
         if (Object.keys(opts).length > 0) throw new Error(`Unsupported get opts: ${JSON.stringify(opts)}`);
         const record = this.data.get(key);
@@ -26,6 +27,7 @@ export class InMemoryBlobs implements Blobs {
         if (as === 'stream') return new Blob([ arr ]).stream();
         if (as === 'stream-and-meta') return { stream: new Blob([ arr ]).stream(), etag };
         if (as === 'buffer') return arr.buffer;
+        if (as === 'buffer-and-meta') return { buffer: arr.buffer, etag };
         if (as === 'text-and-meta') return { text: new TextDecoder().decode(arr), etag };
         if (as === 'text') return new TextDecoder().decode(arr);
         if (as === 'json') return JSON.parse(new TextDecoder().decode(arr));

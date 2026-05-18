@@ -47,6 +47,7 @@ export class R2ApiBlobs implements Blobs {
     get(key: string, as: 'stream-and-meta'): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
     get(key: string, as: 'stream'): Promise<ReadableStream<Uint8Array> | undefined>;
     get(key: string, as: 'buffer'): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'buffer-and-meta'): Promise<{ buffer: ArrayBuffer, etag: string } | undefined>;
     get(key: string, as: 'text-and-meta'): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text'): Promise<string | undefined>;
     get(key: string, as: 'json'): Promise<unknown | undefined>;
@@ -66,6 +67,7 @@ export class R2ApiBlobs implements Blobs {
                 throw new Error('Catchable', { cause: e });
             } } )(), etag };
         if (as === 'buffer') return await res.arrayBuffer();
+        if (as === 'buffer-and-meta') return { buffer: await res.arrayBuffer(), etag };
         if (as === 'json') return await res.json();
                   
         throw new Error();

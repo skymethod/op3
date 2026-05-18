@@ -4,6 +4,7 @@ export interface Blobs {
     get(key: string, as: 'stream-and-meta', opts?: GetOpts): Promise<{ stream: ReadableStream<Uint8Array>, etag: string } | undefined>;
     get(key: string, as: 'stream', opts?: GetOpts): Promise<ReadableStream<Uint8Array> | undefined>;
     get(key: string, as: 'buffer', opts?: GetOpts): Promise<ArrayBuffer | undefined>;
+    get(key: string, as: 'buffer-and-meta', opts?: GetOpts): Promise<{ buffer: ArrayBuffer, etag: string } | undefined>;
     get(key: string, as: 'text-and-meta', opts?: GetOpts): Promise<{ text: string, etag: string } | undefined>;
     get(key: string, as: 'text', opts?: GetOpts): Promise<string | undefined>;
     get(key: string, as: 'json', opts?: GetOpts): Promise<unknown | undefined>;
