@@ -1,12 +1,12 @@
 // minimal deps to facilitate sharing across projects
-import { Bytes } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/bytes.ts';
-import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/get_head_object.ts';
-import type { PutObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/put_object.ts';
-import type { AwsCallContext, AwsCredentials, CompletedPart } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/r2.ts';
-import type { ListBucketResult, ListObjectsOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/list_objects_v2.ts';
-import type { UploadPartOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/upload_part.ts';
-import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/r2/r2.ts';
-import { verifyToken, VerifyTokenResult } from 'https://raw.denoflare.dev/skymethod/denoflare/cebd786cf79a2f1c24736ac706a1b5f54b42949d/common/cloudflare_api.ts';
+import { Bytes } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/bytes.ts';
+import type { GetObjectOpts, HeadObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/get_head_object.ts';
+import type { PutObjectOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/put_object.ts';
+import type { AwsCallContext, AwsCredentials, CompletedPart } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/r2.ts';
+import type { ListBucketResult, ListObjectsOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/list_objects_v2.ts';
+import type { UploadPartOpts } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/upload_part.ts';
+import { abortMultipartUpload, completeMultipartUpload, createMultipartUpload, deleteObject, getObject, headObject, listObjectsV2, putObject, uploadPart } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/r2.ts';
+import { verifyToken, VerifyTokenResult } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/cloudflare_api.ts';
 import { checkMatches } from '../check.ts';
 import { executeWithRetries } from '../sleep.ts';
 import { Blobs, ListBlobsResponse, ListBlobsWithMetadataResponse, ListOpts, Multiput } from './blobs.ts';

@@ -23,5 +23,11 @@ export class DoNames {
         return `hls-instance-pg-${pg}`;
     }
 
+    static readonly tryParsePodcastGuidForHlsInstance = (name: string): string | undefined => {
+        const [ _, pg ] = /^hls-instance-pg-(.*?)$/.exec(name) ?? [];
+        return isValidGuid(pg) ? pg : undefined;
+    }
+    
     static readonly isHlsInstance = (name: string) => name.startsWith('hls-instance-');
+
 }
