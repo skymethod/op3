@@ -1036,4 +1036,6 @@ const botIpHashes = new Set([
     'b149e51fed475bbe08c68f733e111b8d40df5b2c', // 2026-05-16 for 2026-05-15 701    verizon    Overcast
     'd632af36a291af3867a104f812132de686ea6575', // 2026-05-16 for 2026-05-15 20412  clarity    Overcast
     '679fcda9ecf848a5c231f1eb03b9d1266a971a98', // 2026-05-17 for 2026-05-16 701    verizon    Overcast
+    '09d9b182faf269d02c822f02a83899e2620e3070', // 2026-05-18 for 2026-05-17 701    verizon    Overcast
+    '9f9e7e80d3104334bdc2b014e991d32a11fe4a86', // 2026-05-18 for 2026-05-17 48090  techoff    Firefox
 ]);
