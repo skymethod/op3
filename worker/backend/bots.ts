@@ -1038,4 +1038,5 @@ const botIpHashes = new Set([
     '679fcda9ecf848a5c231f1eb03b9d1266a971a98', // 2026-05-17 for 2026-05-16 701    verizon    Overcast
     '09d9b182faf269d02c822f02a83899e2620e3070', // 2026-05-18 for 2026-05-17 701    verizon    Overcast
     '9f9e7e80d3104334bdc2b014e991d32a11fe4a86', // 2026-05-18 for 2026-05-17 48090  techoff    Firefox
+    '365fa1e5ae09a00e09764aadde6627e6287c6bf3', // 2026-05-21 for 2026-05-10 3352   telefonica Overcast, Pocket Casts, Castro
 ]);
