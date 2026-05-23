@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@2b5f51dac91f70782df717c2ec9361d0a16301fd (2026-05-16T14:48:14Z)
+// from user-agents-v2@5ee5c1ce7458664ded409962e6394bc57a5a8ff7 (2026-05-23T14:11:58Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -307,6 +307,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^yacybot/.test(userAgent)) return { name: `YaCy`, type: 'bot' };
     if (/Yahoo! Slurp/.test(userAgent)) return { name: `Yahoo Crawler`, type: 'bot' };
     if (/YandexBot\//.test(userAgent)) return { name: `YandexBot`, type: 'bot' };
+    if (/^yushi-podcast-catalog\//.test(userAgent)) return { name: `yushi-podcast-catalog`, type: 'bot' };
     if (/^Zapier$/.test(userAgent)) return { name: `Zapier`, type: 'bot' };
     if (/^Zencastr\//.test(userAgent)) return { name: `Zencast`, type: 'bot' };
     if (/^podwordsbot\//.test(userAgent)) return { name: `podwords`, type: 'bot' };

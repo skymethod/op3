@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2b5f51dac91f70782df717c2ec9361d0a16301fd (2026-05-16T14:48:14Z)
+// from user-agents-v2@5ee5c1ce7458664ded409962e6394bc57a5a8ff7 (2026-05-23T14:11:58Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -356,6 +356,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; ImageFetcher/9.0; +http://wsrv.nl/)': { type: 'bot', name: `wsrv.nl` },
     'yacybot (/global; amd64 Linux 5.9.8-zen1-1-zen; java 1.8.0_265; Europe/de) http://yacy.net/bot.html': { type: 'bot', name: `YaCy` },
     'Crawler Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)': { type: 'bot', name: `Yahoo Crawler` },
+    'yushi-podcast-catalog/1.0 (+apple-search-api-policy-first)': { type: 'bot', name: `yushi-podcast-catalog` },
     'Zapier': { type: 'bot', name: `Zapier` },
     'Zencastr/2.0': { type: 'bot', name: `Zencast` },
     'podwordsbot/0.0.1 podwords': { type: 'bot', name: `podwords` },
