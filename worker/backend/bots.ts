@@ -1040,4 +1040,5 @@ const botIpHashes = new Set([
     '9f9e7e80d3104334bdc2b014e991d32a11fe4a86', // 2026-05-18 for 2026-05-17 48090  techoff    Firefox
     '365fa1e5ae09a00e09764aadde6627e6287c6bf3', // 2026-05-21 for 2026-05-20 3352   telefonica Overcast, Pocket Casts, Castro
     '1fe65f8ceb8da3dd61b6ca3c894df88fc2e66322', // 2026-05-22 for 2026-05-21 3352   telefonica Overcast, AppleCoreMedia
+    'dac288d7de9f859e663f2823d6d3b5ee437a9205', // 2026-05-23 for 2026-05-22 14061  do         Mozilla/5.0 (compatible; jamie-loader/1.0)
 ]);
