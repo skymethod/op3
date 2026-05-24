@@ -1041,4 +1041,6 @@ const botIpHashes = new Set([
     '365fa1e5ae09a00e09764aadde6627e6287c6bf3', // 2026-05-21 for 2026-05-20 3352   telefonica Overcast, Pocket Casts, Castro
     '1fe65f8ceb8da3dd61b6ca3c894df88fc2e66322', // 2026-05-22 for 2026-05-21 3352   telefonica Overcast, AppleCoreMedia
     'dac288d7de9f859e663f2823d6d3b5ee437a9205', // 2026-05-23 for 2026-05-22 14061  do         Mozilla/5.0 (compatible; jamie-loader/1.0)
+    '758b24b12685d289a34f082fdacca70cb5f759ce', // 2026-05-24 for 2026-05-23 399386 laramie    Overcast
+    'daddbb6c98e3981035739999495addf433bd5b50', // 2026-05-24 for 2026-05-23 24560  bharti     Chrome
 ]);
