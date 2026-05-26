@@ -1043,4 +1043,6 @@ const botIpHashes = new Set([
     'dac288d7de9f859e663f2823d6d3b5ee437a9205', // 2026-05-23 for 2026-05-22 14061  do         Mozilla/5.0 (compatible; jamie-loader/1.0)
     '758b24b12685d289a34f082fdacca70cb5f759ce', // 2026-05-24 for 2026-05-23 399386 laramie    Overcast
     'daddbb6c98e3981035739999495addf433bd5b50', // 2026-05-24 for 2026-05-23 24560  bharti     Chrome
+    '5662fe0896f3361142b39b712e4ed2ce45eed419', // 2026-05-26 for 2026-05-25 7922   comcast    Overcast
+    '6e7b9f4660742bf44c82395bae6cdd63ec6a5e7d', // 2026-05-26 for 2026-05-25 5650   frontier   Overcast
 ]);
