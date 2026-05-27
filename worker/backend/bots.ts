@@ -1045,4 +1045,6 @@ const botIpHashes = new Set([
     'daddbb6c98e3981035739999495addf433bd5b50', // 2026-05-24 for 2026-05-23 24560  bharti     Chrome
     '5662fe0896f3361142b39b712e4ed2ce45eed419', // 2026-05-26 for 2026-05-25 7922   comcast    Overcast
     '6e7b9f4660742bf44c82395bae6cdd63ec6a5e7d', // 2026-05-26 for 2026-05-25 5650   frontier   Overcast
+    '48c435fa07dab9ef8c310f13b083684ea7920e60', // 2026-05-27 for 2026-05-26 13335  cloudflare Chrome
+    '8eb6a7fe3b1b1776cab636ca5ef6b0ace15559de', // 2026-05-27 for 2026-05-26 13335  cloudflare Chrome
 ]);
