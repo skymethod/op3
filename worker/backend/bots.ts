@@ -32,7 +32,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now') // google fiber
         || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
         || asn === '14618' && agentName === 'Chrome' && regionCode === 'VA' && deviceName === 'Apple Computer' && date === '2025-12-20' // amazon
-        || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC') && date >= '2026-01-18' // google
+        || asn === '396982' && agentType === 'browser' && (regionCode === 'IA' || regionCode === 'SC' || date >= '2026-05-28') && date >= '2026-01-18' // google
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
         || asn === '396982' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-02' // google
         || asn === '132203' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-13' // tencent
@@ -40,6 +40,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
         || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date >= '2026-05-11') // sinet
+        || asn === '12876' && agentName === 'ktor-client' && date >= '2026-05-27' // scaleway
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
@@ -1047,4 +1048,41 @@ const botIpHashes = new Set([
     '6e7b9f4660742bf44c82395bae6cdd63ec6a5e7d', // 2026-05-26 for 2026-05-25 5650   frontier   Overcast
     '48c435fa07dab9ef8c310f13b083684ea7920e60', // 2026-05-27 for 2026-05-26 13335  cloudflare Chrome
     '8eb6a7fe3b1b1776cab636ca5ef6b0ace15559de', // 2026-05-27 for 2026-05-26 13335  cloudflare Chrome
+    'a410636589e9926e993c8fb84355e8d61a088666', // 2026-06-01 for 2026-05-27 12876  scaleway   ktor-client
+    '0e3bf5df85fc7c359347fde75e34f10d072d8f67', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    '19f95c4a4111d968e6392e52a6550f768d930c1d', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    '228546c6810fc78c658a5b5a0f9e787923c4cf52', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    '23e228d13ff4c043825df4d150a586cdf6044d90', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    '39b8a050be25e7d40507e06e95801501fcf477df', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    'd14d2ff9bf2e9aa54ae0a873cc4e4374f25c569d', // 2026-06-01 for 2026-05-28 396982 google     Chrome, Edge, Firefox
+    '0fe37539b89dbdb992c143bd5957d10a4b836338', // 2026-06-01 for 2026-05-28 7018   att        parc/0.1.0
+    '0347ad9d805620bc3ac4a8c9f7c7d57e55c8c823', // 2026-06-01 for 2026-05-29 11427  charter    Overcast
+    '32fec81943297b261da11e135c3d67f8c0d73112', // 2026-06-01 for 2026-05-29 47790  mariusz    Overcast
+    '75dc46c96c8d7ea75ec0bf25f9d1abc3e2a3534c', // 2026-06-01 for 2026-05-29 3352   telefonica Overcast
+    '0347ad9d805620bc3ac4a8c9f7c7d57e55c8c823', // 2026-06-01 for 2026-05-30 11427  charter    Overcast
+    '32fec81943297b261da11e135c3d67f8c0d73112', // 2026-06-01 for 2026-05-30 47790  mariusz    Overcast
+    '9213a35c96d2c9675adb5082392dfb14c93a755e', // 2026-06-01 for 2026-05-30 50266  odido      Overcast
+    'c17cc0342341e620ddb8a832b58b650b7be20393', // 2026-06-01 for 2026-05-30 12876  scaleway   ktor-client
+    'd20882d33f5283142ac6eb7c24fb395636b9e69f', // 2026-06-01 for 2026-05-30 132420 e2e        Chrome, Edge, Firefox
+    '0701b3a789732c6acb6d22a08ad59976d94043da', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '10ea3d6175920f974d62ee388d02699fad348974', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '1195bdcfec9a5dbfa2de2ddf2e47bf715848a36d', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '21d155bcd122df9f102414f44846ed44f4cd974e', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '4c074ae0677e3942c5e39b038974ca67a18ada86', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '518b5ce7bbbee9d36153394335da40f51a3443c9', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '683fcac7b40768ca62b832a9b67483878c82275a', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '6b923378c06f986b3d05bca49a671262bade04a3', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '778c2f6838e137a8a29d0b572abe6aa56d4dea24', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '78498b22935e93aca362d4a54804b41fece83128', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '82a15a1fe1316d5a98b6056984143312365d484f', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '831866efc4b5d340e8880f7cd84e7dfad99db9fb', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '8bc5ee016b1c3cb6010f2e5b5736f52b81dd8868', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '9725aa114ac0e4893f15563cb2c21c7acb206e13', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    'd8a486c1c9a417c25453a104bf49deed991a89e5', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    'da2fcd3fd199c8af05ba9e852994e300010e7798', // 2026-06-01 for 2026-05-31 57269  digispain  Overcast
+    '75dc46c96c8d7ea75ec0bf25f9d1abc3e2a3534c', // 2026-06-01 for 2026-05-31 3352   telefonica Overcast
+    '32fec81943297b261da11e135c3d67f8c0d73112', // 2026-06-01 for 2026-05-31 47790  mariusz    Overcast
+    'afaa9487f3cebb75ea5f563319b250b3311f23ac', // 2026-06-01 for 2026-05-31 400618 prime      Chrome
+    'd20882d33f5283142ac6eb7c24fb395636b9e69f', // 2026-06-01 for 2026-05-31 132420 e2e        Chrome, Edge, Firefox
+    'd75df0fd8af2381d2c60e7aa4d2b3b8faa555091', // 2026-06-01 for 2026-05-31 16591  gfiber     Overcast
 ]);
