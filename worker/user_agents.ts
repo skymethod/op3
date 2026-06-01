@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@5ee5c1ce7458664ded409962e6394bc57a5a8ff7 (2026-05-23T14:11:58Z)
+// from user-agents-v2@2331a87aa389c5505b3a4bd3ce3ef9a575449004 (2026-06-01T21:37:53Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -169,6 +169,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Owler \(/.test(userAgent)) return { name: `Owler Open Web Crawler`, type: 'bot' };
     if (/^PandoraRSSCrawler/.test(userAgent)) return { name: `Pandora RSS crawler`, type: 'bot' };
     if (/PaperLiBot\//.test(userAgent)) return { name: `PaperLi`, type: 'bot' };
+    if (/^parc\/\d/.test(userAgent)) return { name: `parc`, type: 'bot' };
     if (/PetalBot/.test(userAgent)) return { name: `PetalBot`, type: 'bot' };
     if (/^Pinecast\/Importer/.test(userAgent)) return { name: `Pinecast Importer`, type: 'bot' };
     if (/^Pingdom/.test(userAgent)) return { name: `Pingdom`, type: 'bot' };
@@ -209,6 +210,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/PodderBot\//.test(userAgent)) return { name: `PodderBot`, type: 'bot' };
     if (/poddl - (podcast downloader|https:\/\/github.com\/freshe\/poddl)/.test(userAgent)) return { name: `poddl - podcast downloader`, type: 'bot' };
     if (/podfollowbot\//.test(userAgent)) return { name: `Podfollow`, type: 'bot' };
+    if (/^Podget$/.test(userAgent)) return { name: `Podget`, type: 'bot' };
     if (/^Podgrab$/.test(userAgent)) return { name: `Podgrab`, type: 'bot' };
     if (/PodhoundBeta/.test(userAgent)) return { name: `Podhound`, type: 'bot' };
     if (/^Podio\//.test(userAgent)) return { name: `Podio Bot`, type: 'bot' };
@@ -524,6 +526,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Fili\//.test(userAgent)) return { name: `Fili`, type: 'app' };
     if (/(^MAC |^WIN )/.test(userAgent)) return { name: `Flash`, type: 'app' };
     if (/ Flipboard\//.test(userAgent)) return { name: `Flipboard`, type: 'app' };
+    if (/^Flux Entertainment Center\//.test(userAgent)) return { name: `Flux Entertainment Center`, type: 'app' };
     if (/^folkebladet\.no\//.test(userAgent)) return { name: `folkebladet.no`, type: 'app' };
     if (/^FocusPodcast_/.test(userAgent)) return { name: `FocusPodcast`, type: 'app' };
     if (/^foobar2000\//.test(userAgent)) return { name: `foobar2000`, type: 'app' };

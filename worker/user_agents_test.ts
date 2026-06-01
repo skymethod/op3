@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@5ee5c1ce7458664ded409962e6394bc57a5a8ff7 (2026-05-23T14:11:58Z)
+// from user-agents-v2@2331a87aa389c5505b3a4bd3ce3ef9a575449004 (2026-06-01T21:37:53Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -212,6 +212,7 @@ const botTests = {
     'Overcast%20Transcriber/1 CFNetwork/3855.100.1 Darwin/25.0.0': { type: 'bot', name: `Overcast Transcriber` },
     'Owler (ows.eu/owler)': { type: 'bot', name: `Owler Open Web Crawler` },
     'Mozilla/5.0 (compatible; PaperLiBot/2.1; https://support.paper.li/entries/20023257-what-is-paper-li)': { type: 'bot', name: `PaperLi` },
+    'parc/0.1.0': { type: 'bot', name: `parc` },
     'Mozilla/5.0 (Linux; Android 7.0;) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; PetalBot; https://aspiegel.com/petalbot)': { type: 'bot', name: `PetalBot` },
     'Pinecast/Importer 1.1': { type: 'bot', name: `Pinecast Importer` },
     'PlayerFM/1.0 Podcast Sync (0 subscribers; url=https://player.fm/series/series-2567872)': { type: 'bot', name: `PlayerFM Podcast Sync` },
@@ -259,6 +260,7 @@ const botTests = {
     'poddl - podcast downloader': { type: 'bot', name: `poddl - podcast downloader` },
     'poddl - https://github.com/freshe/poddl': { type: 'bot', name: `poddl - podcast downloader` },
     'Mozilla/5.0 https://podfollow.com/crawling podfollowbot/1.0': { type: 'bot', name: `Podfollow` },
+    'Podget': { type: 'bot', name: `Podget` },
     'Podgrab': { type: 'bot', name: `Podgrab` },
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
@@ -689,6 +691,7 @@ const appTests = {
     'FilesPro/646 CFNetwork/711.1.16 Darwin/14.0.0': { type: 'app', name: `FilesPro` },
     'Fili/3617 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `Fili` },
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Flipboard/4.3.52': { type: 'app', name: `Flipboard` },
+    'Flux Entertainment Center/1.0 (Podcast Player)': { type: 'app', name: `Flux Entertainment Center` },
     'folkebladet.no/252 CFNetwork/811.5.4 Darwin/16.7.0': { type: 'app', name: `folkebladet.no` },
     'FocusPodcast_2.8.1.20240715': { type: 'app', name: `FocusPodcast` },
     'foobar2000/1.x': { type: 'app', name: `foobar2000` },
