@@ -1085,4 +1085,15 @@ const botIpHashes = new Set([
     'afaa9487f3cebb75ea5f563319b250b3311f23ac', // 2026-06-01 for 2026-05-31 400618 prime      Chrome
     'd20882d33f5283142ac6eb7c24fb395636b9e69f', // 2026-06-01 for 2026-05-31 132420 e2e        Chrome, Edge, Firefox
     'd75df0fd8af2381d2c60e7aa4d2b3b8faa555091', // 2026-06-01 for 2026-05-31 16591  gfiber     Overcast
+    '073b3a0fa348567762b04683a2324c4feeb3c875', // 2026-06-02 for 2026-06-01 13335  cloudflare Chrome
+    '8cbe3ce5395ebcabd9851de6f2e0aa9644921e7a', // 2026-06-02 for 2026-06-01 13335  cloudflare Chrome
+    '0f9044cfebf37fe9e0241b4446a34a21be06ac19', // 2026-06-02 for 2026-06-01 206352 connective Firefox, Chrome, Safari
+    '4cf7698e19ffa6b254935f8b961dce2613be4464', // 2026-06-02 for 2026-06-01 57269  digispain  Overcast
+    'b5dc71c3489ec2f3e5d913ad9f0cf91b29ef98fb', // 2026-06-02 for 2026-06-01 57269  digispain  Overcast
+    '7b40f8e0cd01c7a20026e9b7b7938c3aa7f1feb6', // 2026-06-02 for 2026-06-01 132420 e2e        Firefox, Chrome, Safari
+    'bee2787cae838b686519fadbb696b2b39e4e582e', // 2026-06-02 for 2026-06-01 19151  bbone      Overcast
+    'c30ba7ac3e71dcdb27e11ed9db5a0254d52812ef', // 2026-06-02 for 2026-06-01 10031  websat     Firefox, Chrome, Safari
+    'e70a02062832b527cb05e5b96e14ad2e731158a3', // 2026-06-02 for 2026-06-01 3352   telefonica Overcast
+    'e8ff134973b406d600b38e8139996e233484225e', // 2026-06-02 for 2026-06-01 3352   telefonica Overcast
+    'f02b3996519193764912976e86c3f69911753d31', // 2026-06-02 for 2026-06-01 47790  mariusz    Overcast
 ]);
