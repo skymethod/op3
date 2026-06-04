@@ -1096,4 +1096,22 @@ const botIpHashes = new Set([
     'e70a02062832b527cb05e5b96e14ad2e731158a3', // 2026-06-02 for 2026-06-01 3352   telefonica Overcast
     'e8ff134973b406d600b38e8139996e233484225e', // 2026-06-02 for 2026-06-01 3352   telefonica Overcast
     'f02b3996519193764912976e86c3f69911753d31', // 2026-06-02 for 2026-06-01 47790  mariusz    Overcast
+    '10f343269f52dd5f02a036217b9545bd93dae0f0', // 2026-06-04 for 2026-06-02 7018   att        Overcast
+    '1c43787fcf86e420d66df11dd57fd176d789ef62', // 2026-06-04 for 2026-06-02 7922   comcast    DIFTCL-AnchorAudit/1.0 (+read-only; rate-limited)
+    '1f30acfc52bb771706573f4d87892236e9368f1f', // 2026-06-04 for 2026-06-02 3352   telefonica Overcast
+    '56bd6e5e80c95f7a9ce16f38a443cc05a14791eb', // 2026-06-04 for 2026-06-02 57269  digispain  Overcast
+    '812c175af5f432aabbbbf4a10cb71761d4a7bc94', // 2026-06-04 for 2026-06-02 57269  digispain  Overcast
+    'a067813b56d3c9d77b82cc22130b4d3ecc832a02', // 2026-06-04 for 2026-06-02 202767 futura     Overcast, AppleCoreMedia, PrestoCast
+    'abbe952167234f13c010dff74ba3237dbb7f9760', // 2026-06-04 for 2026-06-02 5650   frontier   Overcast
+    'be6e2324475f544cb711ab1f178ad0330a6db3a3', // 2026-06-04 for 2026-06-02 7018   att        Overcast
+    'd5b36228aa91d9b8bfb17aa31540da1978b01bf7', // 2026-06-04 for 2026-06-02 15704  xtra       Overcast
+    'f4d851c929645c3270dc3ee57a73aae66264d292', // 2026-06-04 for 2026-06-02 50266  odido      Chrome
+    '1f30acfc52bb771706573f4d87892236e9368f1f', // 2026-06-04 for 2026-06-03 3352   telefonica Overcast
+    '55139c0e7c92d553ea25bdd98953b4c3777a0493', // 2026-06-04 for 2026-06-03 3209   vodafone   Overcast
+    '5c32efe3bf6285d71c11b84f282d203dff3eb277', // 2026-06-04 for 2026-06-03 57269  digispain  Overcast
+    '812c175af5f432aabbbbf4a10cb71761d4a7bc94', // 2026-06-04 for 2026-06-03 57269  digispain  Overcast
+    'b3aa2013e8ab3015f8e30c439cf53ca2af512719', // 2026-06-04 for 2026-06-03 26832  rica       Chrome
+    'c27111cc45fa8229eaa887feaeba8db158bff348', // 2026-06-04 for 2026-06-03 39351  31173      Overcast
+    'd5b36228aa91d9b8bfb17aa31540da1978b01bf7', // 2026-06-04 for 2026-06-03 15704  xtra       Overcast, AppleCoreMedia, PrestoCast
+    'fc798af453c1cb1bd978dfbdfe6aa2c3685be676', // 2026-06-04 for 2026-06-03 7018   att        swyxdotio-podcast-migration/1.0
 ]);
