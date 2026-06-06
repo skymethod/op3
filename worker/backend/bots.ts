@@ -71,6 +71,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '30081'  // cachefly
             || asn === '714'    // apple
             || asn === '45102'  // alibaba
+            || asn == '136907' && date === '2026-06-05' // huawei
         )
         ;
 }
@@ -1114,4 +1115,36 @@ const botIpHashes = new Set([
     'c27111cc45fa8229eaa887feaeba8db158bff348', // 2026-06-04 for 2026-06-03 39351  31173      Overcast
     'd5b36228aa91d9b8bfb17aa31540da1978b01bf7', // 2026-06-04 for 2026-06-03 15704  xtra       Overcast, AppleCoreMedia, PrestoCast
     'fc798af453c1cb1bd978dfbdfe6aa2c3685be676', // 2026-06-04 for 2026-06-03 7018   att        swyxdotio-podcast-migration/1.0
+    '0a06ea5a9c2e5a4b9864eaef680608634a50cf1d', // 2026-06-06 for 2026-06-04 10031  websat     Firefox, Chrome, Safari
+    '354b4a145f6a91a69385d1460635fea3535b4a43', // 2026-06-06 for 2026-06-04 14061  do         Mozilla/5.0 (compatible; jamie-loader/1.0)
+    '39c30f80b23002699361005f67627870f141e682', // 2026-06-06 for 2026-06-04 57269  digispain  Overcast
+    '5214be30ce6a5fc802052e9ad6ba6ea01d357e81', // 2026-06-06 for 2026-06-04 57269  digispain  Overcast
+    '872902677207fa82208bc4f2bdd68b4de2456abd', // 2026-06-06 for 2026-06-04 57269  digispain  Overcast
+    'c3deb38338232dbd6c8093a307242eef66861d77', // 2026-06-06 for 2026-06-04 57269  digispain  Overcast
+    'cabed40d3e598b11836b390b35f71d13db7fa728', // 2026-06-06 for 2026-06-04 57269  digispain  Overcast
+    '433e091cc5e0237c1936736e9364b1ab83afd9ce', // 2026-06-06 for 2026-06-04 56048  chinamobile Chrome
+    '4b1e8ec3f439e290b1c4c03535c9d6be128fdc3e', // 2026-06-06 for 2026-06-04 11664  techtel    Chrome
+    '686de14b0c037ba44c5745ed34ec30072f590076', // 2026-06-06 for 2026-06-04 31615  odido      Overcast
+    '6e7d827ca0190836d79d3e48c0fcff13737ecb7b', // 2026-06-06 for 2026-06-04 4808   unicom     Chrome
+    '912b8c7d84e5a547ec8eb693b0f076b357f281cd', // 2026-06-06 for 2026-06-04 4808   unicom     Chrome
+    'cb5909de090c8957a8cdcdefd5f950d2dbbf09d3', // 2026-06-06 for 2026-06-04 33915  vodafone   Overcast
+    'e4b64226d7cbb1529b75d9afb30e4dd5bcec5550', // 2026-06-06 for 2026-06-04 213541 wstelecom  Chrome, Safari, Firefox
+    '01849bddc7cf8c6cec27ac02ae23e50c8ba70493', // 2026-06-06 for 2026-06-05 136907 huawei     Chrome, Firefox
+    '0b9e35d69607a0408a20bb18dd31e5df8c3fb127', // 2026-06-06 for 2026-06-05 136907 huawei     Chrome, Firefox
+    '0ed1d8bcb4ec5db1e101dffafbbb884c98f77e61', // 2026-06-06 for 2026-06-05 136907 huawei     Chrome, Firefox
+    '1295b57c51046a8ba2c29fe93f333b1c9694f99b', // 2026-06-06 for 2026-06-05 136907 huawei     Chrome, Firefox
+    '15e1a69ce4da74e428ebad1bb00f3d9b4028ccae', // 2026-06-06 for 2026-06-05 136907 huawei     Chrome, Firefox
+    '06d2d3f454ca051dd9915aea02b13179284bd832', // 2026-06-06 for 2026-06-05 57269  digispain  Overcast
+    '872902677207fa82208bc4f2bdd68b4de2456abd', // 2026-06-06 for 2026-06-05 57269  digispain  Overcast
+    '0b8d73bd2dded4b42dda7ff2ce7e65e693c4edb9', // 2026-06-06 for 2026-06-05 213541 wstelecom  Chrome, Safari, Firefox
+    '28dfa5c00eabf041462a808da03db279780da3e0', // 2026-06-06 for 2026-06-05 213541 wstelecom  Chrome, Safari, Firefox
+    '7eeebb12164a7694ae8028be4e09fcf08b591afb', // 2026-06-06 for 2026-06-05 213541 wstelecom  Chrome, Safari, Firefox
+    'fdfd15c66788917a65a537c4eedd75b30fc4a67b', // 2026-06-06 for 2026-06-05 213541 wstelecom  Chrome, Safari, Firefox
+    '1f090eb7015ffc77a5d2e718cc3856de213a44dd', // 2026-06-06 for 2026-06-05 207990 hostroyale Chrome, Safari, Firefox
+    '2c0aea3e4a47e4fac51a4f30741ea94903a148d0', // 2026-06-06 for 2026-06-05 207990 hostroyale Chrome, Safari, Firefox
+    '789669f6c7c0f0be3728807d8cc019274dc56cc5', // 2026-06-06 for 2026-06-05 207990 hostroyale Chrome, Safari, Firefox
+    '42874e72fb1c326f09b0adc93b386b2f241e929f', // 2026-06-06 for 2026-06-05 199527 uabbite    Chrome, Safari, Firefox
+    '686de14b0c037ba44c5745ed34ec30072f590076', // 2026-06-06 for 2026-06-05 31615  odido      Overcast
+    '8f309afaf97890601f5cfb33875f7d3cdb363db4', // 2026-06-06 for 2026-06-05 210528 ???        Chrome, Safari, Firefox
+    'beaa2f788da69197ce4dc423e0ef9a403437d611', // 2026-06-06 for 2026-06-05 4213   krypt      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 ]);
