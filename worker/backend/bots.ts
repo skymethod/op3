@@ -1147,4 +1147,8 @@ const botIpHashes = new Set([
     '686de14b0c037ba44c5745ed34ec30072f590076', // 2026-06-06 for 2026-06-05 31615  odido      Overcast
     '8f309afaf97890601f5cfb33875f7d3cdb363db4', // 2026-06-06 for 2026-06-05 210528 ???        Chrome, Safari, Firefox
     'beaa2f788da69197ce4dc423e0ef9a403437d611', // 2026-06-06 for 2026-06-05 4213   krypt      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '45284fb271e9597eb63175077a8e0a84cf15e902', // 2026-06-07 for 2026-06-06 136787 packethub  Overcast
+    '64ff97cf21d8e42c4bad2f00b4c9bee20ee0bdda', // 2026-06-07 for 2026-06-06 57269  digispain  Overcast
+    '6a8a084b2afc6182a1e88573a8574b5322639439', // 2026-06-07 for 2026-06-06 50266  odido      Overcast
+    'a1029c343cbf4578949d4c1dde4494e5cf4df703', // 2026-06-07 for 2026-06-06 27895  nucleo     Spotify, Chrome
 ]);
