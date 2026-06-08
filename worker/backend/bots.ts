@@ -1151,4 +1151,10 @@ const botIpHashes = new Set([
     '64ff97cf21d8e42c4bad2f00b4c9bee20ee0bdda', // 2026-06-07 for 2026-06-06 57269  digispain  Overcast
     '6a8a084b2afc6182a1e88573a8574b5322639439', // 2026-06-07 for 2026-06-06 50266  odido      Overcast
     'a1029c343cbf4578949d4c1dde4494e5cf4df703', // 2026-06-07 for 2026-06-06 27895  nucleo     Spotify, Chrome
+    '7cd08bd5ca77216c03435d2abe96fd221afb6012', // 2026-06-08 for 2026-06-07 57269  digispain  Safari
+    '829893c9cd0027c829fe81f6310d6a4925d36d29', // 2026-06-08 for 2026-06-07 57269  digispain  Safari
+    '8a1704ea73046e2f4e49e881127c0819a3b44683', // 2026-06-08 for 2026-06-07 3352   telefonica Overcast
+    'a8da4827501db48d73562847324107b73fc82b9b', // 2026-06-08 for 2026-06-07 30600  metronet   PodCruncher
+    'a90030b54c18a3e41c4fef4c480b67a4b19ba7df', // 2026-06-08 for 2026-06-07 136787 packethub  Safari
+    'b94661e2d43c0a6f2b437f0ae96077ec2dc61b49', // 2026-06-08 for 2026-06-07 57269  digispain  Overcast
 ]);
