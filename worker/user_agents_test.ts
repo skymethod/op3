@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@2331a87aa389c5505b3a4bd3ce3ef9a575449004 (2026-06-01T21:37:53Z)
+// from user-agents-v2@a519695f941d09efa2bc80da487334d644809185 (2026-06-09T14:26:34Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -109,6 +109,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; data-pipeline-downloader/1.0)': { type: 'bot', name: `data-pipeline-downloader` },
     'Mozilla/5.0 (compatible; Daum/4.1; +http://cs.daum.net/faq/15/4118.html?faqId=28966)': { type: 'bot', name: `Daum` },
     'DeepCast/4.3.0 Podcast Sync (+https://deepcast.fm)': { type: 'bot', name: `Deepcast Podcast Sync` },
+    'DIFTCL-AnchorAudit/1.0 (+read-only; rate-limited)': { type: 'bot', name: `DIFTCL-AnchorAudit` },
     'Digg Mozilla/5.0 (Digg/1.0; support@digg.com)': { type: 'bot', name: `Digg` },
     'Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)': { type: 'bot', name: `DotBot` },
     'Mozilla/5.0 (compatible; DotBot/1.2; https://opensiteexplorer.org/dotbot; help@moz.com)': { type: 'bot', name: `DotBot` },
@@ -169,6 +170,7 @@ const botTests = {
     'ListenNotes/3.0 (id=c1ef144e30174bf6ba1fedf9174ed908; +https://www.listennotes.com/about/)': { type: 'bot', name: `ListenNotes` },
     'llmfeed/2.0 (+https://github.com/llmfeed)': { type: 'bot', name: `llmfeed` },
     'ltx71 - (http://ltx71.com/)': { type: 'bot', name: `LTX71` },
+    'lychee/0.24.2': { type: 'bot', name: `lychee` },
     'ShareSheetUI/1 CFNetwork/1399.4 Darwin/22.1.0': { type: 'bot', name: `MacOS share menu` },
     'ShareSheetUI/1 CFNetwork/1474 Darwin/23.0.0': { type: 'bot', name: `MacOS share menu` },
     'MagellanAI/1.0.4270': { type: 'bot', name: `MagellanAI` },
@@ -1278,6 +1280,7 @@ const appTests = {
     'YouTubeMusic/20230915.1.1 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `YouTube Music` },
     'YouTubeMusic/6.29.2 CFNetwork/1485 Darwin/23.1.0': { type: 'app', name: `YouTube Music` },
     'com.google.ios.youtubemusic/6.21 (iPhone14,3; U; CPU iOS 15_7_1 like Mac OS X; en_US)': { type: 'app', name: `YouTube Music` },
+    'YouTube Music/6.52.52 (Linux; U; Android 14)': { type: 'app', name: `YouTube Music` },
     'app.revanced.android.apps.youtube.music/62852240 (Linux; U; Android 11; pt_BR; Redmi Note 8 Pro; Build/RP1A.200720.011; Cronet/120.0.6057.2)': { type: 'app', name: `YouTube Music (ReVanced)` },
     'Zeno': { type: 'app', name: `Zeno` },
     'Zune/4.8': { type: 'app', name: `Zune` },
@@ -1351,9 +1354,11 @@ const libraryTests = {
     'Java/21.0.5': { type: 'library', name: `Java Platform Default` },
     'Java/11.0.13': { type: 'library', name: `Java Platform Default` },
     'Java/17.0.1': { type: 'library', name: `Java Platform Default` },
+    'Java-http-client/21.0.11': { type: 'library', name: `Java Platform Default` },
     'just_audio/3.6.2 (Linux;Android 9) ExoPlayerLib/2.13.1': { type: 'library', name: `Just Audio` },
     'just_audio/1.0.68 (Linux;Android 12) ExoPlayerLib/2.18.7': { type: 'library', name: `Just Audio` },
     'KaiOS Downloader': { type: 'library', name: `KaiOS Downloader` },
+    'ktor-client': { type: 'library', name: `Ktor (kotlin)` },
     'libsoup/2.68.2': { type: 'library', name: `libsoup` },
     'lua-resty-http/0.07 (Lua) ngx_lua/10025': { type: 'library', name: `lua-resty-http` },
     'Android.LVLDM': { type: 'library', name: `Android License Verification Library` },

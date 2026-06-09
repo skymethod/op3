@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@2331a87aa389c5505b3a4bd3ce3ef9a575449004 (2026-06-01T21:37:53Z)
+// from user-agents-v2@a519695f941d09efa2bc80da487334d644809185 (2026-06-09T14:26:34Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -93,6 +93,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/http:\/\/cs\.daum\.net/.test(userAgent)) return { name: `Daum`, type: 'bot' };
     if (/^DeepCast\/\d.*Sync/.test(userAgent)) return { name: `Deepcast Podcast Sync`, type: 'bot' };
     if (/^Deezer Podcasters\/1\.0/.test(userAgent)) return { name: `Deezer Podcasters`, type: 'bot' };
+    if (/^DIFTCL-AnchorAudit\//.test(userAgent)) return { name: `DIFTCL-AnchorAudit`, type: 'bot' };
     if (/^Digg /.test(userAgent)) return { name: `Digg`, type: 'bot' };
     if (/support@dorada\.co\.uk/.test(userAgent)) return { name: `dorada`, type: 'bot' };
     if (/DotBot/.test(userAgent)) return { name: `DotBot`, type: 'bot' };
@@ -139,6 +140,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^ListenNotes\/3\.0 \(/.test(userAgent)) return { name: `ListenNotes`, type: 'bot' };
     if (/^llmfeed\//.test(userAgent)) return { name: `llmfeed`, type: 'bot' };
     if (/^ltx71 /.test(userAgent)) return { name: `LTX71`, type: 'bot' };
+    if (/^lychee\/\d/.test(userAgent)) return { name: `lychee`, type: 'bot' };
     if (/^ShareSheetUI\//.test(userAgent)) return { name: `MacOS share menu`, type: 'bot' };
     if (/^MagellanAI\//.test(userAgent)) return { name: `MagellanAI`, type: 'bot' };
     if (/^magic-podcast-downloader\//.test(userAgent)) return { name: `magic-podcast-downloader`, type: 'bot' };
@@ -850,7 +852,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Ya(ndex)?\.Music\//.test(userAgent)) return { name: `Yandex Music`, type: 'app' };
     if (/^yapa\//.test(userAgent)) return { name: `Yapa`, type: 'app' };
     if (/^Yoto\/|^Yoto v2 FW;/.test(userAgent)) return { name: `Yoto`, type: 'app' };
-    if (/^com\.google\.android\.apps\.youtube\.music\/|^YouTubeMusic\/\d|^com\.google\.ios\.youtubemusic\//.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
+    if (/^com\.google\.android\.apps\.youtube\.music\/|^YouTubeMusic\/\d|^com\.google\.ios\.youtubemusic\/|^YouTube Music\/\d/.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
     if (/^app\.revanced\.android\.apps\.youtube\.music\//.test(userAgent)) return { name: `YouTube Music (ReVanced)`, type: 'app' };
     if (/^Zeno$/.test(userAgent)) return { name: `Zeno`, type: 'app' };
     if (/Zune\//.test(userAgent)) return { name: `Zune`, type: 'app' };
@@ -893,9 +895,10 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^HTTP-Tiny\//.test(userAgent)) return { name: `HTTP:Tiny`, type: 'library', category: 'bot' };
     if (/^http\.rb\/[\d.]+/.test(userAgent)) return { name: `http.rb`, type: 'library', category: 'bot' };
     if (/^net\/http-easy.*racket/.test(userAgent)) return { name: `net/http-easy (racket)`, type: 'library', category: 'bot' };
-    if (/^Java\/\d/.test(userAgent)) return { name: `Java Platform Default`, type: 'library', category: 'bot' };
+    if (/^Java(-http-client)?\/\d/.test(userAgent)) return { name: `Java Platform Default`, type: 'library', category: 'bot' };
     if (/^just_audio\//.test(userAgent)) return { name: `Just Audio`, type: 'library' };
     if (/KaiOS Downloader/.test(userAgent)) return { name: `KaiOS Downloader`, type: 'library' };
+    if (/^ktor-client$/.test(userAgent)) return { name: `Ktor (kotlin)`, type: 'library' };
     if (/^libsoup\//.test(userAgent)) return { name: `libsoup`, type: 'library' };
     if (/^lua-resty-http\/\d/.test(userAgent)) return { name: `lua-resty-http`, type: 'library', category: 'bot' };
     if (/^Android\.LVLDM$/.test(userAgent)) return { name: `Android License Verification Library`, type: 'library' };
