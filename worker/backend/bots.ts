@@ -5,6 +5,7 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
     if (agentType === 'bot-library') return 'bot-lib'; // user-agents-v2 type='library' with category='bot'
     if (agentType === 'unknown' && /(bot|crawler|spider)/i.test(agentName)) return 'unknown-bot'; // "bot", "crawler" or "spider" in the user-agent string for unknown agents
     if (agentName === '') return 'no-ua'; // no user-agent header provided in the request (or blank) - majority found from Amazon IPs
+    if (EXTRA_BOT_USER_AGENTS.includes(agentName)) return 'bot'; // not in opawg yet
 
     // 2022-12-12: Observed Opera desktop pre-downloading all enclosures for rss feeds added to "My Sources" - they have no referrer
     if (agentType === 'browser' && agentName === 'Opera' && deviceType === 'computer' && referrerName === undefined) return 'opera-desktop-sans-referrer';
@@ -22,6 +23,11 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
     // 2025-08-09: Unknown crosszone requests - subrequests from other cf workers use the hardcoded crosszone ip (not the listener ip)
     if (tags.includes('unknown-crosszone')) return 'crosszone';
 }
+
+const EXTRA_BOT_USER_AGENTS = [
+    'swyxdotio-podcast-migration/1.0',
+    'Mozilla/5.0 (compatible; jamie-loader/1.0)',
+];
 
 export function isWebWidgetHostname(hostname: string): boolean {
     return knownWebWidgetHostnames.has(hostname);
