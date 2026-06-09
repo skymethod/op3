@@ -1157,4 +1157,11 @@ const botIpHashes = new Set([
     'a8da4827501db48d73562847324107b73fc82b9b', // 2026-06-08 for 2026-06-07 30600  metronet   PodCruncher
     'a90030b54c18a3e41c4fef4c480b67a4b19ba7df', // 2026-06-08 for 2026-06-07 136787 packethub  Safari
     'b94661e2d43c0a6f2b437f0ae96077ec2dc61b49', // 2026-06-08 for 2026-06-07 57269  digispain  Overcast
+    '169bad38e94adddd84cc4d877cf3650f0e7157f2', // 2026-06-09 for 2026-06-08 4808   unicom     Chrome
+    '18934aad6e1dd28de9499c025c8750867bfe62a8', // 2026-06-09 for 2026-06-08 15704  xtra       Safari, Pocket Casts
+    '291daff47aaf6376a026f8fdb67eada5e8a147b2', // 2026-06-09 for 2026-06-08 136907 huawei     Chrome, Firefox
+    '867150874bb12449ca7662d9b9af523d5c8149ab', // 2026-06-09 for 2026-06-08 136907 huawei     Chrome, Firefox
+    '67f37842fc15a4355387468244e80f656e7f83c9', // 2026-06-09 for 2026-06-08 14618  amazon     Java-http-client/21.0.11
+    '785c48187013d41de20b713d6eb0f15a86515320', // 2026-06-09 for 2026-06-08 209910 ditt       Safari
+    '9a9f0b01486631c72641ff4128ef3225e1404531', // 2026-06-09 for 2026-06-08 57269  digispain  Overcast
 ]);
