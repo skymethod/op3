@@ -405,9 +405,11 @@ async function addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl }: 
                     other.verifiedTimestamp = t;
                 }
             }
+            if (!other.verifiedTimestamp) {
+                consoleWarn('addHlsOther', `signature verification failed: ${JSON.stringify({ targetUrl, sid, pg, s, p, t, g })}`);
+            }
         }
     }
-    
 }
 
 function parseStringSet(commaDelimitedString: string | undefined): Set<string> {
