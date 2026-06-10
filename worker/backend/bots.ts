@@ -1170,4 +1170,9 @@ const botIpHashes = new Set([
     '67f37842fc15a4355387468244e80f656e7f83c9', // 2026-06-09 for 2026-06-08 14618  amazon     Java-http-client/21.0.11
     '785c48187013d41de20b713d6eb0f15a86515320', // 2026-06-09 for 2026-06-08 209910 ditt       Safari
     '9a9f0b01486631c72641ff4128ef3225e1404531', // 2026-06-09 for 2026-06-08 57269  digispain  Overcast
+    '17a87f60864db83a8862ba5d84c3eb055a6ba465', // 2026-06-10 for 2026-06-09 24560  bharti     Chrome
+    '48697aa5d01b0c8c9582aa0db94cc74d54a61216', // 2026-06-10 for 2026-06-09 47790  netfala    Overcast
+    '9c67945967c44671e6848ab4662e4fe2d9538670', // 2026-06-10 for 2026-06-09 4808   unicom     Chrome
+    'ccc8cb695f54e329e7ed00cc0cbdd172ff37eea7', // 2026-06-10 for 2026-06-09 6830   liberty    Overcast
+    'e16881ac7995cb717e716ac0e14c3664c35b0fc4', // 2026-06-10 for 2026-06-09 13415  firstdigi  Chrome
 ]);
