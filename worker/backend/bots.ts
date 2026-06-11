@@ -1175,4 +1175,7 @@ const botIpHashes = new Set([
     '9c67945967c44671e6848ab4662e4fe2d9538670', // 2026-06-10 for 2026-06-09 4808   unicom     Chrome
     'ccc8cb695f54e329e7ed00cc0cbdd172ff37eea7', // 2026-06-10 for 2026-06-09 6830   liberty    Overcast
     'e16881ac7995cb717e716ac0e14c3664c35b0fc4', // 2026-06-10 for 2026-06-09 13415  firstdigi  Chrome
+    '984c8ec3f22ae6757ed2ca237ae021f62287d454', // 2026-06-11 for 2026-06-10 151390 rutilea    Chrome
+    'c1125976a594d5e8f2c27fe5aca4049824be6a62', // 2026-06-11 for 2026-06-10 6830   liberty    Overcast
+    'd95a2164c5c725b1a10d253ab009c32deca0b1ea', // 2026-06-11 for 2026-06-10 16509  amazon     The Podcast App
 ]);
