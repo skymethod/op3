@@ -27,6 +27,7 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 const EXTRA_BOT_USER_AGENTS = [
     'swyxdotio-podcast-migration/1.0',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
+    'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
@@ -1178,4 +1179,6 @@ const botIpHashes = new Set([
     '984c8ec3f22ae6757ed2ca237ae021f62287d454', // 2026-06-11 for 2026-06-10 151390 rutilea    Chrome
     'c1125976a594d5e8f2c27fe5aca4049824be6a62', // 2026-06-11 for 2026-06-10 6830   liberty    Overcast
     'd95a2164c5c725b1a10d253ab009c32deca0b1ea', // 2026-06-11 for 2026-06-10 16509  amazon     The Podcast App
+    '49e5d9062d724875b7c7b237d4851f7d64adcd01', // 2026-06-12 for 2026-06-11 14593  spacex     Chrome
+    '5b53a728da5669b0e7741e51d9fbeb83c77303dd', // 2026-06-12 for 2026-06-11 7922   comcast    Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1
 ]);
