@@ -1181,4 +1181,10 @@ const botIpHashes = new Set([
     'd95a2164c5c725b1a10d253ab009c32deca0b1ea', // 2026-06-11 for 2026-06-10 16509  amazon     The Podcast App
     '49e5d9062d724875b7c7b237d4851f7d64adcd01', // 2026-06-12 for 2026-06-11 14593  spacex     Chrome
     '5b53a728da5669b0e7741e51d9fbeb83c77303dd', // 2026-06-12 for 2026-06-11 7922   comcast    Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1
+    '2c4a014cf22b6d207e5c12450396afefe3672218', // 2026-06-13 for 2026-06-12 15997  intelligent Overcast
+    '39b6f07ca7f87ac7b68af75e2e3582faf974e26a', // 2026-06-13 for 2026-06-12 400238 pieg       Chrome
+    '696010f5309f7abbf7cb5d2e52fab38120303976', // 2026-06-13 for 2026-06-12 7018   att        Overcast
+    'b1216f5c8f07dd1c101c9cdd4001622f7c44a7af', // 2026-06-13 for 2026-06-12 6830   liberty    Overcast
+    'd9fe76bdebc0e7fdd72032540cf8cf38d25dc265', // 2026-06-13 for 2026-06-12 10796  charter    Overcast
+    'f33267b1c525fca7d9f013e5f1014e52004c8b8d', // 2026-06-13 for 2026-06-12 16591  gfiber     Overcast
 ]);
