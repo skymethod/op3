@@ -1187,4 +1187,7 @@ const botIpHashes = new Set([
     'b1216f5c8f07dd1c101c9cdd4001622f7c44a7af', // 2026-06-13 for 2026-06-12 6830   liberty    Overcast
     'd9fe76bdebc0e7fdd72032540cf8cf38d25dc265', // 2026-06-13 for 2026-06-12 10796  charter    Overcast
     'f33267b1c525fca7d9f013e5f1014e52004c8b8d', // 2026-06-13 for 2026-06-12 16591  gfiber     Overcast
+    '532194ea0eef2fb2448b4fd435275cff24b9499d', // 2026-06-14 for 2026-06-13 7922   comcast    Overcast
+    '5bf0d7428bdb48e4c8ed80bd77a3c10d777de3c0', // 2026-06-14 for 2026-06-13 7922   comcast    Overcast
+    '87cf2857c5bfdd7480b80db4e884dd3758448013', // 2026-06-14 for 2026-06-13 7922   comcast    Overcast
 ]);
