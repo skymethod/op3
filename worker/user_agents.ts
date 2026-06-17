@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@a519695f941d09efa2bc80da487334d644809185 (2026-06-09T14:26:34Z)
+// from user-agents-v2@8a2f513e8389e4ce6ce8dec8ab6a204433d5e8f2 (2026-06-17T13:01:36Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -114,7 +114,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Mediapartners-Google/.test(userAgent)) return { name: `Google Adsense Bot`, type: 'bot' };
     if (/AdsBot-Google|Google-AdWords-Express/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
-    if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
+    if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$|^GoogleOther-Video\/\d/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^gpt-in-mind-podcasts/.test(userAgent)) return { name: `gpt-in-mind-podcasts`, type: 'bot' };
     if (/^GuestPrimer\//.test(userAgent)) return { name: `GuestPrimer`, type: 'bot' };
     if (/^Gumball/.test(userAgent)) return { name: `Gumball`, type: 'bot' };
@@ -396,6 +396,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^BehindTheKnife\/\d/.test(userAgent)) return { name: `Behind the Knife`, type: 'app' };
     if (/Android BT Hermes\//.test(userAgent)) return { name: `Bergens Tidende Android app`, type: 'app' };
     if (/iOS BT Hermes\//.test(userAgent)) return { name: `Bergens Tidende iOS app`, type: 'app' };
+    if (/^BetterCast\//.test(userAgent)) return { name: `BetterCast`, type: 'app' };
     if (/; BeyondPod/.test(userAgent)) return { name: `BeyondPod`, type: 'app' };
     if (/^bgwnr\//.test(userAgent)) return { name: `bgwnr`, type: 'app' };
     if (/^Bible\//.test(userAgent)) return { name: `Bible`, type: 'app' };
@@ -413,6 +414,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Breaker\//.test(userAgent)) return { name: `Breaker`, type: 'app' };
     if (/^breez\//.test(userAgent)) return { name: `Breez`, type: 'app' };
     if (/^BrewApp\//.test(userAgent)) return { name: `BrewApp`, type: 'app' };
+    if (/^Brink\//.test(userAgent)) return { name: `Brink`, type: 'app' };
     if (/^Broadcast\//.test(userAgent)) return { name: `Broadcast`, type: 'app' };
     if (/BroadwayPodcastNetwork\/iOS/.test(userAgent)) return { name: `Broadway Podcast Network`, type: 'app' };
     if (/^Browser\//.test(userAgent)) return { name: `Browser`, type: 'app' };
@@ -746,6 +748,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^(PrestoCast|PrestoCastDev)\//.test(userAgent)) return { name: `PrestoCast`, type: 'app' };
     if (/^Pro[Cc]ast\/\d|^com\.podflitzer\.android\/\d|^Procast \(/.test(userAgent)) return { name: `ProCast`, type: 'app' };
     if (/^PugpigBolt /.test(userAgent)) return { name: `PugPig Bolt`, type: 'app' };
+    if (/^PulsarCast\//.test(userAgent)) return { name: `PulsarCast`, type: 'app' };
     if (/^PurerPodcasts\//.test(userAgent)) return { name: `PurerPodcasts`, type: 'app' };
     if (/^pypodder$/.test(userAgent)) return { name: `Pypodder`, type: 'app' };
     if (/^Queue\/\d/.test(userAgent)) return { name: `Queue`, type: 'app' };

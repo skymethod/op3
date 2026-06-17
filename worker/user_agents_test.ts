@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@a519695f941d09efa2bc80da487334d644809185 (2026-06-09T14:26:34Z)
+// from user-agents-v2@8a2f513e8389e4ce6ce8dec8ab6a204433d5e8f2 (2026-06-17T13:01:36Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -143,6 +143,7 @@ const botTests = {
     'Googlebot-News Audio': { type: 'bot', name: `Googlebot` },
     'Google-Safety': { type: 'bot', name: `Googlebot` },
     'FeedFetcher-Google; (+http://www.google.com/feedfetcher.html)': { type: 'bot', name: `Googlebot` },
+    'GoogleOther-Video/1.0': { type: 'bot', name: `Googlebot` },
     'gpt-in-mind-podcasts-v2/0.1 (research)': { type: 'bot', name: `gpt-in-mind-podcasts` },
     'GuestPrimer/1.0': { type: 'bot', name: `GuestPrimer` },
     'Gumball.fm Analytics Prefix Checker': { type: 'bot', name: `Gumball` },
@@ -515,6 +516,7 @@ const appTests = {
     'BehindTheKnife/1.0.31+142/iOS': { type: 'app', name: `Behind the Knife` },
     'Android BT Hermes/1000094692 _app_': { type: 'app', name: `Bergens Tidende Android app` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS BT Hermes/90.0.0 _app_': { type: 'app', name: `Bergens Tidende iOS app` },
+    'BetterCast/842 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `BetterCast` },
     'Mozilla/5.0 (Linux; U; en-us; BeyondPod 4)': { type: 'app', name: `BeyondPod` },
     'bgwnr/3300 CFNetwork/975.0.3 Darwin/18.0.0': { type: 'app', name: `bgwnr` },
     'Bible/11 CFNetwork/978.0.7 Darwin/18.6.0': { type: 'app', name: `Bible` },
@@ -534,6 +536,7 @@ const appTests = {
     'bPod': { type: 'app', name: `bPod` },
     'breez/5585.1 CFNetwork/1402 Darwin/22.2.0': { type: 'app', name: `Breez` },
     'BrewApp/262 CFNetwork/975.0.3 Darwin/18.2.0': { type: 'app', name: `BrewApp` },
+    'Brink/1.0 (Podcast Audio Cache)': { type: 'app', name: `Brink` },
     'Broadcast/1.0 CFNetwork/893.14.2 Darwin/17.3.0': { type: 'app', name: `Broadcast` },
     'BroadwayPodcastNetwork/iOS': { type: 'app', name: `Broadway Podcast Network` },
     'Browser/21060 CFNetwork/887 Darwin/17.0.0': { type: 'app', name: `Browser` },
@@ -1084,6 +1087,7 @@ const appTests = {
     'Procast (iOS)': { type: 'app', name: `ProCast` },
     'PugpigBolt 2.29.3 (iPhone, iOS 16.1.1) on phone (model iPhone12,1)': { type: 'app', name: `PugPig Bolt` },
     'PugpigBolt 2.14.7 (samsung, Android 12) on phone (model SM-F721U1)': { type: 'app', name: `PugPig Bolt` },
+    'PulsarCast/24 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `PulsarCast` },
     'PurerPodcasts/52 CFNetwork/3826.600.41 Darwin/24.6.0': { type: 'app', name: `PurerPodcasts` },
     'pypodder': { type: 'app', name: `Pypodder` },
     'Queue/1.9.1 (1) (iOS)': { type: 'app', name: `Queue` },
