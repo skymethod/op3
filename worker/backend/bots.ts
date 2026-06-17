@@ -24,10 +24,20 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
     if (tags.includes('unknown-crosszone')) return 'crosszone';
 }
 
-const EXTRA_BOT_USER_AGENTS = [
-    'swyxdotio-podcast-migration/1.0',
+export const EXTRA_BOT_USER_AGENTS = [
+    'CodexPodcastTranscriber/1.0',
+    'DataCollectPodcastIndex/1.0 (hao.wang@estie.co.jp)',
+    'DataCollectSpotify/1.0 (conan1024hao@gmail.com)',
+    'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
+    'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
+    'Mozilla/5.0 (podcast research; contact: research@example.com)',
+    'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
+    'podcast_dl/1.0 (+https://example.local) Python-urllib',
+    'PodcastDownloader/1.0 (+https://github.com/)',
+    'swyxdotio-podcast-migration/1.0',
+    'website-deployment-verifier/1.0',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
