@@ -1196,4 +1196,11 @@ const botIpHashes = new Set([
     '19512e158824136af0e8e19558f7de1ed88b8f92', // 2026-06-16 for 2026-06-15 7922   comcast    Overcast
     '83f3ca6a6c709a0daa7c06cdcfa996de87ae10e5', // 2026-06-16 for 2026-06-15 6830   liberty    Overcast
     'af4f43040332923714147a1f16494318969ca0a7', // 2026-06-16 for 2026-06-15 20001  charter    Overcast
+    '1390e99ef1b9cff01d409e7f69c20873dd6cfe4b', // 2026-06-17 for 2026-06-16 15169  google     GoogleOther-Video/1.0, Googlebot
+    '77f9053b9bc3c7ec7e7cc224e2210feef930a5c2', // 2026-06-17 for 2026-06-16 15169  google     GoogleOther-Video/1.0, Googlebot
+    'fdb4e18c9205d18387a86e204965e3fae328ba6b', // 2026-06-17 for 2026-06-16 15169  google     GoogleOther-Video/1.0, Googlebot
+    '6076f94f0342596cbdd530e1e32ea6471ec8cb43', // 2026-06-17 for 2026-06-16 6830   liberty    Overcast
+    'af9f17d58c420c3f05e3809f22818bfa5391080e', // 2026-06-17 for 2026-06-16 47790  netfala    Overcast
+    'bddfb2040e3a26c46e9bb787c71d1550143d1c2a', // 2026-06-17 for 2026-06-16 50266  odido      Overcast
+    'fc0394468a22681af1e8b7f081a91f46de7d270f', // 2026-06-17 for 2026-06-16 7018   att        Overcast
 ]);
