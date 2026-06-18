@@ -1213,4 +1213,7 @@ const botIpHashes = new Set([
     'af9f17d58c420c3f05e3809f22818bfa5391080e', // 2026-06-17 for 2026-06-16 47790  netfala    Overcast
     'bddfb2040e3a26c46e9bb787c71d1550143d1c2a', // 2026-06-17 for 2026-06-16 50266  odido      Overcast
     'fc0394468a22681af1e8b7f081a91f46de7d270f', // 2026-06-17 for 2026-06-16 7018   att        Overcast
+    '1f28124beea50239c70311b0de40e00c8428f90c', // 2026-06-18 for 2026-06-17 9141   p4         Overcast
+    'b6664db361eb6ddfc2ddf67812ea23c1af55603c', // 2026-06-18 for 2026-06-17 7018   att        Overcast
+    'eb29c3026638714651c914d3ae4eb2ad36759fe3', // 2026-06-18 for 2026-06-17 20001  charter    Overcast
 ]);
