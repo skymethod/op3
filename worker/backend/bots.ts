@@ -38,6 +38,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PodcastDownloader/1.0 (+https://github.com/)',
     'swyxdotio-podcast-migration/1.0',
     'website-deployment-verifier/1.0',
+    'PodcastArchive/1.0',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
@@ -1218,4 +1219,6 @@ const botIpHashes = new Set([
     'eb29c3026638714651c914d3ae4eb2ad36759fe3', // 2026-06-18 for 2026-06-17 20001  charter    Overcast
     '126970e07ec7adc828b6491102dff936dcd9d021', // 2026-06-19 for 2026-06-18 202779 evobits    Chrome
     'c31207aa12f90895966b9527dbec09bb5b62466b', // 2026-06-19 for 2026-06-18 9141   p4         Overcast
+    '922229fef5684cea70b239b55b3337c55064b9d3', // 2026-06-20 for 2026-06-19 12876  scaleway   Ktor (kotlin)
+    '999aa8f65c9d88672d933c8b59631d70ba13b1bf', // 2026-06-20 for 2026-06-19 30600  metronet   PodcastArchive/1.0
 ]);
