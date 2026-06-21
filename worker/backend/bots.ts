@@ -1221,4 +1221,5 @@ const botIpHashes = new Set([
     'c31207aa12f90895966b9527dbec09bb5b62466b', // 2026-06-19 for 2026-06-18 9141   p4         Overcast
     '922229fef5684cea70b239b55b3337c55064b9d3', // 2026-06-20 for 2026-06-19 12876  scaleway   Ktor (kotlin)
     '999aa8f65c9d88672d933c8b59631d70ba13b1bf', // 2026-06-20 for 2026-06-19 30600  metronet   PodcastArchive/1.0
+    'c5891ee4dee685c1e69ec2a5e7db112164cbd022', // 2026-06-21 for 2026-06-20 24560  bharti     Firefox, Chrome
 ]);
