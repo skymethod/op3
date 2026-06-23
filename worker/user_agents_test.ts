@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@8a2f513e8389e4ce6ce8dec8ab6a204433d5e8f2 (2026-06-17T13:01:36Z)
+// from user-agents-v2@4e9cd9737c07f2433d13b4d552c830e432c48163 (2026-06-23T13:32:05Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -95,6 +95,7 @@ const botTests = {
     'TerraCotta https://github.com/CeramicTeam/CeramicTerracotta': { type: 'bot', name: `Ceramic Terracotta Crawler` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)': { type: 'bot', name: `Claudebot` },
     'clipgenie-service-worker': { type: 'bot', name: `clipgenie-service-worker` },
+    'CloudConvert': { type: 'bot', name: `CloudConvert` },
     'Cloudflare-SSLDetector': { type: 'bot', name: `Cloudflare SSL detector` },
     'Mozilla/5.0 (compatible; proximic;  https://www.comscore.com/Web-Crawler)': { type: 'bot', name: `Comscore Crawler` },
     'ContentFlow/1.0 (Podcast Audio Downloader)': { type: 'bot', name: `ContentFlow` },
@@ -136,6 +137,7 @@ const botTests = {
     'Goodpods/2.2': { type: 'bot', name: `Goodpods Bot` },
     'Mediapartners-Google': { type: 'bot', name: `Google Adsense Bot` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; Mozilla/5.0, Google-AdWords-Express) Chrome/137.0.7151.119 Safari/537.36': { type: 'bot', name: `Google AdsBot` },
+    'GoogleAgent-URLContext': { type: 'bot', name: `Google Gemini` },
     'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; http://www.google.com/bot.html)': { type: 'bot', name: `Googlebot` },
     'Googlebot-Image/1.0': { type: 'bot', name: `Googlebot` },
     'Feedfetcher-Google; (+http://www.google.com/feedfetcher.html; 1 subscribers; feed-id=4653447469100830145)': { type: 'bot', name: `Googlebot` },
@@ -187,6 +189,7 @@ const botTests = {
     'Iceshrimp/2023.12.14-dev-5db0fdc63 (https://misskey.noctella.fun)': { type: 'bot', name: `Fediverse Bot` },
     'gotosocial/0.19.1+git-6574dc8 (+https://social.maru.my)': { type: 'bot', name: `Fediverse Bot` },
     'Metacast/1.0 Crawler +https://metacast.app': { type: 'bot', name: `Metacast Crawler` },
+    'MetapodcastV2/1.0': { type: 'bot', name: `Metapodcast` },
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534 (KHTML, like Gecko) BingPreview/1.0b': { type: 'bot', name: `Microsoft Bingbot` },
     'Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)': { type: 'bot', name: `Microsoft Bingbot` },
     'Mozilla/4.0 (compatible; ms-office; MSOffice 16)': { type: 'bot', name: `Microsoft Office` },
@@ -399,6 +402,8 @@ const appTests = {
     'Amazon;Echo_Dot_with_clock;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
     'Amazon;Echo_Show_5;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
     'Amazon;Echo;27d4dfe427b34d57995b463e5d63198d;;tpapi;3.199.422': { type: 'app', name: `Alexa-enabled device` },
+    'AmazonAVS/2.3': { type: 'app', name: `Alexa-enabled device` },
+    'AvsDeviceSdk/1.23.0': { type: 'app', name: `Alexa-enabled device` },
     'AlienBlue/2.9.7 CFNetwork/808.2.16 Darwin/16.3.0': { type: 'app', name: `AlienBlue` },
     'AllDaf/1 CFNetwork/1568.200.51 Darwin/24.1.0': { type: 'app', name: `All Daf` },
     'AllYouCanBooks/510 CFNetwork/811.5.4 Darwin/16.7.0': { type: 'app', name: `All You Can Books` },
@@ -1121,6 +1126,7 @@ const appTests = {
     'RadioPublic/iOS-2.0': { type: 'app', name: `RadioPublic` },
     'RadioPublicDraper/81b12be Faraday/0.15.2 ruby/2.3.8': { type: 'app', name: `RadioPublic` },
     'Radios%20M%C3%A9xico/14 CFNetwork/1568.200.51 Darwin/24.1.0': { type: 'app', name: `Radios México` },
+    'ReadYou/0.13.1(32)': { type: 'app', name: `ReadYou` },
     'Reeder/5040002 CFNetwork/1404.0.5 Darwin/22.3.0': { type: 'app', name: `Reeder` },
     'Relevant Radio/Android 4.0.11 (moto g stylus (2022)/Android 12 Build S3RDES32.123-37-5-22)': { type: 'app', name: `Relevant Radio` },
     'Repod/2.9.0.363 CFNetwork/1240.0.4 Darwin/20.6.0 (iPhone/X iOS/14.7.1)': { type: 'app', name: `Repod` },
@@ -1335,6 +1341,7 @@ const libraryTests = {
     'AHC/2.1': { type: 'library', name: `Async Http Client (java)` },
     'AHC/2.0': { type: 'library', name: `Async Http Client (java)` },
     'axios/0.26.1': { type: 'library', name: `Axios (Node)` },
+    'bruno-runtime/3.2.2': { type: 'library', name: `Bruno` },
     'Bubble': { type: 'library', name: `Bubble (no-code)` },
     'Bun/1.0.7': { type: 'library', name: `Bun` },
     'CarrierWave/2.2.4': { type: 'library', name: `CarrierWave (ruby)` },
@@ -1345,6 +1352,7 @@ const libraryTests = {
     'Deno/1.26.1': { type: 'library', name: `Deno` },
     'Down/5.3.1': { type: 'library', name: `Down (ruby)` },
     'FileDownloader/1.7.7': { type: 'library', name: `FileDownloader (Android)` },
+    'FileDownloader': { type: 'library', name: `FileDownloader (Android)` },
     'git-annex/10.20230407': { type: 'library', name: `git-annex` },
     'Go-http-client/2.0': { type: 'library', name: `Go Http Client` },
     'got (https://github.com/sindresorhus/got)': { type: 'library', name: `Got (node)` },
@@ -1522,6 +1530,7 @@ const deviceTests = {
     'MediaTek;39LHA120TP;756a522d9f1648b89e76e80be654456a;;tpapi;3.127.32': { type: 'device', name: `Other Smart TV` },
     'samsung;gq55q60tguxzg;568a50c7e7f64fe3b44a3316ef5590fd;;tpapi;3.194.71': { type: 'device', name: `Other Smart TV` },
     'samsung;gu50tu7079uxzg;568a50c7e7f64fe3b44a3316ef5590fd;;tpapi;3.194.71': { type: 'device', name: `Other Smart TV` },
+    'samsung-agent/1.1': { type: 'device', name: `Other Smart TV` },
     'GSA/13.39.12.26.arm64': { type: 'device', name: `Android Phone` },
     'GSA/13.39.12.26.arm': { type: 'device', name: `Android Phone` },
     'sp-agent': { type: 'device', name: `Android Phone` },

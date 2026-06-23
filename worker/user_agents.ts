@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@8a2f513e8389e4ce6ce8dec8ab6a204433d5e8f2 (2026-06-17T13:01:36Z)
+// from user-agents-v2@4e9cd9737c07f2433d13b4d552c830e432c48163 (2026-06-23T13:32:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -79,6 +79,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^clark-crawler2/.test(userAgent)) return { name: `Clark-Crawler, unknown`, type: 'bot' };
     if (/ClaudeBot\//.test(userAgent)) return { name: `Claudebot`, type: 'bot' };
     if (/^clipgenie-service-worker$/.test(userAgent)) return { name: `clipgenie-service-worker`, type: 'bot' };
+    if (/^CloudConvert/.test(userAgent)) return { name: `CloudConvert`, type: 'bot' };
     if (/^Cloudflare-SSLDetector/.test(userAgent)) return { name: `Cloudflare SSL detector`, type: 'bot' };
     if (/https:\/\/www\.comscore\.com/.test(userAgent)) return { name: `Comscore Crawler`, type: 'bot' };
     if (/^ContentFlow\//.test(userAgent)) return { name: `ContentFlow`, type: 'bot' };
@@ -113,6 +114,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Goodpods\/\d+\.\d+/.test(userAgent)) return { name: `Goodpods Bot`, type: 'bot' };
     if (/Mediapartners-Google/.test(userAgent)) return { name: `Google Adsense Bot`, type: 'bot' };
     if (/AdsBot-Google|Google-AdWords-Express/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
+    if (/^GoogleAgent-URLContext/.test(userAgent)) return { name: `Google Gemini`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
     if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$|^GoogleOther-Video\/\d/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^gpt-in-mind-podcasts/.test(userAgent)) return { name: `gpt-in-mind-podcasts`, type: 'bot' };
@@ -148,6 +150,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/rb\/.*Mastodon\/|Mastodon\/.*http\.rb/.test(userAgent)) return { name: `Mastodon Bot`, type: 'bot' };
     if (/^Misskey\/|^CherryPick\/|^Iceshrimp\/|^gotosocial\//.test(userAgent)) return { name: `Fediverse Bot`, type: 'bot' };
     if (/^Metacast\/.* Crawler/.test(userAgent)) return { name: `Metacast Crawler`, type: 'bot' };
+    if (/^MetapodcastV2\//.test(userAgent)) return { name: `Metapodcast`, type: 'bot' };
     if (/(BingPreview\/|adidxbot\/|[bB]ingbot\/)/.test(userAgent)) return { name: `Microsoft Bingbot`, type: 'bot' };
     if (/ms-office; MSOffice/.test(userAgent)) return { name: `Microsoft Office`, type: 'bot' };
     if (/^MixcloudPodcastImporter\//.test(userAgent)) return { name: `Mixcloud Podcast Importer`, type: 'bot' };
@@ -335,7 +338,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Airr(%20Beta)?\/|^Airr \(/.test(userAgent)) return { name: `Airr`, type: 'app' };
     if (/^Airsonic\//.test(userAgent)) return { name: `Airsonic`, type: 'app' };
     if (/^Aisten\/\d/.test(userAgent)) return { name: `Aisten - Podcast Transcription`, type: 'app' };
-    if (/^AlexaMediaPlayer\/[\dv]|^Echo\/|^AlexaService\/|^Alexa Mobile Voice\/|^Amazon;Echo/.test(userAgent)) return { name: `Alexa-enabled device`, type: 'app' };
+    if (/^AlexaMediaPlayer\/[\dv]|^Echo\/|^AlexaService\/|^Alexa Mobile Voice\/|^Amazon;Echo|^AmazonAVS\/|^AvsDeviceSdk\//.test(userAgent)) return { name: `Alexa-enabled device`, type: 'app' };
     if (/^AlienBlue\//.test(userAgent)) return { name: `AlienBlue`, type: 'app' };
     if (/^AllDaf\/\d/.test(userAgent)) return { name: `All Daf`, type: 'app' };
     if (/AllYouCanBooks/.test(userAgent)) return { name: `All You Can Books`, type: 'app' };
@@ -760,6 +763,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/(^Radioplayer Android app|^Radioplayer iOS app)|^Radioplayer(%20UK)?\//.test(userAgent)) return { name: `RadioPlayer`, type: 'app' };
     if (/^RadioPublic\/android-|^RadioPublic Android|RadioPublic iOS|RadioPublic.+CFNetwork|^RadioPublic\/iOS|^RadioPublicDraper\//.test(userAgent)) return { name: `RadioPublic`, type: 'app' };
     if (/^Radios%20M%C3%A9xico\/\d/.test(userAgent)) return { name: `Radios México`, type: 'app' };
+    if (/^ReadYou\//.test(userAgent)) return { name: `ReadYou`, type: 'app' };
     if (/^Reeder\//.test(userAgent)) return { name: `Reeder`, type: 'app' };
     if (/^Relevant Radio\//.test(userAgent)) return { name: `Relevant Radio`, type: 'app' };
     if (/(^Repod\/.+iOS|^Repod\/.+Android)/.test(userAgent)) return { name: `Repod`, type: 'app' };
@@ -872,12 +876,13 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Python\/\d.*aiohttp\/\d/.test(userAgent)) return { name: `AIOHTTP`, type: 'library', category: 'bot' };
     if (/^AndroidDownloadManager/.test(userAgent)) return { name: `AndroidDownloadManager`, type: 'library' };
     if (/Apache-HttpClient/.test(userAgent)) return { name: `Apache HttpClient`, type: 'library', category: 'bot' };
-    if (/^AppleCoreMedia\/1/.test(userAgent)) return { name: `AppleCoreMedia`, type: 'library' };
+    if (/^AppleCoreMedia(\/|$)/.test(userAgent)) return { name: `AppleCoreMedia`, type: 'library' };
     if (/^aria2\//.test(userAgent)) return { name: `aria2`, type: 'library', category: 'bot' };
     if (/^Armadillo\/1/.test(userAgent)) return { name: `Armadillo`, type: 'library' };
     if (/^assets_audio_player/.test(userAgent)) return { name: `assets_audio_player (flutter)`, type: 'library' };
     if (/^AHC\/\d+\.\d+/.test(userAgent)) return { name: `Async Http Client (java)`, type: 'library', category: 'bot' };
     if (/^axios\//.test(userAgent)) return { name: `Axios (Node)`, type: 'library', category: 'bot' };
+    if (/^bruno-runtime\//.test(userAgent)) return { name: `Bruno`, type: 'library' };
     if (/^Bubble$/.test(userAgent)) return { name: `Bubble (no-code)`, type: 'library' };
     if (/^Bun\/\d/.test(userAgent)) return { name: `Bun`, type: 'library', category: 'bot' };
     if (/^CarrierWave\//.test(userAgent)) return { name: `CarrierWave (ruby)`, type: 'library', category: 'bot' };
@@ -887,7 +892,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Deno\//.test(userAgent)) return { name: `Deno`, type: 'library', category: 'bot' };
     if (/^Down\/\d/.test(userAgent)) return { name: `Down (ruby)`, type: 'library', category: 'bot' };
     if (/^Lavf\//.test(userAgent)) return { name: `ffmpeg`, type: 'library', category: 'bot' };
-    if (/^FileDownloader\//.test(userAgent)) return { name: `FileDownloader (Android)`, type: 'library' };
+    if (/^FileDownloader(\/|$)/.test(userAgent)) return { name: `FileDownloader (Android)`, type: 'library' };
     if (/^git-annex/.test(userAgent)) return { name: `git-annex`, type: 'library', category: 'bot' };
     if (/^Go-http-client/.test(userAgent)) return { name: `Go Http Client`, type: 'library', category: 'bot' };
     if (/^got(\/| \()/.test(userAgent)) return { name: `Got (node)`, type: 'library', category: 'bot' };
@@ -954,7 +959,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/Chromebook|CrOS/.test(userAgent)) return { name: `Google Chromebook`, type: 'device', category: 'computer' };
     if (/[a|A]ndroid.*[t|T]ablet|[t|T]ablet.*[a|A]ndroid|SM-T| GT-|^ZTE;Xview/.test(userAgent)) return { name: `Android Tablet`, type: 'device', category: 'mobile' };
     if (/^Spotify\/.* \((Rivian|BYD AUTO|Volvo|gminfo\d+|G6|G9)\)/.test(userAgent)) return { name: `Smart Car`, type: 'device', category: 'auto' };
-    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|SMART_TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|TVStick|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^microsoft;xbox_|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;(un|qn|ue|uj|ua|ls|qe|qa|lh|gq|gu)\d|^hisense;(c235x|c205x)|^skyworth;(NoblexTV|SWTV)|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;(VSB|DIW)|^TPV;[A-Z0-9]+AndroidTV;|^(CVT_NULL|MediaTek);SMARTTV;|^NVIDIA;SHIELDAndroidTV|UHDAndroidTV;|^westinghouse;7808x;|^ZTE;B820C|Sky, (ES|EM)|^Cinemo\/\d| Cinemo\/\d|^Amazon;(AFTSSS|AFTMM|AFTSS|AFTKA|AFTT|AFTDCT31|AFTKM|AFTKRT|AFTHA004|AFTEAMR311);|^nowtv;|^SEIRobotics;yes|^Changhong;AIPONT|^Arcadyan;Bouygtel|^Amlogic;ONVO|^Philips;TPM|^MediaTek;39LHA120TP/.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
+    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|SMART_TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|TVStick|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^microsoft;xbox_|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;(un|qn|ue|uj|ua|ls|qe|qa|lh|gq|gu)\d|^hisense;(c235x|c205x)|^skyworth;(NoblexTV|SWTV)|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;(VSB|DIW)|^TPV;[A-Z0-9]+AndroidTV;|^(CVT_NULL|MediaTek);SMARTTV;|^NVIDIA;SHIELDAndroidTV|UHDAndroidTV;|^westinghouse;7808x;|^ZTE;B820C|Sky, (ES|EM)|^Cinemo\/\d| Cinemo\/\d|^Amazon;(AFTSSS|AFTMM|AFTSS|AFTKA|AFTT|AFTDCT31|AFTKM|AFTKRT|AFTHA004|AFTEAMR311);|^nowtv;|^SEIRobotics;yes|^Changhong;AIPONT|^Arcadyan;Bouygtel|^Amlogic;ONVO|^Philips;TPM|^MediaTek;39LHA120TP|^samsung-agent\//.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
     if (/ServeStream|Android|android|HTC|ExoPlayer|^AntennaPod\/|^GSA\/.*\.arm(64)?$|^sp-agent|^PRDownloader$|^(Turtlecast|TURTLECAST)\/|\((SM-A15|SM-A55|moto g|RMO-NX3)/.test(userAgent)) return { name: `Android Phone`, type: 'device', category: 'mobile' };
     if (/Windows|windows|WMPlayer|Winamp|Win32|Win64|NSPlayer|MediaMonkey|NSPlayer|PC/.test(userAgent)) return { name: `Windows Computer`, type: 'device', category: 'computer' };
     if (/Alexa|^Echo\/|^Amazon;Echo/.test(userAgent)) return { name: `Amazon Smart Speaker`, type: 'device', category: 'smart_speaker' };
