@@ -40,6 +40,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'website-deployment-verifier/1.0',
     'PodcastArchive/1.0',
     'luna-podcatcher/0.1 (+downloader)',
+    'CyotekWebCopy/1.9 CyotekHTTP/6.4',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
@@ -1227,4 +1228,5 @@ const botIpHashes = new Set([
     '5d3ad726eaf4aebfeef79e9fec8d93ac579ff6d5', // 2026-06-22 for 2026-06-21 16276  ovh        Firefox
     '66ef77375ff661c3eb148a30a5673c6fae07e96c', // 2026-06-22 for 2026-06-21 16276  ovh        Firefox
     'c5a9d1329db62a0aa7134ef1abe2975caa3e7275', // 2026-06-22 for 2026-06-21 208348 domynet    Firefox
+    'f2babdd59bb618853b35b5592264ea36f83b06b7', // 2026-06-23 for 2026-06-22 12876  scaleway   Ktor (kotlin)
 ]);
