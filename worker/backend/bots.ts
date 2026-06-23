@@ -39,6 +39,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'swyxdotio-podcast-migration/1.0',
     'website-deployment-verifier/1.0',
     'PodcastArchive/1.0',
+    'luna-podcatcher/0.1 (+downloader)',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
@@ -1222,4 +1223,8 @@ const botIpHashes = new Set([
     '922229fef5684cea70b239b55b3337c55064b9d3', // 2026-06-20 for 2026-06-19 12876  scaleway   Ktor (kotlin)
     '999aa8f65c9d88672d933c8b59631d70ba13b1bf', // 2026-06-20 for 2026-06-19 30600  metronet   PodcastArchive/1.0
     'c5891ee4dee685c1e69ec2a5e7db112164cbd022', // 2026-06-21 for 2026-06-20 24560  bharti     Firefox, Chrome
+    '54aa9576aa9c6018ed56a6a34be46300a6d40426', // 2026-06-22 for 2026-06-21 399282 connext    Overcast
+    '5d3ad726eaf4aebfeef79e9fec8d93ac579ff6d5', // 2026-06-22 for 2026-06-21 16276  ovh        Firefox
+    '66ef77375ff661c3eb148a30a5673c6fae07e96c', // 2026-06-22 for 2026-06-21 16276  ovh        Firefox
+    'c5a9d1329db62a0aa7134ef1abe2975caa3e7275', // 2026-06-22 for 2026-06-21 208348 domynet    Firefox
 ]);
