@@ -1232,4 +1232,6 @@ const botIpHashes = new Set([
     '42ac3e130c025458f9c83bbf841905922b6fccba', // 2026-06-24 for 2026-06-23 7018   att        Overcast
     'a89d5a63723e7f613f56f172b0c4ab9ef95e4579', // 2026-06-24 for 2026-06-23 701    verizon    Overcast
     'd91528c8036cd77c26b4b073a89b6b4700e04fed', // 2026-06-24 for 2026-06-23 803    sasktel    Pypodder
+    '5a1c49bceabdffa83ef311201d2c25c6195a9dad', // 2026-06-25 for 2026-06-24 701    verizon    Overcast
+    'f2ec7559a542f3246c26f27344feb548a27845a8', // 2026-06-25 for 2026-06-24 399439 mitchell   Edge
 ]);
