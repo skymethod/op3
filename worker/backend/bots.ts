@@ -1234,4 +1234,5 @@ const botIpHashes = new Set([
     'd91528c8036cd77c26b4b073a89b6b4700e04fed', // 2026-06-24 for 2026-06-23 803    sasktel    Pypodder
     '5a1c49bceabdffa83ef311201d2c25c6195a9dad', // 2026-06-25 for 2026-06-24 701    verizon    Overcast
     'f2ec7559a542f3246c26f27344feb548a27845a8', // 2026-06-25 for 2026-06-24 399439 mitchell   Edge
+    'f3186545606e380c3231953edf451e78b243c760', // 2026-06-26 for 2026-06-25 20055  wholesail  Apple Podcasts, Overcast, Downcast
 ]);
