@@ -1235,4 +1235,10 @@ const botIpHashes = new Set([
     '5a1c49bceabdffa83ef311201d2c25c6195a9dad', // 2026-06-25 for 2026-06-24 701    verizon    Overcast
     'f2ec7559a542f3246c26f27344feb548a27845a8', // 2026-06-25 for 2026-06-24 399439 mitchell   Edge
     'f3186545606e380c3231953edf451e78b243c760', // 2026-06-26 for 2026-06-25 20055  wholesail  Apple Podcasts, Overcast, Downcast
+    '071570af78c615ed58ad41cebefe45e7b51ec325', // 2026-06-27 for 2026-06-26 62610  zenlayer   Chrome
+    '831e44cf5715336600beb91229c93f6f4344e5cb', // 2026-06-27 for 2026-06-26 701    verizon    Overcast
+    'babdd51530206a7ce5aedda1e4bb92cc89595279', // 2026-06-27 for 2026-06-26 62610  zenlayer   Chrome
+    'c1d361c60745885b5d8cc17fd40213819cda2e1e', // 2026-06-27 for 2026-06-26 7018   att        Overcast
+    'cfff9b023161b5d202295d1c7a9cd83ca348c905', // 2026-06-27 for 2026-06-26 7018   att        Overcast
+    'da369c3b1e5d29d90e94bc62768164a05f18b6b8', // 2026-06-27 for 2026-06-26 62610  zenlayer   Chrome
 ]);
