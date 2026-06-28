@@ -26,21 +26,22 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
 export const EXTRA_BOT_USER_AGENTS = [
     'CodexPodcastTranscriber/1.0',
+    'CyotekWebCopy/1.9 CyotekHTTP/6.4',
     'DataCollectPodcastIndex/1.0 (hao.wang@estie.co.jp)',
     'DataCollectSpotify/1.0 (conan1024hao@gmail.com)',
+    'luna-podcatcher/0.1 (+downloader)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
     'Mozilla/5.0 (podcast research; contact: research@example.com)',
+    'Mozilla/5.0 (podcast-downloader)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
+    'PodcastArchive/1.0',
     'PodcastDownloader/1.0 (+https://github.com/)',
     'swyxdotio-podcast-migration/1.0',
     'website-deployment-verifier/1.0',
-    'PodcastArchive/1.0',
-    'luna-podcatcher/0.1 (+downloader)',
-    'CyotekWebCopy/1.9 CyotekHTTP/6.4',
 ];
 
 export function isWebWidgetHostname(hostname: string): boolean {
@@ -1241,4 +1242,10 @@ const botIpHashes = new Set([
     'c1d361c60745885b5d8cc17fd40213819cda2e1e', // 2026-06-27 for 2026-06-26 7018   att        Overcast
     'cfff9b023161b5d202295d1c7a9cd83ca348c905', // 2026-06-27 for 2026-06-26 7018   att        Overcast
     'da369c3b1e5d29d90e94bc62768164a05f18b6b8', // 2026-06-27 for 2026-06-26 62610  zenlayer   Chrome
+    '042b68efc29c63bfeee80b3ebce99016e68c5a5a', // 2026-06-28 for 2026-06-27 62610  zenlayer   Chrome
+    'bfe08c4cdccb9ba8cd93acb3fdc5b0a5a8fd6a65', // 2026-06-28 for 2026-06-27 62610  zenlayer   Chrome
+    '9fadd35000724dc7fa82cfcc9dc9c73ade9c19e0', // 2026-06-28 for 2026-06-27 137409 gsl        Edge
+    'b776719dcda22212ccec8ea1110775dc5866641e', // 2026-06-28 for 2026-06-27 3292   tdc        Mozilla Bot, Mozilla/5.0 (podcast-downloader)
+    'd64d745e4e67b52a6a836e80c18696ded9050564', // 2026-06-28 for 2026-06-27 7018   att        Overcast
+    'dd4e694f40b11f7f6bb69dcf48f2374d9b75459c', // 2026-06-28 for 2026-06-27 701    verizon    Overcast
 ]);
