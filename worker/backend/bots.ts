@@ -1248,4 +1248,7 @@ const botIpHashes = new Set([
     'b776719dcda22212ccec8ea1110775dc5866641e', // 2026-06-28 for 2026-06-27 3292   tdc        Mozilla Bot, Mozilla/5.0 (podcast-downloader)
     'd64d745e4e67b52a6a836e80c18696ded9050564', // 2026-06-28 for 2026-06-27 7018   att        Overcast
     'dd4e694f40b11f7f6bb69dcf48f2374d9b75459c', // 2026-06-28 for 2026-06-27 701    verizon    Overcast
+    '491ff342dff6f78d0fb6a44d68b58c765c39c7ba', // 2026-06-29 for 2026-06-28 5645   teksavvy   Overcast
+    '65b5fc61e6c8a9fbdd66523afb0453d66706a9f1', // 2026-06-29 for 2026-06-28 701    verizon    Overcast
+    'eb3380e8a8ee2ce2b1a0dfecf3dd6bff59e968af', // 2026-06-29 for 2026-06-28 7992   cogeco     Overcast
 ]);
