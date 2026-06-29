@@ -22,7 +22,7 @@ import { isValidPartition } from './show_controller_model.ts';
 
 export type AgentInfo = { agentType: string, agentName?: string, deviceType?: string, deviceName?: string, referrerType?: string, referrerName?: string, isWebWidget?: boolean };
 
-export function computeAgentInfo({ userAgent, referer }: { userAgent: string | undefined, referer: string | undefined }): AgentInfo | undefined {
+export function computeAgentInfo({ userAgent, referer }: { userAgent: string | undefined, referer: string | undefined }): AgentInfo {
     const result = userAgent ? computeUserAgentEntityResult(userAgent, referer) : undefined;
     const agentType = result?.type === 'library' && result.category === 'bot' ? 'bot-library' : (result?.type ?? 'unknown');
     const agentName = result?.name ?? userAgent;
