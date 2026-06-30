@@ -1251,4 +1251,8 @@ const botIpHashes = new Set([
     '491ff342dff6f78d0fb6a44d68b58c765c39c7ba', // 2026-06-29 for 2026-06-28 5645   teksavvy   Overcast
     '65b5fc61e6c8a9fbdd66523afb0453d66706a9f1', // 2026-06-29 for 2026-06-28 701    verizon    Overcast
     'eb3380e8a8ee2ce2b1a0dfecf3dd6bff59e968af', // 2026-06-29 for 2026-06-28 7992   cogeco     Overcast
+    '10edb06bc3e45cfc06baec7754e59de9e2e93dee', // 2026-06-30 for 2026-06-29 48602  connect    Chrome
+    '72307c55e367affa722111d108ab432ed92c8274', // 2026-06-30 for 2026-06-29 3308   telia      Chrome
+    'b72c8636dee1be94798d4657f53095f626083725', // 2026-06-30 for 2026-06-29 13335  cloudflare Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 [client-ip-hash:9601454f85ba32b2fc093fa3c9ae5ad1e50fe07e73cc397e937cdd529fbd7362 country:US city:Los Angeles region:California metro:803]
+    'fa417f3218133aa669770ecb10726b55cf49f998', // 2026-06-30 for 2026-06-29 701    verizon    Overcast
 ]);
