@@ -1255,4 +1255,5 @@ const botIpHashes = new Set([
     '72307c55e367affa722111d108ab432ed92c8274', // 2026-06-30 for 2026-06-29 3308   telia      Chrome
     'b72c8636dee1be94798d4657f53095f626083725', // 2026-06-30 for 2026-06-29 13335  cloudflare Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 [client-ip-hash:9601454f85ba32b2fc093fa3c9ae5ad1e50fe07e73cc397e937cdd529fbd7362 country:US city:Los Angeles region:California metro:803]
     'fa417f3218133aa669770ecb10726b55cf49f998', // 2026-06-30 for 2026-06-29 701    verizon    Overcast
+    'ee176cf0c1eece1ae36aad40543006df50167ea7', // 2026-07-01 for 2026-06-30 701    verizon    Overcast
 ]);
