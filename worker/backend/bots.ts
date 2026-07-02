@@ -61,7 +61,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
         || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date >= '2026-05-11') // sinet
-        || asn === '12876' && agentName === 'ktor-client' && date >= '2026-05-27' // scaleway
+        || asn === '12876' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-05-27' // scaleway
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
@@ -1256,4 +1256,22 @@ const botIpHashes = new Set([
     'b72c8636dee1be94798d4657f53095f626083725', // 2026-06-30 for 2026-06-29 13335  cloudflare Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 [client-ip-hash:9601454f85ba32b2fc093fa3c9ae5ad1e50fe07e73cc397e937cdd529fbd7362 country:US city:Los Angeles region:California metro:803]
     'fa417f3218133aa669770ecb10726b55cf49f998', // 2026-06-30 for 2026-06-29 701    verizon    Overcast
     'ee176cf0c1eece1ae36aad40543006df50167ea7', // 2026-07-01 for 2026-06-30 701    verizon    Overcast
+    '0d3a9146fd428b05ae2dcd61974e27630e97276e', // 2026-07-02 for 2026-07-01 62610  zenlayer   Chrome
+    '6cba9814afbe0af59c9f32f578f86a0a1a642868', // 2026-07-02 for 2026-07-01 62610  zenlayer   Chrome
+    '31a390946d8fcfde4866a654481a028c82d4db7a', // 2026-07-02 for 2026-07-01 3209   vodafone   Overcast
+    '34f8611a378d19a1da5da283b6d9737c18b341a9', // 2026-07-02 for 2026-07-01 20412  clarity    Overcast
+    '5a34c2e215c48eeb8f9cb59b3e989a9afc5012b1', // 2026-07-02 for 2026-07-01 20412  clarity    Overcast
+    '390cffa65e52952aa7e8a33981221b000b700f65', // 2026-07-02 for 2026-07-01 701    verizon    Overcast
+    '4207af7291e899d992a25a1766b6b23f492e0216', // 2026-07-02 for 2026-07-01 12876  scaleway   Ktor (kotlin)
+    'fce0eada0692f95de43500eb37754d462a767cb0', // 2026-07-02 for 2026-07-01 12876  scaleway   Ktor (kotlin)
+    '440459a224b8a4ddc67b09b420225dc355fe2bfb', // 2026-07-02 for 2026-07-01 803    sasktel    Pypodder
+    '7534754254867e158871b61e734684233b303454', // 2026-07-02 for 2026-07-01 4213   krypt      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '7c99919de9e2748b35466de717a0150b411a34c3', // 2026-07-02 for 2026-07-01 19151  bbone      Overcast
+    '815b4c4f203f154447a73e1878610dd99fcba19e', // 2026-07-02 for 2026-07-01 3308   telia      Chrome
+    '867b9c871926170c91bca46c333f1f1f62e48531', // 2026-07-02 for 2026-07-01 3352   telefonica  Overcast
+    'af7b671e48165d0dadc62e147356c3d571e9091a', // 2026-07-02 for 2026-07-01 3352   telefonica  Overcast
+    'b154dd8e423b23341d5b03a88c220d6022923a67', // 2026-07-02 for 2026-07-01 7018   att        Overcast
+    'c18ff5bbbd9f4c130b0b2cb7e6fa1f750a3247fb', // 2026-07-02 for 2026-07-01 7018   att        Overcast
+    'e00e8daffa4efcf0dcfe0b48c1eb189a4c429ba4', // 2026-07-02 for 2026-07-01 7018   att        Overcast
+    'c1ef6d1745ba3b0213cc4b7ed2e6fde0687134c5', // 2026-07-02 for 2026-07-01 20412  clarity    Overcast
 ]);
