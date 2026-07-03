@@ -1274,4 +1274,18 @@ const botIpHashes = new Set([
     'c18ff5bbbd9f4c130b0b2cb7e6fa1f750a3247fb', // 2026-07-02 for 2026-07-01 7018   att        Overcast
     'e00e8daffa4efcf0dcfe0b48c1eb189a4c429ba4', // 2026-07-02 for 2026-07-01 7018   att        Overcast
     'c1ef6d1745ba3b0213cc4b7ed2e6fde0687134c5', // 2026-07-02 for 2026-07-01 20412  clarity    Overcast
+    '2efd4051f020f67deb6bc0dfe062691da596df2e', // 2026-07-03 for 2026-07-02 7018   att        Overcast
+    '45ce01df011b6c62ff564be4c6aa49d019b42d36', // 2026-07-03 for 2026-07-02 701    verizon    Overcast
+    'edcaceb0d312835018a6432844172b13d653ec39', // 2026-07-03 for 2026-07-02 701    verizon    Overcast
+    '49d5eb9268331594984a196473b8858f0fe3170d', // 2026-07-03 for 2026-07-02 7018   att        Overcast
+    '75853916cfd8a3b4791de52f325ed4e1487da1a5', // 2026-07-03 for 2026-07-02 7018   att        Overcast
+    '80d58d21c8d1568597ba35c3a377b07be7184fa5', // 2026-07-03 for 2026-07-02 7018   att        Overcast
+    'b737332f04dc85e67951c6e30e1c0262f5e0ef36', // 2026-07-03 for 2026-07-02 7018   att        Overcast
+    '59d7e980365df9310e9deffda9997f7700c0b43a', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
+    '90cfc5e04cd93797abbf48b30640b2f163eac8dc', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
+    '98170b5c233db581eda9abd23f28a374564d863a', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
+    'db57efb123bf1f4dfafbb2d4c08da22ca9048bde', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
+    'f121af0f3983b37689d83fc785e549c22a8d7931', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
+    '7fb35820db4ca2dc54ff8dc8b26145cd98f6567d', // 2026-07-03 for 2026-07-02 21928  tmobile    Overcast
+    'e2fe30011e1be5ddbcd4e3d4ca44d31869f0f0fb', // 2026-07-03 for 2026-07-02 200521 ministerio Firefox
 ]);
