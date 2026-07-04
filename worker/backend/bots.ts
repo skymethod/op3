@@ -1288,4 +1288,15 @@ const botIpHashes = new Set([
     'f121af0f3983b37689d83fc785e549c22a8d7931', // 2026-07-03 for 2026-07-02 62610  zenlayer   Chrome
     '7fb35820db4ca2dc54ff8dc8b26145cd98f6567d', // 2026-07-03 for 2026-07-02 21928  tmobile    Overcast
     'e2fe30011e1be5ddbcd4e3d4ca44d31869f0f0fb', // 2026-07-03 for 2026-07-02 200521 ministerio Firefox
+    '01d351af2a5ee355c11283775a88577fda221c8e', // 2026-07-04 for 2026-07-03 21928  tmobile    Chrome
+    '0c4fcb3864febfe661c5afc1267a1920185a4ee3', // 2026-07-04 for 2026-07-03 20001  charter    Overcast
+    '0ce3d516db5469464d8a5826384d17c405f7262f', // 2026-07-04 for 2026-07-03 20412  clarity    Overcast
+    '387fef15c672167058e720261bc1648e8a2eba35', // 2026-07-04 for 2026-07-03 9141   p4         Overcast
+    '400b8387f9f683ba0be93b5b04091b5fff0ad047', // 2026-07-04 for 2026-07-03 4808   unicom     Chrome
+    '5e37d6955ccbd1e7f87a30087622bcd3003b6778', // 2026-07-04 for 2026-07-03 701    verizon    Overcast
+    '7950e1a3c0bdf0652f7ed203efaefc4b38825369', // 2026-07-04 for 2026-07-03 701    verizon    Overcast
+    '69b314fa94d9e04889665879c2e9c4e0dbfb811f', // 2026-07-04 for 2026-07-03 62610  zenlayer   Chrome
+    '7984b8f7339d8fe7c69462ec1aa16baa1fed9db3', // 2026-07-04 for 2026-07-03 21859  zenlayer   Chrome
+    '7602524658c8bef033114b624c4cb31411162ad4', // 2026-07-04 for 2026-07-03 15997  intelligent Overcast
+    'f41c45eda6965a79f273e8c9f6023f6f44077761', // 2026-07-04 for 2026-07-03 3209   vodafone   Overcast
 ]);
