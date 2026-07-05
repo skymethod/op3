@@ -29,6 +29,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'CyotekWebCopy/1.9 CyotekHTTP/6.4',
     'DataCollectPodcastIndex/1.0 (hao.wang@estie.co.jp)',
     'DataCollectSpotify/1.0 (conan1024hao@gmail.com)',
+    'fedcom-capture/1.0',
     'luna-podcatcher/0.1 (+downloader)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
@@ -1299,4 +1300,9 @@ const botIpHashes = new Set([
     '7984b8f7339d8fe7c69462ec1aa16baa1fed9db3', // 2026-07-04 for 2026-07-03 21859  zenlayer   Chrome
     '7602524658c8bef033114b624c4cb31411162ad4', // 2026-07-04 for 2026-07-03 15997  intelligent Overcast
     'f41c45eda6965a79f273e8c9f6023f6f44077761', // 2026-07-04 for 2026-07-03 3209   vodafone   Overcast
+    '07be7c5fb62350a10e06bf72f5e841fa0a114ebb', // 2026-07-05 for 2026-07-04 701    verizon    Overcast
+    '1ba6a02ba1a2e5f0f190f70e9850b01f1460055a', // 2026-07-05 for 2026-07-04 47583  hostinger  fedcom-capture/1.0
+    'a35b91553cd6205ab04ab0801d6623539227f585', // 2026-07-05 for 2026-07-04 62610  zenlayer   Chrome
+    'cac1a3c647d91e140f2bcafde9c9393132bb1fb7', // 2026-07-05 for 2026-07-04 62610  zenlayer   Chrome
+    'e79454a7a1378db072189efd977f50fbb5b82ca0', // 2026-07-05 for 2026-07-04 3209   vodafone   Overcast
 ]);
