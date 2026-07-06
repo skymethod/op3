@@ -1305,4 +1305,7 @@ const botIpHashes = new Set([
     'a35b91553cd6205ab04ab0801d6623539227f585', // 2026-07-05 for 2026-07-04 62610  zenlayer   Chrome
     'cac1a3c647d91e140f2bcafde9c9393132bb1fb7', // 2026-07-05 for 2026-07-04 62610  zenlayer   Chrome
     'e79454a7a1378db072189efd977f50fbb5b82ca0', // 2026-07-05 for 2026-07-04 3209   vodafone   Overcast
+    '3559c767b97a1f769f032f08de060b95885b3630', // 2026-07-06 for 2026-07-05 13335  cloudflare Chrome
+    '76bffc155268b00bcdb50b9d39036777c417239c', // 2026-07-06 for 2026-07-05 3209   vodafone   Overcast
+    'b5ef3120c6e5285fbd22e8999a4faa2d068af092', // 2026-07-06 for 2026-07-05 701    verizon    Overcast
 ]);
