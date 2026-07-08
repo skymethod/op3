@@ -93,7 +93,8 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '30081'  // cachefly
             || asn === '714'    // apple
             || asn === '45102'  // alibaba
-            || asn == '136907' && date === '2026-06-05' // huawei
+            || asn === '136907' && date === '2026-06-05' // huawei
+            || asn === '62610' && date >= '2026-07-02' // zenlayer
         )
         ;
 }
@@ -1315,4 +1316,21 @@ const botIpHashes = new Set([
     '49d3b6cea92279c727d856704e05a29ebb4a72ba', // 2026-07-07 for 2026-07-06 7018   att        VLC media player
     '644866355a34aaf4403aad8cffac79d03402ba67', // 2026-07-07 for 2026-07-06 7922   comcast    Overcast
     '951bde792f21307427c576fc1dd7a2f32d93f90e', // 2026-07-07 for 2026-07-06 9141   p4         Overcast
+    '027b18e3a8daebeefe6fe547c1a0eac09ed89951', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    '278019eb0683e09c20f209aa84e2d221d6c9a5f1', // 2026-07-08 for 2026-07-07 7018   att        Overcast
+    '3cf0e94be44a24a3e319df96c182a0a99a7ba011', // 2026-07-08 for 2026-07-07 12271  charter    Overcast
+    '467ac97d7361ca6b8da7fe1f474c60f859111781', // 2026-07-08 for 2026-07-07 701    verizon    Overcast
+    '9bcd47e1e2104d26844f7a583fc83d927837046c', // 2026-07-08 for 2026-07-07 701    verizon    Overcast
+    'b4c141425595f73d32ceb2042b4f0049943fc2d7', // 2026-07-08 for 2026-07-07 701    verizon    Overcast
+    'ef31ee3affb1bab5857b950e7a68a12dfa8a514e', // 2026-07-08 for 2026-07-07 701    verizon    Overcast
+    '480e9ef6022720092d954aed185984f2eab08e27', // 2026-07-08 for 2026-07-07 25776  okla       Chrome
+    '4f46bededb92347d03dca62b76a32931c556f069', // 2026-07-08 for 2026-07-07 21859  zenlayer   Chrome
+    '60c0277d45d289459594fedc9c57006bc217c009', // 2026-07-08 for 2026-07-07 3356   level3     Overcast
+    '83c68daca394d8994989f655fe4814f37d774f92', // 2026-07-08 for 2026-07-07 3209   vodafone   Overcast
+    'a18d2ab9e05094b1cc5b6c5736e183fc4151b270', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    'baefeebdafa039d23c2eebee81deb805429add2b', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    'd23cec8f5235124fb2e08b8a9b6db3fe0cf2c322', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    'd31be6f0ce2b8984b84367ef640bd507691f7971', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    'f10d7a7b784e2e2b3ab7fe9659ae9cec90c5249d', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    'f6223d8acb5e9044e00900b598aaea8d0b6826b9', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
 ]);
