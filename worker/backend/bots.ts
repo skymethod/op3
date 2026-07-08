@@ -1308,4 +1308,11 @@ const botIpHashes = new Set([
     '3559c767b97a1f769f032f08de060b95885b3630', // 2026-07-06 for 2026-07-05 13335  cloudflare Chrome
     '76bffc155268b00bcdb50b9d39036777c417239c', // 2026-07-06 for 2026-07-05 3209   vodafone   Overcast
     'b5ef3120c6e5285fbd22e8999a4faa2d068af092', // 2026-07-06 for 2026-07-05 701    verizon    Overcast
+    '027b18e3a8daebeefe6fe547c1a0eac09ed89951', // 2026-07-07 for 2026-07-06 62610  zenlayer   Chrome
+    'baefeebdafa039d23c2eebee81deb805429add2b', // 2026-07-07 for 2026-07-06 62610  zenlayer   Chrome
+    '4262460010637557299ab2cd72c77f07794333b4', // 2026-07-07 for 2026-07-06 50266  odido      Overcast
+    '480e9ef6022720092d954aed185984f2eab08e27', // 2026-07-07 for 2026-07-06 25776  okla       Chrome
+    '49d3b6cea92279c727d856704e05a29ebb4a72ba', // 2026-07-07 for 2026-07-06 7018   att        VLC media player
+    '644866355a34aaf4403aad8cffac79d03402ba67', // 2026-07-07 for 2026-07-06 7922   comcast    Overcast
+    '951bde792f21307427c576fc1dd7a2f32d93f90e', // 2026-07-07 for 2026-07-06 9141   p4         Overcast
 ]);
