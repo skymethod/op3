@@ -1333,4 +1333,16 @@ const botIpHashes = new Set([
     'd31be6f0ce2b8984b84367ef640bd507691f7971', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
     'f10d7a7b784e2e2b3ab7fe9659ae9cec90c5249d', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
     'f6223d8acb5e9044e00900b598aaea8d0b6826b9', // 2026-07-08 for 2026-07-07 62610  zenlayer   Chrome
+    '0a8951a0fb0afbd57bdae8244faa1d5d33b10410', // 2026-07-09 for 2026-07-08 48602  connect    Chrome
+    '0f78c7280b2a5a9a7f85f34fe706d981cf78d71c', // 2026-07-09 for 2026-07-08 7018   att        Safari, Chrome
+    '1de1bf62c2dec7238a06a07120d1af6e98be6e4c', // 2026-07-09 for 2026-07-08 7018   att        Overcast
+    '205a03c524457efcd5159bfd23c1b8b7c9142a34', // 2026-07-09 for 2026-07-08 7018   att        Overcast
+    '384a2d7427ae168575cf406aa07294a74043f20c', // 2026-07-09 for 2026-07-08 7018   att        Overcast
+    '4998d32bc6d706181d87f467900848f2c2de654b', // 2026-07-09 for 2026-07-08 7018   att        Overcast
+    'e11b1e5784e3852c398ed6f9b5fbe2ff7d7523e2', // 2026-07-09 for 2026-07-08 7018   att        Overcast
+    '109d953640a6a44eb027dbf47043df77fe054bf3', // 2026-07-09 for 2026-07-08 3209   vodafone   Overcast
+    '1d416b5b7534ae4f2350a86db6644c17291bff99', // 2026-07-09 for 2026-07-08 32489  amanah     Overcast
+    '3e045c03197f3cd0c121eb292bb3136c60e6af79', // 2026-07-09 for 2026-07-08 701    verizon    Overcast
+    'a3499d68e9380edac03256e9f5e2a56c549fe534', // 2026-07-09 for 2026-07-08 400238 pieg       Chrome
+    'a7d4b6de3446b5f8b18ffb4be971fd93228efb95', // 2026-07-09 for 2026-07-08 132420 e2e        AIOHTTP, Chrome
 ]);
