@@ -34,6 +34,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
+    'Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)',
     'Mozilla/5.0 (podcast research; contact: research@example.com)',
     'Mozilla/5.0 (podcast-downloader)',
     'Mozilla/5.0 (Sofia podcast downloader)',
@@ -1357,4 +1358,8 @@ const botIpHashes = new Set([
     'b956742e08bb588440eba234f23852023879493c', // 2026-07-12 for 2026-07-11 701    verizon    Overcast
     'dca35c54d7d74d4d588477b3ab84821f357c6052', // 2026-07-12 for 2026-07-11 701    verizon    Overcast
     '65ed22d81d2faa459279d886f31e90d64c962aa8', // 2026-07-12 for 2026-07-11 3352   telefonica Overcast
+    '072dc50ac2e011609741e3811f9143d2447977b9', // 2026-07-13 for 2026-07-12 14618  amazon     Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)
+    '79924d2123d6f74cc9465fc95177ee429fc70f07', // 2026-07-13 for 2026-07-12 3209   vodafone   Overcast
+    'b15344954edd291674c4791dcd791a9ae910dea2', // 2026-07-13 for 2026-07-12 701    verizon    Overcast
+    'd35932b3aa6ca7094c85ac88a837c3506c714111', // 2026-07-13 for 2026-07-12 6128   cablevision Edge
 ]);
