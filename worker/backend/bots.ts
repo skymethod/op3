@@ -30,6 +30,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'DataCollectPodcastIndex/1.0 (hao.wang@estie.co.jp)',
     'DataCollectSpotify/1.0 (conan1024hao@gmail.com)',
     'fedcom-capture/1.0',
+    'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
     'luna-podcatcher/0.1 (+downloader)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
@@ -1376,4 +1377,6 @@ const botIpHashes = new Set([
     '27929f6a5082168d84435c71c258eaa50d3b9b10', // 2026-07-17 for 2026-07-16 7018   att        Overcast
     '7319bd56d90f65ab102a80f68e6611dd9a9e881c', // 2026-07-17 for 2026-07-16 803    sasktel    Overcast
     'cba0959ae4e25d9975b85847b17ee6405d466554', // 2026-07-17 for 2026-07-16 701    verizon    Overcast
+    '06b50738ffbc051c25574be1cb36969f1c13633f', // 2026-07-18 for 2026-07-17 16276  ovh        GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)
+    '86f403ceb1ca6f72cf39daa590089aab6ec29287', // 2026-07-18 for 2026-07-17 3352   telefonica Overcast
 ]);
