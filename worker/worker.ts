@@ -367,18 +367,26 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
         headers.set('x-pid', pid);
         headers.set('x-timestamp', timestamp);
         const pendingWork = async () => {
-            const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
-            const hash = (await originalBytes.sha1()).hex();
             try {
-                const key = `hls/playlists/${hash}.txt`;
-                if (!await blobsBucket.head(key)) {
-                    await blobsBucket.put(key, originalBytes.array(), { httpMetadata: { contentType: 'text/plain' } });
+                const originalBytes = Bytes.ofUtf8(oldLines.join('\n'));
+                const hash = (await originalBytes.sha1()).hex();
+                if (!knownSavedPlaylistHashes.has(hash)) {
+                    try {
+                        const key = `hls/playlists/${hash}.txt`;
+                        if (!await blobsBucket.head(key)) {
+                            await blobsBucket.put(key, originalBytes.array(), { httpMetadata: { contentType: 'text/plain' } });
+                        }
+                        knownSavedPlaylistHashes.add(hash);
+                    } catch (e) {
+                        console.error(`error saving playlist ${hash}: ${(e as Error).stack || e}`);
+                        // better luck next time
+                    }
                 }
+                return { hash };
             } catch (e) {
-                console.error(`error saving playlist ${hash}: ${(e as Error).stack || e}`);
-                // better luck next time
+                consoleError('compute-playlist-hash', `Error computing hash for ${hlsUrl}: ${(e as Error).stack || e}`);
+                throw e;
             }
-            return { hash };
         }
         return { response: new Response(newLines.join('\n'), { headers }), sid, pid, pendingWork };
     } catch (e) {
@@ -386,6 +394,8 @@ async function tryComputeHlsResult(hlsUrl: string, { method, headers: reqHeaders
         return undefined;
     }
 }
+
+const knownSavedPlaylistHashes = new Set<string>();
 
 async function addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl }: { other: Record<string, string>, hlsResult: HlsResult | undefined, prefixArgs: Record<string, string>, secret: string, targetUrl: string }): Promise<void> {
     const sid = hlsResult?.sid ?? prefixArgs.s;
