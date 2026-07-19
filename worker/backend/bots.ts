@@ -1379,4 +1379,6 @@ const botIpHashes = new Set([
     'cba0959ae4e25d9975b85847b17ee6405d466554', // 2026-07-17 for 2026-07-16 701    verizon    Overcast
     '06b50738ffbc051c25574be1cb36969f1c13633f', // 2026-07-18 for 2026-07-17 16276  ovh        GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)
     '86f403ceb1ca6f72cf39daa590089aab6ec29287', // 2026-07-18 for 2026-07-17 3352   telefonica Overcast
+    '3aa7a9524d984a899a839eb54f8bd296128fbbdf', // 2026-07-19 for 2026-07-18 701    verizon    Overcast
+    'a6f88e07e81653b149b9b243417126805853a73d', // 2026-07-19 for 2026-07-18 20412  clarity    Overcast
 ]);
