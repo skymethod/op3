@@ -65,6 +65,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
         || asn === '2907' && agentType === 'browser' && (date === '2026-04-23' || date === '2026-05-01' || date >= '2026-05-11') // sinet
         || asn === '12876' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-05-27' // scaleway
+        || asn === '16509' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-07-20' // amazon
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
@@ -1381,4 +1382,7 @@ const botIpHashes = new Set([
     '86f403ceb1ca6f72cf39daa590089aab6ec29287', // 2026-07-18 for 2026-07-17 3352   telefonica Overcast
     '3aa7a9524d984a899a839eb54f8bd296128fbbdf', // 2026-07-19 for 2026-07-18 701    verizon    Overcast
     'a6f88e07e81653b149b9b243417126805853a73d', // 2026-07-19 for 2026-07-18 20412  clarity    Overcast
+    '09ebe7fb2f2a3bbdd74090b616cc0dea2e2e49b7', // 2026-07-21 for 2026-07-20 16509  amazon     Ktor (kotlin)
+    '2516b1497a6ff6193d7dd7a98a8d83740103dcdf', // 2026-07-21 for 2026-07-20 701    verizon    Overcast
+    'cf0311b895267cf0c0cfbd4f0577be9082608e48', // 2026-07-21 for 2026-07-20 7018   att        Overcast
 ]);
