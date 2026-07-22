@@ -32,6 +32,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'fedcom-capture/1.0',
     'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
     'luna-podcatcher/0.1 (+downloader)',
+    'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
@@ -43,6 +44,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
     'PodcastArchive/1.0',
     'PodcastDownloader/1.0 (+https://github.com/)',
+    'spotify-tech-podcast-discovery/1.0',
     'swyxdotio-podcast-migration/1.0',
     'website-deployment-verifier/1.0',
 ];
@@ -1385,4 +1387,11 @@ const botIpHashes = new Set([
     '09ebe7fb2f2a3bbdd74090b616cc0dea2e2e49b7', // 2026-07-21 for 2026-07-20 16509  amazon     Ktor (kotlin)
     '2516b1497a6ff6193d7dd7a98a8d83740103dcdf', // 2026-07-21 for 2026-07-20 701    verizon    Overcast
     'cf0311b895267cf0c0cfbd4f0577be9082608e48', // 2026-07-21 for 2026-07-20 7018   att        Overcast
+    '0aebab9768651c34e76752351cc28127b10d1822', // 2026-07-22 for 2026-07-21 24560  bharti     Chrome
+    '5805cd97eafc169357933f1df54a527166201008', // 2026-07-22 for 2026-07-21 16509  amazon     spotify-tech-podcast-discovery/1.0
+    '820916a425d828803b1dfd7343c152150df07989', // 2026-07-22 for 2026-07-21 202779 evobits    Chrome
+    'ad94c7f03c694615be99c1a53654ce6158935723', // 2026-07-22 for 2026-07-21 202779 evobits    Chrome
+    'b69414b21de468a8e6bf42b784eb83f0c57d7c78', // 2026-07-22 for 2026-07-21 7018   att        Chrome
+    '905bb63335f966f6b4dba6293e52946ca1aff79a', // 2026-07-22 for 2026-07-21 396982 google     moonshine-podcast-crawl/1.0 (+https://podcastindex.org)
+    'b61f3e1c2b166739dca78257a28cd695e139b277', // 2026-07-22 for 2026-07-21 396982 google     moonshine-podcast-crawl/1.0 (+https://podcastindex.org)
 ]);
