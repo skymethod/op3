@@ -53,11 +53,15 @@ export class ShowControllerNotifications {
             }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
-                console.log(`ShowController: Saving ${newRecordsCount} new feed notification records`);
+                consoleInfo('sc-feed-not-new', `ShowController: Saving ${newRecordsCount} new feed notification records`);
                 await storage.put(newRecords);
             }
             if (feedUrls.size > 0) {
-                await callbacks?.onFeedUrls(feedUrls);
+                try {
+                    await callbacks?.onFeedUrls(feedUrls);
+                } catch {
+                    consoleWarn('sc-feed-not-failed', `Error calling onFeedUrls: ${[...feedUrls].join(', ')}`);
+                }
             }
             return true;
         }
@@ -105,7 +109,11 @@ export class ShowControllerNotifications {
                 await storage.put(newRecords);
             }
             if (podcastGuids.size > 0) {
-                await callbacks?.onPodcastGuids(podcastGuids);
+                try {
+                    await callbacks?.onPodcastGuids(podcastGuids);
+                } catch {
+                    consoleWarn('sc-url-not-failed', `Error calling onPodcastGuids: ${[...podcastGuids].join(', ')}`);
+                }
             }
             return true;
         }
