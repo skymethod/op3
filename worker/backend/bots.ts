@@ -1394,4 +1394,7 @@ const botIpHashes = new Set([
     'b69414b21de468a8e6bf42b784eb83f0c57d7c78', // 2026-07-22 for 2026-07-21 7018   att        Chrome
     '905bb63335f966f6b4dba6293e52946ca1aff79a', // 2026-07-22 for 2026-07-21 396982 google     moonshine-podcast-crawl/1.0 (+https://podcastindex.org)
     'b61f3e1c2b166739dca78257a28cd695e139b277', // 2026-07-22 for 2026-07-21 396982 google     moonshine-podcast-crawl/1.0 (+https://podcastindex.org)
+    '38709b79654307e060efe3cc8954ed6094dc2d9d', // 2026-07-23 for 2026-07-22 701    verizon    chrome
+    '469ed44cfe2863cbb9feed10eece85ac419391cd', // 2026-07-23 for 2026-07-22 24560  bharti     Chrome
+    'c06ee1fa9a5e37d2eef7583ef43ae7e6118f27d2', // 2026-07-23 for 2026-07-22 26832  rica       Chrome
 ]);
