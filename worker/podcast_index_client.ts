@@ -56,6 +56,16 @@ export class PodcastIndexClient {
         return await this.makeApiCall(u, checkGetEpisodeResponse);
     }
 
+    async recentFeeds({ max, since, feedid, desc }: { max?: number, since?: number, feedid?: string, desc?: boolean } = {}): Promise<RecentFeedsResponse> {
+        // https://podcastindex-org.github.io/docs-api/#get-/recent/newfeeds
+        const u = new URL('https://api.podcastindex.org/api/1.0/recent/newfeeds');
+        if (typeof max === 'number') u.searchParams.set('max', max.toString());
+        if (typeof since === 'number') u.searchParams.set('since', since.toString());
+        if (typeof feedid === 'string') u.searchParams.set('feedid', feedid);
+        if (desc === true) u.searchParams.set('desc', '');
+        return await this.makeApiCall(u, checkRecentFeedsResponse);
+    }
+
     //
 
     private async makeApiCall<T>(url: URL, responseCheck: (obj: unknown) => obj is T): Promise<T> {
@@ -167,5 +177,24 @@ export type Episode = Record<string, unknown>; // TODO fill out when needed
 
 function checkEpisode(obj: unknown): obj is Episode {
     if (!isStringRecord(obj)) throw new StatusError(`Unexpected Episode obj: ${JSON.stringify(obj)}`);
+    return true;
+}
+
+export interface RecentFeedsResponse {
+    readonly status: true;
+    readonly feeds: unknown[];
+    readonly count: number;
+    readonly max: number;
+    readonly description: string;
+}
+
+function checkRecentFeedsResponse(obj: unknown): obj is RecentFeedsResponse {
+    if (!isStringRecord(obj)) throw new StatusError(`Unexpected RecentFeedsResponse obj: ${JSON.stringify(obj)}`);
+    const { status, feeds, count, max, description } = obj;
+    if (status !== true) throw new StatusError(`Unexpected status: ${JSON.stringify(status)}`);
+    if (!Array.isArray(feeds)) throw new StatusError(`Unexpected feeds: ${JSON.stringify(feeds)}`);
+    if (typeof count !== 'number') throw new StatusError(`Unexpected count: ${JSON.stringify(count)}`);
+    if (typeof max !== 'number') throw new StatusError(`Unexpected max: ${JSON.stringify(max)}`);
+    if (typeof description !== 'string') throw new StatusError(`Unexpected description: ${JSON.stringify(description)}`);
     return true;
 }

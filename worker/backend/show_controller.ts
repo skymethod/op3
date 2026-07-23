@@ -19,7 +19,7 @@ import { computeShowListenStatsKey, isValidShowListenStats } from './listens.ts'
 import { computeFetchInfo, tryParseBlobKey } from './show_controller_feeds.ts';
 import { EpisodeRecord, FeedItemIndexRecord, FeedItemRecord, FeedRecord, FeedWorkRecord, getHeader, isEpisodeRecord, isFeedItemIndexRecord, isFeedItemRecord, isFeedRecord, isMediaUrlIndexRecord, isShowgroupRecord, isShowPartitionsRecord, isShowRecord, isValidPartition, isValidShowgroupId, isWorkRecord, MediaUrlIndexRecord, PodcastIndexFeed, ShowEpisodesByPubdateIndexRecord, ShowgroupRecord, ShowPartitionsRecord, ShowRecord, WorkRecord } from './show_controller_model.ts';
 import { ShowControllerNotifications } from './show_controller_notifications.ts';
-import { computeListOpts } from './storage.ts';
+import { computeListOpts, queryStorage } from './storage.ts';
 
 export class ShowController {
     static readonly processAlarmKind = 'ShowController.processAlarmKind';
@@ -108,25 +108,7 @@ export class ShowController {
         const { operationKind, targetPath, parameters = {} } = req;
 
         if (operationKind === 'select' && targetPath === '/show/storage') {
-            const map = await storage.list(computeListOpts('', parameters));
-            const { values = 'true', types = 'false', sizes = 'false' } = parameters;
-            const [ includeValues, includeTypes, includeSizes ] = [ values, types, sizes ].map(v => v === 'true');
-            const encoder = new TextEncoder();
-            const computeEstimatedSize = (val: DurableObjectStorageValue): number => {
-                if (typeof val === 'number') return 8;
-                if (typeof val === 'string') return encoder.encode(val).length;
-                if (typeof val === 'object') return encoder.encode(JSON.stringify(val)).length;
-                throw new Error(JSON.stringify({ type: typeof val }));
-            }
-            const results: unknown[] = [];
-            for (const [ key, value ] of map) {
-                const result: unknown[] = [ key ];
-                if (includeValues) result.push(value);
-                if (includeTypes) result.push(typeof value);
-                if (includeSizes) result.push(computeEstimatedSize(value));
-                results.push(result);
-            }
-            return { results };
+            return await queryStorage(storage, parameters);
         }
         if (operationKind === 'select' && targetPath === '/show/feeds') {
             const map = await storage.list(computeListOpts('sc.fr0.', parameters));

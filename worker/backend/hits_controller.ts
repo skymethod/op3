@@ -15,6 +15,7 @@ import { unpackHashedIpAddressHash } from '../ip_addresses.ts';
 import { DoNames } from '../do_names.ts';
 import { computeServerUrl } from '../client_params.ts';
 import { newTextResponse } from '../responses.ts';
+import { queryStorage } from './storage.ts';
 
 export class HitsController {
     private readonly storage: DurableObjectStorage;
@@ -211,6 +212,10 @@ export class HitsController {
         const { storage, recentMinuteTimestamps, colo, knownServerUrls } = this;
        
         if (operationKind === 'select' && targetPath === '/hits/attnums') return { results: [ await storage.get('hits.attNums') ] };
+
+        if (operationKind === 'select' && targetPath === '/hits/storage') {
+            return await queryStorage(storage, parameters);
+        }
 
         if (targetPath === '/hits/state') {
             const state = await this.getOrLoadState();

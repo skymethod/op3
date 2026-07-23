@@ -126,7 +126,7 @@ export class ShowControllerNotifications {
         
         if (operationKind === 'select' && targetPath === '/feed-notifications') {
             const map = await this.storage.list(computeListOpts('fn.1.', parameters));
-            const results = [...map.values()].filter(isFeedNotificationRecord);
+            const results = [ ...map ];
             return { results };
         }
 
