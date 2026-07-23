@@ -109,7 +109,23 @@ export class ShowController {
 
         if (operationKind === 'select' && targetPath === '/show/storage') {
             const map = await storage.list(computeListOpts('', parameters));
-            const results = [ ...map ];
+            const { values = 'true', types = 'false', sizes = 'false' } = parameters;
+            const [ includeValues, includeTypes, includeSizes ] = [ values, types, sizes ].map(v => v === 'true');
+            const encoder = new TextEncoder();
+            const computeEstimatedSize = (val: DurableObjectStorageValue): number => {
+                if (typeof val === 'number') return 8;
+                if (typeof val === 'string') return encoder.encode(val).length;
+                if (typeof val === 'object') return encoder.encode(JSON.stringify(val)).length;
+                throw new Error(JSON.stringify({ type: typeof val }));
+            }
+            const results: unknown[] = [];
+            for (const [ key, value ] of map) {
+                const result: unknown[] = [ key ];
+                if (includeValues) result.push(value);
+                if (includeTypes) result.push(typeof value);
+                if (includeSizes) result.push(computeEstimatedSize(value));
+                results.push(result);
+            }
             return { results };
         }
         if (operationKind === 'select' && targetPath === '/show/feeds') {

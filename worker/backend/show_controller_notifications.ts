@@ -53,7 +53,7 @@ export class ShowControllerNotifications {
             }
             const newRecordsCount = Object.keys(newRecords).length;
             if (newRecordsCount > 0) {
-                consoleInfo('sc-feed-not-new', `ShowController: Saving ${newRecordsCount} new feed notification records`);
+                consoleInfo('sc-feed-not-new', `ShowController: Saving ${newRecordsCount} new feed notification records (feedUrls.size=${feedUrls.size}, callbacks=${!!callbacks})`);
                 await storage.put(newRecords);
             }
             if (feedUrls.size > 0) {
