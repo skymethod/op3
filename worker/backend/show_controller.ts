@@ -823,7 +823,7 @@ async function lookupFeed(feedUrl: string, storage: DurableObjectStorage, client
     try {
         piFeed = await getPodcastIndexFeed('feedUrl', feedUrl, client);
     } catch (e) {
-        consoleWarn('sc-lookup-podcast-feed', `Error calling getPodcastByFeedUrl: ${(e as Error).stack || e}`);
+        consoleWarn('sc-lookup-podcast-feed', `Error calling getPodcastByFeedUrl for ${feedUrl}: ${(e as Error).stack || e}`);
         return;
     }
     if (piFeed === undefined) {
