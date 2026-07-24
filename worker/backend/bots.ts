@@ -39,13 +39,16 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)',
     'Mozilla/5.0 (podcast research; contact: research@example.com)',
     'Mozilla/5.0 (podcast-downloader)',
+    'Mozilla/5.0 (podcast-fetcher)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
     'PodcastArchive/1.0',
     'PodcastDownloader/1.0 (+https://github.com/)',
+    'proc-data-podcast-downloader/1.0',
     'spotify-tech-podcast-discovery/1.0',
     'swyxdotio-podcast-migration/1.0',
+    'voiceai-harvest/0.2 (jeremy@hi-desk.de)',
     'website-deployment-verifier/1.0',
 ];
 
@@ -1397,4 +1400,16 @@ const botIpHashes = new Set([
     '38709b79654307e060efe3cc8954ed6094dc2d9d', // 2026-07-23 for 2026-07-22 701    verizon    chrome
     '469ed44cfe2863cbb9feed10eece85ac419391cd', // 2026-07-23 for 2026-07-22 24560  bharti     Chrome
     'c06ee1fa9a5e37d2eef7583ef43ae7e6118f27d2', // 2026-07-23 for 2026-07-22 26832  rica       Chrome
+    '11af1aa785527b48bddae03de5f7788dc2eb769d', // 2026-07-24 for 2026-07-23 3209   vodafone   voiceai-harvest/0.2 (jeremy@hi-desk.de)
+    '1445ec4a078b909afb81806101b5e510120ad020', // 2026-07-24 for 2026-07-23 701    verizon    Overcast
+    '2cd4109a7d147c8f3cd8cf905af2bfbc9e1d8d69', // 2026-07-24 for 2026-07-23 20412  clarity    Overcast
+    '482ebf6df561b565f02c16eda15afa8db4917e89', // 2026-07-24 for 2026-07-23 24560  bharti     Chrome
+    '67076aa4e5371f5deaa1a7ef87c69db304850103', // 2026-07-24 for 2026-07-23 701    verizon    Firefox
+    '74f6485775d2111ea46df7dfcf0b9a1228575d0f', // 2026-07-24 for 2026-07-23 20412  clarity    Overcast
+    '9fd0b180d9ed238c850409be6915aa5bf1fac842', // 2026-07-24 for 2026-07-23 62240  clouvider  Overcast
+    'e58eb0bad22ad5d044e239d3669bf9744c25101a', // 2026-07-24 for 2026-07-23 62240  clouvider  Overcast
+    'a3d0ae3d2a1ffc47bdb25bd173792ff63ab12207', // 2026-07-24 for 2026-07-23 9443   vocus      Overcast
+    'c9016012dad5bc98877974442c2af35c5274baa6', // 2026-07-24 for 2026-07-23 20412  clarity    Overcast
+    'dd1eea488fdc18144363dd690157786eeb85a134', // 2026-07-24 for 2026-07-23 140641 yotta      Mozilla/5.0 (podcast-fetcher), proc-data-podcast-downloader/1.0
+    'e76ecefbd835afd879d4cbf3abbaa87531b7c39b', // 2026-07-24 for 2026-07-23 6167   verizon    CastBox
 ]);
