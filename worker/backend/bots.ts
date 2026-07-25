@@ -1412,4 +1412,8 @@ const botIpHashes = new Set([
     'c9016012dad5bc98877974442c2af35c5274baa6', // 2026-07-24 for 2026-07-23 20412  clarity    Overcast
     'dd1eea488fdc18144363dd690157786eeb85a134', // 2026-07-24 for 2026-07-23 140641 yotta      Mozilla/5.0 (podcast-fetcher), proc-data-podcast-downloader/1.0
     'e76ecefbd835afd879d4cbf3abbaa87531b7c39b', // 2026-07-24 for 2026-07-23 6167   verizon    CastBox
+    '568b3415dbc9c2914542d7e260a7e84f5f0bebdf', // 2026-07-25 for 2026-07-24 62240  clouvider  Overcast
+    '7c68c1684117219e08fbb59b217903877e203d00', // 2026-07-25 for 2026-07-24 62240  clouvider  Overcast
+    '89faf7f2106239cc8281258b089a9e5a94b41927', // 2026-07-25 for 2026-07-24 7018   att        Overcast
+    '96d08be8883055c5ee042f47f0c0ec2b2e3d5a8d', // 2026-07-25 for 2026-07-24 7018   att        Overcast
 ]);
