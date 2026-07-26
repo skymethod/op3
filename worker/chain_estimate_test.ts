@@ -463,6 +463,16 @@ Deno.test({
             { kind: 'prefix', prefix: 'podcastplusplus', url: 'https://analytics.podcastplusplus.com/e/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://track.fstry.me/p/1w2x3y4z/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'firstory', url: 'https://track.fstry.me/p/1w2x3y4z/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('https://track.fstry.me/p/1w2x3y4z/http://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'firstory', url: 'https://track.fstry.me/p/1w2x3y4z/http://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

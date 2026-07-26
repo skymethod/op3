@@ -348,6 +348,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'podcastplusplus', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://track.fstry.me/p/1w2x3y4z/a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol trumps
+    m = /^(https?):\/\/track\.fstry\.me\/p\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'firstory', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -379,6 +388,7 @@ export interface ChainItem {
         | 'chartable'
         | 'claritas'
         | 'cohost'
+        | 'firstory'
         | 'glystn'
         | 'gumball'
         | 'ipfspodcasting'
