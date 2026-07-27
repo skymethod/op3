@@ -103,6 +103,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '45102'  // alibaba
             || asn === '136907' && date === '2026-06-05' // huawei
             || asn === '62610' && date >= '2026-07-02' // zenlayer
+            || asn === '32934' && date >= '2026-07-26' // facebook
         )
         ;
 }
@@ -1418,4 +1419,11 @@ const botIpHashes = new Set([
     '96d08be8883055c5ee042f47f0c0ec2b2e3d5a8d', // 2026-07-25 for 2026-07-24 7018   att        Overcast
     'd21f11ce4adc74d6d7f95affcf3d76dfbc5bb4c0', // 2026-07-26 for 2026-07-25 20001  charter    Firefox
     'fa3b6cc8ade5d13c1579ab6ac0385007d3f974e7', // 2026-07-26 for 2026-07-25 3209   vodafone   Overcast
+    '03a3457c3fe7337161a7076735ca5490b348bd1e', // 2026-07-27 for 2026-07-26 32934  facebook   Chrome, Edge, Firefox
+    '066bf5c08688027c30fb6673d5f5e214f598e6a8', // 2026-07-27 for 2026-07-26 32934  facebook   Chrome, Edge, Firefox, Facebook Bot
+    'db0d1faa7bf1cfefa603818800216b47e3739453', // 2026-07-27 for 2026-07-26 136787 packethub  Overcast
+    '8c2d0db854fd64e662bf7b1bc487d6d4e765c12d', // 2026-07-27 for 2026-07-26 24560  bharti     Chrome
+    '7058fc7dc5f63d3642f9bedb34722f3426ab7e94', // 2026-07-27 for 2026-07-26 7018   att        Overcast
+    '0c7113774c36f2b53805b4b714a122a0429e5cb3', // 2026-07-27 for 2026-07-26 7018   att        Overcast
+    '5d20b7b3e19e3d44bacb6aca2ded8c392582ad4f', // 2026-07-27 for 2026-07-26 13335  cloudflare Firefox
 ]);
