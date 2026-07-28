@@ -40,6 +40,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (podcast research; contact: research@example.com)',
     'Mozilla/5.0 (podcast-downloader)',
     'Mozilla/5.0 (podcast-fetcher)',
+    'Mozilla/5.0 (podcast-harvest; research)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
@@ -1426,4 +1427,10 @@ const botIpHashes = new Set([
     '7058fc7dc5f63d3642f9bedb34722f3426ab7e94', // 2026-07-27 for 2026-07-26 7018   att        Overcast
     '0c7113774c36f2b53805b4b714a122a0429e5cb3', // 2026-07-27 for 2026-07-26 7018   att        Overcast
     '5d20b7b3e19e3d44bacb6aca2ded8c392582ad4f', // 2026-07-27 for 2026-07-26 13335  cloudflare Firefox
+    '5d20b7b3e19e3d44bacb6aca2ded8c392582ad4f', // 2026-07-27 for 2026-07-26 13335  cloudflare Firefox
+    '4a3c2b1585380e61f33cd5e94bdfc653597c675e', // 2026-07-28 for 2026-07-27 16509  amazon     Mozilla/5.0 (podcast-harvest; research)
+    '74340433672c213e2946a24a9e9f89aa392fe38d', // 2026-07-28 for 2026-07-27 7018   att        Overcast
+    '7933ffae3dbfcedb11005b81ed0fbc8b3538b3c2', // 2026-07-28 for 2026-07-27 136787 packethub  Overcast
+    '96bd73b953b5bcf646d686a7e851cc80ac179060', // 2026-07-28 for 2026-07-27 201838 community  Chrome
+    'd81eb6aa995414db76ef3ce25c81ca22585780f7', // 2026-07-28 for 2026-07-27 701    verizon    Firefox
 ]);
