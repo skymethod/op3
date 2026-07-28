@@ -47,6 +47,7 @@ import { timed } from './async.ts';
 import { importHmacKey } from './crypto.ts';
 import { hmac } from './crypto.ts';
 import { computeTimestamp } from './timestamp.ts';
+import { processRedirectsBatch } from './routes/process_redirects_batch.ts';
 
 export default {
     
@@ -142,36 +143,7 @@ export default {
                 }
             } else if (batch.queue === queue2Name) {
                 // raw redirects batch
-                
-                const batchUuid = generateUuid();
-                const rawRedirectsByMessageId: Record<string, { rawRedirects: RawRedirect[], timestamp: string }> = {};
-                for (const msg of batch.messages) {
-                    const { body, id, timestamp } = msg;
-                    const rawRedirects = body as RawRedirect[];
-                    rawRedirectsByMessageId[id] = { rawRedirects, timestamp: timestamp.toISOString() };
-                }
-                const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer);
-                const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, newUrlCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords, sendNotification } } = response;
-                const messageIds = new Set(processedMessageIds);
-                let ackCount = 0;
-                let retryCount = 0;
-                for (const msg of batch.messages) {
-                    if (messageIds.has(msg.id)) {
-                        msg.ack();
-                        ackCount++;
-                    } else {
-                        msg.retry();
-                        retryCount++;
-                    }
-                }
-                const consumerStartTime = new Date(consumerStart).toISOString();
-                const consumerTime = Date.now() - consumerStart;
-                const doubles: number[] = [ messageCount, redirectCount, putCount, evictedCount, ackCount, retryCount, newUrlCount ];
-                const times: number[] = [ consumerTime, packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords, sendNotification ];
-                writeTraceEvent({ kind: 'hits-batch',
-                    strings: [ '', batchUuid, colo, doColo, rpcSentTime, rpcReceivedTime, minTimestamp ?? '', medTimestamp ?? '', maxTimestamp ?? '', consumerStartTime ],
-                    doubles: [ ...doubles, ...Array(20 - doubles.length - times.length).fill(0), ...times.reverse() ],
-                });
+                await processRedirectsBatch({ batch, rpcClient, consumerStart, colo, source: 'queue2-consumer' });
             }
         } catch (e) {
             consoleError('queue-unhandled', `Unhandled error in worker ${batch.queue} queue handler: ${(e as Error).stack || e}`);

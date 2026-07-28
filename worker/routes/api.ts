@@ -1,5 +1,5 @@
 import { checkDeleteDurableObjectAllowed, tryParseDurableObjectRequest, tryParseRedirectLogRequest } from './admin_api.ts';
-import { AdminDataRequest, AdminDataResponse, ApiTokenPermission, hasPermission, isExternalNotification, RpcClient, RpcRequest, Unkinded } from '../rpc_model.ts';
+import { AdminDataRequest, AdminDataResponse, ApiTokenPermission, hasPermission, isExternalNotification, RpcClient, RpcRequest, Unkinded, RawRedirect, LogRawRedirectsBatchResponse } from '../rpc_model.ts';
 import { newMethodNotAllowedResponse, newJsonResponse, newForbiddenJsonResponse, newTextResponse } from '../responses.ts';
 import { computeQueryRedirectLogsResponse } from './api_query_redirect_logs.ts';
 import { consoleError } from '../tracer.ts';
@@ -25,6 +25,7 @@ import { Baselime } from '../baselime.ts';
 import { generateUuid } from '../uuid.ts';
 import { Limiter } from '../limiter.ts';
 import { tryMakeXfetcher } from '../xfetcher.ts';
+import { processRedirectsBatch } from './process_redirects_batch.ts';
 
 export function tryParseApiRequest(opts: { instance: string, method: string, hostname: string, origin: string, pathname: string, searchParams: URLSearchParams, headers: Headers, bodyProvider: JsonProvider, colo: string | undefined, deploySha: string | undefined, deployTime: string | undefined }): ApiRequest | undefined {
     const { instance, method, hostname, origin, pathname, searchParams, headers, bodyProvider, colo, deploySha, deployTime } = opts;
@@ -84,6 +85,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
     
                 if (path === '/admin/data') return await computeAdminDataResponse(method, bodyProvider, rpcClient, jobQueue, statsBlobs);
                 if (path === '/admin/rebuild-index') return await computeAdminRebuildResponse(method, bodyProvider, rpcClient);
+                if (path === '/admin/process-redirects-batch') return await computeAdminProcessRedirectsBatchResponse(method, bodyProvider, rpcClient, start, colo);
                 if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
             }
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, origin, method, searchParams, rpcClient, rawIpAddress);
@@ -312,6 +314,29 @@ async function computeAdminRebuildResponse(method: string, bodyProvider: JsonPro
 
     const { first, last, count, millis } = await rpcClient.adminRebuildIndex({ indexName, start, inclusive, limit }, DoNames.combinedRedirectLog);
     return newJsonResponse({ first, last, count, millis });
+}
+
+export type ProcessRedirectsBatchRequest = {
+    source: string,
+    messages: { id: string, timestamp: string, body: RawRedirect[] }[],
+}
+
+export type ProcessRedirectsBatchResponse = {
+    acks: string[],
+    retries: string[],
+    response: LogRawRedirectsBatchResponse,
+    consumerTime: number,
+}
+
+async function computeAdminProcessRedirectsBatchResponse(method: string, bodyProvider: JsonProvider, rpcClient: RpcClient, consumerStart: number, colo: string | undefined): Promise<Response> {
+    if (method !== 'POST') return newMethodNotAllowedResponse(method);
+    const { source, messages } = await bodyProvider() as ProcessRedirectsBatchRequest;
+    const acks = new Set<string>();
+    const retries = new Set<string>();
+    const batch = { messages: messages.map(({ id, timestamp, body }) => ({ id, timestamp: new Date(timestamp), body, ack: () => acks.add(id), retry: () => retries.add(id) })) };
+    const { response, consumerTime } = await processRedirectsBatch({ batch, rpcClient, consumerStart, colo, source });
+    const res: ProcessRedirectsBatchResponse = { acks: [...acks], retries: [...retries], response, consumerTime };
+    return newJsonResponse(res);
 }
 
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
