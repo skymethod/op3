@@ -357,6 +357,16 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'firstory', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://tr.ausha.co/gdzJNi5KXXLX/a.com/path/to/episode.mp3
+    // http supported
+    // no suffix protocol support
+    m = /^https?:\/\/tr\.ausha\.co\/[0-9a-zA-Z]+\/(.*?)$/.exec(url);
+    if (m) {
+        const [ _, suffix ] = m;
+        const targetUrl = `https://${suffix}`;
+        return [ { kind: 'prefix', prefix: 'ausha', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -383,6 +393,7 @@ export interface ChainItem {
     readonly prefix?: 'op3'
         | 'adbarker'
         | 'artsai'
+        | 'ausha'
         | 'backtracks'
         | 'blubrry'
         | 'chartable'

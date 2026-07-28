@@ -473,6 +473,11 @@ Deno.test({
             { kind: 'prefix', prefix: 'firstory', url: 'https://track.fstry.me/p/1w2x3y4z/http://a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'http://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://tr.ausha.co/gdzJNi5KXXLX/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'ausha', url: 'https://tr.ausha.co/gdzJNi5KXXLX/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 
