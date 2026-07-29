@@ -122,12 +122,27 @@ export class ShowControllerNotifications {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse> | undefined> {
-        const { operationKind, targetPath, parameters } = req;
+        const { operationKind, targetPath, parameters = {} } = req;
         
-        if (operationKind === 'select' && targetPath === '/feed-notifications') {
-            const map = await this.storage.list(computeListOpts('fn.1.', parameters));
-            const results = [ ...map ];
-            return { results };
+        if (targetPath === '/feed-notifications') {
+            if (operationKind === 'select') {
+                const map = await this.storage.list(computeListOpts('fn.1.', parameters));
+                const results = [ ...map ];
+                return { results };
+            } else if (operationKind === 'update') {
+                const { action } = parameters;
+                if (action === 'peek-oldest' || action === 'trim-oldest') {
+                    const map = await this.storage.list({ prefix: 'fn.1.', limit: 128, noCache: true });
+                    let deleted: number | undefined;
+                    if (action === 'trim-oldest') {
+                        deleted = await this.storage.delete([...map.keys()]);
+                    }
+                    const results = [ ...map ];
+                    return { results, message: typeof deleted === 'number' ? JSON.stringify({ deleted }) : undefined };
+                } else {
+                    throw new Error(`Unknown action: ${action}`);
+                }
+            }
         }
 
         if (operationKind === 'select' && targetPath === '/show/urls') {
