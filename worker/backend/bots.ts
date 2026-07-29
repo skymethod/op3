@@ -1433,4 +1433,5 @@ const botIpHashes = new Set([
     '7933ffae3dbfcedb11005b81ed0fbc8b3538b3c2', // 2026-07-28 for 2026-07-27 136787 packethub  Overcast
     '96bd73b953b5bcf646d686a7e851cc80ac179060', // 2026-07-28 for 2026-07-27 201838 community  Chrome
     'd81eb6aa995414db76ef3ce25c81ca22585780f7', // 2026-07-28 for 2026-07-27 701    verizon    Firefox
+    'd5effdcb80f34221daeceb7627f4f820e4c8d161', // 2026-07-29 for 2026-07-27 7018   att        Overcast
 ]);
