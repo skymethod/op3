@@ -144,7 +144,7 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
     } else if (operationKind === 'select' && targetPath.startsWith('/api-keys/info/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.apiKeyServer);
-    } else if (operationKind === 'select' && targetPath === '/feed-notifications') {
+    } else if (targetPath === '/feed-notifications') {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
