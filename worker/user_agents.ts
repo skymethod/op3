@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@4e9cd9737c07f2433d13b4d552c830e432c48163 (2026-06-23T13:32:05Z)
+// from user-agents-v2@0ca4a80d6721f2ddfde2a5956bea449a04cfd3df (2026-07-29T21:26:48Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -425,7 +425,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^BrowserPlus\//.test(userAgent)) return { name: `BrowserPlus`, type: 'app' };
     if (/^Bullhorn(\/.*)?$|^Bullhorn \(/.test(userAgent)) return { name: `Bullhorn`, type: 'app' };
     if (/iOS Bygdanytt Hermes\//.test(userAgent)) return { name: `Bygdanytt iOS app`, type: 'app' };
-    if (/^Campfire\//.test(userAgent)) return { name: `CampfireFM`, type: 'app' };
+    if (/^Campfire(FM)?\//.test(userAgent)) return { name: `CampfireFM`, type: 'app' };
     if (/^Canvas\//.test(userAgent)) return { name: `Canvas`, type: 'app' };
     if (/^Capital\//.test(userAgent)) return { name: `Capital`, type: 'app' };
     if (/^capsule\.fm\/|^capsule-android/.test(userAgent)) return { name: `capsule.fm`, type: 'app' };
@@ -501,6 +501,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Earbud\//.test(userAgent)) return { name: `Earbud`, type: 'app' };
     if (/^Earmark\//.test(userAgent)) return { name: `Earmark`, type: 'app' };
     if (/^[Ee]arsay\//.test(userAgent)) return { name: `Earsay`, type: 'app' };
+    if (/^Earshot\//.test(userAgent)) return { name: `Earshot`, type: 'app' };
     if (/^EasyGet\//.test(userAgent)) return { name: `EasyGet`, type: 'app' };
     if (/^TheEconomist-Darwin-/.test(userAgent)) return { name: `Economist Espresso`, type: 'app' };
     if (/^Elevation_Health\//.test(userAgent)) return { name: `Elevation Health`, type: 'app' };
@@ -709,12 +710,14 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Pocket Casts|^Pocket%20Casts|^PocketCasts\/|^Shifty Jelly Pocket Casts| PocketCasts\/\d/.test(userAgent)) return { name: `Pocket Casts`, type: 'app' };
     if (/^Podbay\//.test(userAgent)) return { name: `Podbay`, type: 'app' };
     if (/^Podbean\//.test(userAgent)) return { name: `Podbean`, type: 'app' };
+    if (/^Podcast%20Ever\//.test(userAgent)) return { name: `Podcast Ever`, type: 'app' };
     if (/^PodcastGuru/.test(userAgent)) return { name: `Podcast Guru`, type: 'app' };
     if (/^Podcast.*Addict\/|^Podcast Addict /.test(userAgent)) return { name: `Podcast Addict`, type: 'app' };
     if (/janwh\/podcast-archiver/.test(userAgent)) return { name: `Podcast Archiver`, type: 'app' };
     if (/^Podcast Player\//.test(userAgent)) return { name: `Podcast Player`, type: 'app' };
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
+    if (/^Podcast(%20)?Parrot\/\d/.test(userAgent)) return { name: `Podcast Parrot`, type: 'app' };
     if (/^Podcast%20Saver\/\d/.test(userAgent)) return { name: `Podcast Saver`, type: 'app' };
     if (/^Podcatcher \d/.test(userAgent)) return { name: `Podcatcher`, type: 'app' };
     if (/^Podchaser |^Podchaser-Parser/.test(userAgent)) return { name: `Podchaser`, type: 'app' };
@@ -823,6 +826,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^ThePodcastApp|iOS.*The Podcast App\/|com\.evolve\.podcast\/|^podcast\/\d* |^PodcastApp\/\d/.test(userAgent)) return { name: `The Podcast App`, type: 'app' };
     if (/^TwipeMobileApp/.test(userAgent)) return { name: `Twipe Mobile App`, type: 'app' };
     if (/^miaocast /.test(userAgent)) return { name: `miaocast`, type: 'app' };
+    if (/^Momo-Podcast\//.test(userAgent)) return { name: `Momo`, type: 'app' };
     if (/ Thunderbird\//.test(userAgent)) return { name: `Mozilla Thunderbird`, type: 'app' };
     if (/musical_ly/.test(userAgent)) return { name: `TikTok`, type: 'app' };
     if (/^TREBLE\//.test(userAgent)) return { name: `Treble`, type: 'app' };

@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@4e9cd9737c07f2433d13b4d552c830e432c48163 (2026-06-23T13:32:05Z)
+// from user-agents-v2@0ca4a80d6721f2ddfde2a5956bea449a04cfd3df (2026-07-29T21:26:48Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -554,6 +554,7 @@ const appTests = {
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Bygdanytt Hermes/90.0.0 _app_': { type: 'app', name: `Bygdanytt iOS app` },
     'Campfire/2.0.2 (Build 123) Android/15 (SDK 35)': { type: 'app', name: `CampfireFM` },
     'Campfire/2.0.2 (Build 123) iOS/18.5.0': { type: 'app', name: `CampfireFM` },
+    'CampfireFM/1.0 (+https://joincampfire.fm)': { type: 'app', name: `CampfireFM` },
     'Canvas/7369 CFNetwork/1107.1 Darwin/19.0.0': { type: 'app', name: `Canvas` },
     'Capital/1528207522 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Capital` },
     'capsule.fm/1 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `capsule.fm` },
@@ -659,6 +660,7 @@ const appTests = {
     'Earmark/1.0 iOS': { type: 'app', name: `Earmark` },
     'Earsay/1.0 CFNetwork/1568 Darwin/24.0': { type: 'app', name: `Earsay` },
     'earsay/1.0 CFNetwork/1568 Darwin/24.0': { type: 'app', name: `Earsay` },
+    'Earshot/157 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `Earshot` },
     'EasyGet/1.0.70 CFNetwork/672.1.13 Darwin/14.0.0': { type: 'app', name: `EasyGet` },
     'TheEconomist-Darwin-android-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'TheEconomist-Darwin-ios-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
@@ -1033,6 +1035,7 @@ const appTests = {
     'Podbean/Android App 8.1.5 (http://podbean.com),4f6852f59091d32475ef75a53325a4fe': { type: 'app', name: `Podbean` },
     'Podbean/Android generic 1.1.2 (http://podbean.com),9376c517335ded9a716022cc1f15c884': { type: 'app', name: `Podbean` },
     'Podbean/iOS (http://podbean.com) 5.2.0 - 19c4ff292bd09cd2ccbad22cc6755a45': { type: 'app', name: `Podbean` },
+    'Podcast%20Ever/23 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `Podcast Ever` },
     'PodcastAddict/v2 - Dalvik/2.1.0 (Linux; U; Android 9; SM-N950U Build/PPR1.180610.011)': { type: 'app', name: `Podcast Addict` },
     'PodcastAddict/v5 ( https://podcastaddict.com/; Android podcast app)': { type: 'app', name: `Podcast Addict` },
     'Podcast Addict - Dalvik/2.1.0 (Linux; U; Android 9; SM-G960F Build/PPR1.180610.011)': { type: 'app', name: `Podcast Addict` },
@@ -1042,6 +1045,9 @@ const appTests = {
     'PodcastRepublic/18.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)': { type: 'app', name: `Podcast Republic` },
     'Podcastly/1.4.1 (samsung; CPU OS android 11; en_us)': { type: 'app', name: `Podcastly` },
     'Podcastly': { type: 'app', name: `Podcastly` },
+    'Podcast%20Parrot/49 CFNetwork/3892.100.1 Darwin/27.0.0': { type: 'app', name: `Podcast Parrot` },
+    'PodcastParrot/51 (iOS 26.5.2)': { type: 'app', name: `Podcast Parrot` },
+    'PodcastParrot/51 (Android 16)': { type: 'app', name: `Podcast Parrot` },
     'Podcast%20Saver/27 CFNetwork/1498.700.2 Darwin/23.6.0': { type: 'app', name: `Podcast Saver` },
     'Podcatcher 1.3': { type: 'app', name: `Podcatcher` },
     'Podcatcher 1.3 (+https://podcatcher.net)': { type: 'app', name: `Podcatcher` },
@@ -1227,6 +1233,7 @@ const appTests = {
     'TwipeMobileApp PLATFORM=iOS VERSION=5.4.7.0 ENV=PROD isPhone': { type: 'app', name: `Twipe Mobile App` },
     'TwipeMobileApp PLATFORM=Android VERSION=5.4.7.0 ENV=PROD isTablet': { type: 'app', name: `Twipe Mobile App` },
     'miaocast 2025.1.0 Android 15 vivo I2407i iQOO/I2407i/I2407:15/AP3A.240905.015.A2_V000L1/compiler250513211815:user/release-keys': { type: 'app', name: `miaocast` },
+    'Momo-Podcast/1.0 (+https://exploremomo.com)': { type: 'app', name: `Momo` },
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Thunderbird/102.4.1': { type: 'app', name: `Mozilla Thunderbird` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 musical_ly_17.5.0 JsSdk/2.0 NetType/WIFI Channel/App Store ByteLocale/nl Region/NL ByteFullLocale/nl-NL WKWebView/1': { type: 'app', name: `TikTok` },
     'TREBLE/1.0': { type: 'app', name: `Treble` },
