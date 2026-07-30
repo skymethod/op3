@@ -38,6 +38,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
+    'Mozilla/5.0 (compatible; DuplexChatFetch/1.0)',
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
     'Mozilla/5.0 (compatible; PodcastDataBench/1.0; +https://example.invalid/asr-prep)',
     'Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)',
@@ -1453,4 +1454,9 @@ const botIpHashes = new Set([
     '96bd73b953b5bcf646d686a7e851cc80ac179060', // 2026-07-28 for 2026-07-27 201838 community  Chrome
     'd81eb6aa995414db76ef3ce25c81ca22585780f7', // 2026-07-28 for 2026-07-27 701    verizon    Firefox
     'd5effdcb80f34221daeceb7627f4f820e4c8d161', // 2026-07-29 for 2026-07-27 7018   att        Overcast
+    'fb496af00b4b6cf1d25976435e44603f7276b256', // 2026-07-30 for 2026-07-28 393249 ubc        Chrome
+    '483a2b4ab85bf67e99b8eadd5d46fa83fd389b4a', // 2026-07-30 for 2026-07-29 20001  charter    Overcast
+    '531510be0d52deb93b153eb38bc9171c88ea4941', // 2026-07-30 for 2026-07-29 7018   att        Overcast
+    'f5a6afa47046065ba1e9d6df50857ee8d10ecc9d', // 2026-07-30 for 2026-07-29 31898  oracle     Mozilla/5.0 (compatible; DuplexChatFetch/1.0)
+    'fb3fb81ce08359fe5704d0a8ca74b0997988dd2c', // 2026-07-30 for 2026-07-29 7018   att        Overcast
 ]);
