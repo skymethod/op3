@@ -1459,4 +1459,8 @@ const botIpHashes = new Set([
     '531510be0d52deb93b153eb38bc9171c88ea4941', // 2026-07-30 for 2026-07-29 7018   att        Overcast
     'f5a6afa47046065ba1e9d6df50857ee8d10ecc9d', // 2026-07-30 for 2026-07-29 31898  oracle     Mozilla/5.0 (compatible; DuplexChatFetch/1.0)
     'fb3fb81ce08359fe5704d0a8ca74b0997988dd2c', // 2026-07-30 for 2026-07-29 7018   att        Overcast
+    '23363684382d403d5bfb0902fd2a144c5beb6973', // 2026-07-31 for 2026-07-30 202662 hytron     Chrome
+    '2b7b6a332e9292d718dfe513241528e1e75ad899', // 2026-07-31 for 2026-07-30 202662 hytron     Chrome
+    'd4e36eeac97abdbb0c237863f1064ecefe16519b', // 2026-07-31 for 2026-07-30 202662 hytron     Chrome
+    '7ac0807642f9a23ea9e30c225795618e8ea771ec', // 2026-07-31 for 2026-07-30 8412   tmo        Chrome
 ]);
