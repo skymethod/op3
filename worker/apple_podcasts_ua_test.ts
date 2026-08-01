@@ -6,7 +6,8 @@ Deno.test({
     fn: () => {
 
         const good: Record<string, ApplePodcastsUserAgent> = {
-            'Podcasts/4023.510.2 CFNetwork/1494.0.7 Darwin/23.4.0': { appName: 'Podcasts', appVersion: '4023.0510.0002.0000', cfVersion: '1494.0000.0007.0000', dwVersion: '0023.0004.0000.0000', trailer: undefined },
+            'Podcasts/4023.510.2 CFNetwork/1494.0.7 Darwin/23.4.0': { appName: 'Podcasts', appVersion: '4023.0510.0002.0000', cfVersion: '1494.0000.0007.0000', dwVersion: '0023.0004.0000.0000', trailer: undefined, cfVersionExtra: undefined },
+            'Podcasts/4027.200.9 CFNetwork/3896.100.1.3.1 Darwin/27.2.0': { appName: 'Podcasts', appVersion: '4027.0200.0009.0000', cfVersion: '3896.0100.0001.0003', dwVersion: '0027.0002.0000.0000', trailer: undefined, cfVersionExtra: '0001' },
         };
         for (const [ userAgent, expected ] of Object.entries(good)) {
             const result = parseApplePodcastsUserAgent(userAgent);
