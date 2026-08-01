@@ -1463,4 +1463,7 @@ const botIpHashes = new Set([
     '2b7b6a332e9292d718dfe513241528e1e75ad899', // 2026-07-31 for 2026-07-30 202662 hytron     Chrome
     'd4e36eeac97abdbb0c237863f1064ecefe16519b', // 2026-07-31 for 2026-07-30 202662 hytron     Chrome
     '7ac0807642f9a23ea9e30c225795618e8ea771ec', // 2026-07-31 for 2026-07-30 8412   tmo        Chrome
+    '10f56de7ed109dc1a1cfc48ea60b3217b5422815', // 2026-08-01 for 2026-07-31 5650   frontier   Overcast, AppleCoreMedia, Safari
+    '2de287d47f7c56bdb97f051384924f44ecd203e5', // 2026-08-01 for 2026-07-31 20115  charter    Overcast
+    '4dccd36afcf700d4382229068cc749ea52d51392', // 2026-08-01 for 2026-07-31 7018   att        Overcast
 ]);
