@@ -1466,4 +1466,7 @@ const botIpHashes = new Set([
     '10f56de7ed109dc1a1cfc48ea60b3217b5422815', // 2026-08-01 for 2026-07-31 5650   frontier   Overcast, AppleCoreMedia, Safari
     '2de287d47f7c56bdb97f051384924f44ecd203e5', // 2026-08-01 for 2026-07-31 20115  charter    Overcast
     '4dccd36afcf700d4382229068cc749ea52d51392', // 2026-08-01 for 2026-07-31 7018   att        Overcast
+    '045027148c8e5712dc41217cae8e91b10f284cbb', // 2026-08-02 for 2026-08-01 5650   frontier   Overcast
+    'e0a2d5331168072b8795de2fc41a1ce683f3301c', // 2026-08-02 for 2026-08-01 3352   telefonica Overcast
+    'fa2cb49138d4beee74aed2823c5aa09906999221', // 2026-08-02 for 2026-08-01 19151  bbone      Overcast
 ]);
