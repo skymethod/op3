@@ -52,6 +52,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 podcast-archive-downloader/1.0',
     'pod-intel/0.1 (Livingston Insights transcription)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
+    'podcast-archive-backfill/1.0 (personal archive)',
     'podcast-classification-research/1.0 (academic; audio-download; caleb.eynon@chicagobooth.edu)',
     'podcast-data/0.1 (+https://github.com/local/podcast-data)',
     'podcast-pipeline/0.1 (+https://github.com/)',
@@ -64,6 +65,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'proc-data-podcast-downloader/1.0',
     'PSW-Archive/1.0 (authorized member archive; contact: paul@example.com)',
     'PulsewireV4V/0.6 enclosure verifier',
+    'rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper',
     'spotify-tech-podcast-discovery/1.0',
     'subscriber-rss-downloader/1.0',
     'swyxdotio-podcast-migration/1.0',
@@ -1469,4 +1471,7 @@ const botIpHashes = new Set([
     '045027148c8e5712dc41217cae8e91b10f284cbb', // 2026-08-02 for 2026-08-01 5650   frontier   Overcast
     'e0a2d5331168072b8795de2fc41a1ce683f3301c', // 2026-08-02 for 2026-08-01 3352   telefonica Overcast
     'fa2cb49138d4beee74aed2823c5aa09906999221', // 2026-08-02 for 2026-08-01 19151  bbone      Overcast
+    '6c334f7f9d7f8ec35471196b29bdb4462e256b87', // 2026-08-03 for 2026-08-02 6830   liberty    rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper
+    '89707bd9783ea9107446d631c3eea1eace77b039', // 2026-08-03 for 2026-08-02 13335  cloudflare Chrome
+    'eecc1d866491fa30e86454c4034ddc8b4f10a1bb', // 2026-08-03 for 2026-08-02 8151   uninet     podcast-archive-backfill/1.0 (personal archive)
 ]);
