@@ -1474,4 +1474,8 @@ const botIpHashes = new Set([
     '6c334f7f9d7f8ec35471196b29bdb4462e256b87', // 2026-08-03 for 2026-08-02 6830   liberty    rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper
     '89707bd9783ea9107446d631c3eea1eace77b039', // 2026-08-03 for 2026-08-02 13335  cloudflare Chrome
     'eecc1d866491fa30e86454c4034ddc8b4f10a1bb', // 2026-08-03 for 2026-08-02 8151   uninet     podcast-archive-backfill/1.0 (personal archive)
+    '86f7e29364cc296b04b2d2fc59c1db904de2f5c9', // 2026-08-04 for 2026-08-03 48602  connect    Chrome
+    'a00e2e128a9cdb568bfee4f995d84afa5f6f85b4', // 2026-08-04 for 2026-08-03 20001  charter    Overcast
+    'a76b00eeb412d42747330370d8f3d0602727aa8d', // 2026-08-04 for 2026-08-03 25369  hydra      Overcast
+    'c513de749c91a4c0a4eec522158e68b7b59d5ed9', // 2026-08-04 for 2026-08-03 3352   telefonica Overcast
 ]);
