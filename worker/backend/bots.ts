@@ -127,6 +127,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '136907' && date === '2026-06-05' // huawei
             || asn === '62610' && date >= '2026-07-02' // zenlayer
             || asn === '32934' && date >= '2026-07-26' // facebook
+            || asn === '136510' && date >= '2026-08-04' // streamline servers
         )
         ;
 }
@@ -1478,4 +1479,9 @@ const botIpHashes = new Set([
     'a00e2e128a9cdb568bfee4f995d84afa5f6f85b4', // 2026-08-04 for 2026-08-03 20001  charter    Overcast
     'a76b00eeb412d42747330370d8f3d0602727aa8d', // 2026-08-04 for 2026-08-03 25369  hydra      Overcast
     'c513de749c91a4c0a4eec522158e68b7b59d5ed9', // 2026-08-04 for 2026-08-03 3352   telefonica Overcast
+    '198d5d4c0b9ee71dcd1dcce68ccc48885eb335ca', // 2026-08-05 for 2026-08-04 202662 hytron     Chrome
+    '2eab921149e8b451745c465a2f39f40425984295', // 2026-08-05 for 2026-08-04 136510 streamline Chrome
+    '4e1e6365037ffcb9e22a9edf6e3d5f73cc8a5ce8', // 2026-08-05 for 2026-08-04 20001  charter    Overcast
+    '9083d1b74418ff0b22dc2274af802b27c9537004', // 2026-08-05 for 2026-08-04 202662 hytron     Chrome
+    'cb9e289aa9d829fa57d29eea114d44bdc66bf1d0', // 2026-08-05 for 2026-08-04 7018   att        Overcast
 ]);
