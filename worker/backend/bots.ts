@@ -34,6 +34,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'fedcom-capture/1.0',
     'GladiaPodcastScraper/1.0 (+https://gladia.io; research dataset)',
     'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
+    'kweb-wikify/0.1 (podcast player)',
     'luna-podcatcher/0.1 (+downloader)',
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
@@ -1484,4 +1485,8 @@ const botIpHashes = new Set([
     '4e1e6365037ffcb9e22a9edf6e3d5f73cc8a5ce8', // 2026-08-05 for 2026-08-04 20001  charter    Overcast
     '9083d1b74418ff0b22dc2274af802b27c9537004', // 2026-08-05 for 2026-08-04 202662 hytron     Chrome
     'cb9e289aa9d829fa57d29eea114d44bdc66bf1d0', // 2026-08-05 for 2026-08-04 7018   att        Overcast
+    '07aa0041496243c0608bae93cbd7865de257042b', // 2026-08-06 for 2026-08-05 197540 netcup     kweb-wikify/0.1 (podcast player)
+    '15649645c278b49e140555946390820a7e54b1e7', // 2026-08-06 for 2026-08-05 20001  charter    Overcast
+    '17ddf9e7670c71124a0a884a8b7d35a34b54a90e', // 2026-08-06 for 2026-08-05 48090  techoff    Firefox
+    'c5477f607c65bd4c9be2f31927f744a76bfd74e1', // 2026-08-06 for 2026-08-05 9304   hgcglobal  Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 ]);
