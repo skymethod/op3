@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@0ca4a80d6721f2ddfde2a5956bea449a04cfd3df (2026-07-29T21:26:48Z)
+// from user-agents-v2@f1ff9530b2b3b932e91e7132586babe36704a234 (2026-08-05T00:02:40Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -429,12 +429,14 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Canvas\//.test(userAgent)) return { name: `Canvas`, type: 'app' };
     if (/^Capital\//.test(userAgent)) return { name: `Capital`, type: 'app' };
     if (/^capsule\.fm\/|^capsule-android/.test(userAgent)) return { name: `capsule.fm`, type: 'app' };
+    if (/^CarCurious\//.test(userAgent)) return { name: `Car Curious`, type: 'app' };
     if (/^Cast\//.test(userAgent)) return { name: `Cast`, type: 'app' };
     if (/^Castamatic\//.test(userAgent)) return { name: `Castamatic`, type: 'app' };
     if (/^Castaway\//.test(userAgent)) return { name: `Castaway`, type: 'app' };
     if (/^Cast[Bb]ox|^fm\.castbox\./.test(userAgent)) return { name: `CastBox`, type: 'app' };
     if (/^Casterbate\//.test(userAgent)) return { name: `Casterbate`, type: 'app' };
     if (/^castero \d/.test(userAgent)) return { name: `castero`, type: 'app' };
+    if (/^Castria\/\d/.test(userAgent)) return { name: `Castria`, type: 'app' };
     if (/^Castro[\/ ]/.test(userAgent)) return { name: `Castro`, type: 'app' };
     if (/^Casts\//.test(userAgent)) return { name: `Casts`, type: 'app' };
     if (/^CCGF\//.test(userAgent)) return { name: `CCGF`, type: 'app' };
@@ -552,6 +554,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Garmin Venu /.test(userAgent)) return { name: `Garmin Venu`, type: 'app' };
     if (/^Garmin v/.test(userAgent)) return { name: `Garmin Vivoactive`, type: 'app' };
     if (/^GBEngine\//.test(userAgent)) return { name: `GBEngine`, type: 'app' };
+    if (/^Gertrude%20Podcasts\//.test(userAgent)) return { name: `Gertrude Podcasts`, type: 'app' };
     if (/^GMB Show\//.test(userAgent)) return { name: `GMB Show`, type: 'app' };
     if (/^Godcaster/.test(userAgent)) return { name: `Godcaster`, type: 'app' };
     if (/^Godster\//.test(userAgent)) return { name: `Godster`, type: 'app' };
@@ -824,6 +827,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^The God Minute\//.test(userAgent)) return { name: `The God Minute`, type: 'app' };
     if (/(^lamarr-iOS|^TheEconomist-Lamarr-ios|^TheEconomist-Lamarr-iOS|^lamarr-android|^TheEconomist-Lamarr-android)/.test(userAgent)) return { name: `The Economist`, type: 'app' };
     if (/^ThePodcastApp|iOS.*The Podcast App\/|com\.evolve\.podcast\/|^podcast\/\d* |^PodcastApp\/\d/.test(userAgent)) return { name: `The Podcast App`, type: 'app' };
+    if (/^TPA\/\d|^TPA-Wear\//.test(userAgent)) return { name: `The Podcast App (Magnolia Apps)`, type: 'app' };
     if (/^TwipeMobileApp/.test(userAgent)) return { name: `Twipe Mobile App`, type: 'app' };
     if (/^miaocast /.test(userAgent)) return { name: `miaocast`, type: 'app' };
     if (/^Momo-Podcast\//.test(userAgent)) return { name: `Momo`, type: 'app' };
@@ -981,6 +985,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/:\/\/www\.audible(\.com|\.co\.uk)\//.test(referer)) return { name: `Audible`, type: 'referrer', category: 'app' };
     if (/:\/\/[^.\/]+\.buzzsprout\.com\//.test(referer)) return { name: `Buzzsprout Web Player`, type: 'referrer', category: 'host' };
     if (/:\/\/player\.captivate\.fm\//.test(referer)) return { name: `Captivate Web Player`, type: 'referrer', category: 'host' };
+    if (/^https:\/\/getcarcurious\.com\//.test(referer)) return { name: `Car Curious`, type: 'referrer', category: 'app' };
     if (/:\/\/castamatic\.com\//.test(referer)) return { name: `Castamatic`, type: 'referrer', category: 'app' };
     if (/^https:\/\/castbox\.fm\//.test(referer)) return { name: `CastBox`, type: 'referrer', category: 'app' };
     if (/^https:\/\/[a-z0-9]+\.castos\.com\//.test(referer)) return { name: `Castos Web Player`, type: 'referrer', category: 'host' };

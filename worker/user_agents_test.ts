@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@0ca4a80d6721f2ddfde2a5956bea449a04cfd3df (2026-07-29T21:26:48Z)
+// from user-agents-v2@f1ff9530b2b3b932e91e7132586babe36704a234 (2026-08-05T00:02:40Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -559,6 +559,7 @@ const appTests = {
     'Capital/1528207522 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `Capital` },
     'capsule.fm/1 CFNetwork/976 Darwin/18.2.0': { type: 'app', name: `capsule.fm` },
     'capsule-android': { type: 'app', name: `capsule.fm` },
+    'CarCurious/1.0 (iOS; +https://getcarcurious.com)': { type: 'app', name: `Car Curious` },
     'Cast/1031 CFNetwork/711.4.6 Darwin/14.0.0': { type: 'app', name: `Cast` },
     'Castamatic/3847 CFNetwork/1240.0.4 Darwin/20.6.0': { type: 'app', name: `Castamatic` },
     'Castamatic/5.1.4 (com.gunpmedia.Castamatic; build:3136; iOS 13.1.3) Alamofire/4.9.0': { type: 'app', name: `Castamatic` },
@@ -572,6 +573,7 @@ const appTests = {
     'fm.castbox.audiobook.radio.podcast/240611306 (Linux; U; Android 13; en_GB; Lenovo TB125FU; Build/TP1A.220624.014; Cronet/126.0.6423.0)': { type: 'app', name: `CastBox` },
     'Casterbate/1 CFNetwork/744.5 Darwin/14.4.0': { type: 'app', name: `Casterbate` },
     'castero 0.9.5 <https://github.com/xgi/castero>': { type: 'app', name: `castero` },
+    'Castria/1.0 (+https://castria.app)': { type: 'app', name: `Castria` },
     'Castro 2019.13/1167': { type: 'app', name: `Castro` },
     'Castro 2020.14/1287': { type: 'app', name: `Castro` },
     'Castro/1024 CFNetwork/955.1.2 Darwin/18.0.0': { type: 'app', name: `Castro` },
@@ -731,6 +733,7 @@ const appTests = {
     'Garmin Venu 2S/17.4': { type: 'app', name: `Garmin Venu` },
     'Garmin vivoactive 3 Music/6.30': { type: 'app', name: `Garmin Vivoactive` },
     'GBEngine/1.2 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `GBEngine` },
+    'Gertrude%20Podcasts/28 CFNetwork/3860.600.12 Darwin/25.5.0': { type: 'app', name: `Gertrude Podcasts` },
     'GMB Show/1.2.0 (iPad; iOS 9.3.2; Scale/2.00)': { type: 'app', name: `GMB Show` },
     'Godcaster app 1.0': { type: 'app', name: `Godcaster` },
     'GodcasterApp/android/v1.13.0': { type: 'app', name: `Godcaster` },
@@ -1230,6 +1233,8 @@ const appTests = {
     'podcast/ CFNetwork/1107 Darwin/19.0.0': { type: 'app', name: `The Podcast App` },
     'podcast/878 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `The Podcast App` },
     'PodcastApp/22.10.30 CFNetwork/1333.0.4 Darwin/21.5.0': { type: 'app', name: `The Podcast App` },
+    'TPA/3.0.468 (+https://thepodcastapp.dev)': { type: 'app', name: `The Podcast App (Magnolia Apps)` },
+    'TPA-Wear/1.0': { type: 'app', name: `The Podcast App (Magnolia Apps)` },
     'TwipeMobileApp PLATFORM=iOS VERSION=5.4.7.0 ENV=PROD isPhone': { type: 'app', name: `Twipe Mobile App` },
     'TwipeMobileApp PLATFORM=Android VERSION=5.4.7.0 ENV=PROD isTablet': { type: 'app', name: `Twipe Mobile App` },
     'miaocast 2025.1.0 Android 15 vivo I2407i iQOO/I2407i/I2407:15/AP3A.240905.015.A2_V000L1/compiler250513211815:user/release-keys': { type: 'app', name: `miaocast` },
@@ -1621,6 +1626,7 @@ const referrerTests = {
     'https://asdf.buzzsprout.com/': { type: 'referrer', name: `Buzzsprout Web Player` },
     'https://www.buzzsprout.com/': { type: 'referrer', name: `Buzzsprout Web Player` },
     'https://player.captivate.fm/': { type: 'referrer', name: `Captivate Web Player` },
+    'https://getcarcurious.com/': { type: 'referrer', name: `Car Curious` },
     'https://castamatic.com/': { type: 'referrer', name: `Castamatic` },
     'https://castbox.fm/': { type: 'referrer', name: `CastBox` },
     'https://audience.castos.com/player/1641975': { type: 'referrer', name: `Castos Web Player` },
