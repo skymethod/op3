@@ -51,6 +51,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
+    'PaidcastAudioFetcher/1.0 (+podcast benchmark)',
     'pod-intel/0.1 (Livingston Insights transcription)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
     'podcast-archive-backfill/1.0 (personal archive)',
@@ -1489,4 +1490,9 @@ const botIpHashes = new Set([
     '15649645c278b49e140555946390820a7e54b1e7', // 2026-08-06 for 2026-08-05 20001  charter    Overcast
     '17ddf9e7670c71124a0a884a8b7d35a34b54a90e', // 2026-08-06 for 2026-08-05 48090  techoff    Firefox
     'c5477f607c65bd4c9be2f31927f744a76bfd74e1', // 2026-08-06 for 2026-08-05 9304   hgcglobal  Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '57d6fd2457fd909f33126493cf2452e7ae2b046b', // 2026-08-07 for 2026-08-06 212238 datacamp   Chrome
+    '5941859867b4792ff8b00e843c44a6f0e375e56d', // 2026-08-07 for 2026-08-06 7018   att        Overcast
+    'f22d1462994c3ebb9dd11c4d5a00c7890db33b6e', // 2026-08-07 for 2026-08-06 7018   att        Overcast
+    '62c472ef5bfb215cea486cfb8f79a6d0f135db7c', // 2026-08-07 for 2026-08-06 6677   mila       PaidcastAudioFetcher/1.0 (+podcast benchmark)
+    'd8287d1e15210c665608fd8ba121f50506f5ba29', // 2026-08-07 for 2026-08-06 701    verizon    Overcast
 ]);
