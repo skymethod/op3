@@ -1499,4 +1499,8 @@ const botIpHashes = new Set([
     'a1880b8a99a2aa17e0257de2fb275dfbe56b2d0d', // 2026-08-09 for 2026-08-08 701    verizon    Overcast
     'aaac5ff575f787f9a7cf57092597470b1c8c9dde', // 2026-08-09 for 2026-08-08 399282 connext    Overcast
     'cd352f4836ccb9c61a4715894ea90dff04ccfcb6', // 2026-08-09 for 2026-08-08 4808   unicom     Chrome
+    '1dc4a2141523cbcced4639279adb091d16803f78', // 2026-08-10 for 2026-08-09 5378   vodafone   CastBox
+    '1efc674e09003590dd46f422bcb9c221ebd4b17e', // 2026-08-10 for 2026-08-09 7018   att        Overcast
+    '605de65e2c00d1fa2b0a60c870b4f1778cd4685a', // 2026-08-10 for 2026-08-09 207137 packethub  Overcast
+    '938d81e2d2ee7c86d28464c7c57c35bf50d1d51f', // 2026-08-10 for 2026-08-09 3352   telefonica Overcast
 ]);
