@@ -1503,4 +1503,9 @@ const botIpHashes = new Set([
     '1efc674e09003590dd46f422bcb9c221ebd4b17e', // 2026-08-10 for 2026-08-09 7018   att        Overcast
     '605de65e2c00d1fa2b0a60c870b4f1778cd4685a', // 2026-08-10 for 2026-08-09 207137 packethub  Overcast
     '938d81e2d2ee7c86d28464c7c57c35bf50d1d51f', // 2026-08-10 for 2026-08-09 3352   telefonica Overcast
+    '31afa9ad32fb2b3b141d49abc61f02623b008c75', // 2026-08-11 for 2026-08-10 212238 datacamp   Overcast
+    '562e33a758de7b4b65234e6761ee7be193a3725a', // 2026-08-11 for 2026-08-10 3209   vodafone   Chrome
+    '58c8823baefdac199ec8b912d260d8f28dfa9cc1', // 2026-08-11 for 2026-08-10 1312   vt         Chrome
+    '96ff93bfdaa4c3c0c9df97a4f52a6558c46b4169', // 2026-08-11 for 2026-08-10 7018   att        Overcast
+    'cbb481239218030ab2a78315c263e6a827b23443', // 2026-08-11 for 2026-08-10 7018   att        Overcast
 ]);
