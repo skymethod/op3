@@ -71,8 +71,9 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
     
             const { permissions } = identity;
             const hasAdmin = permissions.has('admin');
+            const showStatsMatch = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path);
 
-            if (!hasAdmin && limiter) {
+            if (!hasAdmin && !showStatsMatch && limiter) {
                 const { success } = await limiter.isAllowed(`api:ip:${rawIpAddress}`);
                 if (!success) return new Response('slow down', { status: 429 });
             }
@@ -98,7 +99,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
             if (path === '/feeds/analyze') return await computeFeedsAnalyzeResponse(method, origin, bodyProvider, podcastIndexCredentials, rpcClient, roRpcClient, searchParams, background, xfetcher); 
             if (path === '/session-tokens') return await computeSessionTokensResponse(method, origin, bodyProvider, podcastIndexCredentials); 
             { const m = /^\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/.exec(path); if (m && configuration) return await computeShowsResponse({ showUuidOrPodcastGuidOrFeedUrlBase64: m[1], method, searchParams, rpcClient, roRpcClient, configuration, origin }); }
-            { const m = /^\/shows\/([0-9a-f]{32})\/stats$/.exec(path); if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
+            { const m = showStatsMatch; if (m && configuration) return await computeShowStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
             { const m = /^\/shows\/([0-9a-f]{32})\/summary-stats$/.exec(path); if (m && configuration) return await computeShowSummaryStatsResponse({ showUuid: m[1], method, searchParams, statsBlobs, roStatsBlobs, configuration }); }
             { const m = /^\/queries\/([0-9a-z-]+)$/.exec(path); if (m && configuration) return await computeQueriesResponse({ name: m[1], method, searchParams, miscBlobs, roMiscBlobs, configuration, rpcClient, roRpcClient, statsBlobs, roStatsBlobs }); }
         
