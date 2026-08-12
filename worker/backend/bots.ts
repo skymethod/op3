@@ -1508,4 +1508,10 @@ const botIpHashes = new Set([
     '58c8823baefdac199ec8b912d260d8f28dfa9cc1', // 2026-08-11 for 2026-08-10 1312   vt         Chrome
     '96ff93bfdaa4c3c0c9df97a4f52a6558c46b4169', // 2026-08-11 for 2026-08-10 7018   att        Overcast
     'cbb481239218030ab2a78315c263e6a827b23443', // 2026-08-11 for 2026-08-10 7018   att        Overcast
+    '50b88b8f22dda81824ae472eab3468a49c58e9f5', // 2026-08-12 for 2026-08-11 62240  clouvider  Overcast
+    '7258cad3892d231d3c7c94e1179fffdeb6ab70eb', // 2026-08-12 for 2026-08-11 62240  clouvider  Overcast
+    '58c994db28004f61a863730e9922df1517874128', // 2026-08-12 for 2026-08-11 20412  clarity    Overcast
+    '9b8bf5b587d2f9e53dde0eb6dfed18984e48a9c5', // 2026-08-12 for 2026-08-11 20412  clarity    Overcast
+    'ac1507dba5459e05de69904d36a13131f83d1459', // 2026-08-12 for 2026-08-11 7018   att        Overcast
+    'e4959f1aafebf613204b2fcc6885cacc3eb02567', // 2026-08-12 for 2026-08-11 1312   vt         Chrome
 ]);
