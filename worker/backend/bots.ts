@@ -130,6 +130,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '62610' && date >= '2026-07-02' // zenlayer
             || asn === '32934' && date >= '2026-07-26' // facebook
             || asn === '136510' && date >= '2026-08-04' // streamline servers
+            || asn === '396356' && date >= '2026-08-12' // latitude.sh
         )
         ;
 }
@@ -1514,4 +1515,14 @@ const botIpHashes = new Set([
     '9b8bf5b587d2f9e53dde0eb6dfed18984e48a9c5', // 2026-08-12 for 2026-08-11 20412  clarity    Overcast
     'ac1507dba5459e05de69904d36a13131f83d1459', // 2026-08-12 for 2026-08-11 7018   att        Overcast
     'e4959f1aafebf613204b2fcc6885cacc3eb02567', // 2026-08-12 for 2026-08-11 1312   vt         Chrome
+    '6a3bc6463eae18d4f38409e44b065bfb4527e8be', // 2026-08-14 for 2026-08-12 396356 latitude   Safari, Chrome, Edge
+    '9ca3ab00bb6b9d2d9299df87389c68994f8b4a61', // 2026-08-14 for 2026-08-12 20412  clarity    Overcast
+    'f060b27943135f79dc457978881f4669a614ab40', // 2026-08-14 for 2026-08-12 7018   att        Overcast
+    '4fcc9cd16b24f1dd29104a7b12bf45004d5926ad', // 2026-08-14 for 2026-08-12 7018   att        Overcast
+    '68dc623fff3af4d3cde60ca9a4e8c21bc997eb08', // 2026-08-14 for 2026-08-12 7018   att        Overcast
+    'd3be3983a4319946085f32666c12c550fc9815ac', // 2026-08-14 for 2026-08-12 7018   att        Overcast
+    'fd0b74cf345df4bad266b764d1eb0b565393fedc', // 2026-08-14 for 2026-08-12 38136  akari      Edge
+    '0dc6b04492e6cab75c6bebe3b14657bf38fe2216', // 2026-08-14 for 2026-08-13 20412  clarity    Overcast
+    '4d619f01a857f5e473d45bd9c8227a4c8b862bfc', // 2026-08-14 for 2026-08-13 33363  charter    Overcast
+    '689e0047cdbb9c2898daaed88433311e7e1f8fcc', // 2026-08-14 for 2026-08-13 701    verizon    Overcast
 ]);
