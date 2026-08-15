@@ -90,6 +90,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16509' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-02-04' // amazon
         || asn === '396982' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-02' // google
         || asn === '132203' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-03-13' // tencent
+        || asn === '9908' && agentName === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' && date >= '2026-08-14' // hong kong cable
         || asn === '24940' && agentType === 'browser' && date >= '2026-02-06' // hetzner
         || agentName === 'node' && (asn === '396982' || asn === '14618' || asn === '14061') // google, amazon, digitalocean
         || asn === '401560' && (agentName === 'Apple Podcasts' || agentName === 'Chrome') // onecable
@@ -1525,4 +1526,7 @@ const botIpHashes = new Set([
     '0dc6b04492e6cab75c6bebe3b14657bf38fe2216', // 2026-08-14 for 2026-08-13 20412  clarity    Overcast
     '4d619f01a857f5e473d45bd9c8227a4c8b862bfc', // 2026-08-14 for 2026-08-13 33363  charter    Overcast
     '689e0047cdbb9c2898daaed88433311e7e1f8fcc', // 2026-08-14 for 2026-08-13 701    verizon    Overcast
+    '0e14c20efbf4e56aab1d878307e0181cb15a08d4', // 2026-08-15 for 2026-08-14 33363  charter    Overcast
+    'ab4d7180833f078e8fb838233c79e2b78fef6372', // 2026-08-15 for 2026-08-14 3352   telefonica Overcast, AppleCoreMedia, Prestocast
+    'b217dbf99494f58899b1dd2189bd39ea7654b957', // 2026-08-15 for 2026-08-14 9908   hongkong   Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 ]);
