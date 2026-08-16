@@ -26,6 +26,7 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
 export const EXTRA_BOT_USER_AGENTS = [
     'BelgianFrenchUsage/2.0 public-RSS research archive',
+    'BitcoinEducationArchive/1.0',
     'CodexPodcastTranscriber/1.0',
     'CREscope/1.0 (podcast research pipeline)',
     'CyotekWebCopy/1.9 CyotekHTTP/6.4',
@@ -51,6 +52,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
+    'nuance-net-ingest/0.1',
     'PaidcastAudioFetcher/1.0 (+podcast benchmark)',
     'pod-intel/0.1 (Livingston Insights transcription)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
@@ -1529,4 +1531,9 @@ const botIpHashes = new Set([
     '0e14c20efbf4e56aab1d878307e0181cb15a08d4', // 2026-08-15 for 2026-08-14 33363  charter    Overcast
     'ab4d7180833f078e8fb838233c79e2b78fef6372', // 2026-08-15 for 2026-08-14 3352   telefonica Overcast, AppleCoreMedia, Prestocast
     'b217dbf99494f58899b1dd2189bd39ea7654b957', // 2026-08-15 for 2026-08-14 9908   hongkong   Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    '22a9d6e11987193fcff51f0da51f7fc7ac3770ff', // 2026-08-16 for 2026-08-15 63949  akamai     nuance-net-ingest/0.1
+    '313637b7cf0b6796c27deb1b03b095bb320984b0', // 2026-08-16 for 2026-08-15 7922   comcast    Overcast
+    '49e998f9e4e4d9ad02c02166e12c40e1fb01c9d2', // 2026-08-16 for 2026-08-15 7018   att        Overcast
+    '6cf232a29eb1d631aa5d26ab11c3f234885f4ed9', // 2026-08-16 for 2026-08-15 1312   vt         Chrome
+    'a43db9d80ef795e7e8e44f7d4b901fdab4f58d30', // 2026-08-16 for 2026-08-15 14061  do         BitcoinEducationArchive/1.0
 ]);
