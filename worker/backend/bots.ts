@@ -53,6 +53,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
     'nuance-net-ingest/0.1',
+    'nuance-podcast-download/1.0',
     'PaidcastAudioFetcher/1.0 (+podcast benchmark)',
     'pod-intel/0.1 (Livingston Insights transcription)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
@@ -1536,4 +1537,10 @@ const botIpHashes = new Set([
     '49e998f9e4e4d9ad02c02166e12c40e1fb01c9d2', // 2026-08-16 for 2026-08-15 7018   att        Overcast
     '6cf232a29eb1d631aa5d26ab11c3f234885f4ed9', // 2026-08-16 for 2026-08-15 1312   vt         Chrome
     'a43db9d80ef795e7e8e44f7d4b901fdab4f58d30', // 2026-08-16 for 2026-08-15 14061  do         BitcoinEducationArchive/1.0
+    '11d9c406574de001a48b9bb12c3dc430cf8bdeae', // 2026-08-17 for 2026-08-16 7922   comcast    nuance-podcast-download/1.0
+    '491ccc586127a6495481aeb72170d5ee5b2d2afe', // 2026-08-17 for 2026-08-16 701    verizon    Overcast
+    '7223b3df260f65d2452d11ddf1ad7162cab80d6d', // 2026-08-17 for 2026-08-16 5650   frontier   Overcast
+    '9705bda2fbb470db638302a0503e04e88aa6f9bf', // 2026-08-17 for 2026-08-16 7018   att        Overcast
+    'b9fb2c329cfd2cce4e9f0e582b8f5dce2e61a86f', // 2026-08-17 for 2026-08-16 7922   comcast    Overcast
+    'f5e2b197e9de4d876fdef7306153ec429133dbb1', // 2026-08-17 for 2026-08-16 401182 applied    Chrome
 ]);
