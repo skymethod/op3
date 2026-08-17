@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@f1ff9530b2b3b932e91e7132586babe36704a234 (2026-08-05T00:02:40Z)
+// from user-agents-v2@d46f1e7da3a11a0dc0f892e3138c304643d4d330 (2026-08-17T22:53:51Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -74,6 +74,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^castget |^castget$/.test(userAgent)) return { name: `castget`, type: 'bot' };
     if (/^Castnews-Topiker\//.test(userAgent)) return { name: `Castnews`, type: 'bot' };
     if (/Castopod\/\d/.test(userAgent)) return { name: `Castopod`, type: 'bot' };
+    if (/^Tentacles, Like iTunes$/.test(userAgent)) return { name: `Castro automated actions`, type: 'bot' };
     if (/CeramicTerracotta/.test(userAgent)) return { name: `Ceramic Terracotta Crawler`, type: 'bot' };
     if (/^Trackable\//.test(userAgent)) return { name: `Chartable`, type: 'bot' };
     if (/^clark-crawler2/.test(userAgent)) return { name: `Clark-Crawler, unknown`, type: 'bot' };
@@ -93,6 +94,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/data-pipeline-downloader\//.test(userAgent)) return { name: `data-pipeline-downloader`, type: 'bot' };
     if (/http:\/\/cs\.daum\.net/.test(userAgent)) return { name: `Daum`, type: 'bot' };
     if (/^DeepCast\/\d.*Sync/.test(userAgent)) return { name: `Deepcast Podcast Sync`, type: 'bot' };
+    if (/^Deepgram$/.test(userAgent)) return { name: `Deepgram`, type: 'bot' };
     if (/^Deezer Podcasters\/1\.0/.test(userAgent)) return { name: `Deezer Podcasters`, type: 'bot' };
     if (/^DIFTCL-AnchorAudit\//.test(userAgent)) return { name: `DIFTCL-AnchorAudit`, type: 'bot' };
     if (/^Digg /.test(userAgent)) return { name: `Digg`, type: 'bot' };
@@ -182,6 +184,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ PlayNext\/|^playnext-/.test(userAgent)) return { name: `PlayNext`, type: 'bot' };
     if (/^PodbeanFeedReader/.test(userAgent)) return { name: `PodBean Feed Reader`, type: 'bot' };
     if (/^Podbean Importer/.test(userAgent)) return { name: `Podbean Importer`, type: 'bot' };
+    if (/^Podbean Podcast Service/.test(userAgent)) return { name: `Podbean Podcast Service`, type: 'bot' };
     if (/^Podcastindex\.org\/|\(PodcastIndex\.org\)|PodcastIndexManager\/|^PodcastIndex Classifier\//.test(userAgent)) return { name: `Podcastindex.org`, type: 'bot' };
     if (/^PodcastStandard\//.test(userAgent)) return { name: `Podcast de facto Standard`, type: 'bot' };
     if (/^Podcast%20Archiver\//.test(userAgent)) return { name: `Podcast Archiver`, type: 'bot' };
@@ -206,7 +209,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/ podcast-renamer\//.test(userAgent)) return { name: `podcast-renamer`, type: 'bot' };
     if (/^podcast-shard-downloader\//.test(userAgent)) return { name: `podcast-shard-downloader`, type: 'bot' };
     if (/^podcast-stt\//.test(userAgent)) return { name: `podcast-stt`, type: 'bot' };
-    if (/ PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
+    if (/PodcastTranscriber\//.test(userAgent)) return { name: `PodcastTranscriber`, type: 'bot' };
     if (/^PodcastWorker\//.test(userAgent)) return { name: `PodcastWorker`, type: 'bot' };
     if (/^podcasts-ai-local-transcribe\//.test(userAgent)) return { name: `podcasts ai local transcribe`, type: 'bot' };
     if (/podCloud/.test(userAgent)) return { name: `PodCloud`, type: 'bot' };
@@ -358,6 +361,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Anytime\/.*amugofjava/.test(userAgent)) return { name: `Anytime Podcast Player`, type: 'app' };
     if (/^APKXDL/.test(userAgent)) return { name: `APK Downloader`, type: 'app' };
     if (/^Apollo\/|Apollo Podcasts \(android\)/.test(userAgent)) return { name: `Apollo`, type: 'app' };
+    if (/^AirPlay\/\d.*MFi_AirPlay_Device/.test(userAgent)) return { name: `Apple AirPlay`, type: 'app' };
     if (/^AirPodcasts\/\d/.test(userAgent)) return { name: `Apple HomePod`, type: 'app' };
     if (/^MessagesViewService\/|^Messages\/|^Messages Share Extension\/|^MessagesNotificationExtension\//.test(userAgent)) return { name: `Apple iMessage`, type: 'app' };
     if (/^Mail\//.test(userAgent)) return { name: `Apple Mail`, type: 'app' };
@@ -918,6 +922,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^libsoup\//.test(userAgent)) return { name: `libsoup`, type: 'library' };
     if (/^lua-resty-http\/\d/.test(userAgent)) return { name: `lua-resty-http`, type: 'library', category: 'bot' };
     if (/^Android\.LVLDM$/.test(userAgent)) return { name: `Android License Verification Library`, type: 'library' };
+    if (/^node$/.test(userAgent)) return { name: `node (fetch)`, type: 'library', category: 'bot' };
     if (/^node-fetch(\/.*)?$/.test(userAgent)) return { name: `node-fetch`, type: 'library', category: 'bot' };
     if (/okhttp/.test(userAgent)) return { name: `okhttp`, type: 'library', category: 'bot' };
     if (/^PRDownloader$/.test(userAgent)) return { name: `PRDownloader`, type: 'library' };
@@ -967,11 +972,11 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/Chromebook|CrOS/.test(userAgent)) return { name: `Google Chromebook`, type: 'device', category: 'computer' };
     if (/[a|A]ndroid.*[t|T]ablet|[t|T]ablet.*[a|A]ndroid|SM-T| GT-|^ZTE;Xview/.test(userAgent)) return { name: `Android Tablet`, type: 'device', category: 'mobile' };
     if (/^Spotify\/.* \((Rivian|BYD AUTO|Volvo|gminfo\d+|G6|G9)\)/.test(userAgent)) return { name: `Smart Car`, type: 'device', category: 'auto' };
-    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|SMART_TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|TVStick|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^microsoft;xbox_|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;(un|qn|ue|uj|ua|ls|qe|qa|lh|gq|gu)\d|^hisense;(c235x|c205x)|^skyworth;(NoblexTV|SWTV)|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;(VSB|DIW)|^TPV;[A-Z0-9]+AndroidTV;|^(CVT_NULL|MediaTek);SMARTTV;|^NVIDIA;SHIELDAndroidTV|UHDAndroidTV;|^westinghouse;7808x;|^ZTE;B820C|Sky, (ES|EM)|^Cinemo\/\d| Cinemo\/\d|^Amazon;(AFTSSS|AFTMM|AFTSS|AFTKA|AFTT|AFTDCT31|AFTKM|AFTKRT|AFTHA004|AFTEAMR311);|^nowtv;|^SEIRobotics;yes|^Changhong;AIPONT|^Arcadyan;Bouygtel|^Amlogic;ONVO|^Philips;TPM|^MediaTek;39LHA120TP|^samsung-agent\//.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
+    if (/SmartTV|[Rr]oku|CrKey|AFTT Build|AFTM Build|BRAVIA 4K|Opera TV|SmartTv|TSBNetTV|SMART-TV|SMART_TV|TV Safari|WebTV|InettvBrowser|GoogleTV|HbbTV|smart-tv|TVStick|olleh tv|^sony_tv;ps5;|Microsoft Xbox|^microsoft;xbox_|^Google;Chromecast|^TCL;|^Xiaomi;(MIBOX|MiTV-)|^samsung;(un|qn|ue|uj|ua|ls|qe|qa|lh|gq|gu)\d|^hisense;(c235x|c205x)|^skyworth;(NoblexTV|SWTV)|^Sony;BRAVIA|^tcl;(c1\d{2}x|7140x)|^onn\.;8821x|^Funai;PHILIPS4KTV|^Sagemcom;(VSB|DIW)|^TPV;[A-Z0-9]+AndroidTV;|^(CVT_NULL|MediaTek);SMARTTV;|^NVIDIA;SHIELDAndroidTV|UHDAndroidTV;|^westinghouse;7808x;|^ZTE;B820C|Sky, (ES|EM)|^Cinemo\/\d| Cinemo\/\d|^Amazon;(AFTSSS|AFTMM|AFTSS|AFTKA|AFTT|AFTDCT31|AFTKM|AFTKRT|AFTHA004|AFTEAMR311);|^nowtv;|^SEIRobotics;yes|^Changhong;AIPONT|^Arcadyan;Bouygtel|^Amlogic;ONVO|^Philips;TPM|^MediaTek;39LHA120TP|^samsung-agent\/|^AirPlay\/\d.*MFi_AirPlay_Device/.test(userAgent)) return { name: `Other Smart TV`, type: 'device', category: 'smart_tv' };
     if (/ServeStream|Android|android|HTC|ExoPlayer|^AntennaPod\/|^GSA\/.*\.arm(64)?$|^sp-agent|^PRDownloader$|^(Turtlecast|TURTLECAST)\/|\((SM-A15|SM-A55|moto g|RMO-NX3)/.test(userAgent)) return { name: `Android Phone`, type: 'device', category: 'mobile' };
     if (/Windows|windows|WMPlayer|Winamp|Win32|Win64|NSPlayer|MediaMonkey|NSPlayer|PC/.test(userAgent)) return { name: `Windows Computer`, type: 'device', category: 'computer' };
     if (/Alexa|^Echo\/|^Amazon;Echo/.test(userAgent)) return { name: `Amazon Smart Speaker`, type: 'device', category: 'smart_speaker' };
-    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar|Portable_Home|Smart_Speaker)|^HEOS;DENON|^Denon;DENON-(DWHS|DWMINI)|^Storybutton\/|^Bluesound;|^Yamaha;(WX-|YAS_|ATS_|SR-)|^Xiaomi;07G|^(BangAndOlufsen|Bang_And_Olufsen);beo_|^ArgonAudio;SOLO;|^Samsung;HW-(Q9|Q8|Q7|LS60D|S6|S8)|^LenbrookIndustries;NADAmplifier|^Marshall;Uxbridge|^Edifier;MS50A|^Wiim;Pro;|^Naim_Audio;Mu-so|^Audio_Pro;C10MKII|^Devialet;Mania|^Bowers___Wilkins;Zeppelin|^JBL;Charge_5/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
+    if (/sonos|Sonos|^Bose\/|^VictorReader|^Bose;Bose_(Home_Speaker|Soundbar|Portable_Home|Smart_Speaker)|^HEOS;DENON|^Denon;DENON-(DWHS|DWMINI)|^Storybutton\/|^Bluesound;|^Yamaha;(WX-|YAS_|ATS_|SR-)|^Xiaomi;07G|^(BangAndOlufsen|Bang_And_Olufsen);beo_|^ArgonAudio;SOLO;|^Samsung;HW-(Q9|Q8|Q7|LS60D|S6|S8)|^LenbrookIndustries;NADAmplifier|^Marshall;Uxbridge|^Edifier;MS50A|^Wiim;Pro;|^Naim_Audio;Mu-so|^Audio_Pro;C10MKII|^Devialet;Mania|^Bowers___Wilkins;Zeppelin|^JBL;Charge_5|^Kenwood;|^Audizio;|^Argon;Stream/.test(userAgent)) return { name: `Other Smart Speaker`, type: 'device', category: 'smart_speaker' };
     if (/Lavf\/|desktop|Linux|linux|VLC|^okhttp\/|CastBox\/|X11; (OpenBSD|NetBSD)/.test(userAgent)) return { name: `Other Computer`, type: 'device', category: 'computer' };
     if (/tablet|Tablet/.test(userAgent)) return { name: `Other Tablet`, type: 'device', category: 'mobile' };
     if (/watch|Watch|^Garmin /.test(userAgent)) return { name: `Other Watch`, type: 'device', category: 'watch' };

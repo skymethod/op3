@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@f1ff9530b2b3b932e91e7132586babe36704a234 (2026-08-05T00:02:40Z)
+// from user-agents-v2@d46f1e7da3a11a0dc0f892e3138c304643d4d330 (2026-08-17T22:53:51Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -92,6 +92,7 @@ const botTests = {
     'Castnews-Topiker/1.0 (+https://index.castnews.com.br)': { type: 'bot', name: `Castnews` },
     'Castopod/1.0': { type: 'bot', name: `Castopod` },
     'Castopod/1.1.2': { type: 'bot', name: `Castopod` },
+    'Tentacles, Like iTunes': { type: 'bot', name: `Castro automated actions` },
     'TerraCotta https://github.com/CeramicTeam/CeramicTerracotta': { type: 'bot', name: `Ceramic Terracotta Crawler` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)': { type: 'bot', name: `Claudebot` },
     'clipgenie-service-worker': { type: 'bot', name: `clipgenie-service-worker` },
@@ -110,6 +111,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; data-pipeline-downloader/1.0)': { type: 'bot', name: `data-pipeline-downloader` },
     'Mozilla/5.0 (compatible; Daum/4.1; +http://cs.daum.net/faq/15/4118.html?faqId=28966)': { type: 'bot', name: `Daum` },
     'DeepCast/4.3.0 Podcast Sync (+https://deepcast.fm)': { type: 'bot', name: `Deepcast Podcast Sync` },
+    'Deepgram': { type: 'bot', name: `Deepgram` },
     'DIFTCL-AnchorAudit/1.0 (+read-only; rate-limited)': { type: 'bot', name: `DIFTCL-AnchorAudit` },
     'Digg Mozilla/5.0 (Digg/1.0; support@digg.com)': { type: 'bot', name: `Digg` },
     'Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)': { type: 'bot', name: `DotBot` },
@@ -227,6 +229,7 @@ const botTests = {
     'playnext-t3/0.1': { type: 'bot', name: `PlayNext` },
     'PodbeanFeedReader/6.0 (Feed Parser; http://www.podbean.com/; Allow like Gecko) Build/20251103053444': { type: 'bot', name: `PodBean Feed Reader` },
     'Podbean Importer': { type: 'bot', name: `Podbean Importer` },
+    'Podbean Podcast Service': { type: 'bot', name: `Podbean Podcast Service` },
     'Podcastindex.org/v0.3.3 (Aggrivate)': { type: 'bot', name: `Podcastindex.org` },
     'Aggrivator (PodcastIndex.org)/v0.1.7': { type: 'bot', name: `Podcastindex.org` },
     'PodcastIndexManager/1.0': { type: 'bot', name: `Podcastindex.org` },
@@ -258,6 +261,7 @@ const botTests = {
     'podcast-shard-downloader/1.0': { type: 'bot', name: `podcast-shard-downloader` },
     'podcast-stt/1.0': { type: 'bot', name: `podcast-stt` },
     'Mozilla/5.0 (compatible; PodcastTranscriber/1.0)': { type: 'bot', name: `PodcastTranscriber` },
+    'PodcastTranscriber/1.0': { type: 'bot', name: `PodcastTranscriber` },
     'PodcastWorker/1.0': { type: 'bot', name: `PodcastWorker` },
     'podcasts-ai-local-transcribe/1.0': { type: 'bot', name: `podcasts ai local transcribe` },
     'Podcorn/1.0': { type: 'bot', name: `Podcorn` },
@@ -438,6 +442,10 @@ const appTests = {
     'APKXDL (Linux; U; Android 4.4.4;nb_no; trlte/KTU84P) Downloader': { type: 'app', name: `APK Downloader` },
     'Apollo/11.28 CFNetwork/1085.4 Darwin/19.0.0': { type: 'app', name: `Apollo` },
     'Apollo Podcasts (android) https://apollopods.com': { type: 'app', name: `Apollo` },
+    'AirPlay/2.0 (App/75.112.0) MFi_AirPlay_Device': { type: 'app', name: `Apple AirPlay` },
+    'AirPlay/2.0 (App/74.128.1) MFi_AirPlay_Device': { type: 'app', name: `Apple AirPlay` },
+    'AirPlay/2.0 (App/75.109.0) MFi_AirPlay_Device (MFiModelGroup/SWS8WJ_au5GqOy6EPST5H01yx_cxxWwCCtjzUiDqNCQ)': { type: 'app', name: `Apple AirPlay` },
+    'AirPlay/2.0 (App/80.139.0) MFi_AirPlay_Device (MFiModelGroup/d7dGEIeqGIT-tFALlLbwfMSRUpOE6XfLBDv90DJtpfg)': { type: 'app', name: `Apple AirPlay` },
     'AirPodcasts/4022.700.8 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `Apple HomePod` },
     'AirPodcasts/4022.700.8 CFNetwork/1410.0.2 Darwin/22.6.0': { type: 'app', name: `Apple HomePod` },
     'MessagesViewService/1.0 CFNetwork/1120 Darwin/19.0.0': { type: 'app', name: `Apple iMessage` },
@@ -1386,6 +1394,7 @@ const libraryTests = {
     'libsoup/2.68.2': { type: 'library', name: `libsoup` },
     'lua-resty-http/0.07 (Lua) ngx_lua/10025': { type: 'library', name: `lua-resty-http` },
     'Android.LVLDM': { type: 'library', name: `Android License Verification Library` },
+    'node': { type: 'library', name: `node (fetch)` },
     'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)': { type: 'library', name: `node-fetch` },
     'node-fetch': { type: 'library', name: `node-fetch` },
     'okhttp/3.11.0': { type: 'library', name: `okhttp` },
@@ -1543,6 +1552,8 @@ const deviceTests = {
     'samsung;gq55q60tguxzg;568a50c7e7f64fe3b44a3316ef5590fd;;tpapi;3.194.71': { type: 'device', name: `Other Smart TV` },
     'samsung;gu50tu7079uxzg;568a50c7e7f64fe3b44a3316ef5590fd;;tpapi;3.194.71': { type: 'device', name: `Other Smart TV` },
     'samsung-agent/1.1': { type: 'device', name: `Other Smart TV` },
+    'AirPlay/2.0 (App/75.112.0) MFi_AirPlay_Device': { type: 'device', name: `Other Smart TV` },
+    'AirPlay/2.0 (App/80.139.0) MFi_AirPlay_Device (MFiModelGroup/d7dGEIeqGIT-tFALlLbwfMSRUpOE6XfLBDv90DJtpfg)': { type: 'device', name: `Other Smart TV` },
     'GSA/13.39.12.26.arm64': { type: 'device', name: `Android Phone` },
     'GSA/13.39.12.26.arm': { type: 'device', name: `Android Phone` },
     'sp-agent': { type: 'device', name: `Android Phone` },
@@ -1599,6 +1610,9 @@ const deviceTests = {
     'Samsung;HW-S60B;f92d2110c0e3483c82534460ac6b08bf;;tpapi;3.194.61': { type: 'device', name: `Other Smart Speaker` },
     'Yamaha;SR-X50A;59c7bf046992472ab0689f5fc7fa08e2;;tpapi;3.194.71': { type: 'device', name: `Other Smart Speaker` },
     'JBL;Charge_5_Wi-Fi;ae8cc5068e6443f3b90da43a356e7578;;tpapi;3.194.61': { type: 'device', name: `Other Smart Speaker` },
+    'Kenwood;CR-ST700SCD;d6b97f06634d476e946238ef2b8eb4e0;;tpapi;3.198.55': { type: 'device', name: `Other Smart Speaker` },
+    'Audizio;Adria;902ce3b9eaa84026afcb93aa46002b5a;;tpapi;3.200.445': { type: 'device', name: `Other Smart Speaker` },
+    'Argon;Stream3;bafeb878ad744864bd2021cbb5988111;;tpapi;3.200.445': { type: 'device', name: `Other Smart Speaker` },
     'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36': { type: 'device', name: `Other Computer` },
     'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36': { type: 'device', name: `Other Computer` },
     'Mozilla/5.0 (Mobile; Nokia_8110_4G; rv:48.0) Gecko/48.0 Firefox/48.0 KAIOS/2.5.1 PodKast': { type: 'device', name: `Other Mobile Device` },
