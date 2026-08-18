@@ -1543,4 +1543,8 @@ const botIpHashes = new Set([
     '9705bda2fbb470db638302a0503e04e88aa6f9bf', // 2026-08-17 for 2026-08-16 7018   att        Overcast
     'b9fb2c329cfd2cce4e9f0e582b8f5dce2e61a86f', // 2026-08-17 for 2026-08-16 7922   comcast    Overcast
     'f5e2b197e9de4d876fdef7306153ec429133dbb1', // 2026-08-17 for 2026-08-16 401182 applied    Chrome
+    '0f37e3a66f87ae9b8d42bedc0785b525fc1e5ca5', // 2026-08-18 for 2026-08-17 20412  clarity    Overcast
+    '35d966bf19be7c92f3698fde256a97c789cdb57b', // 2026-08-18 for 2026-08-17 7922   comcast    Firefox
+    '3763801bb3edc9f5bc4a83cfb1cdb3221b396c0c', // 2026-08-18 for 2026-08-17 138997 eons       Safari, Chrome, Chrome, Google Podcasts
+    '944f76d3da51b0fc29822d941b73b5e2c2952f6b', // 2026-08-18 for 2026-08-17 976    corenet    Xiao Yu Zhou
 ]);
