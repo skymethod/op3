@@ -71,6 +71,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PSW-Archive/1.0 (authorized member archive; contact: paul@example.com)',
     'PulsewireV4V/0.6 enclosure verifier',
     'rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper',
+    'rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)',
     'spotify-tech-podcast-discovery/1.0',
     'subscriber-rss-downloader/1.0',
     'swyxdotio-podcast-migration/1.0',
@@ -1547,4 +1548,11 @@ const botIpHashes = new Set([
     '35d966bf19be7c92f3698fde256a97c789cdb57b', // 2026-08-18 for 2026-08-17 7922   comcast    Firefox
     '3763801bb3edc9f5bc4a83cfb1cdb3221b396c0c', // 2026-08-18 for 2026-08-17 138997 eons       Safari, Chrome, Chrome, Google Podcasts
     '944f76d3da51b0fc29822d941b73b5e2c2952f6b', // 2026-08-18 for 2026-08-17 976    corenet    Xiao Yu Zhou
+    '2e112bec927c575f0c1652ecd3cb13b2f8e27bfc', // 2026-08-19 for 2026-08-18 7018   att        Overcast
+    '30fac4bb682c19b3ba6eec239f369b1e69d013b9', // 2026-08-19 for 2026-08-18 394056 bif        Overcast
+    '49bc917d2b4232556b0ae87c3058985124c41c93', // 2026-08-19 for 2026-08-18 400238 pieg       Chrome
+    '7aa046379307065aea437683f74e9e369a44a1ff', // 2026-08-19 for 2026-08-18 22773  cox        Chrome
+    'c12b393f726900cda347eb2a195ccf54209d8ad1', // 2026-08-19 for 2026-08-18 7018   att        Overcast
+    'da5adbfb74cf11fc8d8ee3cdfc39b9ff2d320454', // 2026-08-19 for 2026-08-18 16509  amazon     rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)
+    'f2de0bf3c0d4621b564e4728b36428f40a888274', // 2026-08-19 for 2026-08-18 1312   vtech      Chrome
 ]);
