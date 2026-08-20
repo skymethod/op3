@@ -1555,4 +1555,6 @@ const botIpHashes = new Set([
     'c12b393f726900cda347eb2a195ccf54209d8ad1', // 2026-08-19 for 2026-08-18 7018   att        Overcast
     'da5adbfb74cf11fc8d8ee3cdfc39b9ff2d320454', // 2026-08-19 for 2026-08-18 16509  amazon     rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)
     'f2de0bf3c0d4621b564e4728b36428f40a888274', // 2026-08-19 for 2026-08-18 1312   vtech      Chrome
+    'c98148b3b2f65ab1d25ce336360f61ac64c16807', // 2026-08-20 for 2026-08-19 3352   telefonica Overcast
+    'df18013aa7cf5fe95ccc97b38d0314f2a6125336', // 2026-08-20 for 2026-08-19 701    verizon    Overcast
 ]);
