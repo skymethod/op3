@@ -1568,4 +1568,11 @@ const botIpHashes = new Set([
     '241cc00332698f637ddadcb196d119b006bc4f7b', // 2026-08-23 for 2026-08-22 1136   kpn        Overcast
     '415b2ba39e3b2689285ed7823711b63bb1fb13f6', // 2026-08-23 for 2026-08-22 7018   att        Overcast
     '874fd61a7e7698ad188ddd41838a019ff98cebd6', // 2026-08-23 for 2026-08-22 7018   att        Overcast
+    '1f7bb18982d5ca067b5764be0a097c40a9351629', // 2026-08-24 for 2026-08-23 701    verizon    Overcast
+    'd5df245b7564a90af6e2ce904126d3a6d4323e1f', // 2026-08-24 for 2026-08-23 701    verizon    Overcast
+    '46a524bed0436fe531fd8293f3ce959a15a8bfed', // 2026-08-24 for 2026-08-23 7018   att        Overcast
+    '64b20ce93ab7dcfbe83836d7197a1790aad7f5fd', // 2026-08-24 for 2026-08-23 7018   att        Overcast
+    'c6797b1721eedfbb348a21fd596f9cfa6191cc56', // 2026-08-24 for 2026-08-23 7922   comcast    Chrome
+    'd7e6522f198fa3e224e654c79e84503e19f6c1d6', // 2026-08-24 for 2026-08-23 32489  amanah     Overcast
+    'dfe746382125b48625971a217328af27027e6ea5', // 2026-08-24 for 2026-08-23 24560  bharti     Chrome
 ]);
