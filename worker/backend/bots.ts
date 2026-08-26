@@ -85,7 +85,7 @@ export function isWebWidgetHostname(hostname: string): boolean {
     return knownWebWidgetHostnames.has(hostname);
 }
 
-export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentType, agentName, deviceName, regionCode, date }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentType: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string, date: string }): boolean {
+export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentType, agentName, deviceName, regionCode, date, referrerType }: { hashedIpAddress: string, destinationServerUrl: string, asn: string, agentType: string, agentName: string | undefined, deviceName: string | undefined, regionCode: string, date: string, referrerType: string | undefined }): boolean {
     return botIpHashes.has(hashedIpAddress)
         || asn === '16591' && regionCode === 'TX' && agentName === 'Chrome' && deviceName === 'Windows Computer' && destinationServerUrl.includes('/ondemand.kut.org/') && destinationServerUrl.includes('kut-news-now') // google fiber
         || asn === '33425' && agentName === 'Mozilla/5.0 (compatible; V/1.0)' // coreweave (see below)
@@ -102,6 +102,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '12876' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-05-27' // scaleway
         || asn === '16509' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-07-20' // amazon
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
+        || (date >= '2026-08-21' && date <= '2026-08-23') && referrerType === undefined && (agentName === 'Chrome' || agentName === 'Generic WebKit') && destinationServerUrl.includes('/redirect.zencastr.com/') && destinationServerUrl.includes('/679ceb1787082444de3f8c68/')
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
@@ -1578,4 +1579,7 @@ const botIpHashes = new Set([
     '6e10355fd5f46d1a576367cb4fe7b693a041cc64', // 2026-08-25 for 2026-08-24 19318  interserver Chrome
     '7f3ea4cecf6744a171187905add45b00e4f48b2e', // 2026-08-25 for 2026-08-24 701    verizon    Overcast
     '892fd548f60eb20edc2d8301b6c3a8db25d933ed', // 2026-08-25 for 2026-08-24 701    verizon    Overcast
+    '2b4da96fcb724fab6c116bd848434187f8f32212', // 2026-08-26 for 2026-08-25 7018   att        Overcast
+    '8f8431d0dfd07b2ef7f80b073cacb2444c5e7e25', // 2026-08-26 for 2026-08-25 1312   vtech      Chrome
+    'd3d87293779b47af48f60bfc018ef3a534798271', // 2026-08-26 for 2026-08-25 701    verizon    Overcast
 ]);
