@@ -1582,4 +1582,10 @@ const botIpHashes = new Set([
     '2b4da96fcb724fab6c116bd848434187f8f32212', // 2026-08-26 for 2026-08-25 7018   att        Overcast
     '8f8431d0dfd07b2ef7f80b073cacb2444c5e7e25', // 2026-08-26 for 2026-08-25 1312   vtech      Chrome
     'd3d87293779b47af48f60bfc018ef3a534798271', // 2026-08-26 for 2026-08-25 701    verizon    Overcast
+    '2367021ccd3642bf491b1db9fb687e3781b28b77', // 2026-08-27 for 2026-08-26 5089   virgin     audiobookshelf, Apple Podcasts automated checks
+    '5556f0724be9b1de2b5adbe8a6b4ec5c2c1b10bf', // 2026-08-27 for 2026-08-26 20412  clarity    Overcast
+    'a55ae484f6a5894d08d845cea4c92389288ce41c', // 2026-08-27 for 2026-08-26 20412  clarity    Overcast
+    '5a116fd21742d9a6e48675898799d4577e9580cc', // 2026-08-27 for 2026-08-26 701    verizon    Overcast
+    'cb282a144e49ead5e6212d367cc79b9e78a29579', // 2026-08-27 for 2026-08-26 701    verizon    Overcast
+    'b89c3a869d7ee6979bb3685eddb3043fbd796420', // 2026-08-27 for 2026-08-26 7922   comcast    Overcast
 ]);
