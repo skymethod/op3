@@ -43,6 +43,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'FeedScanner/1.0',
     'GladiaPodcastScraper/1.0 (+https://gladia.io; research dataset)',
     'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
+    'InworldTTS-DataPipeline/1.0 (+research dataset collection; contact yufei@inworld.ai)',
     'KevinHuInvestmentPodcastResearch/0.4 (episode asset audit)',
     'kweb-wikify/0.1 (podcast player)',
     'luna-podcatcher/0.1 (+downloader)',
@@ -1619,4 +1620,8 @@ const botIpHashes = new Set([
     '007ea0cae76e9c133dd581d55f18df47e94bda5c', // 2026-08-28 for 2026-08-27 3269   italia     Chrome
     '58981391dbee1637423491f2f283c1021620bb82', // 2026-08-28 for 2026-08-27 701    verizon    Overcast
     '9d93817d63fd35980a90984adfab50a4130ebcc3', // 2026-08-28 for 2026-08-27 30600  metronet   Overcast
+    '0566337158ea7b79c95313361d8081874b24c362', // 2026-08-29 for 2026-08-28 12876  scaleway   Chrome
+    'af843f055c652b77452734c958daa11bfd567ed0', // 2026-08-29 for 2026-08-28 701    verizon    Overcast
+    'e0ec65ffb339c542bf614d644e9d9935f1cd6132', // 2026-08-29 for 2026-08-28 31898  oracle     InworldTTS-DataPipeline/1.0 (+research dataset collection; contact yufei@inworld.ai)
+    'f615b6c128cac77c6b0108f7f7f98434979a5bf9', // 2026-08-29 for 2026-08-28 7922   comcast    Overcast
 ]);
