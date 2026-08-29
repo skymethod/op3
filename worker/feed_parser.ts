@@ -68,10 +68,12 @@ export function parseFeed(feedContents: BufferSource | string): Feed {
                     const url = attributes.get('url');
                     let type = attributes.get('type');
                     if (type === undefined && url) {
-                        // workaround for RedCircle feeds with srt urls, but no type
+                        // workaround for RedCircle feeds with srt/vtt urls, but no type
                         const u = tryParseUrl(url);
                         if (u && /\.srt$/i.test(u.pathname)) {
                             type = 'application/x-subrip';
+                        } else if (u && /\.vtt$/i.test(u.pathname)) {
+                            type = 'text/vtt';
                         }
                     }
                     const language = attributes.get('language');
