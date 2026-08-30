@@ -1624,4 +1624,7 @@ const botIpHashes = new Set([
     'af843f055c652b77452734c958daa11bfd567ed0', // 2026-08-29 for 2026-08-28 701    verizon    Overcast
     'e0ec65ffb339c542bf614d644e9d9935f1cd6132', // 2026-08-29 for 2026-08-28 31898  oracle     InworldTTS-DataPipeline/1.0 (+research dataset collection; contact yufei@inworld.ai)
     'f615b6c128cac77c6b0108f7f7f98434979a5bf9', // 2026-08-29 for 2026-08-28 7922   comcast    Overcast
+    '167ec662add86311dadc8893cce50a206d4910ff', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
+    '20289250a8bb884b3d9ca87ecf0dfc70c618a87b', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
+    'c99a9e8377ab981f06908a8378403430efec6f6c', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
 ]);
