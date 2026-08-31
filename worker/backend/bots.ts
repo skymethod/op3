@@ -43,6 +43,8 @@ export const EXTRA_BOT_USER_AGENTS = [
     'FeedScanner/1.0',
     'GladiaPodcastScraper/1.0 (+https://gladia.io; research dataset)',
     'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
+    'HiddenPod/1.0',
+    'HiddenPodPipeline/1.0 (audio-quality-analysis; +https://hiddenpod.com)',
     'InworldTTS-DataPipeline/1.0 (+research dataset collection; contact yufei@inworld.ai)',
     'KevinHuInvestmentPodcastResearch/0.4 (episode asset audit)',
     'kweb-wikify/0.1 (podcast player)',
@@ -1627,4 +1629,9 @@ const botIpHashes = new Set([
     '167ec662add86311dadc8893cce50a206d4910ff', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
     '20289250a8bb884b3d9ca87ecf0dfc70c618a87b', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
     'c99a9e8377ab981f06908a8378403430efec6f6c', // 2026-08-30 for 2026-08-29 701    verizon    Overcast
+    '85c618bf57631352ac98ae9c781c8aa4b0a1d9c9', // 2026-08-31 for 2026-08-30 701    verizon    HiddenPod/1.0, HiddenPodPipeline/1.0 (audio-quality-analysis; +https://hiddenpod.com)
+    'a2be3a197e35ff1b3e53c763e685e1441f1009f6', // 2026-08-31 for 2026-08-30 137263 netease    Safari, Edge, Chrome, Google Podcasts
+    'a7c290b30c2abb1c5dbdf111ff5d735b39cc9219', // 2026-08-31 for 2026-08-30 701    verizon    Firefox
+    'c86e87075322233d51ccd2c362799fd5c4268b4f', // 2026-08-31 for 2026-08-30 1312   vtech      Chrome
+    'c9e0e5cd41329e9f03be200a45285372f557ce5e', // 2026-08-31 for 2026-08-30 7922   comcast    Overcast
 ]);
