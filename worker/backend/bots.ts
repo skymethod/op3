@@ -82,6 +82,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'pod-intel/0.1 (Livingston Insights transcription)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
     'podcast-archive-backfill/1.0 (personal archive)',
+    'podcast-archiver/1.0 (personal offline listening)',
     'podcast-classification-research/1.0 (academic; audio-download; caleb.eynon@chicagobooth.edu)',
     'podcast-data/0.1 (+https://github.com/local/podcast-data)',
     'podcast-pipeline/0.1 (+https://github.com/)',
@@ -1634,4 +1635,9 @@ const botIpHashes = new Set([
     'a7c290b30c2abb1c5dbdf111ff5d735b39cc9219', // 2026-08-31 for 2026-08-30 701    verizon    Firefox
     'c86e87075322233d51ccd2c362799fd5c4268b4f', // 2026-08-31 for 2026-08-30 1312   vtech      Chrome
     'c9e0e5cd41329e9f03be200a45285372f557ce5e', // 2026-08-31 for 2026-08-30 7922   comcast    Overcast
+    '1259ba11484bbee97b9ee82326bb2b54f5e80c3d', // 2026-09-01 for 2026-08-31 16509  amazon     iTunes
+    '158ed13e349c659eaea3ea024ddd7f1e565064f1', // 2026-09-01 for 2026-08-31 55836  reliance   podcast-archiver/1.0 (personal offline listening)
+    '16dd27f5bb487e15b1fac6583e38ccd9d93ac0fa', // 2026-09-01 for 2026-08-31 9009   m247       Overcast
+    '2d126f3171cc50f9f65472d87359637a2389a206', // 2026-09-01 for 2026-08-31 701    verizon    Overcast
+    '8a362692968d08ef3084fdf5d4734ecdfa9436ba', // 2026-09-01 for 2026-08-31 24940  hetzner    Apple Podcasts
 ]);
