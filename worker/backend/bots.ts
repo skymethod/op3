@@ -1640,4 +1640,9 @@ const botIpHashes = new Set([
     '16dd27f5bb487e15b1fac6583e38ccd9d93ac0fa', // 2026-09-01 for 2026-08-31 9009   m247       Overcast
     '2d126f3171cc50f9f65472d87359637a2389a206', // 2026-09-01 for 2026-08-31 701    verizon    Overcast
     '8a362692968d08ef3084fdf5d4734ecdfa9436ba', // 2026-09-01 for 2026-08-31 24940  hetzner    Apple Podcasts
+    '1138d2c9d4e919d9159f9dd3ff015b9599156a0d', // 2026-09-02 for 2026-09-01 8412   tmobile    Chrome
+    '662f28011635c38c69337a034b116597fe863768', // 2026-09-02 for 2026-09-01 3352   telefonica Overcast
+    'a7237b53a11a7a731d1776f0724686acd185854f', // 2026-09-02 for 2026-09-01 701    verizon    Firefox
+    'daaf54f7b767c5c73699bab495d0f5d4e5b7f731', // 2026-09-02 for 2026-09-01 1312   vtech      Chrome
+    'ecf6605f5fa1640b76b3b87911774f02d6149886', // 2026-09-02 for 2026-09-01 19151  bbone      Overcast
 ]);
