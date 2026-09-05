@@ -1650,4 +1650,8 @@ const botIpHashes = new Set([
     'c7f6e6bc5828738379325ff5b16dc540d3417dd6', // 2026-09-04 for 2026-09-03 3320   telekom    Chrome
     'd757dd14d22d6a0d457f507ae5c432924b56c378', // 2026-09-04 for 2026-09-03 701    verizon    Overcast
     'fab2cf82f7c4302deb4de219f5ad89f07b0aebaa', // 2026-09-04 for 2026-09-03 701    verizon    Overcast
+    '0823330cca382a19e96dc9972874ef1983e70ad9', // 2026-09-05 for 2026-09-04 21928  tmobile    Overcast
+    '28464b315d97ae3d3814f248f3b796b4bcf72775', // 2026-09-05 for 2026-09-04 398721 oxio       Apple Podcasts automated checks, audiobookshelf
+    '542ad338decc2affcadbc83d992f6303149e048c', // 2026-09-05 for 2026-09-04 701    verizon    Overcast
+    'dd9c7cb399119f49ea2d54f13c341a2f5ec5b8fb', // 2026-09-05 for 2026-09-04 9299   philippine Chrome
 ]);
