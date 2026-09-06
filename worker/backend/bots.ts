@@ -1654,7 +1654,7 @@ const botIpHashes = new Set([
     '28464b315d97ae3d3814f248f3b796b4bcf72775', // 2026-09-05 for 2026-09-04 398721 oxio       Apple Podcasts automated checks, audiobookshelf
     '542ad338decc2affcadbc83d992f6303149e048c', // 2026-09-05 for 2026-09-04 701    verizon    Overcast
     'dd9c7cb399119f49ea2d54f13c341a2f5ec5b8fb', // 2026-09-05 for 2026-09-04 9299   philippine Chrome
-    '201798da2771f7f8f08bdb6b96cbc61b9e153383', // 2026-09-06 for 2026-09-05 7922   comcast    Overcast
+    '201798da2771f7f8f08bdb6b96cbc61b9e153383', // 2026-09-06 for 2026-09-05 7922   comcast    Chrome, Safari
     '2b53e274bd8cbd1eb66c3b5ea0aae8668201b97a', // 2026-09-06 for 2026-09-05 701    verizon    Overcast
     'e376febf374d708c8a865ad47abc2804b8e9a37f', // 2026-09-06 for 2026-09-05 701    verizon    Overcast
 ]);
