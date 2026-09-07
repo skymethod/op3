@@ -46,6 +46,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'HiddenPod/1.0',
     'HiddenPodPipeline/1.0 (audio-quality-analysis; +https://hiddenpod.com)',
     'InworldTTS-DataPipeline/1.0 (+research dataset collection; contact yufei@inworld.ai)',
+    'K Capital AVATAR archive (podcast keep-fresh; admin@k-capital.ch)',
     'KevinHuInvestmentPodcastResearch/0.4 (episode asset audit)',
     'kweb-wikify/0.1 (podcast player)',
     'luna-podcatcher/0.1 (+downloader)',
@@ -73,6 +74,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'msh-pdf-origin-canary/1',
     'narya-tts-data-jp-podcast-downloader/1.0',
     'NellPodcastCorpus/0.1 (+https://nell.ai)',
+    'NeoLabPodcastArchive/1.0 (+https://neolab.ai/acquisition)',
     'nuance-net-ingest/0.1',
     'nuance-podcast-download/1.0',
     'ohdio-archiver/1.0 (personal podcast downloader; one request at a time)',
@@ -1657,4 +1659,6 @@ const botIpHashes = new Set([
     '201798da2771f7f8f08bdb6b96cbc61b9e153383', // 2026-09-06 for 2026-09-05 7922   comcast    Chrome, Safari
     '2b53e274bd8cbd1eb66c3b5ea0aae8668201b97a', // 2026-09-06 for 2026-09-05 701    verizon    Overcast
     'e376febf374d708c8a865ad47abc2804b8e9a37f', // 2026-09-06 for 2026-09-05 701    verizon    Overcast
+    '5b12ac371483c5fca55e06cc5e875906fbd95e3e', // 2026-09-07 for 2026-09-06 8821   wwz        K Capital AVATAR archive (podcast keep-fresh; admin@k-capital.ch)
+    'd665d99d5aac2a6d6eb28d3b67fccaf225902749', // 2026-09-07 for 2026-09-06 23316  belair     NeoLabPodcastArchive/1.0 (+https://neolab.ai/acquisition)
 ]);
