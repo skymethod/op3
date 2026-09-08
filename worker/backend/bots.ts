@@ -34,6 +34,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'CyotekWebCopy/1.9 CyotekHTTP/6.4',
     'DataCollectPodcastIndex/1.0 (hao.wang@estie.co.jp)',
     'DataCollectSpotify/1.0 (conan1024hao@gmail.com)',
+    'DiarizationPodcastDownloader/1.0 (public episode download), Wispr-Diarization-Research/0.1',
     'dossier/0.1 (podcast research; contact via repo)',
     'DuplexIO/0.1 (podcast conversation pipeline evaluation)',
     'DuplexPipeline/2.0',
@@ -1661,4 +1662,7 @@ const botIpHashes = new Set([
     'e376febf374d708c8a865ad47abc2804b8e9a37f', // 2026-09-06 for 2026-09-05 701    verizon    Overcast
     '5b12ac371483c5fca55e06cc5e875906fbd95e3e', // 2026-09-07 for 2026-09-06 8821   wwz        K Capital AVATAR archive (podcast keep-fresh; admin@k-capital.ch)
     'd665d99d5aac2a6d6eb28d3b67fccaf225902749', // 2026-09-07 for 2026-09-06 23316  belair     NeoLabPodcastArchive/1.0 (+https://neolab.ai/acquisition)
+    '22f46c6a4150bf56acf5b386e9761b978f605063', // 2026-09-08 for 2026-09-07 6167   verizon    Podcast Addict, stagefright
+    '32be56ee5ae45c15902a2aac83c5556e28aca282', // 2026-09-08 for 2026-09-07 6830   liberty    Overcast
+    '38e1fd807d817808cb272090bf35401e385bad27', // 2026-09-08 for 2026-09-07 16509  amazon     DiarizationPodcastDownloader/1.0 (public episode download), Wispr-Diarization-Research/0.1
 ]);
