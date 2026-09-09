@@ -1665,4 +1665,7 @@ const botIpHashes = new Set([
     '22f46c6a4150bf56acf5b386e9761b978f605063', // 2026-09-08 for 2026-09-07 6167   verizon    Podcast Addict, stagefright
     '32be56ee5ae45c15902a2aac83c5556e28aca282', // 2026-09-08 for 2026-09-07 6830   liberty    Overcast
     '38e1fd807d817808cb272090bf35401e385bad27', // 2026-09-08 for 2026-09-07 16509  amazon     DiarizationPodcastDownloader/1.0 (public episode download), Wispr-Diarization-Research/0.1
+    '2c1574da0a7d02af2202e5d9b10b6ad483efe37c', // 2026-09-09 for 2026-09-08 18403  fpt        Chrome
+    'cc2572f16669797d6ec66ceefafa8ae81ff28636', // 2026-09-09 for 2026-09-08 37963  alibaba    Safari, Chrome, Google Podcasts, Edge, Firefox, Facebook
+    'cdaa339dc67d11b9c478069fb72a41fc69799970', // 2026-09-09 for 2026-09-08 202870 dimensione Chrome
 ]);
