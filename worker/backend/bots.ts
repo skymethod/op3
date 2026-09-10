@@ -1668,4 +1668,6 @@ const botIpHashes = new Set([
     '2c1574da0a7d02af2202e5d9b10b6ad483efe37c', // 2026-09-09 for 2026-09-08 18403  fpt        Chrome
     'cc2572f16669797d6ec66ceefafa8ae81ff28636', // 2026-09-09 for 2026-09-08 37963  alibaba    Safari, Chrome, Google Podcasts, Edge, Firefox, Facebook
     'cdaa339dc67d11b9c478069fb72a41fc69799970', // 2026-09-09 for 2026-09-08 202870 dimensione Chrome
+    'c31d72a2f1beabaca1ed7528d8693dad796b68bb', // 2026-09-10 for 2026-09-09 11562  netuno     Chrome, Safari
+    'dba3614e9de6000b129ef414206d878f0f216890', // 2026-09-10 for 2026-09-09 6830   liberty    Overcast
 ]);
