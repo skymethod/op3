@@ -1670,4 +1670,12 @@ const botIpHashes = new Set([
     'cdaa339dc67d11b9c478069fb72a41fc69799970', // 2026-09-09 for 2026-09-08 202870 dimensione Chrome
     'c31d72a2f1beabaca1ed7528d8693dad796b68bb', // 2026-09-10 for 2026-09-09 11562  netuno     Chrome, Safari
     'dba3614e9de6000b129ef414206d878f0f216890', // 2026-09-10 for 2026-09-09 6830   liberty    Overcast
+    '1d1d92728e996f72c4dfa3f447bbd44262da56a4', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '433a21a5a1b187b4f33896229e6655f0b189627c', // 2026-09-11 for 2026-09-10 56478  hyperoptic Chrome
+    '59a6728e423f9de53ce27d02ff0a0497bde2b4f0', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia
+    '5e33eef44b6de5b37ccfb069a81c6b31cedccaa7', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia
+    '6914b0c4285f61febf604427114bb438a0e7c760', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '7d9073b33821c22a2f6fe7d726a8e3fcf557c13e', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts
+    'f417ea70c413aeb1be0fbb85c1cb7acd5274f855', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts
+    'fef3f977a2c16d95b5dbcb6e3664b002afe1f3ba', // 2026-09-11 for 2026-09-10 2764   aapt       Apple Podcasts, AppleCoreMedia
 ]);
