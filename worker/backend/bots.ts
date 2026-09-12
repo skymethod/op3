@@ -138,6 +138,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16509' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-07-20' // amazon
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || (date >= '2026-08-21' && date <= '2026-08-23') && referrerType === undefined && (agentName === 'Chrome' || agentName === 'Generic WebKit') && destinationServerUrl.includes('/redirect.zencastr.com/') && destinationServerUrl.includes('/679ceb1787082444de3f8c68/')
+        || asn === '16509' && agentName === 'AppleCoreMedia' && (date === '2026-09-10' || date === '2026-09-11') // amazon
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
