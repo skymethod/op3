@@ -1678,4 +1678,42 @@ const botIpHashes = new Set([
     '7d9073b33821c22a2f6fe7d726a8e3fcf557c13e', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts
     'f417ea70c413aeb1be0fbb85c1cb7acd5274f855', // 2026-09-11 for 2026-09-10 16509  amazon     AppleCoreMedia, Apple Podcasts
     'fef3f977a2c16d95b5dbcb6e3664b002afe1f3ba', // 2026-09-11 for 2026-09-10 2764   aapt       Apple Podcasts, AppleCoreMedia
+    '0f0882faeeb91efab4ae5dd20cb7b50ffc6ae3f6', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '121333e02adf9afa174de4c85ac72363bb23b08c', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '17bfc79e0645958b00527d7e12a9350bbaca3323', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '23c37d69fb1bfd18b630c8074aaaa685994dde49', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '26b1fdc2b74f1b16b4498532c19636ebfaa3b073', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '2cba4d05667df3aa9f0a8560f7a3f12de59486c8', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '2d75036ffb34fd8c35a1b2a2d2a59dd2e5bd7a39', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '372808a041054385ad5218d0826e19bf49fbf37b', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '3d037a7a1564b2789ae2f86be5306b1b78c7e1f7', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '3dbdbd9465eaeb723fa760170e62f7d32d27b3b5', // 2026-09-12 for 2026-09-11 33915  vodafone   Apple Podcasts, AppleCoreMedia
+    '3f86c0da6cec64b218475819638eef1c25ad687f', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '43b0f6a4c339d67a2091486057e95c5a5a019a90', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '55231cbc3af3eab2e62f66ce9f436e877a27c855', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '578f96e3b43f3ff5174359f9b8fe9964cf40a9e2', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '60da2185c2667684392622cdad59d58dd7c1da7b', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '73a228883edc07cfcf441207092780275edf6dba', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '7709388ce1c32202b99dc7f77349966137f564da', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '7e07675faaae7d146a2f83e83b171c917d3395fc', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '88fdd88921df08705e30d8b4b61e51fdad18b7d3', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '9087513ed19c8ff9786a1e63fc1e005995d8e440', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '93f517c553896f771d95f42cbe1e780033412c80', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '9f9d0ea753459e208168c9fefa71f666c56f5e59', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'a4cebe5065eb7f5b415b3d1ff214816fbc3e914f', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'bfa75f9302c021269f6c135e56975f24bd180330', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'c033b91f85fd3bd07535432aaf80cd1acd78ef9f', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'c29c765ec2aa40aa071579e47a35459ca44c4c70', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'c3d1794300dcf09ea0d3b0da5baf514981296ed0', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts
+    'cfaa5f8cbb0a75d014f6e6a11ea6c812aba20427', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'd72f51602dab4e44a8e1c2bfccea7ce484396e02', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'd8098e5d6e8df5fed01a06f69780cc6b8915ecba', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'dcbd6ce29be8869caea83bc4c4d53f9c5c0dcef6', // 2026-09-12 for 2026-09-11 31898  oracle     Chrome
+    'df8b7d0b5c90b42f3d11880dc321697f94949e11', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'e902d3f627c94630921e15bc9e98c0667a305429', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'ea282bb34a9a20ad9bb713d84682e60a567be182', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'f3e95b1694f8026b221bead0c34c4480452b6f54', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'f5a086fc2188ced7784b0bda15fc42eb12f82884', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'f81dc60c101d89dd7eedec9d94da48656e036fac', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'f93c4814c4a15509ca0030b3872e33f24849791a', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
 ]);
