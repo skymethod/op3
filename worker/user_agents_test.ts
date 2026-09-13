@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@d46f1e7da3a11a0dc0f892e3138c304643d4d330 (2026-08-17T22:53:51Z)
+// from user-agents-v2@0deded587e90108332ed43d89e6444ecb71e5aff (2026-09-08T15:28:53Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -276,6 +276,8 @@ const botTests = {
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
     'PodlexiconDownloader/1.0': { type: 'bot', name: `Podlexicon Downloader` },
     'Podmonbot/1.0': { type: 'bot', name: `Podmon Bot` },
+    'Podnado/1.0 Podcast Indexer (feed-id=12; +https://bot.podnado.com/)': { type: 'bot', name: `Podnado` },
+    'Podnado/1.0 Podcast Indexer (+https://bot.podnado.com/)': { type: 'bot', name: `Podnado` },
     'PodOracle/1.0 (Podcast Search Engine)': { type: 'bot', name: `PodOracle` },
     'Podplay-Podcast-Sync/1.0 (+https://podplay.com/articles/contact)': { type: 'bot', name: `Podplay Podcast Sync` },
     'pod-rank-downloader/1.0': { type: 'bot', name: `PodRank Downloader` },
@@ -341,6 +343,8 @@ const botTests = {
     'SupportingCast': { type: 'bot', name: `SupportingCast` },
     'swiperight-pipeline/0.1': { type: 'bot', name: `swiperight-pipeline` },
     'Taddy Podcast API (https://taddy.org/developers)': { type: 'bot', name: `Taddy Podcast API` },
+    'TPA-Server/1.0 (+https://thepodcastapp.dev)': { type: 'bot', name: `The Podcast App (Magnolia Apps) server` },
+    'Mozilla/5.0 (compatible; TPA-Server/1.0; +https://thepodcastapp.dev)': { type: 'bot', name: `The Podcast App (Magnolia Apps) server` },
     'Timpibot/0.8 ( http://www.timpi.io)': { type: 'bot', name: `Timpi search crawler` },
     'Tiny Tiny RSS/22.12-c30b24d09 (Unsupported) (https://tt-rss.org/)': { type: 'bot', name: `Tiny Tiny RSS` },
     'TranscribeServer/1.0 (com.xiao.TranscribeServer; build:1; macOS 15.2.0) Alamofire/5.10.2': { type: 'bot', name: `TranscribeServer` },

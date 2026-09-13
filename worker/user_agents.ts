@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@d46f1e7da3a11a0dc0f892e3138c304643d4d330 (2026-08-17T22:53:51Z)
+// from user-agents-v2@0deded587e90108332ed43d89e6444ecb71e5aff (2026-09-08T15:28:53Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -224,6 +224,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podio\//.test(userAgent)) return { name: `Podio Bot`, type: 'bot' };
     if (/^PodlexiconDownloader/.test(userAgent)) return { name: `Podlexicon Downloader`, type: 'bot' };
     if (/^Podmonbot\//.test(userAgent)) return { name: `Podmon Bot`, type: 'bot' };
+    if (/^Podnado\/\d+\.\d+/.test(userAgent)) return { name: `Podnado`, type: 'bot' };
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };
     if (/(podnods-crawler|podnods)/.test(userAgent)) return { name: `Podnods Bot`, type: 'bot' };
     if (/^PodOracle\//.test(userAgent)) return { name: `PodOracle`, type: 'bot' };
@@ -285,6 +286,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^SupportingCast(\/.*)?$/.test(userAgent)) return { name: `SupportingCast`, type: 'bot' };
     if (/^swiperight-pipeline\//.test(userAgent)) return { name: `swiperight-pipeline`, type: 'bot' };
     if (/^Taddy Podcast API /.test(userAgent)) return { name: `Taddy Podcast API`, type: 'bot' };
+    if (/TPA-Server\/\d/.test(userAgent)) return { name: `The Podcast App (Magnolia Apps) server`, type: 'bot' };
     if (/Timpibot\//.test(userAgent)) return { name: `Timpi search crawler`, type: 'bot' };
     if (/^Tiny Tiny RSS\//.test(userAgent)) return { name: `Tiny Tiny RSS`, type: 'bot' };
     if (/^TranscribeServer\/\d/.test(userAgent)) return { name: `TranscribeServer`, type: 'bot' };
