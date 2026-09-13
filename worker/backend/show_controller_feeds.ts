@@ -32,11 +32,12 @@ export async function computeFetchInfo(url: string, headers: Headers, blobKeyBas
             fetchUrls.add(fetchUrl);
             res = await fetch(fetchUrl, { headers, redirect: 'manual' });
             responses = responses ?? [];
-            const { url, status } = res;
+            let { url, status } = res;
             responses.push({ url, status });
             if (xfetcher && isXfetchCandidate(res as Response)) {
                 res = await xfetcher(fetchUrl, { headers, redirect: 'manual' });
-                const { url, status } = res;
+                url = res.url;
+                status = res.status;
                 responses.push({ url, status, fetcher: 'xfetcher' });
             }
             const location = res.headers.get('location');
