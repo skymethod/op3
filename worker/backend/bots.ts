@@ -1,4 +1,4 @@
-export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'bot-ip' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload' | 'crosszone';
+export type BotType = 'bot' | 'bot-lib' | 'unknown-bot' | 'bot-ip' | 'opera-desktop-sans-referrer' | 'no-ua' | 'podverse-web-preload' | 'web-widget-preload' | 'crosszone' | 'referrer-preload';
 
 export function computeBotType({ agentType, agentName = '', deviceType, referrerName, tags = '', date }: { agentType: string, agentName?: string, deviceType?: string, referrerName?: string, tags?: string, date: string }): BotType | undefined {
     if (agentType === 'bot') return 'bot'; // easy
@@ -22,6 +22,9 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
     // 2025-08-09: Unknown crosszone requests - subrequests from other cf workers use the hardcoded crosszone ip (not the listener ip)
     if (tags.includes('unknown-crosszone')) return 'crosszone';
+
+    // 2026-09-13: Observed four web players requesting the entire file before user playback
+    if (date >= '2026-08-01' && referrerName && [ 'noagendashow.net', 'talks.co', 'PodMatch', 'religionnews.com' ].includes(referrerName)) return 'referrer-preload';
 }
 
 export const EXTRA_BOT_USER_AGENTS = [
