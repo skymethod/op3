@@ -64,6 +64,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; SputnikTranscribe/1.0; +https://sputnikintelligence.com)',
     'Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)',
     'Mozilla/5.0 (podcast research; contact: research@example.com)',
+    'Mozilla/5.0 (podcast-archiver; personal offline use)',
     'Mozilla/5.0 (podcast-downloader)',
     'Mozilla/5.0 (podcast-fetcher)',
     'Mozilla/5.0 (podcast-harvest; research)',
@@ -138,7 +139,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
         || asn === '16509' && (agentName === 'ktor-client' || agentName === 'Ktor (kotlin)') && date >= '2026-07-20' // amazon
         || date.startsWith('2026-05') && destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/') && !destinationServerUrl.includes('/hls.audio.buzzsprout.com/19084245/master.m3u8')
         || (date >= '2026-08-21' && date <= '2026-08-23') && referrerType === undefined && (agentName === 'Chrome' || agentName === 'Generic WebKit') && destinationServerUrl.includes('/redirect.zencastr.com/') && destinationServerUrl.includes('/679ceb1787082444de3f8c68/')
-        || asn === '16509' && agentName === 'AppleCoreMedia' && (date === '2026-09-10' || date === '2026-09-11') // amazon
+        || asn === '16509' && agentName === 'AppleCoreMedia' && date >= '2026-09-10' && date <= '2026-09-12' // amazon
         || agentType === 'browser' && (
                asn === '19148'  // leaseweb
             || asn === '7203'   // leaseweb
@@ -1717,4 +1718,8 @@ const botIpHashes = new Set([
     'f5a086fc2188ced7784b0bda15fc42eb12f82884', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
     'f81dc60c101d89dd7eedec9d94da48656e036fac', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
     'f93c4814c4a15509ca0030b3872e33f24849791a', // 2026-09-12 for 2026-09-11 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '19c80b62e0dbdace489847a085e8bc7af399559c', // 2026-09-13 for 2026-09-12 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    '4c68fbbe7993657c0ee28e7a8b126ffd160c656e', // 2026-09-13 for 2026-09-12 55836  reliance   Mozilla/5.0 (podcast-archiver; personal offline use)
+    '733e1a3c1664a2e5e0feccf58857d6f6871fc3cc', // 2026-09-13 for 2026-09-12 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
+    'c25c7c158f9768c4163dd2d0ec29a412988e4b05', // 2026-09-13 for 2026-09-12 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
 ]);
