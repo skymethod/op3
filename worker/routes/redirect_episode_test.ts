@@ -18,6 +18,7 @@ Deno.test({
             'https://example.org/e,pg=fe4fb16c-062a-4257-ba8d-9a9b923356c2,hls=1/example.com/path/to/episode.mp3': { expectedTargetUrl: 'https://example.com/path/to/episode.mp3', expectedPrefixArgs: { pg: 'fe4fb16c-062a-4257-ba8d-9a9b923356c2', hls: '1' } },
             'https://op3.dev/e/pg=fe4fb16c-062a-4257-ba8d-9a9b923356c2/example.com/path/to/episode.mp3': { expectedTargetUrl: 'https://example.com/path/to/episode.mp3', expectedPrefixArgs: { pg: 'fe4fb16c-062a-4257-ba8d-9a9b923356c2' } }, // temporarily allowed
             'https://example.org/e,/example.com/path/to/episode.mp3': 'https://example.com/path/to/episode.mp3',
+            'https://op3.dev/e/=f27e0000-0000-0000-0000-000000000000/example.com/path/to/episode.mp3': { expectedTargetUrl: 'https://example.com/path/to/episode.mp3', expectedPrefixArgs: { pg: 'f27e0000-0000-0000-0000-000000000000' } }, // temporarily allowed
         }
         for (const [ requestUrl, expected ] of Object.entries(good)) {
             const expectedTargetUrl = typeof expected === 'string' ? expected : expected.expectedTargetUrl;

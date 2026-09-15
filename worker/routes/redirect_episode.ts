@@ -12,6 +12,10 @@ export function tryParseRedirectRequest(requestUrl: string): RedirectRequest | u
             // temporarily support found typo: https://op3.dev/e/pg=
             return tryParseRedirectRequest(requestUrl.replace('://op3.dev/e/pg=', '://op3.dev/e,pg='));
         }
+        if (suffix && suffix.startsWith('=f27') && requestUrl && requestUrl.includes('://op3.dev/e/=f27')) {
+            // temporarily support found typo: https://op3.dev/e/=<guid>/
+            return tryParseRedirectRequest(requestUrl.replace('://op3.dev/e/=f27', '://op3.dev/e,pg=f27'));
+        }
         return { kind: 'invalid' };
     }
     let prefix = optPrefix ?? 'https://';
