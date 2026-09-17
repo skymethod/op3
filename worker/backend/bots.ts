@@ -1736,4 +1736,5 @@ const botIpHashes = new Set([
     'c25c7c158f9768c4163dd2d0ec29a412988e4b05', // 2026-09-13 for 2026-09-12 16509  amazon     AppleCoreMedia, Apple Podcasts, Chrome
     '1e23710d4863f81ea13f5cc2017be36a1d400ae9', // 2026-09-15 for 2026-09-14 3320   telekom    Chrome
     '0cae183da6780bdc97b44695f20ad7259ce2afd8', // 2026-09-16 for 2026-09-15 7922   comcast    Mozilla/5.0 (compatible; dispatch/1.0), curl
+    '20a30ec8a757eac86dd9ec4eaa902634ecaddadb', // 2026-09-17 for 2026-09-16 20001  charter    Chrome
 ]);
