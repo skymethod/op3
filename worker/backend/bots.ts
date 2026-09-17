@@ -25,6 +25,9 @@ export function computeBotType({ agentType, agentName = '', deviceType, referrer
 
     // 2026-09-13: Observed four web players requesting the entire file before user playback
     if (date >= '2026-08-01' && referrerName && [ 'noagendashow.net', 'talks.co', 'PodMatch', 'religionnews.com' ].includes(referrerName)) return 'referrer-preload';
+
+    // 2026-09-17: Observed web player preload
+    if (date >= '2026-09-10' && referrerName === 'mytuner-radio.com') return 'referrer-preload';
 }
 
 export const EXTRA_BOT_USER_AGENTS = [
