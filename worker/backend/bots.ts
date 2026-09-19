@@ -1741,4 +1741,7 @@ const botIpHashes = new Set([
     '0cae183da6780bdc97b44695f20ad7259ce2afd8', // 2026-09-16 for 2026-09-15 7922   comcast    Mozilla/5.0 (compatible; dispatch/1.0), curl
     '20a30ec8a757eac86dd9ec4eaa902634ecaddadb', // 2026-09-17 for 2026-09-16 20001  charter    Chrome
     'e888a1593e3ccf8f367c627d2b974df8731db260', // 2026-09-18 for 2026-09-17 3320   telekom    Chrome
+    '27861a40252441cf85dc23f068a51ab7f13c85fd', // 2026-09-19 for 2026-09-18 22773  cox        Overcast
+    'b61407c9c804756d75aa6af39105db20a2f5ee64', // 2026-09-19 for 2026-09-18 3320   telekom    Chrome
+    'eaf0abe66be8bde7cd8a9b2e3a7f1184fcc885b4', // 2026-09-19 for 2026-09-18 20473  constant   Chrome
 ]);
