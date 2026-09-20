@@ -1744,4 +1744,9 @@ const botIpHashes = new Set([
     '27861a40252441cf85dc23f068a51ab7f13c85fd', // 2026-09-19 for 2026-09-18 22773  cox        Overcast
     'b61407c9c804756d75aa6af39105db20a2f5ee64', // 2026-09-19 for 2026-09-18 3320   telekom    Chrome
     'eaf0abe66be8bde7cd8a9b2e3a7f1184fcc885b4', // 2026-09-19 for 2026-09-18 20473  constant   Chrome
+    '0b82b6bbb2bb59ea5866c4ce733b1e3f724b4913', // 2026-09-20 for 2026-09-19 22773  cox        Overcast
+    '23c3f07e37107e3259f53dd0120dd0a531141739', // 2026-09-20 for 2026-09-19 212238 datacamp   Overcast
+    '4d8d35fb0491c5742aa92ef12dbc0df3235746d5', // 2026-09-20 for 2026-09-19 3320   telekom    Chrome
+    '59d582e971bae5c0054adc205dfebb5ee7665d15', // 2026-09-20 for 2026-09-19 22773  cox        Overcast
+    '5e91fe74f00854c77237f6dd733e167a8509333b', // 2026-09-20 for 2026-09-19 6830   liberty    Overcast
 ]);
