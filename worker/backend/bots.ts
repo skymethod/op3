@@ -58,6 +58,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'K Capital AVATAR archive (podcast keep-fresh; admin@k-capital.ch)',
     'KevinHuInvestmentPodcastResearch/0.4 (episode asset audit)',
     'kweb-wikify/0.1 (podcast player)',
+    'kyutai-research-sampler/1.0 (dataset audit; contact: atsumoto.ohashi@kyutai.org)',
     'luna-podcatcher/0.1 (+downloader)',
     'MEM personal transcripts research pipeline (mem10121@nyu.edu)',
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
@@ -1749,4 +1750,8 @@ const botIpHashes = new Set([
     '4d8d35fb0491c5742aa92ef12dbc0df3235746d5', // 2026-09-20 for 2026-09-19 3320   telekom    Chrome
     '59d582e971bae5c0054adc205dfebb5ee7665d15', // 2026-09-20 for 2026-09-19 22773  cox        Overcast
     '5e91fe74f00854c77237f6dd733e167a8509333b', // 2026-09-20 for 2026-09-19 6830   liberty    Overcast
+    '2fa4a398245276c68f3b94b22a847b825d6aeada', // 2026-09-21 for 2026-09-20 577    bellcan    Chrome
+    '85d305e6fb8dc6e937a54216a653541b5e91e0b8', // 2026-09-21 for 2026-09-20 12876  scaleway   kyutai-research-sampler/1.0 (dataset audit; contact: atsumoto.ohashi@kyutai.org)
+    'bbef250c4d7dcce5186b3f28326ad036e35aafb7', // 2026-09-21 for 2026-09-20 3320   telekom    Chrome
+    'fbb6c9dfac67dc6691f7f5b662b9465fdb03ae7e', // 2026-09-21 for 2026-09-20 6167   verizon    Overcast
 ]);
