@@ -1754,4 +1754,10 @@ const botIpHashes = new Set([
     '85d305e6fb8dc6e937a54216a653541b5e91e0b8', // 2026-09-21 for 2026-09-20 12876  scaleway   kyutai-research-sampler/1.0 (dataset audit; contact: atsumoto.ohashi@kyutai.org)
     'bbef250c4d7dcce5186b3f28326ad036e35aafb7', // 2026-09-21 for 2026-09-20 3320   telekom    Chrome
     'fbb6c9dfac67dc6691f7f5b662b9465fdb03ae7e', // 2026-09-21 for 2026-09-20 6167   verizon    Overcast
+    '3b6229f7f8c16b33dbca2ff90cfd7fcae6c5a1ef', // 2026-09-22 for 2026-09-21 3320   telekom    Chrome
+    '4aaeffc3b8ca679c641afec703ec8c20c0d64ea8', // 2026-09-22 for 2026-09-21 3320   telekom    Chrome
+    'a45870216d18d304210d6011c3f4d3ff36a1f7f5', // 2026-09-22 for 2026-09-21 22773  cox        Overcast
+    'b299b9018f70f2919b3327f1faca0706d2227029', // 2026-09-22 for 2026-09-21 3320   telekom    Chrome
+    'ce40a982513950188e5d06489748791c7712aa1d', // 2026-09-22 for 2026-09-21 6830   liberty    Overcast
+    'f173eeed2affd1123b541be0617e1acf2af7b5f7', // 2026-09-22 for 2026-09-21 6167   verizon    Overcast
 ]);
