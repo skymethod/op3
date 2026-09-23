@@ -1760,4 +1760,12 @@ const botIpHashes = new Set([
     'b299b9018f70f2919b3327f1faca0706d2227029', // 2026-09-22 for 2026-09-21 3320   telekom    Chrome
     'ce40a982513950188e5d06489748791c7712aa1d', // 2026-09-22 for 2026-09-21 6830   liberty    Overcast
     'f173eeed2affd1123b541be0617e1acf2af7b5f7', // 2026-09-22 for 2026-09-21 6167   verizon    Overcast
+    '07dfe3b4372e8dae8bc8face30846f893e9f8180', // 2026-09-23 for 2026-09-22 22773  cox        Overcast
+    '65d3c7c2dc3cef37e05c2e90b6b995d94361494b', // 2026-09-23 for 2026-09-22 3320   telekom    Chrome
+    '93c8949d5a86537443b3bd67ae60c70015ab882c', // 2026-09-23 for 2026-09-22 6167   verizon    Overcast
+    'a08dbba01d2b7a5392acb7b5b10df99ee9076c77', // 2026-09-23 for 2026-09-22 22611  inmotion   AzuraCast-Integration-WP
+    'bbb2d7143ca319fef5a8728ce53b36afcacf483c', // 2026-09-23 for 2026-09-22 22773  cox        Overcast
+    'bfbca28c105b71cc28ad69b66d073a513744a34f', // 2026-09-23 for 2026-09-22 3320   telekom    Chrome
+    'e0ac8102f3bf68afc825c3948c47f9fa01fe896d', // 2026-09-23 for 2026-09-22 22773  cox        Overcast
+    'ef8bae8cdf7ec6f33d0f626689424c5af15e2a06', // 2026-09-23 for 2026-09-22 3320   telekom    Chrome
 ]);
