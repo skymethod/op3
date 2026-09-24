@@ -106,6 +106,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast-miner/0.1 (+https://podcastindex.org)',
     'podcast-pipeline/0.1 (+https://github.com/)',
     'podcast-transcriber/0.1',
+    'PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)',
     'PodcastArchive/1.0',
     'PodcastDataEnricher/2.0 (audio-research; admin@podcasthawk.com)',
     'PodcastDownloader/1.0 (+https://github.com/)',
@@ -1768,4 +1769,9 @@ const botIpHashes = new Set([
     'bfbca28c105b71cc28ad69b66d073a513744a34f', // 2026-09-23 for 2026-09-22 3320   telekom    Chrome
     'e0ac8102f3bf68afc825c3948c47f9fa01fe896d', // 2026-09-23 for 2026-09-22 22773  cox        Overcast
     'ef8bae8cdf7ec6f33d0f626689424c5af15e2a06', // 2026-09-23 for 2026-09-22 3320   telekom    Chrome
+    '497aeab8e59f06d999ceeed117d9ad250fb1a17d', // 2026-09-24 for 2026-09-23 133310 netzone    Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+    '5b933099c5d2a1873d2900f2f4be32a87f50610c', // 2026-09-24 for 2026-09-23 6830   liberty    Overcast
+    '68acd9c8e7696717f7cccfe9e1dcea3d47859556', // 2026-09-24 for 2026-09-23 3320   telekom    Chrome
+    '9325823a788e179e15c6e39a907d0666a0e2447c', // 2026-09-24 for 2026-09-23 14061  do         PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)
+    'e99927c1f1b40cf58eba0d7a45b4f09cb08749f0', // 2026-09-24 for 2026-09-23 14061  do         PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)
 ]);
