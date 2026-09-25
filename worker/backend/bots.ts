@@ -1774,4 +1774,10 @@ const botIpHashes = new Set([
     '68acd9c8e7696717f7cccfe9e1dcea3d47859556', // 2026-09-24 for 2026-09-23 3320   telekom    Chrome
     '9325823a788e179e15c6e39a907d0666a0e2447c', // 2026-09-24 for 2026-09-23 14061  do         PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)
     'e99927c1f1b40cf58eba0d7a45b4f09cb08749f0', // 2026-09-24 for 2026-09-23 14061  do         PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)
+    '75b50f58cf922e98ee2c33e4445db9701dcf6222', // 2026-09-25 for 2026-09-24 3352   telefonica Overcast
+    'bc85277e856d7ec5a9a7313ba3da8b451f2cbc1e', // 2026-09-25 for 2026-09-24 14593  spacex     Overcast
+    'bd1b4d8d90d1df6547e1941e21a7959309fcaf74', // 2026-09-25 for 2026-09-24 6167   verizon    Overcast
+    'c6a50af46af1df6ac8710195e5bf69e5deaf57df', // 2026-09-25 for 2026-09-24 3320   telekom    Chrome
+    'df736b9c3b521af5845b378452af3c628884a42f', // 2026-09-25 for 2026-09-24 15704  xtra       Overcast
+    'e40feb17b46474e9113653b8e880aa7c913f5e41', // 2026-09-25 for 2026-09-24 15704  xtra       Overcast
 ]);
