@@ -191,6 +191,7 @@ export function isBotIpHash({ hashedIpAddress, destinationServerUrl, asn, agentT
             || asn === '32934' && date >= '2026-07-26' // facebook
             || asn === '136510' && date >= '2026-08-04' // streamline servers
             || asn === '396356' && date >= '2026-08-12' // latitude.sh
+            || asn === '154049' && date >= '2026-09-19' // exatech
         )
         ;
 }
@@ -1780,4 +1781,12 @@ const botIpHashes = new Set([
     'c6a50af46af1df6ac8710195e5bf69e5deaf57df', // 2026-09-25 for 2026-09-24 3320   telekom    Chrome
     'df736b9c3b521af5845b378452af3c628884a42f', // 2026-09-25 for 2026-09-24 15704  xtra       Overcast
     'e40feb17b46474e9113653b8e880aa7c913f5e41', // 2026-09-25 for 2026-09-24 15704  xtra       Overcast
+    '00a13aa155458b07a3886b9d490859a256a2c3da', // 2026-09-26 for 2026-09-25 7922   comcast    Overcast
+    '37f1b1700f9606b63b5342f5d39bfb3863281877', // 2026-09-26 for 2026-09-25 3352   telefonica Overcast
+    '43b12d3d707c14e082fcebff5fda4545b4fc0972', // 2026-09-26 for 2026-09-25 209    centurylink playerweek/0.1 (personal research archive)
+    '4a25407087d7373affd52925176f57ba886ffe00', // 2026-09-26 for 2026-09-25 6167   verizon    Overcast
+    '510ccb53cc6b339b0b2eea50d8ee2442f5727a34', // 2026-09-26 for 2026-09-25 3352   telefonica Overcast
+    'b03d05c56ddf0f3ea800ab102c33b9691601a0d6', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Google Podcasts, Edge, Firefox, Opera
+    'b7f7f20831be09ff4109e4d6d5f496ae35a56fd6', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Edge, Google Podcasts, Firefox, Opera
+    'e927d7eeb205faae5ebc5cce094733c0060008c4', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Firefox, Edge, Google Podcasts, Opera
 ]);
