@@ -93,6 +93,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'ohdio-archiver/1.0 (personal podcast downloader; one request at a time)',
     'okapirank/0.1 (+https://github.com/anselbrandt/okapirank)',
     'openthepod-transcribe-worker/1.0',
+    'Overcast Transcription Service (+http://overcast.fm/; iOS podcast app)',
     'PaidcastAudioFetcher/1.0 (+podcast benchmark)',
     'piqo-scribe/0.1',
     'pkb/0.1 (Podcast Knowledge Base)',
@@ -1789,4 +1790,9 @@ const botIpHashes = new Set([
     'b03d05c56ddf0f3ea800ab102c33b9691601a0d6', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Google Podcasts, Edge, Firefox, Opera
     'b7f7f20831be09ff4109e4d6d5f496ae35a56fd6', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Edge, Google Podcasts, Firefox, Opera
     'e927d7eeb205faae5ebc5cce094733c0060008c4', // 2026-09-26 for 2026-09-25 154049 exatech    Chrome, Safari, Firefox, Edge, Google Podcasts, Opera
+    '28b8bb36b8d6f9ae90adf0fd83e1231aed8071b8', // 2026-09-27 for 2026-09-26 32133  tingfiber  Overcast
+    'c4f372f460f18bca3116c76f41f2ad307615a44f', // 2026-09-27 for 2026-09-26 4837   chinauni   Chrome, Safari, Edge, Firefox, Google Podcasts, Opera, Twitter
+    'e8f9033a5c01bc7b74c38c4bba88a5bbf489452c', // 2026-09-27 for 2026-09-26 701    verizon    Overcast Transcription Service (+http://overcast.fm/; iOS podcast app)
+    'effdc73cf3e3855e39330766fbf562e2392564e9', // 2026-09-27 for 2026-09-26 6830   liberty    Overcast
+    'ffd5c9e8c89646fa6b6b0663c818ebd59e9cc402', // 2026-09-27 for 2026-09-26 20001  charter    Apple Podcasts, AppleCoreMedia
 ]);
