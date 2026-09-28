@@ -1795,4 +1795,5 @@ const botIpHashes = new Set([
     'e8f9033a5c01bc7b74c38c4bba88a5bbf489452c', // 2026-09-27 for 2026-09-26 701    verizon    Overcast Transcription Service (+http://overcast.fm/; iOS podcast app)
     'effdc73cf3e3855e39330766fbf562e2392564e9', // 2026-09-27 for 2026-09-26 6830   liberty    Overcast
     'ffd5c9e8c89646fa6b6b0663c818ebd59e9cc402', // 2026-09-27 for 2026-09-26 20001  charter    Apple Podcasts, AppleCoreMedia
+    'dde363c480a2a99f5fea79e84b6fa1fdf9d4e616', // 2026-09-28 for 2026-09-27 48803  mediateknik Overcast
 ]);
