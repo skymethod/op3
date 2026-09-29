@@ -1796,4 +1796,9 @@ const botIpHashes = new Set([
     'effdc73cf3e3855e39330766fbf562e2392564e9', // 2026-09-27 for 2026-09-26 6830   liberty    Overcast
     'ffd5c9e8c89646fa6b6b0663c818ebd59e9cc402', // 2026-09-27 for 2026-09-26 20001  charter    Apple Podcasts, AppleCoreMedia
     'dde363c480a2a99f5fea79e84b6fa1fdf9d4e616', // 2026-09-28 for 2026-09-27 48803  mediateknik Overcast
+    '13f3dd62718d71002dc7d3fcca8d46adfcc99669', // 2026-09-29 for 2026-09-28 11320  lightedge  Chrome
+    '1f141bf62ece33e9838d59b54c6cd225a336d7d9', // 2026-09-29 for 2026-09-28 4922   shenandoah Overcast
+    '62b65303e01f116048b02aa5a499b70792f2a793', // 2026-09-29 for 2026-09-28 48602  connect    Chrome
+    'bf9e501008e47ead7d147ab4fb1fa6214d63a7a0', // 2026-09-29 for 2026-09-28 33915  vodafone   Overcast
+    'e7722a38ed92287cb954b093756f000dd271da3d', // 2026-09-29 for 2026-09-28 1221   telstra    Overcast
 ]);
