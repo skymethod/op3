@@ -59,6 +59,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'KevinHuInvestmentPodcastResearch/0.4 (episode asset audit)',
     'kweb-wikify/0.1 (podcast player)',
     'kyutai-research-sampler/1.0 (dataset audit; contact: atsumoto.ohashi@kyutai.org)',
+    'LocalPodcastArchive/2.0 (personal offline player)',
     'luna-podcatcher/0.1 (+downloader)',
     'MEM personal transcripts research pipeline (mem10121@nyu.edu)',
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
@@ -1801,4 +1802,6 @@ const botIpHashes = new Set([
     '62b65303e01f116048b02aa5a499b70792f2a793', // 2026-09-29 for 2026-09-28 48602  connect    Chrome
     'bf9e501008e47ead7d147ab4fb1fa6214d63a7a0', // 2026-09-29 for 2026-09-28 33915  vodafone   Overcast
     'e7722a38ed92287cb954b093756f000dd271da3d', // 2026-09-29 for 2026-09-28 1221   telstra    Overcast
+    '003faab389ec8c42c80b46c6b0e5a8d0188f285e', // 2026-09-30 for 2026-09-29 12876  scaleway   ffmpeg, Radioline Stream Monitoring, MPlayer, Windows Media Player, 
+    '30a745cd2867e9f75b2e5fe64849d524a16d3e15', // 2026-09-30 for 2026-09-29 34984  superonline LocalPodcastArchive/2.0 (personal offline player), Firefox
 ]);
