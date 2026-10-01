@@ -1804,4 +1804,6 @@ const botIpHashes = new Set([
     'e7722a38ed92287cb954b093756f000dd271da3d', // 2026-09-29 for 2026-09-28 1221   telstra    Overcast
     '003faab389ec8c42c80b46c6b0e5a8d0188f285e', // 2026-09-30 for 2026-09-29 12876  scaleway   ffmpeg, Radioline Stream Monitoring, MPlayer, Windows Media Player, 
     '30a745cd2867e9f75b2e5fe64849d524a16d3e15', // 2026-09-30 for 2026-09-29 34984  superonline LocalPodcastArchive/2.0 (personal offline player), Firefox
+    '6f470e66651cd05e7ff20a198add4bf1ff90e938', // 2026-10-01 for 2026-09-30 1221   telstra    Overcast
+    '70004b6945bd31c8413fbbc71bfe15cf94b1441c', // 2026-10-01 for 2026-09-30 3352   telefonica PrestoCast, AppleCoreMedia
 ]);
