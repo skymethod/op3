@@ -1806,4 +1806,12 @@ const botIpHashes = new Set([
     '30a745cd2867e9f75b2e5fe64849d524a16d3e15', // 2026-09-30 for 2026-09-29 34984  superonline LocalPodcastArchive/2.0 (personal offline player), Firefox
     '6f470e66651cd05e7ff20a198add4bf1ff90e938', // 2026-10-01 for 2026-09-30 1221   telstra    Overcast
     '70004b6945bd31c8413fbbc71bfe15cf94b1441c', // 2026-10-01 for 2026-09-30 3352   telefonica PrestoCast, AppleCoreMedia
+    '0e35ac0c49ea63e60f5bf9392cb39c174a41a312', // 2026-10-02 for 2026-10-01 20001  charter    Chrome
+    '17a526e367e8bdd48e058a493010405dc1e34b8c', // 2026-10-02 for 2026-10-01 4922   shenandoah Overcast
+    '32fb8c43d07341b3498949f1ca56b94d844bb29e', // 2026-10-02 for 2026-10-01 21826  corporación Apple Podcasts, Chrome
+    '370662bad540e8b58bcc707008644cb5331d3ce8', // 2026-10-02 for 2026-10-01 1221   telstra    Overcast
+    '612f63fe1e8987e18f426e2dd20cc0225585f15e', // 2026-10-02 for 2026-10-01 8412   tmobile    Chrome
+    '80e4d2c13a7fc6085178e9903f6a8ccbfed93b94', // 2026-10-02 for 2026-10-01 3352   telefonica Overcast
+    'cc09a121dc21fc6e5fd4ccad8aa34250f2792673', // 2026-10-02 for 2026-10-01 12876  scaleway   ffmpeg, Radioline Stream Monitoring, MPlayer, Windows Media Player, 
+    'fa2f50440bd708a79d738297e84015e1118d2414', // 2026-10-02 for 2026-10-01 48602  connect    Chrome
 ]);
