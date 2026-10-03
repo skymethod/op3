@@ -1814,4 +1814,5 @@ const botIpHashes = new Set([
     '80e4d2c13a7fc6085178e9903f6a8ccbfed93b94', // 2026-10-02 for 2026-10-01 3352   telefonica Overcast
     'cc09a121dc21fc6e5fd4ccad8aa34250f2792673', // 2026-10-02 for 2026-10-01 12876  scaleway   ffmpeg, Radioline Stream Monitoring, MPlayer, Windows Media Player, 
     'fa2f50440bd708a79d738297e84015e1118d2414', // 2026-10-02 for 2026-10-01 48602  connect    Chrome
+    '925e712bdc36036e61c40226b2e0b9523d69f127', // 2026-10-03 for 2026-10-02 3352   telefonica Overcast
 ]);
