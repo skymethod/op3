@@ -1815,4 +1815,7 @@ const botIpHashes = new Set([
     'cc09a121dc21fc6e5fd4ccad8aa34250f2792673', // 2026-10-02 for 2026-10-01 12876  scaleway   ffmpeg, Radioline Stream Monitoring, MPlayer, Windows Media Player, 
     'fa2f50440bd708a79d738297e84015e1118d2414', // 2026-10-02 for 2026-10-01 48602  connect    Chrome
     '925e712bdc36036e61c40226b2e0b9523d69f127', // 2026-10-03 for 2026-10-02 3352   telefonica Overcast
+    '0b8cf8511530f4ae4d6d94ca24987d558ded32ce', // 2026-10-04 for 2026-10-03 214159 cherry     Firefox
+    '1c3e0bc3cc2ad6ca7b4f34ffa259c2296038f402', // 2026-10-04 for 2026-10-03 33915  vodafone   Overcast
+    'ad4e5af4299bc8e9c2f5fe15024734bacc0072af', // 2026-10-04 for 2026-10-03 48803  mediateknik Overcast
 ]);
