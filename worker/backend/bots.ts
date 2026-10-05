@@ -1818,4 +1818,11 @@ const botIpHashes = new Set([
     '0b8cf8511530f4ae4d6d94ca24987d558ded32ce', // 2026-10-04 for 2026-10-03 214159 cherry     Firefox
     '1c3e0bc3cc2ad6ca7b4f34ffa259c2296038f402', // 2026-10-04 for 2026-10-03 33915  vodafone   Overcast
     'ad4e5af4299bc8e9c2f5fe15024734bacc0072af', // 2026-10-04 for 2026-10-03 48803  mediateknik Overcast
+    '348bf86c72ca48233a90b8e062828fcb80a1b42f', // 2026-10-05 for 2026-10-04 213220 delta      Firefox
+    '80983358f74702f4820e14ae67b45a076fdbde50', // 2026-10-05 for 2026-10-04 6830   liberty    Overcast
+    'c39e62edd17a6363e2186ae66283dd17956f2e75', // 2026-10-05 for 2026-10-04 55286  b2net      Firefox
+    'c4530c92944f6e56db9d23cca6f8e8298c7cfce4', // 2026-10-05 for 2026-10-04 33915  vodafone   Overcast
+    'ce2a4487b76977823a4bcc0889143b85c237fa84', // 2026-10-05 for 2026-10-04 214159 cherry     Firefox
+    'd9e88500c027d232025fe6433ec113e89f63a588', // 2026-10-05 for 2026-10-04 213790 limited    Safari
+    'e69ed0dbfce06f761548ffc950d502b286b4afc9', // 2026-10-05 for 2026-10-04 213220 delta      Firefox
 ]);
