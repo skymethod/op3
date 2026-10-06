@@ -1825,4 +1825,5 @@ const botIpHashes = new Set([
     'ce2a4487b76977823a4bcc0889143b85c237fa84', // 2026-10-05 for 2026-10-04 214159 cherry     Firefox
     'd9e88500c027d232025fe6433ec113e89f63a588', // 2026-10-05 for 2026-10-04 213790 limited    Safari
     'e69ed0dbfce06f761548ffc950d502b286b4afc9', // 2026-10-05 for 2026-10-04 213220 delta      Firefox
+    '05ead026dea7e2e5bfda21ed44cd91211910ad85', // 2026-10-06 for 2026-10-05 3352   telefonica Overcast
 ]);
