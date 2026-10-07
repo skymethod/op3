@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@0deded587e90108332ed43d89e6444ecb71e5aff (2026-09-08T15:28:53Z)
+// from user-agents-v2@b9c70bc9c30d5dec0dcc88dcd70b14d30cbe73cb (2026-10-07T11:51:33Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -166,6 +166,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/NL-Israel_IA/.test(userAgent)) return { name: `NL Israel Internet Archiver`, type: 'bot' };
     if (/Google-NotebookLM/.test(userAgent)) return { name: `Google NotebookLM`, type: 'bot' };
     if (/^NovaStreamLive\/.*Import/.test(userAgent)) return { name: `NovaStream Live Importer`, type: 'bot' };
+    if (/^odtune\//.test(userAgent)) return { name: `od·tune`, type: 'bot' };
     if (/OgScrper/.test(userAgent)) return { name: `OgScrper`, type: 'bot' };
     if (/^OkDownload\//.test(userAgent)) return { name: `OkDownload`, type: 'bot' };
     if (/^OmnyStudio\/\d/.test(userAgent)) return { name: `OmniStudio`, type: 'bot' };
@@ -223,6 +224,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/PodhoundBeta/.test(userAgent)) return { name: `Podhound`, type: 'bot' };
     if (/^Podio\//.test(userAgent)) return { name: `Podio Bot`, type: 'bot' };
     if (/^PodlexiconDownloader/.test(userAgent)) return { name: `Podlexicon Downloader`, type: 'bot' };
+    if (/^PodmixBot\//.test(userAgent)) return { name: `PodmixBot`, type: 'bot' };
     if (/^Podmonbot\//.test(userAgent)) return { name: `Podmon Bot`, type: 'bot' };
     if (/^Podnado\/\d+\.\d+/.test(userAgent)) return { name: `Podnado`, type: 'bot' };
     if (/PodnewsBot/.test(userAgent)) return { name: `Podnews`, type: 'bot' };

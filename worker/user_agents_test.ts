@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@0deded587e90108332ed43d89e6444ecb71e5aff (2026-09-08T15:28:53Z)
+// from user-agents-v2@b9c70bc9c30d5dec0dcc88dcd70b14d30cbe73cb (2026-10-07T11:51:33Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -209,6 +209,8 @@ const botTests = {
     'Mozilla/5.0 (compatible; NL-Israel_IAHarvester2025/3.3.0;  https://www.nli.org.il/he/research-and-teach/internet-archive/law-and-order)': { type: 'bot', name: `NL Israel Internet Archiver` },
     'Google-NotebookLM': { type: 'bot', name: `Google NotebookLM` },
     'NovaStreamLive/1.0 (Podcast Import)': { type: 'bot', name: `NovaStream Live Importer` },
+    'odtune/0.0.0-dev (+https://odtune.com/about; podcasts@odtune.com)': { type: 'bot', name: `od·tune` },
+    'odtune/cd932c5 (+https://odtune.com/about; podcasts@odtune.com)': { type: 'bot', name: `od·tune` },
     'OgScrper': { type: 'bot', name: `OgScrper` },
     'OmnyStudio/1.0': { type: 'bot', name: `OmniStudio` },
     'op3-fetcher/1.0 (https://op3.dev)': { type: 'bot', name: `OP3 Fetcher` },
@@ -275,6 +277,7 @@ const botTests = {
     'PodhoundBeta': { type: 'bot', name: `Podhound` },
     'Podio/1.0': { type: 'bot', name: `Podio Bot` },
     'PodlexiconDownloader/1.0': { type: 'bot', name: `Podlexicon Downloader` },
+    'PodmixBot/0.1 (+https://podmix.tibero.ai; contact: diego@tibero.ai)': { type: 'bot', name: `PodmixBot` },
     'Podmonbot/1.0': { type: 'bot', name: `Podmon Bot` },
     'Podnado/1.0 Podcast Indexer (feed-id=12; +https://bot.podnado.com/)': { type: 'bot', name: `Podnado` },
     'Podnado/1.0 Podcast Indexer (+https://bot.podnado.com/)': { type: 'bot', name: `Podnado` },

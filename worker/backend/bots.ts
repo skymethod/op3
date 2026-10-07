@@ -1826,4 +1826,7 @@ const botIpHashes = new Set([
     'd9e88500c027d232025fe6433ec113e89f63a588', // 2026-10-05 for 2026-10-04 213790 limited    Safari
     'e69ed0dbfce06f761548ffc950d502b286b4afc9', // 2026-10-05 for 2026-10-04 213220 delta      Firefox
     '05ead026dea7e2e5bfda21ed44cd91211910ad85', // 2026-10-06 for 2026-10-05 3352   telefonica Overcast
+    '3fb7c1a93c7e12369e541163431e7502aebd4078', // 2026-10-07 for 2026-10-06 16591  gfiber     Chrome
+    'be322060d4f654f4d7a9b4c76907266523e0fe82', // 2026-10-07 for 2026-10-06 24940  hetzner    odtune/cd932c5 (+https://odtune.com/about; podcasts@odtune.com)
+    'd5a0c1fa95386e0099cd5722f79b4a7be974c408', // 2026-10-07 for 2026-10-06 24444  chinamobile Chrome
 ]);
