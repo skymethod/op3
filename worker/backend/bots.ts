@@ -1829,4 +1829,7 @@ const botIpHashes = new Set([
     '3fb7c1a93c7e12369e541163431e7502aebd4078', // 2026-10-07 for 2026-10-06 16591  gfiber     Chrome
     'be322060d4f654f4d7a9b4c76907266523e0fe82', // 2026-10-07 for 2026-10-06 24940  hetzner    odtune/cd932c5 (+https://odtune.com/about; podcasts@odtune.com)
     'd5a0c1fa95386e0099cd5722f79b4a7be974c408', // 2026-10-07 for 2026-10-06 24444  chinamobile Chrome
+    '3cef93584fccb568faa1fd33bea5d5f049d3e6e6', // 2026-10-08 for 2026-10-07 19108  optimum    Overcast
+    '766a9c24c3ca9c8f479793e4c2de18c21024a644', // 2026-10-08 for 2026-10-07 701    verizon    Overcast
+    '9c8a659dc246eb3dbaa0549bdf07a538d06161b8', // 2026-10-08 for 2026-10-07 26932  bravo      Chrome
 ]);
