@@ -62,6 +62,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'LocalPodcastArchive/2.0 (personal offline player)',
     'luna-podcatcher/0.1 (+downloader)',
     'MEM personal transcripts research pipeline (mem10121@nyu.edu)',
+    'Miso-S2S-RSS-Collector/2.0',
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
     'Mozilla/5.0 (compatible; bulk-downloader/1.0)',
@@ -1832,4 +1833,13 @@ const botIpHashes = new Set([
     '3cef93584fccb568faa1fd33bea5d5f049d3e6e6', // 2026-10-08 for 2026-10-07 19108  optimum    Overcast
     '766a9c24c3ca9c8f479793e4c2de18c21024a644', // 2026-10-08 for 2026-10-07 701    verizon    Overcast
     '9c8a659dc246eb3dbaa0549bdf07a538d06161b8', // 2026-10-08 for 2026-10-07 26932  bravo      Chrome
+    '23431ccab0f8ec958076255155f24d74b76cd99b', // 2026-10-09 for 2026-10-08 59437  northern   Miso-S2S-RSS-Collector/2.0
+    '2c3b42bbaf5d7ed2167779d86ec17ed0549fa186', // 2026-10-09 for 2026-10-08 59437  northern   Miso-S2S-RSS-Collector/2.0
+    '3fab6c65e5be7088585cf1df080f16a51cd4d733', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
+    '3fae594071ae4f34116cdbc59fb584070e854eb3', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
+    '93440da03d24a29a91963fa20758a17392f7ec96', // 2026-10-09 for 2026-10-08 59437  northern   Miso-S2S-RSS-Collector/2.0
+    'a407ef1800f4177d955946750a5467dc55af0dab', // 2026-10-09 for 2026-10-08 11427  charter    Overcast
+    'a93c186563c295f1086b3b73b53dc1717e61c981', // 2026-10-09 for 2026-10-08 59437  northern   Miso-S2S-RSS-Collector/2.0
+    'e17600c5a97249d1521f231ac55eac297db3f155', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
+    'efd9e17726cd8eb8eb400a6d048ff3349a02cc50', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
 ]);
