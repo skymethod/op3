@@ -1842,4 +1842,6 @@ const botIpHashes = new Set([
     'a93c186563c295f1086b3b73b53dc1717e61c981', // 2026-10-09 for 2026-10-08 59437  northern   Miso-S2S-RSS-Collector/2.0
     'e17600c5a97249d1521f231ac55eac297db3f155', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
     'efd9e17726cd8eb8eb400a6d048ff3349a02cc50', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
+    '18cb8e0e82904036982a851ccf8fd30046049fab', // 2026-10-10 for 2026-10-09 16509  amazon     Chrome
+    '3d9efcfbd39f3eee51df48d1d9b678299afad1d9', // 2026-10-10 for 2026-10-09 16509  amazon     Chrome
 ]);
