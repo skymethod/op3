@@ -1868,4 +1868,6 @@ const botIpHashes = new Set([
     'efd9e17726cd8eb8eb400a6d048ff3349a02cc50', // 2026-10-09 for 2026-10-08 40617  hewlett    Miso-S2S-RSS-Collector/2.0
     '18cb8e0e82904036982a851ccf8fd30046049fab', // 2026-10-10 for 2026-10-09 16509  amazon     Chrome
     '3d9efcfbd39f3eee51df48d1d9b678299afad1d9', // 2026-10-10 for 2026-10-09 16509  amazon     Chrome
+    '4740e97dd156de8884a1a84ceaa34bb49656c430', // 2026-10-11 for 2026-10-10 15435  deltafiber Overcast
+    '945d550240b4403508b7ff62506300d9dc228dd8', // 2026-10-11 for 2026-10-10 9009   m247       Podcast Republic, CastBox, doubleTwist CloudPlayer, Anytime Podcast Player, Dalvik, AntennaPod, Apple Podcasts
 ]);
