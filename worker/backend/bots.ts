@@ -1870,4 +1870,13 @@ const botIpHashes = new Set([
     '3d9efcfbd39f3eee51df48d1d9b678299afad1d9', // 2026-10-10 for 2026-10-09 16509  amazon     Chrome
     '4740e97dd156de8884a1a84ceaa34bb49656c430', // 2026-10-11 for 2026-10-10 15435  deltafiber Overcast
     '945d550240b4403508b7ff62506300d9dc228dd8', // 2026-10-11 for 2026-10-10 9009   m247       Podcast Republic, CastBox, doubleTwist CloudPlayer, Anytime Podcast Player, Dalvik, AntennaPod, Apple Podcasts
+    '9571bd7f0dc6321073db763541fbac5f9ed872bc', // 2026-10-12 for 2026-10-11 212238 datacamp   doubleTwist CloudPlayer, Podcast Republic, Podcast Guru, CastBox, Anytime Podcast Player, Pocket Casts, AntennaPod, Dalvik
+    '97ac230829feb9de92ccaaee7e1beec7a077e99a', // 2026-10-12 for 2026-10-11 6327   shaw       Chrome, AppleCoreMedia
+    'a2ceb5a219db6a28f4215ea62a6b7cf43bba23da', // 2026-10-12 for 2026-10-11 11427  charter    Overcast
+    'a5a3b7e2ed8578f78369ad0bf8b7b4f0afcfd304', // 2026-10-12 for 2026-10-11 1257   tele2      Overcast
+    'ab4e6a8bbcf04b161fa94f49e4ad0622ca29ce91', // 2026-10-12 for 2026-10-11 33915  vodafone   Apple Podcasts, AppleCoreMedia
+    'adc64eb7c17ef77748a346566e63c8f6788aab7e', // 2026-10-12 for 2026-10-11 11427  charter    Overcast
+    'ba038a42e19360e92cac5bfb560d10325461f2d8', // 2026-10-12 for 2026-10-11 1257   tele2      Overcast
+    'd7c0a49961cd63a9585f3c3d1aa3e08eaab29db3', // 2026-10-12 for 2026-10-11 60068  datacamp   Podcast Republic, CastBox, AntennaPod, Player FM, Dalvik, Anytime Podcast Player, AndroidDownloadManager, Pocket Casts, Podcast Guru, Chrome, ProCast
+    'fab06204015a7d3717e630e7bc12c4e1b1caa5de', // 2026-10-12 for 2026-10-11 138997 eons       Chrome, Safari, Edge, Firefox, Google Podcasts, Opera
 ]);
