@@ -136,9 +136,12 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcastindex-downloader/1.0 (+https://podcastindex.org)',
     'PodcastResearchArchive/1.0 (public RSS enclosures)',
     'PodcastTopicResearch/1.0 (SURF Research Cloud)',
+    'PodcastToText/1.0',
     'PodcastTranscriptFetcher/1.0 (research use)',
     'podchaser-language-downloader/1.0',
     'PodFinder/1.0 (+https://podfinder.com)',
+    'Podscud/1.0 (Enclosure Liveness; +https://podscud.com)',
+    'Podscud/1.0 (Feed Fetcher; +https://podscud.com)',
     'Podzone/1.0 (+https://podzone.fm; podcast indexing)',
     'proc-data-podcast-downloader/1.0',
     'PSW-Archive/1.0 (authorized member archive; contact: paul@example.com)',
@@ -1879,4 +1882,6 @@ const botIpHashes = new Set([
     'ba038a42e19360e92cac5bfb560d10325461f2d8', // 2026-10-12 for 2026-10-11 1257   tele2      Overcast
     'd7c0a49961cd63a9585f3c3d1aa3e08eaab29db3', // 2026-10-12 for 2026-10-11 60068  datacamp   Podcast Republic, CastBox, AntennaPod, Player FM, Dalvik, Anytime Podcast Player, AndroidDownloadManager, Pocket Casts, Podcast Guru, Chrome, ProCast
     'fab06204015a7d3717e630e7bc12c4e1b1caa5de', // 2026-10-12 for 2026-10-11 138997 eons       Chrome, Safari, Edge, Firefox, Google Podcasts, Opera
+    '6ac3d786178ab253566f04f96651cb6691356414', // 2026-10-13 for 2026-10-12 24940  hetzner    Podscud/1.0 (Enclosure Liveness; +https://podscud.com), Podscud/1.0 (Feed Fetcher; +https://podscud.com)
+    'f445be90212432b8bf09aab014717e93fbe406e6', // 2026-10-13 for 2026-10-12 701    verizon    PodcastToText/1.0
 ]);
