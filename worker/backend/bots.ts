@@ -1884,4 +1884,10 @@ const botIpHashes = new Set([
     'fab06204015a7d3717e630e7bc12c4e1b1caa5de', // 2026-10-12 for 2026-10-11 138997 eons       Chrome, Safari, Edge, Firefox, Google Podcasts, Opera
     '6ac3d786178ab253566f04f96651cb6691356414', // 2026-10-13 for 2026-10-12 24940  hetzner    Podscud/1.0 (Enclosure Liveness; +https://podscud.com), Podscud/1.0 (Feed Fetcher; +https://podscud.com)
     'f445be90212432b8bf09aab014717e93fbe406e6', // 2026-10-13 for 2026-10-12 701    verizon    PodcastToText/1.0
+    '0e0ef4768940e9cfe2c085fccbc6abe75a895db0', // 2026-10-14 for 2026-10-13 3303   swisscom   Overcast
+    '27c4fa04524eca4fe923b6a688c59757547d2e1b', // 2026-10-14 for 2026-10-13 12271  charter    Chrome
+    '64842db95520bdee94ebb71bffd593ffd9483ca0', // 2026-10-14 for 2026-10-13 400238 pieg       Chrome
+    '6cf53e33ffb12d11e1b962b9dad6f425445af02b', // 2026-10-14 for 2026-10-13 20001  charter    Overcast
+    '8f2e87547345694af5931ab02d8edaa929f11bc1', // 2026-10-14 for 2026-10-13 3303   swisscom   Overcast
+    'f108959a8d921c7bdeae79992f0c03f374d69582', // 2026-10-14 for 2026-10-13 3303   swisscom   Overcast
 ]);
