@@ -1893,4 +1893,6 @@ const botIpHashes = new Set([
     '049c81c4488b3fd1d7732810d0836914ab792252', // 2026-10-15 for 2026-10-14 7922   comcast    PinePods/1.0, gPodder
     '53bf869505efdf1f6156126188294d46f0e1b2f8', // 2026-10-15 for 2026-10-14 3303   swisscom   Overcast
     '766a17a030325dc7436727120c00730b1faff94d', // 2026-10-15 for 2026-10-14 4812   chinatelecom Chrome, Safari, EnglishPodcastRSSCrawler/1.0 (+RSS metadata collection), Edge, Google Podcasts, Firefox, Opera, Twitter
+    '18e82a89c5e8aa22b75e10fbad5a63ed91853ed5', // 2026-10-16 for 2026-10-15 3303   swisscom   Overcast
+    '68d4c7b305343ea5a3da97739ffbe12e569d805d', // 2026-10-16 for 2026-10-15 3303   swisscom   Overcast
 ]);
