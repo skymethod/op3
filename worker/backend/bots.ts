@@ -123,6 +123,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast-archiver/1.0 (personal offline listening)',
     'podcast-brain/1.0 (personal archiving)',
     'podcast-classification-research/1.0 (academic; audio-download; caleb.eynon@chicagobooth.edu)',
+    'podcast-corpus/1.0 (research archive)',
     'podcast-data/0.1 (+https://github.com/local/podcast-data)',
     'podcast-miner/0.1 (+https://podcastindex.org)',
     'podcast-pipeline/0.1 (+https://github.com/)',
@@ -130,6 +131,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast-transcripts/1.0 (+personal transcript archiver)',
     'PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)',
     'PodcastArchive/1.0',
+    'PodcastArchiver/1.0',
     'PodcastDataEnricher/2.0 (audio-research; admin@podcasthawk.com)',
     'PodcastDownloader/1.0 (+https://github.com/)',
     'PodcastHarvester/1.0 (training data collection)',
@@ -1895,4 +1897,17 @@ const botIpHashes = new Set([
     '766a17a030325dc7436727120c00730b1faff94d', // 2026-10-15 for 2026-10-14 4812   chinatelecom Chrome, Safari, EnglishPodcastRSSCrawler/1.0 (+RSS metadata collection), Edge, Google Podcasts, Firefox, Opera, Twitter
     '18e82a89c5e8aa22b75e10fbad5a63ed91853ed5', // 2026-10-16 for 2026-10-15 3303   swisscom   Overcast
     '68d4c7b305343ea5a3da97739ffbe12e569d805d', // 2026-10-16 for 2026-10-15 3303   swisscom   Overcast
+    '18d5ca2c975ffe056d161a0aa6915f3d9233e39c', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    '4192f32b139d4946cf2334e283cae19070260fa3', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    '52c18f2526abd9d5082b71b3801dc7a6566a05eb', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    '582fad179bf2828c100a15948087ec7aea18d993', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    '6601d8c8e906c6c1e81e181ed8ca94e11434d1f1', // 2026-10-17 for 2026-10-16 7922   comcast    Overcast
+    '6d270852e26a56db815ef100bb5384091097993a', // 2026-10-17 for 2026-10-16 680    verein     podcast-corpus/1.0 (research archive)
+    'ae29263a8f0d16e4b69b5290a077c8b4fbca4714', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    'cf92c38bb7fd3004dc6671220a18678d1b4c157f', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    'd82ab90a4bc2c45183a1b4f97ac6c3514699eb10', // 2026-10-17 for 2026-10-16 12271  charter    Chrome
+    'e0d6a9ddcbc36f8c15078e98fa05c01460687b67', // 2026-10-17 for 2026-10-16 30600  metronet   Overcast
+    'ef530d3fcc71e7b88f1f76838c341139110977eb', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+    'f3dcb70e93ccb2e607296fdbd44977a920b839ef', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
+
 ]);
