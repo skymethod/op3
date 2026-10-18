@@ -1909,5 +1909,5 @@ const botIpHashes = new Set([
     'e0d6a9ddcbc36f8c15078e98fa05c01460687b67', // 2026-10-17 for 2026-10-16 30600  metronet   Overcast
     'ef530d3fcc71e7b88f1f76838c341139110977eb', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
     'f3dcb70e93ccb2e607296fdbd44977a920b839ef', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
-
+    'ea60457b0d4fbe36a49668a11fc29d4b99b96c93', // 2026-10-18 for 2026-10-17 3303   swisscom   Overcast
 ]);
