@@ -75,6 +75,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Miso-S2S-RSS-Collector/2.0',
     'moonshine-podcast-crawl/1.0 (+https://podcastindex.org)',
     'Mozilla/5.0 (compatible; ArtemRSSDirectory/2.0; +https://static.sashakuzina.com/rss-directory/rss_sources.csv)',
+    'Mozilla/5.0 (compatible; asr-multilingual-downloader/2; research; contact peter)',
     'Mozilla/5.0 (compatible; bulk-downloader/1.0)',
     'Mozilla/5.0 (compatible; cc-video-dataset/1.0)',
     'Mozilla/5.0 (compatible; ContentAnalyzer/1.0; SEO Research Tool)',
@@ -83,6 +84,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; jamie-loader/1.0)',
     'Mozilla/5.0 (compatible; podcast-duration/1.0)',
     'Mozilla/5.0 (compatible; podcast-transcriber/1.0)',
+    'Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)',
     'Mozilla/5.0 (compatible; PodcastDataBench/1.0; +https://example.invalid/asr-prep)',
     'Mozilla/5.0 (compatible; SputnikTranscribe/1.0; +https://sputnikintelligence.com)',
     'Mozilla/5.0 (compatible; telos-audio-crawl/1.0)',
@@ -1910,4 +1912,22 @@ const botIpHashes = new Set([
     'ef530d3fcc71e7b88f1f76838c341139110977eb', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
     'f3dcb70e93ccb2e607296fdbd44977a920b839ef', // 2026-10-17 for 2026-10-16 154049 exatech    PodcastArchiver/1.0
     'ea60457b0d4fbe36a49668a11fc29d4b99b96c93', // 2026-10-18 for 2026-10-17 3303   swisscom   Overcast
+    '1be3dadf2813cbda03cdef378cae10e3af9ed680', // 2026-10-21 for 2026-10-19 11427  charter    Overcast
+    '23a7708fcd95617a8c55a34ffe7c97143329dc60', // 2026-10-21 for 2026-10-19 11427  charter    Overcast
+    '2ca6892fa35c9e03775e5eeb9a9c5275a81d2b45', // 2026-10-21 for 2026-10-19 16509  amazon     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '3980f914700d4d38b12bef21e5f2ae10d17f64b8', // 2026-10-21 for 2026-10-19 3303   swisscom   Overcast
+    '8ae349eefabf8fc6da66fc450102756ba27322a2', // 2026-10-21 for 2026-10-19 50266  odido      Apple Podcasts, Cast Lite
+    '97c7670e853aab16c8519d306d522edd5e265793', // 2026-10-21 for 2026-10-19 3320   telekom    Chrome
+    'db9ce51b08629241c60142484c891f4ad975b875', // 2026-10-21 for 2026-10-19 9351   ztv        Apple Podcasts, AppleCoreMedia
+    'e98e11504e49c66f2aa32494a07880937c73906d', // 2026-10-21 for 2026-10-19 4134   chinatelecom Safari, Chrome, Edge, Google Podcasts, Firefox, Opera
+    'f19063d8abb3cb66cc2122d5abaf68ef697e404c', // 2026-10-21 for 2026-10-19 7922   comcast    Overcast
+    '3fdbac8a825b5a2832a304b82d1accc864e9add4', // 2026-10-21 for 2026-10-20 7018   att        Overcast
+    '4e03866f8c1d814fc934243e921b745772d604bd', // 2026-10-21 for 2026-10-20 1257   tele2      Overcast
+    '4e79da63df81c158d9e25cfe2d9035bcd217acf6', // 2026-10-21 for 2026-10-20 701    verizon    Safari
+    '5d1363602c805e878bafca77af4b5479fce0c350', // 2026-10-21 for 2026-10-20 7018   att        Overcast
+    '7437df27cf43612a5a64ce2a8abf0cb52a3b01ae', // 2026-10-21 for 2026-10-20 7922   comcast    Overcast
+    '807086abf57fddd04ea68c438a9bce0b7f223c3b', // 2026-10-21 for 2026-10-20 20001  charter    Overcast
+    '9708756b498a2910f6a4074a970d51025f105c2b', // 2026-10-21 for 2026-10-20 19122  estruxture Chrome, asr-multilingual-downloader/2 (research; contact peter), Mozilla/5.0 (compatible; asr-multilingual-downloader/2; research; contact peter)
+    'df02893c57438d00edd030e096336dce4b4581e9', // 2026-10-21 for 2026-10-20 1136   kpn        Apple Podcasts, AppleCoreMedia
+    'f7d25dc43b31028b42e12cd6319e5f1e730cf92b', // 2026-10-21 for 2026-10-20 6167   verizon    Overcast
 ]);
