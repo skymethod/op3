@@ -156,10 +156,12 @@ export const EXTRA_BOT_USER_AGENTS = [
     'SalarybookResearch/1.0 (+mailto:naitik@salarybook.co.in)',
     'scribe/0.1 (+https://github.com/Vycari/scribe)',
     'shelest-research-podcast-survey/0.1',
+    'speedspeak-feed-survey/0.1',
     'sporc-pipeline/0.1',
     'spotify-tech-podcast-discovery/1.0',
     'subscriber-rss-downloader/1.0',
     'swyxdotio-podcast-migration/1.0',
+    'umia-indexing-feed-sample/1 (+https://github.com/umia-core/indexing-module)',
     'voiceai-harvest/0.2 (jeremy@hi-desk.de)',
     'voicegraph-audio-locator-verifier/0.1',
     'website-deployment-verifier/1.0',
@@ -1930,4 +1932,8 @@ const botIpHashes = new Set([
     '9708756b498a2910f6a4074a970d51025f105c2b', // 2026-10-21 for 2026-10-20 19122  estruxture Chrome, asr-multilingual-downloader/2 (research; contact peter), Mozilla/5.0 (compatible; asr-multilingual-downloader/2; research; contact peter)
     'df02893c57438d00edd030e096336dce4b4581e9', // 2026-10-21 for 2026-10-20 1136   kpn        Apple Podcasts, AppleCoreMedia
     'f7d25dc43b31028b42e12cd6319e5f1e730cf92b', // 2026-10-21 for 2026-10-20 6167   verizon    Overcast
+    '57961d4a22cca5a3be4f700026b66cf07b925d7b', // 2026-10-22 for 2026-10-21 8075   microsoft  umia-indexing-feed-sample/1 (+https://github.com/umia-core/indexing-module)
+    '6ab59ea7884d20217ab762102efac021836b0307', // 2026-10-22 for 2026-10-21 22773  cox        Overcast
+    '717334927a5b0a174b477d35c23800f8939ce2f2', // 2026-10-22 for 2026-10-21 396982 google     AppleCoreMedia
+    '76f6916d2e52caef223356a1b767ff1fb239354a', // 2026-10-22 for 2026-10-21 3209   vodafone   speedspeak-feed-survey/0.1
 ]);
