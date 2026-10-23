@@ -151,6 +151,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PSW-Archive/1.0 (authorized member archive; contact: paul@example.com)',
     'PublicFrenchYouthPodcastArchive/1.0 (+offline-preservation)',
     'PulsewireV4V/0.6 enclosure verifier',
+    'Reverb-Podcast/1.0 (+bcguardian.com)',
     'rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper',
     'rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)',
     'SalarybookResearch/1.0 (+mailto:naitik@salarybook.co.in)',
@@ -1936,4 +1937,7 @@ const botIpHashes = new Set([
     '6ab59ea7884d20217ab762102efac021836b0307', // 2026-10-22 for 2026-10-21 22773  cox        Overcast
     '717334927a5b0a174b477d35c23800f8939ce2f2', // 2026-10-22 for 2026-10-21 396982 google     AppleCoreMedia
     '76f6916d2e52caef223356a1b767ff1fb239354a', // 2026-10-22 for 2026-10-21 3209   vodafone   speedspeak-feed-survey/0.1
+    '091bbeb221094d673857ed447e6748101a3d9239', // 2026-10-23 for 2026-10-22 3320   telekom    Edge
+    'ab0e7d782e32932f0e8fbd0f0df950f595c8d2b9', // 2026-10-23 for 2026-10-22 14618  amazon     Reverb-Podcast/1.0 (+bcguardian.com)
+    'bcd34dcc76bee17d2c02b6cdff2518fb19365c7d', // 2026-10-23 for 2026-10-22 19413  roanoke    Overcast
 ]);
