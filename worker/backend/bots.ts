@@ -151,6 +151,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PSW-Archive/1.0 (authorized member archive; contact: paul@example.com)',
     'PublicFrenchYouthPodcastArchive/1.0 (+offline-preservation)',
     'PulsewireV4V/0.6 enclosure verifier',
+    'r2n/1.0 (+https://github.com/Buildtall-Systems/buildtall)',
     'Reverb-Podcast/1.0 (+bcguardian.com)',
     'rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper',
     'rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)',
@@ -1940,4 +1941,13 @@ const botIpHashes = new Set([
     '091bbeb221094d673857ed447e6748101a3d9239', // 2026-10-23 for 2026-10-22 3320   telekom    Edge
     'ab0e7d782e32932f0e8fbd0f0df950f595c8d2b9', // 2026-10-23 for 2026-10-22 14618  amazon     Reverb-Podcast/1.0 (+bcguardian.com)
     'bcd34dcc76bee17d2c02b6cdff2518fb19365c7d', // 2026-10-23 for 2026-10-22 19413  roanoke    Overcast
+    '05253294e30f6953e6ba193a8f46db751ecb602f', // 2026-10-24 for 2026-10-23 208137 feoprest   Firefox
+    '053472a107de863fef45b1e8be5230a7cdc508a5', // 2026-10-24 for 2026-10-23 55286  b2net      Firefox
+    '36b8aa8e3aa41a9313f5f23f446e309ec028ce3a', // 2026-10-24 for 2026-10-23 1257   tele2      Overcast
+    '5d7fade12bae85365b8706af6677b2f7fcff13f1', // 2026-10-24 for 2026-10-23 1257   tele2      Overcast
+    '7763b2c20589fe4c98c308bb3f587ae6189b0c2e', // 2026-10-24 for 2026-10-23 55286  b2net      Firefox
+    '9d7735c5b18c5f0fd3e2e284119699d1fb85ce6f', // 2026-10-24 for 2026-10-23 11878  tzulo      r2n/1.0 (+https://github.com/Buildtall-Systems/buildtall), Apple Podcasts
+    'cbe424363a064b9c1e3b79ac6fa6deb684d24530', // 2026-10-24 for 2026-10-23 55286  b2net      Firefox
+    'd234a76a04f0516c78d28013b6064dcdc39fc76c', // 2026-10-24 for 2026-10-23 1257   tele2      Overcast
+    'fd73f74c86424e603b35b06644ade0b2d4eea6c1', // 2026-10-24 for 2026-10-23 5650   frontier   Overcast
 ]);
