@@ -163,6 +163,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'spotify-tech-podcast-discovery/1.0',
     'subscriber-rss-downloader/1.0',
     'swyxdotio-podcast-migration/1.0',
+    'taddy-assets/0.1',
     'umia-indexing-feed-sample/1 (+https://github.com/umia-core/indexing-module)',
     'voiceai-harvest/0.2 (jeremy@hi-desk.de)',
     'voicegraph-audio-locator-verifier/0.1',
@@ -1950,4 +1951,7 @@ const botIpHashes = new Set([
     'cbe424363a064b9c1e3b79ac6fa6deb684d24530', // 2026-10-24 for 2026-10-23 55286  b2net      Firefox
     'd234a76a04f0516c78d28013b6064dcdc39fc76c', // 2026-10-24 for 2026-10-23 1257   tele2      Overcast
     'fd73f74c86424e603b35b06644ade0b2d4eea6c1', // 2026-10-24 for 2026-10-23 5650   frontier   Overcast
+    '192a5ff044d518ae195b6fe8137a9a087b8c731e', // 2026-10-25 for 2026-10-24 1257   tele2      Overcast
+    'a3b93967538b60c5d5bc5a232eebe1a6dc4a8f35', // 2026-10-25 for 2026-10-24 1221   telstra    Apple Podcasts, AppleCoreMedia
+    'f3ec33e3890e2a161cca958899c09e9bc0d7fb1b', // 2026-10-25 for 2026-10-24 14969  janestreet taddy-assets/0.1
 ]);
