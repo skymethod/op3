@@ -1954,4 +1954,12 @@ const botIpHashes = new Set([
     '192a5ff044d518ae195b6fe8137a9a087b8c731e', // 2026-10-25 for 2026-10-24 1257   tele2      Overcast
     'a3b93967538b60c5d5bc5a232eebe1a6dc4a8f35', // 2026-10-25 for 2026-10-24 1221   telstra    Apple Podcasts, AppleCoreMedia
     'f3ec33e3890e2a161cca958899c09e9bc0d7fb1b', // 2026-10-25 for 2026-10-24 14969  janestreet taddy-assets/0.1
+    '09f413b8b6bbee1b64728f34343f811d66b269bc', // 2026-10-26 for 2026-10-25 1257   tele2      Overcast
+    '0ac10fe5f557cb453b5984ff5a3d59247ffd27da', // 2026-10-26 for 2026-10-25 55286  b2net      Firefox
+    '3586cfe54d8f6bb35cd52079c883406f884b6f15', // 2026-10-26 for 2026-10-25 214159 cherry     Firefox
+    '94de57c4a8385e2b0db26c1ae1493d00a4141529', // 2026-10-26 for 2026-10-25 5089   virgin     Apple Podcasts, Apple Podcasts (Watch)
+    'baee46f7f4c92840eb4627efa8887d5fcd6d8405', // 2026-10-26 for 2026-10-25 7018   att        Overcast
+    'de5088c2ccbb76a8e00a93c4941b43605c1dc9bf', // 2026-10-26 for 2026-10-25 4134   chinatelecom Chrome, Safari, Edge, Google Podcasts, Firefox, Opera
+    'e8821b9a86c2442319d6d3baf52dc25a6e4fbc6b', // 2026-10-26 for 2026-10-25 1257   tele2      Overcast
+    'e96c6ce5779d5f4cf41cffff260e94974225ebd7', // 2026-10-26 for 2026-10-25 1257   tele2      Overcast
 ]);
