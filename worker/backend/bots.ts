@@ -70,6 +70,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'kweb-wikify/0.1 (podcast player)',
     'kyutai-research-sampler/1.0 (dataset audit; contact: atsumoto.ohashi@kyutai.org)',
     'LocalPodcastArchive/2.0 (personal offline player)',
+    'Lumina/1.4.5 personal RSS reader',
     'luna-podcatcher/0.1 (+downloader)',
     'MEM personal transcripts research pipeline (mem10121@nyu.edu)',
     'Miso-S2S-RSS-Collector/2.0',
@@ -1962,4 +1963,16 @@ const botIpHashes = new Set([
     'de5088c2ccbb76a8e00a93c4941b43605c1dc9bf', // 2026-10-26 for 2026-10-25 4134   chinatelecom Chrome, Safari, Edge, Google Podcasts, Firefox, Opera
     'e8821b9a86c2442319d6d3baf52dc25a6e4fbc6b', // 2026-10-26 for 2026-10-25 1257   tele2      Overcast
     'e96c6ce5779d5f4cf41cffff260e94974225ebd7', // 2026-10-26 for 2026-10-25 1257   tele2      Overcast
+    '4c973542334fa6a5dd806c753fd8b40cffb3de1d', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '5899bc6b93d409e0fd2baeb8ba454c01492c720e', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '6af1792317679d53bcf00d75f882cfaf377294ce', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '720b3cf818ea2f197d61daf26992bc7402d0f06c', // 2026-10-27 for 2026-10-26 3352   telefonica Lumina/1.4.5 personal RSS reader
+    '7a3b9dee316acc3864c87e7226c63b63aa358508', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '9863946d62aaa3c6a79c7d558276201ba4aa3444', // 2026-10-27 for 2026-10-26 1257   tele2      Overcast
+    '9ddccc0f265071b37d757a4376a7ab962afc7573', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '9ec98cee8517509fc6c87703cf40d41cf66646e0', // 2026-10-27 for 2026-10-26 7018   att        Overcast
+    'bcd228d69dfdaa6178f37ffd661a380bd62c98c5', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    'bf3c50926ac8920d84c70f618b31cbeabf7d3a41', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    'dd6f6ba07e52109d503fa0964417eae04e534419', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    'ed827ef2cc251c70f4c6fbe5e6f0586a1c2191c4', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
 ]);
