@@ -5,6 +5,7 @@ export type Xfetcher = (url: string, opts: { headers: Headers, redirect: 'manual
 export type XResponse = {
     url: string,
     status: number,
+    ok: boolean,
     headers: Headers,
     text: () => Promise<string>,
     arrayBuffer: () => Promise<ArrayBuffer>,
@@ -16,12 +17,13 @@ export function tryMakeXfetcher(str: string | undefined): Xfetcher | undefined {
         return async (url, opts) => {
             const u = new URL(endpoint);
             u.searchParams.set('url', url);
-            const headers = new Headers([ ...opts.headers ].filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ]));
+            const headers = new Headers([ ...opts.headers ].map(v => [ 'x-' + v[0], v[1] ]));
             headers.set('authorization', auth);
             const res = await fetch(u.toString(), { headers });
             const rt: XResponse = {
                 url,
                 status: res.status,
+                ok: res.ok,
                 headers: new Headers([ ...res.headers ].filter(v => v[0].startsWith('x-')).map(v => [ v[0].substring(2), v[1] ])),
                 text: async () => await res.text(),
                 arrayBuffer: async () => await res.arrayBuffer(),
