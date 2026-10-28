@@ -109,6 +109,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'narya-tts-data-jp-podcast-downloader/1.0',
     'NellPodcastCorpus/0.1 (+https://nell.ai)',
     'NeoLabPodcastArchive/1.0 (+https://neolab.ai/acquisition)',
+    'NigerianPodcastCorpus/0.1 (public RSS research acquisition)',
     'nuance-net-ingest/0.1',
     'nuance-podcast-download/1.0',
     'ohdio-archiver/1.0 (personal podcast downloader; one request at a time)',
@@ -1975,4 +1976,14 @@ const botIpHashes = new Set([
     'bf3c50926ac8920d84c70f618b31cbeabf7d3a41', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
     'dd6f6ba07e52109d503fa0964417eae04e534419', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
     'ed827ef2cc251c70f4c6fbe5e6f0586a1c2191c4', // 2026-10-27 for 2026-10-26 208677 cloudtech  Chrome
+    '10c630d0915cfcae72c707dc50a52cfbd218584a', // 2026-10-28 for 2026-10-27 14593  spacex     Overcast
+    '11e1ca1539813c36982a14585bbcb5b242b676d9', // 2026-10-28 for 2026-10-27 4181   tdstelecom PodHaven/0.1
+    '2998fcd619f5a12a0d35c82fa8b79f4e657ae447', // 2026-10-28 for 2026-10-27 1257   tele2      Overcast
+    '2c47e29500d935acc899dce70cd9e4bb7da9e314', // 2026-10-28 for 2026-10-27 6079   rcn        Overcast
+    '39ed523740ac2fea319efe66d3b53e99e532246c', // 2026-10-28 for 2026-10-27 3352   telefonica Apple Podcasts, AppleCoreMedia
+    '6c53398836bfdba9caccc52dba5b9478c1bfe02f', // 2026-10-28 for 2026-10-27 7018   att        Overcast
+    'a4c210597350de199470dde34d2716d842ae8916', // 2026-10-28 for 2026-10-27 208677 cloudtech  Chrome
+    'ba3d34a1c0c001e6e7e759f3bd07d6dec9670a69', // 2026-10-28 for 2026-10-27 5610   o2czech    NigerianPodcastCorpus/0.1 (public RSS research acquisition)
+    'd44c2da3c6b95bcca0fb4cfe24401d292318d729', // 2026-10-28 for 2026-10-27 55286  b2net      Firefox
+    'd98a539f0ad1e2f88cf58168421fe6368915ec79', // 2026-10-28 for 2026-10-27 213220 delta      Firefox
 ]);
