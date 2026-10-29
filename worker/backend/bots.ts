@@ -40,6 +40,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'BelgianFrenchUsage/2.0 public-RSS research archive',
     'BitcoinEducationArchive/1.0',
     'CastopodMobile/0.1 (transcriber)',
+    'ChariotPodcastFetcher/1.0',
     'CodexPodcastTranscriber/1.0',
     'CREscope/1.0 (podcast research pipeline)',
     'csv-link-downloader/1.0',
@@ -1986,4 +1987,7 @@ const botIpHashes = new Set([
     'ba3d34a1c0c001e6e7e759f3bd07d6dec9670a69', // 2026-10-28 for 2026-10-27 5610   o2czech    NigerianPodcastCorpus/0.1 (public RSS research acquisition)
     'd44c2da3c6b95bcca0fb4cfe24401d292318d729', // 2026-10-28 for 2026-10-27 55286  b2net      Firefox
     'd98a539f0ad1e2f88cf58168421fe6368915ec79', // 2026-10-28 for 2026-10-27 213220 delta      Firefox
+    '25b3689063c9fb4a424e61479a2dbdc5474c7cca', // 2026-10-29 for 2026-10-28 132420 e2e        ChariotPodcastFetcher/1.0
+    '419015316399b267a6352736305c0d93edcdca16', // 2026-10-29 for 2026-10-28 32167  lshiy      Chrome
+    '4bae7deb854b502aaeb3fcfe3e53495b05f8fca5', // 2026-10-29 for 2026-10-28 32167  lshiy      Chrome
 ]);
