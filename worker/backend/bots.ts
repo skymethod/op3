@@ -99,6 +99,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (podcast-fetcher)',
     'Mozilla/5.0 (podcast-harvest; research)',
     'Mozilla/5.0 (PrettyData Industry Watch)',
+    'Mozilla/5.0 (research)',
     'Mozilla/5.0 (signalmusic podcast-dl)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
@@ -1990,4 +1991,13 @@ const botIpHashes = new Set([
     '25b3689063c9fb4a424e61479a2dbdc5474c7cca', // 2026-10-29 for 2026-10-28 132420 e2e        ChariotPodcastFetcher/1.0
     '419015316399b267a6352736305c0d93edcdca16', // 2026-10-29 for 2026-10-28 32167  lshiy      Chrome
     '4bae7deb854b502aaeb3fcfe3e53495b05f8fca5', // 2026-10-29 for 2026-10-28 32167  lshiy      Chrome
+    '53afbd4bf5b04e9682699684abf64ad3007119ad', // 2026-10-30 for 2026-10-29 213896 uabcherry  Firefox
+    '6933169b5fa260afdc67460fe29586bc498987f3', // 2026-10-30 for 2026-10-29 7018   att        Overcast
+    '849aa896f80f247757e2c2baaab4926c1824c783', // 2026-10-30 for 2026-10-29 14593  spacex     Overcast
+    'a709c2c4aa27fa6ebc9a7960e28334a60df4c327', // 2026-10-30 for 2026-10-29 786    jisc       Mozilla/5.0 (research)
+    'b1e7e1a4ed30f16eee46de7be98b418f5b682a96', // 2026-10-30 for 2026-10-29 20473  constant   Chrome, Safari, Firefox, Edge
+    'c9e7b3acb81de3f83c13de4c07737a7c1efe9327', // 2026-10-30 for 2026-10-29 7018   att        Overcast
+    'ca30900ea8e5960f8cf7b80231a4f22368f41d87', // 2026-10-30 for 2026-10-29 20473  constant   Safari, Chrome, Firefox, Edge
+    'cc5439beac97ce0a8aebbbf129920fb3e85c2136', // 2026-10-30 for 2026-10-29 1257   tele2      Overcast
+    'd9375f64e5f65df8b48a2f151bd7238af715389e', // 2026-10-30 for 2026-10-29 7018   att        Overcast
 ]);
