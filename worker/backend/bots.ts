@@ -2000,4 +2000,8 @@ const botIpHashes = new Set([
     'ca30900ea8e5960f8cf7b80231a4f22368f41d87', // 2026-10-30 for 2026-10-29 20473  constant   Safari, Chrome, Firefox, Edge
     'cc5439beac97ce0a8aebbbf129920fb3e85c2136', // 2026-10-30 for 2026-10-29 1257   tele2      Overcast
     'd9375f64e5f65df8b48a2f151bd7238af715389e', // 2026-10-30 for 2026-10-29 7018   att        Overcast
+    '15bcc35c93c598c09a8ef8b219c2e485294ef41a', // 2026-10-31 for 2026-10-30 25977  houston    Overcast
+    '2a543c796ce791e2dc8dff475968af83bfdbc7a9', // 2026-10-31 for 2026-10-30 17465  asianet    Chrome
+    '5832cf07e9c03ca39e0a907e66bee66ae4a0f704', // 2026-10-31 for 2026-10-30 51396  pfcloud    Chrome, Safari, Firefox
+    'b930178be52b4c4f4b1900180db6ef279e765e29', // 2026-10-31 for 2026-10-30 1257   tele2      Overcast
 ]);
