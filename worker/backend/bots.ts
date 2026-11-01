@@ -103,6 +103,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (signalmusic podcast-dl)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
+    'Mozilla/5.0 (X11; Linux x86_64) dsc-offline-archive (personal offline copy)',
     'Mozilla/5.0 Gabble-feed-sample/1.0',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
     'Mozilla/5.0 stereo-conversation-research/1.0',
@@ -136,6 +137,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast-transcriber/0.1',
     'podcast-transcripts/1.0 (+personal transcript archiver)',
     'PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)',
+    'PodcastArchive/1.0 (personal homelab archive)',
     'PodcastArchive/1.0',
     'PodcastArchiver/1.0',
     'PodcastDataEnricher/2.0 (audio-research; admin@podcasthawk.com)',
@@ -2004,4 +2006,16 @@ const botIpHashes = new Set([
     '2a543c796ce791e2dc8dff475968af83bfdbc7a9', // 2026-10-31 for 2026-10-30 17465  asianet    Chrome
     '5832cf07e9c03ca39e0a907e66bee66ae4a0f704', // 2026-10-31 for 2026-10-30 51396  pfcloud    Chrome, Safari, Firefox
     'b930178be52b4c4f4b1900180db6ef279e765e29', // 2026-10-31 for 2026-10-30 1257   tele2      Overcast
+    '1714e98b370fec8029e7098f33975b7e4b849308', // 2026-11-01 for 2026-10-31 140641 yotta      AppleCoreMedia
+    '2895421dd5384410435ffd59ac66fb3436a413fe', // 2026-11-01 for 2026-10-31 8447   a1telekom  Overcast
+    '29e0971c8cc0cbf17cd0ba0f95ca0e7fae6500a1', // 2026-11-01 for 2026-10-31 3209   vodafone   Edge
+    '4222b75e2644904e3a272754a9c0c888585e639a', // 2026-11-01 for 2026-10-31 11426  charter    Mozilla/5.0 (X11; Linux x86_64) dsc-offline-archive (personal offline copy)
+    '5af856abb19e951788c81796d22d1449e3c394b4', // 2026-11-01 for 2026-10-31 7029   windstream PodcastArchive/1.0 (personal homelab archive)
+    '6b1d35ecb11c06cd20cca01eba3a3c4e915979f3', // 2026-11-01 for 2026-10-31 1257   tele2      Overcast
+    '7bbf3087d0513e72622a07391f347366cd22258a', // 2026-11-01 for 2026-10-31 140641 yotta      AppleCoreMedia
+    '83acfdfee044e77445833aaa77948a7fc988852e', // 2026-11-01 for 2026-10-31 3352   telefonica Overcast, Safari
+    'b09a523b73a87cdace0d358438c865fa27cc8383', // 2026-11-01 for 2026-10-31 7018   att        Overcast
+    'c9bdac072f8c33522e7b926b8d507e7b779fda42', // 2026-11-01 for 2026-10-31 1257   tele2      Overcast
+    'f7537f626534c392a1f5f9894ccee148eed69aa9', // 2026-11-01 for 2026-10-31 7018   att        Overcast
+    'fe4824336bdcae32235e994b097150668cb5f352', // 2026-11-01 for 2026-10-31 7018   att        Overcast
 ]);
