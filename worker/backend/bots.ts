@@ -158,6 +158,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PublicFrenchYouthPodcastArchive/1.0 (+offline-preservation)',
     'PulsewireV4V/0.6 enclosure verifier',
     'r2n/1.0 (+https://github.com/Buildtall-Systems/buildtall)',
+    'RadioMaster+/1.3.0',
     'Reverb-Podcast/1.0 (+bcguardian.com)',
     'rss-to-whisper/2.0.0 https://github.com/baz8080/rss_to_whisper',
     'rssfeedexporter/0.1 (podcast archiver; info@allCHGO.com)',
@@ -2018,4 +2019,24 @@ const botIpHashes = new Set([
     'c9bdac072f8c33522e7b926b8d507e7b779fda42', // 2026-11-01 for 2026-10-31 1257   tele2      Overcast
     'f7537f626534c392a1f5f9894ccee148eed69aa9', // 2026-11-01 for 2026-10-31 7018   att        Overcast
     'fe4824336bdcae32235e994b097150668cb5f352', // 2026-11-01 for 2026-10-31 7018   att        Overcast
+    '03f69f71d7c99974c1b744d6ba030631905260e0', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '0b6c520f5a5887c3774247bc38ec69962af5af0b', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '0c16829e4913338d8b93447285cbb3606e586905', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '1b3dc7f2833b15092ae7d103c1dec5c21f317a38', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '1e1090174802d9df6671bbeb9532522dbc418829', // 2026-11-02 for 2026-11-01 1257   tele2      Overcast
+    '20d5465b5d131a7a56ff81d27253213596544b2b', // 2026-11-02 for 2026-11-01 1257   tele2      Overcast
+    '494df35bfb07967f39cb87d5742e161fcacbf289', // 2026-11-02 for 2026-11-01 7018   att        Overcast
+    '4950c830ae4f63b5e1326287ac81239a3918becc', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '73bb4e0e3c90f21c91aaa9dc9626e1cfc8606896', // 2026-11-02 for 2026-11-01 7018   att        Overcast
+    '7a7b1c3b9f32fd3a81e55242425a29419b26e42c', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '7bc127afe1659eba1eb4f20dc55d9b63d652a4d3', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '7d733ba9f3cee3cd5d8897b52e711d10029112bb', // 2026-11-02 for 2026-11-01 216444 uabcherry  Firefox
+    '8ae9a440028ab81306970c2c1a17bdfa3e5a7e6a', // 2026-11-02 for 2026-11-01 140641 yotta      AppleCoreMedia
+    '8b9eacb46f21df9c7e2fc880d20694fd960a6b2d', // 2026-11-02 for 2026-11-01 19413  roanoke    Overcast
+    '97be92d476898d5a94128452f453776c34e5e5de', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    'b1e7e2f46ddd4f12896f42ce9cca2bda478e2ee0', // 2026-11-02 for 2026-11-01 20001  charter    Chrome
+    'bdf0af0d8d4d1af9301f2c0c90ab85c90095ca42', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    'dff7930a2d00b2b347a3cf4a87ddadc3df978470', // 2026-11-02 for 2026-11-01 5650   frontier   Overcast
+    'e8b1187f77b5a77ad9e7f84e162c49196e1503fb', // 2026-11-02 for 2026-11-01 329038 welink     RadioMaster+/1.3.0
+    'f0574ce761ed8578e83d0a3d7c326a6c6485ac33', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
 ]);
