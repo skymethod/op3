@@ -19,6 +19,7 @@ Deno.test({
             'https://a.wildcard.sus/a',
             'https://asdf-123.wildcard.sus/a',
             'https://https',
+            'https://127.0.0.1:8080/evil',
         ];
 
         for (const targetUrl of ban) {

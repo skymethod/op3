@@ -46,7 +46,7 @@ export class Banlist {
 
 function isReservedForTesting(hostname: string): boolean {
     // https://www.rfc-editor.org/rfc/rfc2606.html#section-2
-    return /^(.+?\.)?(test|example|invalid|localhost)$/.test(hostname);
+    return /^(.+?\.)?(test|example|invalid|localhost)$/.test(hostname) || hostname === '127.0.0.1';
 }
 
 async function loadBannedHostnames(namespace: KVNamespace, cache: CfCache | undefined): Promise<Set<string>> {
