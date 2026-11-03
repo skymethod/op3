@@ -53,6 +53,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'DiarizationPodcastDownloader/1.0 (public episode download)',
     'dossier/0.1 (podcast research; contact via repo)',
     'DoubleTap-LivePlayout-Ingest/1.0 (+https://blindguystudio.com)',
+    'DSC-Archive-Download/1.0',
     'DuplexIO/0.1 (podcast conversation pipeline evaluation)',
     'DuplexPipeline/2.0',
     'edgewise-podcast-harvest/0.1',
@@ -127,6 +128,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podarch/0.1 (personal archive)',
     'podcast_dl/1.0 (+https://example.local) Python-urllib',
     'podcast-archive-backfill/1.0 (personal archive)',
+    'podcast-archiver/1.0 (personal archive; +https://github.com)',
     'podcast-archiver/1.0 (personal offline listening)',
     'podcast-brain/1.0 (personal archiving)',
     'podcast-classification-research/1.0 (academic; audio-download; caleb.eynon@chicagobooth.edu)',
@@ -2039,4 +2041,17 @@ const botIpHashes = new Set([
     'dff7930a2d00b2b347a3cf4a87ddadc3df978470', // 2026-11-02 for 2026-11-01 5650   frontier   Overcast
     'e8b1187f77b5a77ad9e7f84e162c49196e1503fb', // 2026-11-02 for 2026-11-01 329038 welink     RadioMaster+/1.3.0
     'f0574ce761ed8578e83d0a3d7c326a6c6485ac33', // 2026-11-02 for 2026-11-01 208677 cloudtech  Chrome
+    '53708af97b7c4767f2d9ce7028807f9aaf94f929', // 2026-11-03 for 2026-11-02 7922   comcast    podcast-archiver/1.0 (personal archive; +https://github.com)
+    '547361e8da8c776e302ce1a7f2019ca5b4a025ee', // 2026-11-03 for 2026-11-02 396982 google     AppleCoreMedia
+    '70abe196e740557305264c3654036312cece3446', // 2026-11-03 for 2026-11-02 1257   tele2      Overcast
+    '71eebf2f41ba10629955aa798a495832c2d609cb', // 2026-11-03 for 2026-11-02 14593  spacex     Overcast
+    '721e3e26ac12ee6c28af64f2d04386389e99dcee', // 2026-11-03 for 2026-11-02 396982 google     AppleCoreMedia
+    '777a52649453ca55e5fc6d0fb105ba9809cc073d', // 2026-11-03 for 2026-11-02 396982 google     AppleCoreMedia
+    '7ed393672c1a5c6821c3bc2ca3eaa84b1f88882b', // 2026-11-03 for 2026-11-02 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    '920c4f56731af053c694473e6d094b44e4c1f06c', // 2026-11-03 for 2026-11-02 15153  starvision DSC-Archive-Download/1.0, Apple Podcasts (Watch), Safari
+    'ad2564d5c15fc8e660e98b88f2dc12686ada8550', // 2026-11-03 for 2026-11-02 8412   tmobile    Chrome
+    'd25715c0ae303108c152b78a0e03f9d01aaff004', // 2026-11-03 for 2026-11-02 1257   tele2      Overcast
+    'd9ef18330f1a198a1dc1d5215146cbe841a1bcd4', // 2026-11-03 for 2026-11-02 30036  mediacom   iCatcher
+    'f94daa2ea16eaeeab42bccbf4a045d2610df2631', // 2026-11-03 for 2026-11-02 214159 cherry     Firefox
+    'fda2feaec40cd9c50bdb059c8ac9e611838d55eb', // 2026-11-03 for 2026-11-02 7018   att        Overcast
 ]);
