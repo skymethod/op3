@@ -8,6 +8,7 @@ Deno.test({
         const good: Record<string, ApplePodcastsUserAgent> = {
             'Podcasts/4023.510.2 CFNetwork/1494.0.7 Darwin/23.4.0': { appName: 'Podcasts', appVersion: '4023.0510.0002.0000', cfVersion: '1494.0000.0007.0000', dwVersion: '0023.0004.0000.0000', trailer: undefined, cfVersionExtra: undefined },
             'Podcasts/4027.200.9 CFNetwork/3896.100.1.3.1 Darwin/27.2.0': { appName: 'Podcasts', appVersion: '4027.0200.0009.0000', cfVersion: '3896.0100.0001.0003', dwVersion: '0027.0002.0000.0000', trailer: undefined, cfVersionExtra: '0001' },
+            'Podcasts/4025.300.9 CFNetwork/3860.300.21 Darwin/25.2.0 [client-ip-hash:foo country:foo city:foo region:foo metro:foo]': { appName: 'Podcasts', appVersion: '4025.0300.0009.0000', cfVersion: '3860.0300.0021.0000', dwVersion: '0025.0002.0000.0000', trailer: '[client-ip-hash:foo country:foo city:foo region:foo metro:foo]', cfVersionExtra: undefined },
         };
         for (const [ userAgent, expected ] of Object.entries(good)) {
             const result = parseApplePodcastsUserAgent(userAgent);
@@ -25,6 +26,7 @@ Deno.test({
             'Podcasts/3.5.1 (app.podcast.cosmos; build:402; iOS 16.2.0) Alamofire/5.0.0-rc.3',
             'Podcast/1.7.3 (Linux;Android 13) ExoPlayerLib/2.10.4',
             'Podcasts/3.9 iOS/17.2.1 model/iPhone12,3 hwp/t8030 build/21C66 (6; dt:205) AMS/1',
+            'Podcasts/2.4 [client-ip-hash:foo]',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
