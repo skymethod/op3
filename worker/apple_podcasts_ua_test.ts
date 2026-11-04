@@ -27,6 +27,7 @@ Deno.test({
             'Podcast/1.7.3 (Linux;Android 13) ExoPlayerLib/2.10.4',
             'Podcasts/3.9 iOS/17.2.1 model/iPhone12,3 hwp/t8030 build/21C66 (6; dt:205) AMS/1',
             'Podcasts/2.4 [client-ip-hash:foo]',
+            'Podcasty/13.12.2023Ad',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
