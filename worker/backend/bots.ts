@@ -2054,4 +2054,9 @@ const botIpHashes = new Set([
     'd9ef18330f1a198a1dc1d5215146cbe841a1bcd4', // 2026-11-03 for 2026-11-02 30036  mediacom   iCatcher
     'f94daa2ea16eaeeab42bccbf4a045d2610df2631', // 2026-11-03 for 2026-11-02 214159 cherry     Firefox
     'fda2feaec40cd9c50bdb059c8ac9e611838d55eb', // 2026-11-03 for 2026-11-02 7018   att        Overcast
+    '11efa11f5ea9ccf5ac5ff1c547b7a0265a55e980', // 2026-11-04 for 2026-11-03 52362  servicios  AppleCoreMedia
+    '8f3668d6f845b6d1a5bf1a815f038eaadde626a1', // 2026-11-04 for 2026-11-03 51396  pfcloud    Chrome, Firefox, Safari
+    '9be23e75fc5d3de802561333207cf6a63933503b', // 2026-11-04 for 2026-11-03 7018   att        Overcast
+    'a71131a94b83d41a93330603af4563bfe5ccfaab', // 2026-11-04 for 2026-11-03 7018   att        Overcast
+    'd320e1a33551aa3a6a58ba17cdcfe8e21dfd1f75', // 2026-11-04 for 2026-11-03 14754  teleguatemala AppleCoreMedia
 ]);
