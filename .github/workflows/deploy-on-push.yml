@@ -45,7 +45,7 @@ jobs:
           QUEUE1_NAME: queue1-ci
           QUEUE2_NAME: queue2-ci
           XFETCHER: ${{ secrets.XFETCHER }}
-          QHI_VPC: qhi-dev
+          QHI_VPC: 01a1ac56-68b3-71a0-b590-4e7c49d62747 # qhi-dev
   deploy-staging:
     runs-on: ubuntu-22.04
     env:
