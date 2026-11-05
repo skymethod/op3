@@ -2059,4 +2059,11 @@ const botIpHashes = new Set([
     '9be23e75fc5d3de802561333207cf6a63933503b', // 2026-11-04 for 2026-11-03 7018   att        Overcast
     'a71131a94b83d41a93330603af4563bfe5ccfaab', // 2026-11-04 for 2026-11-03 7018   att        Overcast
     'd320e1a33551aa3a6a58ba17cdcfe8e21dfd1f75', // 2026-11-04 for 2026-11-03 14754  teleguatemala AppleCoreMedia
+    '317593b094fd0c0ba8dbef422ac01488eb9d386d', // 2026-11-05 for 2026-11-04 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '3193944eb9c6f528ed1f8cc9b453398238ab2a7b', // 2026-11-05 for 2026-11-04 6805   telefonica Chrome, Edge, Safari
+    '3b1aa9938492d83b519aee14c7ccca3333d3a5d6', // 2026-11-05 for 2026-11-04 396982 google     AppleCoreMedia
+    '63020f09adaaa405e1b37fa416020f64afc4ecba', // 2026-11-05 for 2026-11-04 209    centurylink Apple Podcasts
+    '68a33724eaf3ba4db7483cb9241c182baa05b723', // 2026-11-05 for 2026-11-04 7018   att        Overcast
+    'a35d2ccdcc9c60d397f0e42be6272c201e3f7ac6', // 2026-11-05 for 2026-11-04 52362  servicios  AppleCoreMedia
+    'b517f77eb8e3076f40912b35560e074ccfc5b5e9', // 2026-11-05 for 2026-11-04 21928  tmobile    AppleCoreMedia
 ]);
