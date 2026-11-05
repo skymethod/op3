@@ -2,11 +2,12 @@
 export type ApplePodcastsUserAgent = { appName: string, appVersion: string, cfVersion: string, dwVersion: string, trailer: string | undefined, cfVersionExtra: string | undefined };
 
 export function parseApplePodcastsUserAgent(userAgent: string): ApplePodcastsUserAgent | undefined {
-    if (/^Podcasts?y?\/\d{1,4}\.\d+(\.\d+[Ad]*)?( (\(app\..*?|[^\s]+|\[client-ip-hash:.*?\]|\(Apple Inc\..*?|\(Fl.*?|\(iPhone;.*?AppleCoreMedia.*?))?$/.test(userAgent)) return undefined; // Podcasts/3.5.1, Podcasts/1530.3 Podcast/2.2 (app.podcast.cosmos; build:402; iOS 16.2.0) Alamofire/5.0.0-rc.3, Podcasts/2.4 [client-ip-hash:...]
+    if (/^Podcasts?y?\/\d{1,4}\.\d+(\.\d+[Ad]*)?( (\(app\..*?|[^\s]+|\[client-ip-hash:.*?\]|\(Apple Inc\..*?|\(Fl.*?|\(iPhone;.*?AppleCoreMedia.*?|\(Android RSS.*?|\(iOS;.*? podcast player.*?|\(.*?master project.*?|\(a personal podcast.*?|\(Golden Gate; Linux.*?|CFNetwork AppleCoreMedia))?$/.test(userAgent)) return undefined; // Podcasts/3.5.1, Podcasts/1530.3 Podcast/2.2 (app.podcast.cosmos; build:402; iOS 16.2.0) Alamofire/5.0.0-rc.3, Podcasts/2.4 [client-ip-hash:...]
     if (/ExoPlayerLib\//.test(userAgent)) return undefined; // Podcast/1.7.3 (Linux;Android 13) ExoPlayerLib/2.10.4
     if (/ model\/.*?hwp\//.test(userAgent)) return undefined; // Podcasts/3.9 iOS/17.2.1 model/iPhone12,3 hwp/t8030 build/21C66 (6; dt:205) AMS/1
     if (/^Podcasts\/\d.*iOS.*Scale\/\d/.test(userAgent)) return undefined; // Podcasts/1530.3 (iPad; iOS 17.4; Scale/1.00)
     if (/^Podcast\/\d+\.\d+\.\d+ linux /.test(userAgent)) return undefined; // Podcast/0.1.0 linux Linux 6.8.0-110-generic ...
+    if (/^Podcaster\/\d+\.\d+ \(Android.*?\)/.test(userAgent)) return undefined; // Podcaster/1.0 (Android), Podcaster/1.0 (Android; com.podcaster.app)
     const m = /^([^/\s]+)\/(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))? CFNetwork\/(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))?(\.(\d+))? Darwin\/(\d+)\.(\d+)\.(\d+)( (\(x86_64\)( [0-9A-Za-z]{6})?|Opendium|(?:\(x86_64\) )?\[client-ip-hash:.*?\]|[^\s]+))?$/.exec(userAgent);
     if (!m) throw new Error(`Unsupported Apple Podcasts user-agent: ${userAgent}`);
     const [ _, appName, 

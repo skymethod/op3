@@ -32,6 +32,15 @@ Deno.test({
             'Podcast/0.1.0 linux Linux 6.8.0-110-generic #110-Ubuntu SMP PREEMPT_DYNAMIC Thu Mar 19 15:09:20 UTC 2026',
             'Podcasts/1.0 (FlickFlack Audio Pipeline)',
             'Podcasts/1.0 (iPhone; iOS 18.0) AppleCoreMedia/1.0.0',
+            'Podcasts/1.0 (Android RSS podcast player)',
+            'Podcast/1.0 (iOS; personal podcast player)',
+            'Podcast/0.4 (master project; Ktor)',
+            'Podcast/0.5 (Android; master project)',
+            'Podcaster/1.0 (Android)',
+            'Podcasts/1.0 (a personal podcast app; one listener)',
+            'Podcasts/1.1.0 (Golden Gate; Linux)',
+            'Podcaster/1.0 (Android; com.podcaster.app)',
+            'Podcasts/1.0 CFNetwork AppleCoreMedia',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
