@@ -74,6 +74,7 @@ jobs:
           QUEUE1_NAME: queue1-staging
           QUEUE2_NAME: queue2-staging
           XFETCHER: ${{ secrets.XFETCHER }}
+          QHI_VPC: 01a1ac56-68b3-71a0-b590-4e7c49d62747 # qhi-dev
   deploy-prod:
     runs-on: ubuntu-22.04
     env:
@@ -102,3 +103,4 @@ jobs:
           QUEUE1_NAME: queue1-prod
           QUEUE2_NAME: queue2-prod
           XFETCHER: ${{ secrets.XFETCHER }}
+          QHI_VPC: 01a1ac56-68b3-71a0-b590-4e7c49d62747 # qhi-dev
