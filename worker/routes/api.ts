@@ -12,7 +12,7 @@ import { PodcastIndexClient } from '../podcast_index_client.ts';
 import { computeFeedAnalysis } from '../feed_analysis.ts';
 import { computeUserAgent, newPodcastIndexClient } from '../outbound.ts';
 import { DoNames } from '../do_names.ts';
-import { Queue } from '../deps.ts';
+import { Queue, VpcService } from '../deps.ts';
 import { tryParseRecomputeShowSummariesForMonthRequest, recomputeShowSummariesForMonth } from '../backend/show_summaries.ts';
 import { Blobs } from '../backend/blobs.ts';
 import { computeApiQueryDownloadsResponse } from './api_query_downloads.ts';
@@ -43,10 +43,10 @@ export function tryParseApiRequest(opts: { instance: string, method: string, hos
 export type JsonProvider = () => Promise<any>;
 export type Background = (work: () => Promise<unknown>) => void;
 
-type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined, xfetcher: string | undefined };
+type Opts = { rpcClient: RpcClient, adminTokens: Set<string>, previewTokens: Set<string>, turnstileSecretKey: string | undefined, podcastIndexCredentials: string | undefined, background: Background, jobQueue: Queue | undefined, statsBlobs: Blobs | undefined, roStatsBlobs: Blobs | undefined, roRpcClient: RpcClient | undefined, configuration: Configuration | undefined, miscBlobs: Blobs | undefined, roMiscBlobs: Blobs | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, baselime: Baselime | undefined, limiter: Limiter | undefined, xfetcher: string | undefined, qhiVpc: VpcService | undefined };
 export async function computeApiResponse(request: ApiRequest, opts: Opts): Promise<Response> {
     const { instance, method, hostname, origin, path, searchParams, bearerToken, rawIpAddress, bodyProvider, colo, deploySha, deployTime, userAgent } = request;
-    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter, xfetcher } = opts;
+    const { rpcClient, adminTokens, previewTokens, turnstileSecretKey, podcastIndexCredentials, background, jobQueue, statsBlobs, roStatsBlobs, roRpcClient, configuration, miscBlobs, roMiscBlobs, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, baselime, limiter, xfetcher, qhiVpc } = opts;
 
     const start = Date.now();
     const namespace = `op3-${instance}-api-${method.toLowerCase()}${computeNamespaceSuffix(path)}`;
@@ -90,7 +90,7 @@ export async function computeApiResponse(request: ApiRequest, opts: Opts): Promi
                 if (path === '/admin/rpc') return await computeAdminRpcResponse(method, bodyProvider, rpcClient);
             }
             if (path === '/redirect-logs') return await computeQueryRedirectLogsResponse(permissions, origin, method, searchParams, rpcClient, rawIpAddress);
-            if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress });
+            if (path === '/hits') return await computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress, qhiVpc });
             if (path.startsWith('/downloads/')) return await computeApiQueryDownloadsResponse(permissions, method, path, searchParams, { statsBlobs, roStatsBlobs, colo, rpcClient });
             if (path === '/api-keys') return await computeApiKeysResponse({ instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient });
             { const m = /^\/api-keys\/([0-9a-f]{32})$/.exec(path); if (m) return await computeApiKeyResponse(m[1], { instance, isAdmin: hasAdmin, method, hostname, bodyProvider, rawIpAddress, turnstileSecretKey, rpcClient }); }

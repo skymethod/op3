@@ -14,9 +14,10 @@ import { computeApiQueryCommonParameters, newQueryResponse } from './api_query_c
 import { DoNames } from '../do_names.ts';
 import { computeLinestream } from '../streams.ts';
 import { computeChainDestinationUrl } from '../chain_estimate.ts';
+import { VpcService } from '../deps.ts';
 
-type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, rawIpAddress: string | undefined };
-export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress }: Opts): Promise<Response> {
+type Opts = { permissions: ReadonlySet<ApiTokenPermission>, method: string, searchParams: URLSearchParams, rpcClient: RpcClient | undefined, roRpcClient: RpcClient | undefined, hitsBlobs: Blobs | undefined, roHitsBlobs: Blobs | undefined, backupBlobs: Blobs | undefined, roBackupBlobs: Blobs | undefined, rawIpAddress: string | undefined, qhiVpc: VpcService | undefined };
+export async function computeQueryHitsResponse({ permissions, method, searchParams, rpcClient, roRpcClient, hitsBlobs, roHitsBlobs, backupBlobs, roBackupBlobs, rawIpAddress, qhiVpc: qhiVpcOpt }: Opts): Promise<Response> {
     if (!hasPermission(permissions, 'preview', 'read-data')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
 
@@ -29,6 +30,8 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need targetRpcClient`);
 
+    const qhiVpc = searchParams.has('vpc') ? qhiVpcOpt : undefined;
+
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
         const admin = permissions.has('admin');
@@ -38,19 +41,24 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
         const { message } = packError(e);
         return newJsonResponse({ message }, 400);
     }
-    return await query(request, { rpcClient: targetRpcClient, hitsBlobs: targetHitsBlobs, backupBlobs: targetBackupBlobs });
+    return await query(request, { rpcClient: targetRpcClient, hitsBlobs: targetHitsBlobs, backupBlobs: targetBackupBlobs, qhiVpc });
 }
 
 //
 
-async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, hitsBlobs, backupBlobs }: { rpcClient: RpcClient, hitsBlobs: Blobs, backupBlobs: Blobs }): Promise<Response> {
+async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, hitsBlobs, backupBlobs, qhiVpc }: { rpcClient: RpcClient, hitsBlobs: Blobs, backupBlobs: Blobs, qhiVpc?: VpcService }): Promise<Response> {
     const { format = 'tsv', include = '', hashedIpAddress, rawIpAddress, url, urlStartsWith, descending = false } = request;
     const startTime = Date.now();
 
     let indexSortKeys: string[] | undefined;
     if (typeof hashedIpAddress === 'string' || typeof rawIpAddress === 'string' || typeof url === 'string' || typeof urlStartsWith === 'string') {
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, descending } = request;
-        const response = await rpcClient.queryHitsIndex({ limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith, descending }, DoNames.hitsServer);
+        const response = await (async () => {
+            const req = { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith, descending };
+            if (qhiVpc && rawIpAddress) return new Response('not supported yet', { status: 400 });
+            if (qhiVpc) return await qhiVpc.fetch('http://vpc/qhi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(req) });
+            return await rpcClient.queryHitsIndex(req, DoNames.hitsServer);
+        })();
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
         if (!response.body) throw new Error(`queryHitsIndex returned no body`);
         indexSortKeys = [];

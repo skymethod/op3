@@ -1,4 +1,4 @@
-import { DurableObjectNamespace, AnalyticsEngine, R2Bucket, KVNamespace, Queue, Ratelimiter } from './deps.ts';
+import { DurableObjectNamespace, AnalyticsEngine, R2Bucket, KVNamespace, Queue, Ratelimiter, VpcService } from './deps.ts';
 
 export interface WorkerEnv {
     readonly instance: string;
@@ -31,4 +31,5 @@ export interface WorkerEnv {
     readonly baselimeApiKey?: string;
     readonly limiter1?: Ratelimiter;
     readonly xfetcher?: string;
+    readonly qhiVpc?: VpcService;
 }

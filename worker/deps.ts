@@ -1,7 +1,7 @@
 export type { CfGlobalCaches, CfCache, CfCacheOptions, IncomingRequestCf, ModuleWorkerContext, DurableObjectState, DurableObjectNamespace, DurableObjectStorage, DurableObjectStorageMethods, 
     AnalyticsEngine, DurableObjectStorageValue, AnalyticsEngineEvent, DurableObjectStorageListOptions, DurableObjectStorageReadOptions,
     R2Bucket, R2ListOptions, KVNamespace, R2MultipartUpload, R2UploadedPart, R2GetOptions, R2Object, R2ObjectBody,
-    QueueMessageBatch, QueueMessage, Queue, QueuesContentType, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions, Ratelimiter, SqlStorage, LocationHint } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/cloudflare_workers_types.d.ts';
+    QueueMessageBatch, QueueMessage, Queue, QueuesContentType, KVPutOptions, KVGetOptions, KVValueAndMetadata, KVListCompleteResult, KVListIncompleteResult, KVListOptions, Ratelimiter, SqlStorage, LocationHint, VpcService } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/cloudflare_workers_types.d.ts';
 export { Bytes } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/bytes.ts';
 export { R2, signAwsCallV4 } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/r2.ts';
 export type { AwsCall, AwsCallContext } from 'https://raw.denoflare.dev/skymethod/denoflare/4e25659532eb44bf2dead216dcf7d5155248835a/common/r2/r2.ts';

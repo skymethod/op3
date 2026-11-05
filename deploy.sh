@@ -62,4 +62,5 @@ ${DEBUG_WEBHOOK_URL:+--secret-binding debugWebhookUrl:$DEBUG_WEBHOOK_URL} \
 ${BASELIME_EVENTS_URL:+--text-binding baselimeEventsUrl:$BASELIME_EVENTS_URL} \
 ${BASELIME_API_KEY:+--secret-binding baselimeApiKey:$BASELIME_API_KEY} \
 ${LIMITER_1:+--ratelimit-binding limiter1:$LIMITER_1} \
-${XFETCHER:+--secret-binding xfetcher:$XFETCHER}
+${XFETCHER:+--secret-binding xfetcher:$XFETCHER} \
+${QHI_VPC:+--vpc-service-binding qhiVpc:$QHI_VPC}
