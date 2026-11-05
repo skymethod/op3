@@ -55,8 +55,18 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, h
         const { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, descending } = request;
         const response = await (async () => {
             const req = { limit, startTimeInclusive, startTimeExclusive, endTimeExclusive, hashedIpAddress, rawIpAddress, url, urlStartsWith, descending };
-            if (qhiVpc && rawIpAddress) return new Response('not supported yet', { status: 400 });
-            if (qhiVpc) return await qhiVpc.fetch('http://vpc/qhi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...req, instance }) });
+            if (qhiVpc) {
+                const { rawIpAddress, ...rest } = req;
+                if (typeof rawIpAddress === 'string') {
+                    const [ result ] = ((await rpcClient.adminExecuteDataQuery({ targetPath: '/hits/compute', operationKind: 'select', parameters: { rawIpAddress } }, DoNames.hitsServer)).results ?? []) as { hashedIpAddress: string }[];
+                    if (typeof result?.hashedIpAddress === 'string') {
+                        rest.hashedIpAddress = result.hashedIpAddress;
+                    } else {
+                        return new Response('Unable to compute hashedIpAddress', { status: 400 });
+                    }
+                }
+                return await qhiVpc.fetch('http://vpc/qhi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...rest, instance }) });
+            }
             return await rpcClient.queryHitsIndex(req, DoNames.hitsServer);
         })();
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);

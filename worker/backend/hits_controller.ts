@@ -209,7 +209,7 @@ export class HitsController {
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         const { operationKind, targetPath, parameters = {} } = req;
-        const { storage, recentMinuteTimestamps, colo, knownServerUrls } = this;
+        const { storage, recentMinuteTimestamps, colo, knownServerUrls, hashIpAddress } = this;
        
         if (operationKind === 'select' && targetPath === '/hits/attnums') return { results: [ await storage.get('hits.attNums') ] };
 
@@ -247,6 +247,14 @@ export class HitsController {
             const go = goStr === 'true';
             const result = await trimIndexRecords({ maxIterations, go, type }, storage);
             return { results: [ result ] };
+        }
+
+        if (targetPath === '/hits/compute' && operationKind === 'select') {
+            const { rawIpAddress } = parameters;
+            if (typeof rawIpAddress === 'string') {
+                const hashedIpAddress = unpackHashedIpAddressHash(await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }));
+                return { results: [ { hashedIpAddress } ] };
+            }
         }
 
         throw new Error(`Unsupported hits query`);
