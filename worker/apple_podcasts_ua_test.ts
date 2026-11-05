@@ -28,6 +28,10 @@ Deno.test({
             'Podcasts/3.9 iOS/17.2.1 model/iPhone12,3 hwp/t8030 build/21C66 (6; dt:205) AMS/1',
             'Podcasts/2.4 [client-ip-hash:foo]',
             'Podcasty/13.12.2023Ad',
+            'Podcasts/1.0 (Apple Inc.; iOS 19.0)',
+            'Podcast/0.1.0 linux Linux 6.8.0-110-generic #110-Ubuntu SMP PREEMPT_DYNAMIC Thu Mar 19 15:09:20 UTC 2026',
+            'Podcasts/1.0 (FlickFlack Audio Pipeline)',
+            'Podcasts/1.0 (iPhone; iOS 18.0) AppleCoreMedia/1.0.0',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
