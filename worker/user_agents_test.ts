@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@dbee236e63d88e7e8066f80190260ee80953d6a4 (2026-11-05T13:37:36Z)
+// from user-agents-v2@3d403ee1d7f9321d0a4ddf3b60439b6d27d73308 (2026-11-06T17:11:16Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -693,6 +693,8 @@ const appTests = {
     'TheEconomist-Darwin-android-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'TheEconomist-Darwin-ios-2.1.1-master-2999-2001024': { type: 'app', name: `Economist Espresso` },
     'Elevation_Health/2.9 CFNetwork/672.1.14 Darwin/14.0.0': { type: 'app', name: `Elevation Health` },
+    'ELLE-Ecoute/1.0.7 (CMI-France; ios)': { type: 'app', name: `ELLE écoute` },
+    'ELLE-Ecoute/1.0.7 (CMI-France; android)': { type: 'app', name: `ELLE écoute` },
     'EMAudioPlayer 2.9.7 (720) / Android 6.0.1 / MotoG3': { type: 'app', name: `EMAudioPlayer` },
     'URL/Emacs Emacs/28.2 (TTY; x86_64-pc-linux-gnu)': { type: 'app', name: `Emacs` },
     'Encounter/1 CFNetwork/711.3.18 Darwin/14.0.0': { type: 'app', name: `Encounter` },

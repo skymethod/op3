@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@dbee236e63d88e7e8066f80190260ee80953d6a4 (2026-11-05T13:37:36Z)
+// from user-agents-v2@3d403ee1d7f9321d0a4ddf3b60439b6d27d73308 (2026-11-06T17:11:16Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -523,6 +523,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^EasyGet\//.test(userAgent)) return { name: `EasyGet`, type: 'app' };
     if (/^TheEconomist-Darwin-/.test(userAgent)) return { name: `Economist Espresso`, type: 'app' };
     if (/^Elevation_Health\//.test(userAgent)) return { name: `Elevation Health`, type: 'app' };
+    if (/^ELLE-Ecoute\//.test(userAgent)) return { name: `ELLE écoute`, type: 'app' };
     if (/^EMAudioPlayer /.test(userAgent)) return { name: `EMAudioPlayer`, type: 'app' };
     if (/^URL\/Emacs /.test(userAgent)) return { name: `Emacs`, type: 'app' };
     if (/^Encounter\//.test(userAgent)) return { name: `Encounter`, type: 'app' };
