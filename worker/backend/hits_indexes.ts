@@ -31,7 +31,7 @@ export async function computeIndexRecords(record: Record<string, string>, timest
 export type DeletionInfo = { iterations: number, listed: number, deleted: number, minKey?: string, maxKey?: string, end: string };
 
 export async function trimIndexRecords({ maxIterations, go, type, now = Date.now() }: { maxIterations: number, go: boolean, type?: string, now?: number }, storage: DurableObjectStorage): Promise<Record<string, DeletionInfo>> {
-    if (type !== undefined && type !== 'month' && type !== 'day') throw new Error(`Bad type: ${type}`);
+    if (type !== undefined && type !== 'month' && type !== 'day' && type !== 'final') throw new Error(`Bad type: ${type}`);
     const windowStart = computeIndexWindowStartInstant(now);
     const windowStartTimestamp = computeTimestamp(windowStart);
     const windowStartTimestampDay = windowStartTimestamp.substring(0, 6);
@@ -39,8 +39,8 @@ export async function trimIndexRecords({ maxIterations, go, type, now = Date.now
     
     const rt: Record<string, DeletionInfo> = {};
 
-    const trimIndex = async (indexId: IndexId, type: 'day' | 'month') => {
-        const end = `hits.i0.${indexId}.${type === 'month' ? monthEndSuffix : windowStartTimestampDay}`;
+    const trimIndex = async (indexId: IndexId, type: 'day' | 'month' | 'final') => {
+        const end = `hits.i0.${indexId}.${type === 'final' ? `z` : type === 'month' ? monthEndSuffix : windowStartTimestampDay}`;
         const info: DeletionInfo = { end, iterations: 0, listed: 0, deleted: 0 };
         rt[IndexId[indexId]] = info;
         const limit = 128; // max delete
@@ -57,8 +57,8 @@ export async function trimIndexRecords({ maxIterations, go, type, now = Date.now
             if (keys.length < limit) break;
         }
     }
-    if (type === undefined || type === 'month') await trimIndex(IndexId.MonthHashedIpAddress, 'month');
-    if (type === undefined || type === 'day') await trimIndex(IndexId.DayUrl, 'day');
+    if (type === undefined || type === 'month' || type === 'final') await trimIndex(IndexId.MonthHashedIpAddress, type ?? 'month');
+    if (type === undefined || type === 'day' || type === 'final') await trimIndex(IndexId.DayUrl, type ?? 'day');
 
     return rt;
 }
