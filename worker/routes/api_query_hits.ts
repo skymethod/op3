@@ -30,7 +30,7 @@ export async function computeQueryHitsResponse({ permissions, method, searchPara
     const targetRpcClient = searchParams.has('ro') ? roRpcClient : rpcClient;
     if (!targetRpcClient) throw new Error(`Need targetRpcClient`);
 
-    const qhiVpc = searchParams.has('vpc') ? qhiVpcOpt : undefined;
+    const qhiVpc = searchParams.has('do') ? undefined : qhiVpcOpt;
 
     let request: Unkinded<QueryRedirectLogsRequest>;
     try {
