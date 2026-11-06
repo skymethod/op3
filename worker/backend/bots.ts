@@ -146,6 +146,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PodcastDownloader/1.0 (+https://github.com/)',
     'PodcastHarvester/1.0 (training data collection)',
     'podcastindex-downloader/1.0 (+https://podcastindex.org)',
+    'PodcastPipeline',
     'PodcastResearchArchive/1.0 (public RSS enclosures)',
     'PodcastTopicResearch/1.0 (SURF Research Cloud)',
     'PodcastToText/1.0',
@@ -2066,4 +2067,10 @@ const botIpHashes = new Set([
     '68a33724eaf3ba4db7483cb9241c182baa05b723', // 2026-11-05 for 2026-11-04 7018   att        Overcast
     'a35d2ccdcc9c60d397f0e42be6272c201e3f7ac6', // 2026-11-05 for 2026-11-04 52362  servicios  AppleCoreMedia
     'b517f77eb8e3076f40912b35560e074ccfc5b5e9', // 2026-11-05 for 2026-11-04 21928  tmobile    AppleCoreMedia
+    '3c9f3a710e189c561a91b6530764c7bd54b6f8be', // 2026-11-06 for 2026-11-05 701    verizon    Overcast
+    '3e81bf35076d802e827e95f3a9c2d5fe0ecc4579', // 2026-11-06 for 2026-11-05 16276  ovh        Chrome, PodcastPipeline
+    'b058d61c9d1b51758d4c791c80d468637b6641ad', // 2026-11-06 for 2026-11-05 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'c7fd8a545c02d74a3218f493bdbde344e25a8db6', // 2026-11-06 for 2026-11-05 28573  claro      Overcast
+    'd10f8de614b4dbce12092b35d04a4110cc239d6c', // 2026-11-06 for 2026-11-05 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'dddedecdc0b9205a7e42435635e02f2c2ccea6bb', // 2026-11-06 for 2026-11-05 701    verizon    Overcast
 ]);
