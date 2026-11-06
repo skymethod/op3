@@ -7,7 +7,7 @@ import { consoleError, consoleWarn } from '../tracer.ts';
 import { AttNums } from './att_nums.ts';
 import { Blobs } from './blobs.ts';
 import { computeMinuteFileKey, computeMinuteTimestamp, computeRecordInfo, queryPackedRedirectLogsFromHits, yieldRecords } from './hits_common.ts';
-import { computeIndexRecords, queryHitsIndexFromStorage, trimIndexRecords } from './hits_indexes.ts';
+import { queryHitsIndexFromStorage, trimIndexRecords } from './hits_indexes.ts';
 import { isRetryableErrorFromR2 } from './r2_bucket_blobs.ts';
 import { IpAddressEncryptionFn, IpAddressHashingFn, packRawRedirect } from './raw_redirects.ts';
 import { computeTimestamp, timestampToInstant } from '../timestamp.ts';
@@ -60,7 +60,7 @@ export class HitsController {
         const attNums = await this.getOrLoadAttNums();
         const attNumsMaxBefore = attNums.max();
         const minuteTimestampsChanged = new Set<string>();
-        const indexRecords: Record<string, string> = {};
+        // const indexRecords: Record<string, string> = {};
         const serverUrlFoundTimestamps: Record<string /* serverUrl */ , string /* found timestamp */> = {};
         const hlsRecords: Record<string, string> = {}; // uuid -> record
         // begin optimization: ensureMinuteFileLoaded can be expensive when there is a wide timestamp range, try to parallelize
@@ -89,7 +89,7 @@ export class HitsController {
                 const minuteFile = await timed(times, 'ensureMinuteFileLoaded', () => this.ensureMinuteFileLoaded(minuteTimestamp, attNums));
                 const inserted = minuteFile.insert([ record, sortKey ]);
                 if (inserted) minuteTimestampsChanged.add(minuteTimestamp);
-                await computeIndexRecords(obj, timestamp, sortKey, indexRecords);
+                // await computeIndexRecords(obj, timestamp, sortKey, indexRecords);
                 const { url } = obj;
                 if (typeof url === 'string') {
                     const serverUrl = computeServerUrl(url);
@@ -122,11 +122,11 @@ export class HitsController {
         }
 
         // save index records
-        await timed(times, 'saveIndexRecords', async () => {
-            for (const batch of chunk(Object.entries(indexRecords), 128)) {
-                await storage.put(Object.fromEntries(batch)); // separate transactions, but ok
-            }
-        });
+        // await timed(times, 'saveIndexRecords', async () => {
+        //     for (const batch of chunk(Object.entries(indexRecords), 128)) {
+        //         await storage.put(Object.fromEntries(batch)); // separate transactions, but ok
+        //     }
+        // });
 
         // evict old minutefiles from memory
         let evictedCount = 0;
