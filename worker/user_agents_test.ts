@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@3d403ee1d7f9321d0a4ddf3b60439b6d27d73308 (2026-11-06T17:11:16Z)
+// from user-agents-v2@cb3fe2c85f62c33ee686dfff5ef7b8ce6613d884 (2026-11-07T17:27:05Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -245,6 +245,7 @@ const botTests = {
     'Podcast%20Archiver/3000000003 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'bot', name: `Podcast Archiver` },
     'podcast-archiver/v1.7.1 (https://github.com/janw/podcast-archiver)': { type: 'bot', name: `Podcast Archiver (janw)` },
     'PodcastArchiver/1.0': { type: 'bot', name: `PodcastArchiver` },
+    'PodcastBuzzBot-Transcriber/1.0 (+https://podcastbuzz.ir/bot)': { type: 'bot', name: `Podcast Buzz Transcriber` },
     'podcast-downloader': { type: 'bot', name: `Podcast Downloader` },
     'Mozilla/5.0 (compatible; podcast-downloader/1.0)': { type: 'bot', name: `Podcast Downloader` },
     'PodcastFeedAnalyzer/1.0': { type: 'bot', name: `PodcastFeedAnalyzer` },
@@ -1046,6 +1047,8 @@ const appTests = {
     'Pandora/2179 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'app', name: `Pandora` },
     'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/2009.2': { type: 'app', name: `Pandora` },
     'Mozilla/5.0 (iPad; CPU OS 12_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Pandora/1908.1': { type: 'app', name: `Pandora` },
+    'Parasocial/1.0 (share preview; parasocial.fm)': { type: 'app', name: `Parasocial` },
+    'Parasocial/302 (iPad14,3; iOS 27.0; +https://parasocial.fm)': { type: 'app', name: `Parasocial` },
     'Parler Staging/542 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `Parler` },
     'Patreon/125.38.0.5 (iPhone; iOS 26.1; Scale/3.00)': { type: 'app', name: `Patreon` },
     'Patreon/125.37.0.15 (Android; Android 16; Scale/3.00)': { type: 'app', name: `Patreon` },
@@ -1072,6 +1075,7 @@ const appTests = {
     'PodcastAddict/v5 ( https://podcastaddict.com/; Android podcast app)': { type: 'app', name: `Podcast Addict` },
     'Podcast Addict - Dalvik/2.1.0 (Linux; U; Android 9; SM-G960F Build/PPR1.180610.011)': { type: 'app', name: `Podcast Addict` },
     'Podcast-Archiver/0.5.1 (https://github.com/janwh/podcast-archiver)': { type: 'app', name: `Podcast Archiver` },
+    'PodcastBuzz/1.0.13 (+https://podcastbuzz.ir)': { type: 'app', name: `Podcast Buzz` },
     'Podcast Player/1.0 (phone;android RMX3195_11_A.18)': { type: 'app', name: `Podcast Player` },
     'PodcastRepublic/18.0 (Linux; U; Android 10;blueline/QP1A.190711.020.C3)': { type: 'app', name: `Podcast Republic` },
     'PodcastRepublic/18.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)': { type: 'app', name: `Podcast Republic` },
@@ -1092,6 +1096,8 @@ const appTests = {
     'Podeo/4.2.3 (Linux;Android 12) ExoPlayerLib/2.11.7': { type: 'app', name: `Podeo` },
     'Podfriend/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) PodFriend/0.7.11 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36': { type: 'app', name: `Podfriend` },
     'Podgrab - docker': { type: 'app', name: `Podgrab` },
+    'PodHaven/0.1': { type: 'app', name: `Podhaven` },
+    'PodHaven/588 CFNetwork/3896.100.1.2.1 Darwin/27.0.0': { type: 'app', name: `Podhaven` },
     'Podhero%20Alpha/4373 CFNetwork/1197 Darwin/20.0.0': { type: 'app', name: `Podhero` },
     'Swoot Agent 1.0': { type: 'app', name: `Podhero` },
     'Podhome App/1.0 CFNetwork/1121.2.2 Darwin/19.2.0': { type: 'app', name: `Podhome` },
@@ -1728,6 +1734,8 @@ const referrerTests = {
     'https://podcastaddict.com': { type: 'referrer', name: `Podcast Addict` },
     'https://podcastaddict.com/': { type: 'referrer', name: `Podcast Addict` },
     'https://podcastaddict.com/podcast/3050361': { type: 'referrer', name: `Podcast Addict` },
+    'https://podcastbuzz.ir/': { type: 'referrer', name: `Podcast Buzz` },
+    'https://www.podcastbuzz.ir/': { type: 'referrer', name: `Podcast Buzz` },
     'https://podcastindex.org/': { type: 'referrer', name: `Podcast Index` },
     'https://podcast.app/': { type: 'referrer', name: `Podcast.app` },
     'https://www.podchaser.com/something': { type: 'referrer', name: `Podchaser` },

@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@3d403ee1d7f9321d0a4ddf3b60439b6d27d73308 (2026-11-06T17:11:16Z)
+// from user-agents-v2@cb3fe2c85f62c33ee686dfff5ef7b8ce6613d884 (2026-11-07T17:27:05Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -195,6 +195,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podcast%20Archiver\//.test(userAgent)) return { name: `Podcast Archiver`, type: 'bot' };
     if (/^podcast-archiver\/v\d/.test(userAgent)) return { name: `Podcast Archiver (janw)`, type: 'bot' };
     if (/^PodcastArchiver\//.test(userAgent)) return { name: `PodcastArchiver`, type: 'bot' };
+    if (/^PodcastBuzzBot-Transcriber\//.test(userAgent)) return { name: `Podcast Buzz Transcriber`, type: 'bot' };
     if (/^podcast-downloader$| podcast-downloader\//.test(userAgent)) return { name: `Podcast Downloader`, type: 'bot' };
     if (/^PodcastFeedAnalyzer\//.test(userAgent)) return { name: `PodcastFeedAnalyzer`, type: 'bot' };
     if (/^Mozilla.* PodcastFetcher\//.test(userAgent)) return { name: `PodcastFetcher`, type: 'bot' };
@@ -720,6 +721,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podcast Overhaul\/|^Overhaul FM\//.test(userAgent)) return { name: `Overhaul`, type: 'app' };
     if (/^Palco MP3/.test(userAgent)) return { name: `Palco MP3`, type: 'app' };
     if (/(^Pandora\/| Pandora\/)/.test(userAgent)) return { name: `Pandora`, type: 'app' };
+    if (/^Parasocial\//.test(userAgent)) return { name: `Parasocial`, type: 'app' };
     if (/^Parler( Staging)?\//.test(userAgent)) return { name: `Parler`, type: 'app' };
     if (/^Patreon\//.test(userAgent)) return { name: `Patreon`, type: 'app' };
     if (/^PeaCast\//.test(userAgent)) return { name: `PeaCast`, type: 'app' };
@@ -735,6 +737,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PodcastGuru/.test(userAgent)) return { name: `Podcast Guru`, type: 'app' };
     if (/^Podcast.*Addict\/|^Podcast Addict /.test(userAgent)) return { name: `Podcast Addict`, type: 'app' };
     if (/janwh\/podcast-archiver/.test(userAgent)) return { name: `Podcast Archiver`, type: 'app' };
+    if (/^PodcastBuzz\//.test(userAgent)) return { name: `Podcast Buzz`, type: 'app' };
     if (/^Podcast Player\//.test(userAgent)) return { name: `Podcast Player`, type: 'app' };
     if (/^PodcastRepublic\//.test(userAgent)) return { name: `Podcast Republic`, type: 'app' };
     if (/^Podcastly\/|^Podcastly$/.test(userAgent)) return { name: `Podcastly`, type: 'app' };
@@ -749,6 +752,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Podeo\//.test(userAgent)) return { name: `Podeo`, type: 'app' };
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
     if (/^Podgrab /.test(userAgent)) return { name: `Podgrab`, type: 'app' };
+    if (/^PodHaven\//.test(userAgent)) return { name: `Podhaven`, type: 'app' };
     if (/^Podhero|^Swoot[\/ ]/.test(userAgent)) return { name: `Podhero`, type: 'app' };
     if (/^Podhome App/.test(userAgent)) return { name: `Podhome`, type: 'app' };
     if (/^Podimo\//.test(userAgent)) return { name: `Podimo`, type: 'app' };
@@ -1047,6 +1051,7 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/^https?:\/\/(old\.)?podbay\.fm\//.test(referer)) return { name: `Podbay`, type: 'referrer', category: 'app' };
     if (/^https:\/\/www\.podbean\.com\//.test(referer)) return { name: `Podbean`, type: 'referrer', category: 'host' };
     if (/^https:\/\/(www\.)?podcastaddict\.com/.test(referer)) return { name: `Podcast Addict`, type: 'referrer', category: 'app' };
+    if (/^https:\/\/(www\.)?podcastbuzz\.ir/.test(referer)) return { name: `Podcast Buzz`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podcastindex\.org/.test(referer)) return { name: `Podcast Index`, type: 'referrer' };
     if (/^https:\/\/podcast\.app\//.test(referer)) return { name: `Podcast.app`, type: 'referrer', category: 'app' };
     if (/https:\/\/www\.podchaser\.com\//.test(referer)) return { name: `Podchaser`, type: 'referrer', category: 'app' };
