@@ -42,6 +42,7 @@ Deno.test({
             'Podcaster/1.0 (Android; com.podcaster.app)',
             'Podcasts/1.0 CFNetwork AppleCoreMedia',
             'Podcasts/1.1.0 (iPhone; iOS 18.1)',
+            'Podcasts/0.5.1 (self-hosted podcast server)',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
