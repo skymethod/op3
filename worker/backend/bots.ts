@@ -140,6 +140,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podcast-transcripts/1.0 (+personal transcript archiver)',
     'PodcastAI-FeedValidator/1.0 (+https://podcastai.com/feed-validator)',
     'PodcastArchive/1.0 (personal homelab archive)',
+    'PodcastArchive/1.0 (research audio collection)',
     'PodcastArchive/1.0',
     'PodcastArchiver/1.0',
     'PodcastDataEnricher/2.0 (audio-research; admin@podcasthawk.com)',
@@ -2073,4 +2074,15 @@ const botIpHashes = new Set([
     'c7fd8a545c02d74a3218f493bdbde344e25a8db6', // 2026-11-06 for 2026-11-05 28573  claro      Overcast
     'd10f8de614b4dbce12092b35d04a4110cc239d6c', // 2026-11-06 for 2026-11-05 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
     'dddedecdc0b9205a7e42435635e02f2c2ccea6bb', // 2026-11-06 for 2026-11-05 701    verizon    Overcast
+    '1e91c8901f542525a2869046aa5f58181a31bb81', // 2026-11-07 for 2026-11-06 20473  constant   Chrome, Safari, Firefox, Edge
+    '2935e838c8aa55eb01734f497385749936b377a6', // 2026-11-07 for 2026-11-06 16276  ovh        Chrome
+    '29780f6dc378b4a3a75ddd43424692fbdb1a8cd3', // 2026-11-07 for 2026-11-06 402687 falai      Safari
+    '34e596a1adbfea925bd2f83564bd1a75eba8f328', // 2026-11-07 for 2026-11-06 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '7150c2638a350a5fd95d6e7fe12a9d0c929aca6b', // 2026-11-07 for 2026-11-06 55286  b2net      Firefox
+    'a8a1971af4bbf05b7d51369a60cf14c179853fcd', // 2026-11-07 for 2026-11-06 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'c26723adbf5eb792149a5ac086f91bd5ab083841', // 2026-11-07 for 2026-11-06 1136   kpn        Apple Podcasts, AppleCoreMedia
+    'd6f5651324b4b1a6dc56079ebcfeee7abbab49cd', // 2026-11-07 for 2026-11-06 8075   microsoft  Chrome
+    'd89d120dbecf52b69ffd9b11859283f3bb42704f', // 2026-11-07 for 2026-11-06 402687 falai      Safari
+    'dd01254a95da364d3707f29ec254dd79c3468316', // 2026-11-07 for 2026-11-06 680    verein     Firefox
+    'f28893976892b8c703d4ea7a01ffa116d632311e', // 2026-11-07 for 2026-11-06 16509  amazon     PodcastArchive/1.0 (research audio collection)
 ]);
