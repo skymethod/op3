@@ -64,6 +64,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'fedcom-capture/1.0',
     'FeedBurner/1.0 (http://www.FeedBurner.com)',
     'FeedScanner/1.0',
+    'fzjuelich-bot',
     'GladiaPodcastScraper/1.0 (+https://gladia.io; research dataset)',
     'GladiaPodcastScraper/2.0-rs (+https://gladia.io; research dataset)',
     'globalping probe (https://github.com/jsdelivr/globalping)',
@@ -2119,4 +2120,25 @@ const botIpHashes = new Set([
     'd89d120dbecf52b69ffd9b11859283f3bb42704f', // 2026-11-07 for 2026-11-06 402687 falai      Safari
     'dd01254a95da364d3707f29ec254dd79c3468316', // 2026-11-07 for 2026-11-06 680    verein     Firefox
     'f28893976892b8c703d4ea7a01ffa116d632311e', // 2026-11-07 for 2026-11-06 16509  amazon     PodcastArchive/1.0 (research audio collection)
+    '0c00390c2527060688416173821f46fd846ef95e', // 2026-11-08 for 2026-11-07 20473  constant   Chrome, Safari, Firefox, Edge
+    '0c72cd1a76bd6a10bed89cf971038a0f21a7f494', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '0c75a1bba95468e5c34d808204324e68e5a06ffd', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '1b2d82c0ad142baeec3727d838895d02153a2fb1', // 2026-11-08 for 2026-11-07 20473  constant   Chrome, Safari, Firefox, Edge
+    '1f024c3571fd8d5b6c265b93bd4e311cb59d6606', // 2026-11-08 for 2026-11-07 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '22883502e164936274066c29eb81c4dc50e83c96', // 2026-11-08 for 2026-11-07 16509  amazon     iTunes, AntennaPod
+    '232d0e90c510827b068483efc639472f632c4152', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '24b76cc85808ad22b4bd5e9f4894777caf5a44bb', // 2026-11-08 for 2026-11-07 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    '33dc8878ab1fe914605db7866be6e15a2d96dc0a', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '77f016b8d3ffe3bf627e4d61e7dec3183a3203d9', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '7b872b9fbaff2f5e4c04c707652cd44e4cd2158c', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '83880d55146c58ba76eb314c1caf775fcc5f07ac', // 2026-11-08 for 2026-11-07 21928  tmobile    Overcast
+    '8a6d805df2d3b07168734b4fa6eca117a88ba489', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '924db746e28ed7845d0283d69620348567de6f88', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '9c7ad156d84791c208d9b27e56ff3e04257b1ff1', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'b327dff4bae8e1b63a532b730d7c0890425e8d6f', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia, Apple Podcasts, Chrome
+    'c9e4492cd18132206369417990fa46909361cceb', // 2026-11-08 for 2026-11-07 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'cbc35227de20143e9dc7a5be9e2f88e50e9bf819', // 2026-11-08 for 2026-11-07 1257   tele2      Overcast
+    'd17e98c40916aa7925f48dc3f14f79278be7d13d', // 2026-11-08 for 2026-11-07 20473  constant   Chrome
+    'e1b8816cbc6f31c552d435b2ac103fb4e2e62e50', // 2026-11-08 for 2026-11-07 701    verizon    Overcast
+    'f39cf56ae06d864b9290178b71eae9b3b46e58e4', // 2026-11-08 for 2026-11-07 680    verein     fzjuelich-bot, Firefox
 ]);
