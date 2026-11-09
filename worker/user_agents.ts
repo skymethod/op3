@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@cb3fe2c85f62c33ee686dfff5ef7b8ce6613d884 (2026-11-07T17:27:05Z)
+// from user-agents-v2@7af2c8efb5df5ff429ad48a328effe3ac6aa34d2 (2026-11-09T17:57:11Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -42,6 +42,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^com.apple.(mobilenotes.SharingExtension|Notes.SharingExtension)\//.test(userAgent)) return { name: `Apple Notes share extension`, type: 'bot' };
     if (/^atc\/|\(null\) watchOS\//.test(userAgent)) return { name: `Apple Podcasts (Watch)`, type: 'bot' };
     if (/(iTMS|itunesstored|itms)/.test(userAgent)) return { name: `Apple Podcasts automated checks`, type: 'bot' };
+    if (/CFNetwork\/.* Scout\//.test(userAgent)) return { name: `Apple Podcasts Scout`, type: 'bot' };
     if (/^Applebot\//.test(userAgent)) return { name: `Applebot`, type: 'bot' };
     if (/archive\.org_bot/.test(userAgent)) return { name: `Archive.org`, type: 'bot' };
     if (/^atheerfm\//.test(userAgent)) return { name: `atheerfm`, type: 'bot' };
@@ -118,6 +119,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/Mediapartners-Google/.test(userAgent)) return { name: `Google Adsense Bot`, type: 'bot' };
     if (/AdsBot-Google|Google-AdWords-Express/.test(userAgent)) return { name: `Google AdsBot`, type: 'bot' };
     if (/^GoogleAgent-URLContext/.test(userAgent)) return { name: `Google Gemini`, type: 'bot' };
+    if (/^Google-Lens$/.test(userAgent)) return { name: `Google Lens`, type: 'bot' };
     if (/Google-Podcast/.test(userAgent)) return { name: `Google Podcasts Manager`, type: 'bot' };
     if (/Googlebot\/|Googlebot-Video\/|Googlebot-Image\/|^Feed[fF]etcher-Google|google-xrawler|^Googlebot-News|^Google-Safety$|^GoogleOther-Video\/\d/.test(userAgent)) return { name: `Googlebot`, type: 'bot' };
     if (/^gpt-in-mind-podcasts/.test(userAgent)) return { name: `gpt-in-mind-podcasts`, type: 'bot' };
@@ -442,6 +444,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^BrowserPlus\//.test(userAgent)) return { name: `BrowserPlus`, type: 'app' };
     if (/^Bullhorn(\/.*)?$|^Bullhorn \(/.test(userAgent)) return { name: `Bullhorn`, type: 'app' };
     if (/iOS Bygdanytt Hermes\//.test(userAgent)) return { name: `Bygdanytt iOS app`, type: 'app' };
+    if (/^Cadence\//.test(userAgent)) return { name: `Cadence`, type: 'app' };
     if (/^Campfire(FM)?\//.test(userAgent)) return { name: `CampfireFM`, type: 'app' };
     if (/^Canvas\//.test(userAgent)) return { name: `Canvas`, type: 'app' };
     if (/^Capital\//.test(userAgent)) return { name: `Capital`, type: 'app' };

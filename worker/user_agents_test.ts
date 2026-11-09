@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@cb3fe2c85f62c33ee686dfff5ef7b8ce6613d884 (2026-11-07T17:27:05Z)
+// from user-agents-v2@7af2c8efb5df5ff429ad48a328effe3ac6aa34d2 (2026-11-09T17:57:11Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -59,6 +59,7 @@ const botTests = {
     'atc/1.0 watchOS/7.1 model/Watch5,3 hwp/t8006 build/18R590 (6; dt:202)': { type: 'bot', name: `Apple Podcasts (Watch)` },
     'atc/1.0 watchOS/7.1 model/Watch5,4 hwp/t8006 build/18R590 (6; dt:202)': { type: 'bot', name: `Apple Podcasts (Watch)` },
     '(null)/(null) watchOS/5.0.1 model/Watch3,3 hwp/t8004 build/16R381 (6; dt:155)': { type: 'bot', name: `Apple Podcasts (Watch)` },
+    'Podcasts/4027.210.1 CFNetwork/3896.200.61 Darwin/27.2.0 Scout/1.0': { type: 'bot', name: `Apple Podcasts Scout` },
     'Mozilla/5.0 (compatible; archive.org_bot http://archive.org/details/archive.org_bot)': { type: 'bot', name: `Archive.org` },
     'atheerfm/1 CFNetwork/758.3.15 Darwin/15.3.0': { type: 'bot', name: `atheerfm` },
     'atlas-transcribe/1.0': { type: 'bot', name: `atlas-transcribe` },
@@ -141,6 +142,7 @@ const botTests = {
     'Mediapartners-Google': { type: 'bot', name: `Google Adsense Bot` },
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; Mozilla/5.0, Google-AdWords-Express) Chrome/137.0.7151.119 Safari/537.36': { type: 'bot', name: `Google AdsBot` },
     'GoogleAgent-URLContext': { type: 'bot', name: `Google Gemini` },
+    'Google-Lens': { type: 'bot', name: `Google Lens` },
     'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; http://www.google.com/bot.html)': { type: 'bot', name: `Googlebot` },
     'Googlebot-Image/1.0': { type: 'bot', name: `Googlebot` },
     'Feedfetcher-Google; (+http://www.google.com/feedfetcher.html; 1 subscribers; feed-id=4653447469100830145)': { type: 'bot', name: `Googlebot` },
@@ -579,6 +581,7 @@ const appTests = {
     'Bullhorn (https://bullhorn.fm)': { type: 'app', name: `Bullhorn` },
     'Bullhorn/1 CFNetwork/1335.0.3 Darwin/21.6.0': { type: 'app', name: `Bullhorn` },
     'AppleCoreMedia/1.0.0.19E239 (iPhone; U; CPU OS 15_4 like Mac OS X; sv_se) iOS Bygdanytt Hermes/90.0.0 _app_': { type: 'app', name: `Bygdanytt iOS app` },
+    'Cadence/1 CFNetwork/3896.100.1.1.1 Darwin/27.0.0': { type: 'app', name: `Cadence` },
     'Campfire/2.0.2 (Build 123) Android/15 (SDK 35)': { type: 'app', name: `CampfireFM` },
     'Campfire/2.0.2 (Build 123) iOS/18.5.0': { type: 'app', name: `CampfireFM` },
     'CampfireFM/1.0 (+https://joincampfire.fm)': { type: 'app', name: `CampfireFM` },
