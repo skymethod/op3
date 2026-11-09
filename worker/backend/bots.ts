@@ -2141,4 +2141,24 @@ const botIpHashes = new Set([
     'd17e98c40916aa7925f48dc3f14f79278be7d13d', // 2026-11-08 for 2026-11-07 20473  constant   Chrome
     'e1b8816cbc6f31c552d435b2ac103fb4e2e62e50', // 2026-11-08 for 2026-11-07 701    verizon    Overcast
     'f39cf56ae06d864b9290178b71eae9b3b46e58e4', // 2026-11-08 for 2026-11-07 680    verein     fzjuelich-bot, Firefox
+    '1e7c086b418bcdc3e9c8dd77ba44db079bf621c0', // 2026-11-09 for 2026-11-08 1257   tele2      Overcast
+    '20cdf91517361c59bb10b93a1cf307a416a62733', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '3575b6c3de63669cb8844c7dc1fb05154c9095e9', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia, Apple Podcasts, Chrome
+    '3e17e7cd060a3634b9ac3b9901a72c5a26bd38ad', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '423e033559d4b42b1b3526d5c763c4dd80115817', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '5329056b2ab41d83d321ba858ffb4aa070a530d6', // 2026-11-09 for 2026-11-08 402687 falai      Safari
+    '54ca9792499ec87886d39af8f5e9398f42d0957e', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '571c12d938da8c265a6a5b79f7e2a0e78a270066', // 2026-11-09 for 2026-11-08 402687 falai      Safari
+    '64a40940f86cea4c0ffbd77036b4245662f756ec', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '70373748d334fad416ad58e70dbd756a9b28ea5f', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '750b50efa4fa99e8cdda611d118e1abf70219d9f', // 2026-11-09 for 2026-11-08 1257   tele2      Overcast
+    '85c793cd57563784bf219e5764e242cfedc97a94', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '9301d28450feda22f850387449ad3da7054302e7', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    'b23a1f846057a8013a88e8289ae7159bb1d4d154', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia, Apple Podcasts, Chrome
+    'b2c6a2b37ad5bc4a97ebce0e3186d0574a27610b', // 2026-11-09 for 2026-11-08 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    'b7a5bb487eafb21a36de86ad64717f939d00ead5', // 2026-11-09 for 2026-11-08 33363  charter    Overcast
+    'c6c2bb3d71e9cf029949481d5ef9e85c4e3fb7ae', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'd3301278554f6de3c78f5830b90bbcaeb4ed7a44', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    'd8baf7da3c809c75bf3003459415e0b4ddf8eb86', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    'f25de802a6a0f56e3cb1b6dc46d11a69b1ff1d69', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
 ]);
