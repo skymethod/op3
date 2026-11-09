@@ -937,13 +937,27 @@ async function indexItems(feedUrlOrRecord: string | FeedRecord, opts: { storage:
     const { body } = lastOkFetch;
     if (!body) return [ ...rt, 'no ok response body' ].join(', ');
 
+    const feedContentType = lastOkFetch.headers ? new Headers(lastOkFetch.headers).get('content-type') : undefined;
+
     const blobKey = tryParseBlobKey(body);
     if (!blobKey) return [ ...rt, `unknown ok response body: ${body}` ].join(', ');
 
     const text = await blobs.get(blobKey, 'text'); // assumes utf-8
     if (!text) return [ ...rt, `ok response body text not found: ${body}` ].join(', ');
 
-    const feed = parseFeed(text);
+    const feed = (() => {
+        try {
+            return parseFeed(text);
+        } catch (e) {
+            const str = `${(e as Error).stack || e}`;
+            if (str.includes('at XMLParser.parse') && feedContentType && /^text\/html/i.test(feedContentType)) {
+                rt.push(`failed to parse html body`);
+                return undefined;
+            }
+            throw e;
+        }
+    })();
+    if (!feed) return rt.join(', ');
     console.log(JSON.stringify(feed, undefined, 2));
 
     rt.push(`${feed.items.length} items, ${feed.items.flatMap(v => v.enclosures ?? []).length} enclosures, ${feed.items.flatMap(v => v.alternateEnclosures ?? []).length} alternate enclosures`);
