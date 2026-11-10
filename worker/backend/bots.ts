@@ -40,6 +40,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'AudioCorpusPipeline/1.0',
     'audioscrape-backfill-feeder/1.0',
     'BelgianFrenchUsage/2.0 public-RSS research archive',
+    'BibleStudy/1.0 (+https://biblestudy.hive-project.com)',
     'BitcoinEducationArchive/1.0',
     'BR-SiteMonitor/1.6 (+https://portal.learnwell.net/status/)',
     'CastopodMobile/0.1 (transcriber)',
@@ -2182,4 +2183,14 @@ const botIpHashes = new Set([
     'd3301278554f6de3c78f5830b90bbcaeb4ed7a44', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
     'd8baf7da3c809c75bf3003459415e0b4ddf8eb86', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
     'f25de802a6a0f56e3cb1b6dc46d11a69b1ff1d69', // 2026-11-09 for 2026-11-08 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '11c14f4e7751c5a2a71f709bb638a51c1de62701', // 2026-11-10 for 2026-11-09 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '19dad35119c53c25984fcaf7f114633440e62c6b', // 2026-11-10 for 2026-11-09 1257   tele2      Overcast
+    '2b835c19cb3c72870ac065254f8eb155032ef85e', // 2026-11-10 for 2026-11-09 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '882bdfa1ff15f9eece44d8d63e3ea768e6f3c280', // 2026-11-10 for 2026-11-09 7922   comcast    Overcast
+    '88eee2b0d79054c7b6e51584cee7f8431be60dba', // 2026-11-10 for 2026-11-09 7018   att        Overcast
+    'd1d2aaf68fcbe6b17b5cb41b5a1e7a74e434b613', // 2026-11-10 for 2026-11-09 53366  tillman    Overcast
+    'd7ac5798e749f2f055628bec75e2302ce06149dc', // 2026-11-10 for 2026-11-09 402687 falai      Safari
+    'da7b963704f54d9f9af365f2a6a87e57852bcf4e', // 2026-11-10 for 2026-11-09 21928  tmobile    Overcast
+    'e0445ff60779e50c41aeb467fc8e8373cf9c15d9', // 2026-11-10 for 2026-11-09 32990  eastcentral BibleStudy/1.0 (+https://biblestudy.hive-project.com)
+    'e9632518508ce3d83771371bb9f542a24c5fe8f1', // 2026-11-10 for 2026-11-09 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
 ]);
