@@ -179,7 +179,7 @@ function isRetryableR2(e: Error): boolean {
     if (msg.includes('peer closed connection')) return true; // TypeError: error sending request from 2.3.4.5:51392 for https://asdf.asdf.r2.cloudflarestorage.com/asdf (1.2.3.4:443): client error (SendRequest): connection error: peer closed connection without sending TLS close_notify: https://docs.rs/rustls/latest/rustls/manual/_03_howto/index.html#unexpected-eof
     if (msg.includes('Connection timed out')) return true; // TypeError: error sending request from 2.3.4.5:47704 for https://asdf.asdf.r2.cloudflarestorage.com/asdf (1.2.3.4:443): client error (SendRequest): connection error: Connection timed out (os error 110)
     if (msg.includes('assign requested address')) return true; // TypeError: error sending request from 2.3.4.5:55761 for https://asdf.asdf.r2.cloudflarestorage.com/asdf (1.2.3.4:443): client error (SendRequest): connection error: Can't assign requested address (os error 49)
-
+    if (msg.includes('TypeError: fetch failed')) return true; // TypeError: fetch failed
     return false;
 }
 
