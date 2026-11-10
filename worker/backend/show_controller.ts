@@ -730,7 +730,10 @@ export async function lookupShowBulk(storage: DurableObjectStorage) {
 }
 
 export function isValidPodcastGuid(podcastGuid: string): boolean {
-    return typeof podcastGuid === 'string' && (isValidGuid(podcastGuid) || /^0x[a-fA-F0-9]{40}$/.test(podcastGuid)); // 0x1bECc6153CBdF5654357E5AAc813D5f1a45c40a6
+    return typeof podcastGuid === 'string' && (isValidGuid(podcastGuid)
+        || /^0x[a-fA-F0-9]{40}$/.test(podcastGuid) // 0x1bECc6153CBdF5654357E5AAc813D5f1a45c40a6
+        || isValidGuid(podcastGuid.toLowerCase()) // https://feeds.transistor.fm/female-vc-lab-b6d3dc0f-c723-4389-b27c-83700f4c8577
+    );
 }
 
 //
