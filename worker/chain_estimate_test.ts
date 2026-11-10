@@ -478,6 +478,16 @@ Deno.test({
             { kind: 'prefix', prefix: 'ausha', url: 'https://tr.ausha.co/gdzJNi5KXXLX/a.com/path/to/episode.mp3' },
             { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
         ]);
+
+        assertEquals(computeChainEstimate('https://hopr.fm/k/12345xyz/a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podseo', url: 'https://hopr.fm/k/12345xyz/a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
+
+        assertEquals(computeChainEstimate('http://hopr.fm/k/12345xyz/https://a.com/path/to/episode.mp3'), [
+            { kind: 'prefix', prefix: 'podseo', url: 'http://hopr.fm/k/12345xyz/https://a.com/path/to/episode.mp3' },
+            { kind: 'destination', url: 'https://a.com/path/to/episode.mp3' }
+        ]);
     }
 });
 

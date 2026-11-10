@@ -367,6 +367,15 @@ export function computeChainEstimate(url: string): ChainEstimate {
         return [ { kind: 'prefix', prefix: 'ausha', url }, ...computeChainEstimate(targetUrl) ];
     }
 
+    // https://hopr.fm/k/12345xyz/a.com/path/to/episode.mp3
+    // http and https supported, suffix protocol trumps
+    m = /^(https?):\/\/hopr\.fm\/k\/[^/]+\/(https?:\/\/)?(.*?)$/.exec(url);
+    if (m) {
+        const [ _, scheme, suffixProtocol, suffix ] = m;
+        const targetUrl = `${suffixProtocol ?? `${scheme}://`}${suffix}`;
+        return [ { kind: 'prefix', prefix: 'podseo', url }, ...computeChainEstimate(targetUrl) ];
+    }
+
     // final destination
     return [ { kind: 'destination', url } ];
 }
@@ -413,6 +422,7 @@ export interface ChainItem {
         | 'podkite'
         | 'podroll'
         | 'podscribe'
+        | 'podseo'
         | 'podsights'
         | 'podtrac'
         | 'ppprotect'
