@@ -239,7 +239,7 @@ export class HitsController {
 
         if (/^\/hits[12]?\/state$/.test(targetPath)) {
             const state = await this.getOrLoadState();
-            if (operationKind === 'select') return { results: [ { v: '20261111a', durableObjectName, colo, ...state, recentMinuteTimestamps, knownServerUrls: knownServerUrls.length } ] };
+            if (operationKind === 'select') return { results: [ { v: '20261111b', durableObjectName, colo, ...state, recentMinuteTimestamps, knownServerUrls: knownServerUrls.length } ] };
             if (operationKind === 'update') {
                 const { 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
                 if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
