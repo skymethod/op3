@@ -226,6 +226,16 @@ export class HitsController {
         if (operationKind === 'select' && /^\/hits[12]?\/storage$/.test(targetPath)) {
             return await queryStorage(storage, parameters);
         }
+        if (operationKind === 'delete' && targetPath === '/hits1/storage') {
+            const start = Date.now();
+            let error: Error | undefined;
+            try {
+                await storage.deleteAll();
+            } catch (e) {
+                error = e;
+            }
+            return { message: `hits1.deleteAll took ${Date.now() - start }ms${error ? ` error=${error.stack || error}` : ''}` };
+        }
 
         if (/^\/hits[12]?\/state$/.test(targetPath)) {
             const state = await this.getOrLoadState();
