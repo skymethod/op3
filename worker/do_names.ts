@@ -7,6 +7,7 @@ export class DoNames {
     static readonly keyServer = 'key-server';
     static readonly apiKeyServer = 'api-key-server';
     static readonly hitsServer = 'hits-server';
+    static readonly hitsServer2 = 'hits-server-2';
     static readonly hlsServer = 'hls-server';
 
     static readonly redirectLogForColo = (colo: string) => `redirect-log-${colo}`;

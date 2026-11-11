@@ -199,7 +199,10 @@ export class BackendDO {
                             const backupBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'backup/' }) : undefined;
                             const hitsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'hits/' }) : undefined;
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs, hitsBlobs) });
-                        } else if (targetPath.startsWith('/hits/') && durableObjectName === DoNames.hitsServer) {
+                        } else if ((targetPath.startsWith('/hits/') || targetPath.startsWith('/hits1/')) && durableObjectName === DoNames.hitsServer) {
+                            const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
+                            return newRpcResponse({ kind: 'admin-data', results, message });
+                        } else if ((targetPath.startsWith('/hits2/')) && durableObjectName === DoNames.hitsServer2) {
                             const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } else if (targetPath.startsWith('/hls/') && durableObjectName === DoNames.hlsServer) {

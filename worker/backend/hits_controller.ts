@@ -208,18 +208,28 @@ export class HitsController {
     }
 
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
-        const { operationKind, targetPath, parameters = {} } = req;
-        const { storage, recentMinuteTimestamps, colo, knownServerUrls, hashIpAddress } = this;
-       
-        if (operationKind === 'select' && targetPath === '/hits/attnums') return { results: [ await storage.get('hits.attNums') ] };
+        const { operationKind, targetPath, parameters = {}, dryRun } = req;
+        const { storage, recentMinuteTimestamps, colo, knownServerUrls, hashIpAddress, durableObjectName, rpcClient } = this;
 
-        if (operationKind === 'select' && targetPath === '/hits/storage') {
+       
+        if (operationKind === 'select' && /^\/hits[12]?\/attnums$/.test(targetPath)) return { results: [ await storage.get('hits.attNums') ] };
+        if (operationKind === 'update' && targetPath === '/hits2/attnums') {
+            const { json, ...rest } = parameters;
+            if (!json) throw new Error(`Missing json parameter: ${JSON.stringify(parameters)}`);
+            if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
+            const record = AttNums.fromJson(JSON.parse(json)).toJson();
+            console.log(`saveAttNums: ${JSON.stringify(record)}`);
+            await storage.put('hits.attNums', record);
+            return { message: 'saved attNums' };
+        }
+
+        if (operationKind === 'select' && /^\/hits[12]?\/storage$/.test(targetPath)) {
             return await queryStorage(storage, parameters);
         }
 
-        if (targetPath === '/hits/state') {
+        if (/^\/hits[12]?\/state$/.test(targetPath)) {
             const state = await this.getOrLoadState();
-            if (operationKind === 'select') return { results: [ { colo, ...state, recentMinuteTimestamps, knownServerUrls: knownServerUrls.length } ] };
+            if (operationKind === 'select') return { results: [ { durableObjectName, colo, ...state, recentMinuteTimestamps, knownServerUrls: knownServerUrls.length } ] };
             if (operationKind === 'update') {
                 const { 'max-minutefiles': maxMinuteFilesStr, ...rest } = parameters;
                 if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
@@ -240,7 +250,7 @@ export class HitsController {
             }
         }
 
-        if (targetPath === '/hits/indexes' && operationKind === 'delete') {
+        if (/^\/hits[12]?\/indexes$/.test(targetPath) && operationKind === 'delete') {
             const { 'max-iterations': maxIterationsStr = '1', go: goStr, type, ...rest } = parameters;
             if (Object.keys(rest).length > 0) throw new Error(`Unsupported parameters: ${JSON.stringify(rest)}`);
             const maxIterations = parseInt(maxIterationsStr);
@@ -249,12 +259,16 @@ export class HitsController {
             return { results: [ result ] };
         }
 
-        if (targetPath === '/hits/compute' && operationKind === 'select') {
+        if (/^\/hits[12]?\/compute$/.test(targetPath) && operationKind === 'select') {
             const { rawIpAddress } = parameters;
             if (typeof rawIpAddress === 'string') {
                 const hashedIpAddress = unpackHashedIpAddressHash(await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }));
                 return { results: [ { hashedIpAddress } ] };
             }
+        }
+
+        if (targetPath.startsWith('/hits1/hits2/') && rpcClient) {
+            return await rpcClient.adminExecuteDataQuery({ targetPath: targetPath.substring('/hits1'.length), operationKind, dryRun, parameters }, DoNames.hitsServer2, { sql: true });
         }
 
         throw new Error(`Unsupported hits query`);

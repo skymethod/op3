@@ -149,8 +149,10 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
-    } else if (targetPath.startsWith('/hits/')) {
+    } else if (targetPath.startsWith('/hits/') || targetPath.startsWith('/hits1/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer);
+    } else if (targetPath.startsWith('/hits2/')) {
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer2, { sql: true });
     } else if (targetPath.startsWith('/hls/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsServer, { sql: true });
     } else if (targetPath.startsWith('/hlsi/')) {
