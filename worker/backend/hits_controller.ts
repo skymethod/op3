@@ -45,6 +45,7 @@ export class HitsController {
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>): Promise<Unkinded<LogRawRedirectsBatchResponse>> {
         const { rawRedirectsByMessageId, rpcSentTime } = request;
         const { encryptIpAddress, hashIpAddress, colo, storage, rpcClient, durableObjectName, knownServerUrls } = this;
+        if (durableObjectName === DoNames.hitsServer) throw new Error('NO!');
         const { maxMinuteFiles = defaultMaxMinuteFiles } = await this.getOrLoadState();
         const rpcReceivedTime = new Date().toISOString();
         const redirectCount = Object.values(rawRedirectsByMessageId).reduce((a, b) => a + b.rawRedirects.length, 0);
@@ -210,7 +211,6 @@ export class HitsController {
     async adminExecuteDataQuery(req: Unkinded<AdminDataRequest>): Promise<Unkinded<AdminDataResponse>> {
         const { operationKind, targetPath, parameters = {}, dryRun } = req;
         const { storage, recentMinuteTimestamps, colo, knownServerUrls, hashIpAddress, durableObjectName, rpcClient } = this;
-
        
         if (operationKind === 'select' && /^\/hits[12]?\/attnums$/.test(targetPath)) return { results: [ await storage.get('hits.attNums') ] };
         if (operationKind === 'update' && targetPath === '/hits2/attnums') {
@@ -285,13 +285,15 @@ export class HitsController {
     }
 
     async queryPackedRedirectLogs(request: Unkinded<QueryPackedRedirectLogsRequest>): Promise<PackedRedirectLogsResponse> {
-        const { hitsBlobs } = this;
+        const { hitsBlobs, durableObjectName } = this;
+        if (durableObjectName === DoNames.hitsServer) throw new Error('NO!');
         const attNums = await this.getOrLoadAttNums();
         return await queryPackedRedirectLogsFromHits(request, { hitsBlobs, attNums, indexSortKeys: undefined, descending: false });
     }
 
     async queryHitsIndex(request: Unkinded<QueryHitsIndexRequest>): Promise<Response> {
-        const { storage, hashIpAddress } = this;
+        const { storage, hashIpAddress, durableObjectName } = this;
+        if (durableObjectName === DoNames.hitsServer) throw new Error('NO!');
         const { rawIpAddress } = request;
         if (typeof rawIpAddress === 'string') {
             const hashedIpAddress = unpackHashedIpAddressHash(await hashIpAddress(rawIpAddress, { timestamp: computeTimestamp() }));
@@ -302,6 +304,8 @@ export class HitsController {
     }
 
     async getMetrics(): Promise<Response> {
+        const { durableObjectName } = this;
+        if (durableObjectName === DoNames.hitsServer) throw new Error('NO!');
         await Promise.resolve();
 
         const lines: string[] = [];
