@@ -58,7 +58,7 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, h
             if (qhiVpc) {
                 const { rawIpAddress, ...rest } = req;
                 if (typeof rawIpAddress === 'string') {
-                    const [ result ] = ((await rpcClient.adminExecuteDataQuery({ targetPath: '/hits/compute', operationKind: 'select', parameters: { rawIpAddress } }, DoNames.hitsServer)).results ?? []) as { hashedIpAddress: string }[];
+                    const [ result ] = ((await rpcClient.adminExecuteDataQuery({ targetPath: '/hits/compute', operationKind: 'select', parameters: { rawIpAddress } }, DoNames.hitsServer2)).results ?? []) as { hashedIpAddress: string }[];
                     if (typeof result?.hashedIpAddress === 'string') {
                         rest.hashedIpAddress = result.hashedIpAddress;
                     } else {
@@ -67,7 +67,7 @@ async function query(request: Unkinded<QueryRedirectLogsRequest>, { rpcClient, h
                 }
                 return await qhiVpc.fetch('http://vpc/qhi', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...rest, instance }) });
             }
-            return await rpcClient.queryHitsIndex(req, DoNames.hitsServer);
+            return await rpcClient.queryHitsIndex(req, DoNames.hitsServer2);
         })();
         if (response.status !== 200) throw new Error(`queryHitsIndex returned ${response.status}`);
         if (!response.body) throw new Error(`queryHitsIndex returned no body`);

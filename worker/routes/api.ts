@@ -149,9 +149,9 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
     } else if (targetPath.startsWith('/show/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.showServer);
-    } else if (targetPath.startsWith('/hits/') || targetPath.startsWith('/hits1/')) {
+    } else if (targetPath.startsWith('/hits1/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer);
-    } else if (targetPath.startsWith('/hits2/')) {
+    } else if (targetPath.startsWith('/hits/') || targetPath.startsWith('/hits2/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer2, { sql: true });
     } else if (targetPath.startsWith('/hls/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsServer, { sql: true });
@@ -345,7 +345,7 @@ async function computeAdminProcessRedirectsBatchResponse(method: string, bodyPro
 async function computeAdminGetMetricsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, rpcClient: RpcClient): Promise<Response> {
     if (!hasPermission(permissions, 'admin-metrics')) return newForbiddenJsonResponse();
     if (method !== 'GET') return newMethodNotAllowedResponse(method);
-    return await rpcClient.adminGetMetrics({}, DoNames.hitsServer);
+    return await rpcClient.adminGetMetrics({}, DoNames.hitsServer2);
 }
 
 async function computeNotificationsResponse(permissions: ReadonlySet<ApiTokenPermission>, method: string, bodyProvider: JsonProvider, rpcClient: RpcClient): Promise<Response> {

@@ -18,7 +18,7 @@ export async function processRedirectsBatch({ batch, rpcClient, consumerStart, c
         const rawRedirects = body as RawRedirect[];
         rawRedirectsByMessageId[id] = { rawRedirects, timestamp: timestamp.toISOString() };
     }
-    const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer);
+    const response = await rpcClient.logRawRedirectsBatch({ rawRedirectsByMessageId, rpcSentTime: new Date().toISOString() }, DoNames.hitsServer2);
     const { processedMessageIds, colo: doColo, rpcSentTime, rpcReceivedTime, minTimestamp, medTimestamp, maxTimestamp, messageCount, redirectCount, putCount, evictedCount, newUrlCount, times: { packRawRedirects, saveAttNums, ensureMinuteFileLoaded, saveMinuteFile, saveIndexRecords, sendNotification } } = response;
     const messageIds = new Set(processedMessageIds);
     let ackCount = 0;

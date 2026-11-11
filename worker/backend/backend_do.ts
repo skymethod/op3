@@ -199,10 +199,10 @@ export class BackendDO {
                             const backupBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'backup/' }) : undefined;
                             const hitsBlobs = blobsBucket ? new R2BucketBlobs({ bucket: blobsBucket, prefix: 'hits/' }) : undefined;
                             return newRpcResponse({ kind: 'admin-data', ...await getOrLoadShowController().adminExecuteDataQuery(obj, backupBlobs, hitsBlobs) });
-                        } else if ((targetPath.startsWith('/hits/') || targetPath.startsWith('/hits1/')) && durableObjectName === DoNames.hitsServer) {
+                        } else if (targetPath.startsWith('/hits1/') && durableObjectName === DoNames.hitsServer) {
                             const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });
-                        } else if ((targetPath.startsWith('/hits2/')) && durableObjectName === DoNames.hitsServer2) {
+                        } else if ((targetPath.startsWith('/hits/') || targetPath.startsWith('/hits2/')) && durableObjectName === DoNames.hitsServer2) {
                             const { results, message } = await getOrLoadHitsController().adminExecuteDataQuery(obj);
                             return newRpcResponse({ kind: 'admin-data', results, message });
                         } else if (targetPath.startsWith('/hls/') && durableObjectName === DoNames.hlsServer) {
@@ -304,11 +304,11 @@ export class BackendDO {
                         return newRpcResponse({ kind: 'ok' });
                     } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.combinedRedirectLog) {
                         return newRpcResponse(await getOrLoadCombinedRedirectLogController().queryPackedRedirectLogs(obj));
-                    } else if (obj.kind === 'log-raw-redirects-batch' && durableObjectName === DoNames.hitsServer) {
+                    } else if (obj.kind === 'log-raw-redirects-batch' && durableObjectName === DoNames.hitsServer2) {
                         return newRpcResponse({ kind: 'log-raw-redirects-batch', ...await getOrLoadHitsController().logRawRedirectsBatch(obj) });
-                    } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.hitsServer) {
+                    } else if (obj.kind === 'query-packed-redirect-logs' && durableObjectName === DoNames.hitsServer2) {
                         return newRpcResponse(await getOrLoadHitsController().queryPackedRedirectLogs(obj));
-                    } else if (obj.kind === 'query-hits-index' && durableObjectName === DoNames.hitsServer) {
+                    } else if (obj.kind === 'query-hits-index' && durableObjectName === DoNames.hitsServer2) {
                         return await getOrLoadHitsController().queryHitsIndex(obj);
                     } else if (obj.kind === 'send-packed-records' && durableObjectName === DoNames.hlsServer) {
                         await getOrLoadHlsController().sendPackedRecords(obj);
