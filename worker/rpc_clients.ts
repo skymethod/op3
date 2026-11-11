@@ -67,16 +67,16 @@ export class StubRpcClient implements RpcClient {
         throw new Error(`StubRpcClient: receiveExternalNotification(${JSON.stringify({ request, target })}) not implemented`);
     }
 
-    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<OkResponse> {
-        throw new Error(`StubRpcClient: sendPackedRecords(${JSON.stringify({ request, target, sql })}) not implemented`);
+    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string): Promise<OkResponse> {
+        throw new Error(`StubRpcClient: sendPackedRecords(${JSON.stringify({ request, target })}) not implemented`);
     }
 
     executeSql(request: Unkinded<ExecuteSqlRequest>, target: string): Promise<ExecuteSqlResponse> {
         throw new Error(`StubRpcClient: executeSql(${JSON.stringify({ request, target })}) not implemented`);
     }
 
-    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<AdminDataResponse> {
-        throw new Error(`StubRpcClient: adminExecuteDataQuery(${JSON.stringify({ request, target, sql })}) not implemented`);
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
+        throw new Error(`StubRpcClient: adminExecuteDataQuery(${JSON.stringify({ request, target })}) not implemented`);
     }
 
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {

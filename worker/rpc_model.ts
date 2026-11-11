@@ -572,10 +572,10 @@ export interface RpcClient {
     getApiKey(request: Unkinded<GetApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     modifyApiKey(request: Unkinded<ModifyApiKeyRequest>, target: string): Promise<ApiKeyResponse>;
     receiveExternalNotification(request: Unkinded<ExternalNotificationRequest>, target: string): Promise<OkResponse>;
-    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, opts?: { sql?: boolean }): Promise<OkResponse>;
+    sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string): Promise<OkResponse>;
     executeSql(request: Unkinded<ExecuteSqlRequest>, target: string): Promise<ExecuteSqlResponse>;
 
-    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, opts?: { sql?: boolean }): Promise<AdminDataResponse>;
+    adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse>;
     adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse>;
     adminGetMetrics(request: Unkinded<AdminGetMetricsRequest>, target: string): Promise<Response>;
 }

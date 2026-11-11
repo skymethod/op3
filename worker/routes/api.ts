@@ -152,12 +152,12 @@ export async function routeAdminDataRequest(request: Unkinded<AdminDataRequest>,
     } else if (targetPath.startsWith('/hits1/')) {
         return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer);
     } else if (targetPath.startsWith('/hits/') || targetPath.startsWith('/hits2/')) {
-        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer2, { sql: true });
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hitsServer2);
     } else if (targetPath.startsWith('/hls/')) {
-        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsServer, { sql: true });
+        return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsServer);
     } else if (targetPath.startsWith('/hlsi/')) {
         const m = /^\/hlsi\/(.*?)\//.exec(targetPath);
-        if (m) return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsInstanceForPodcastGuid(m[1]), { sql: true });
+        if (m) return await rpcClient.adminExecuteDataQuery({ operationKind, targetPath, parameters, dryRun }, DoNames.hlsInstanceForPodcastGuid(m[1]));
        
     } 
     

@@ -172,7 +172,7 @@ export class HitsController {
         // send hls records
         if (Object.keys(hlsRecords).length > 0 && rpcClient) {
             try {
-                await timed(times, 'sendPackedRecords', () => rpcClient.sendPackedRecords({ attNums: attNums.toJson(), records: hlsRecords }, DoNames.hlsServer, { sql: true }));
+                await timed(times, 'sendPackedRecords', () => rpcClient.sendPackedRecords({ attNums: attNums.toJson(), records: hlsRecords }, DoNames.hlsServer));
             } catch (e) {
                 // don't fail the hits batch for this - maybe later once we've been in production for a while
                 consoleWarn('hits-to-hls', `Unexpected error in rpc call: ${(e as Error).stack || e}`);
@@ -278,7 +278,7 @@ export class HitsController {
         }
 
         if (targetPath.startsWith('/hits1/hits2/') && rpcClient) {
-            return await rpcClient.adminExecuteDataQuery({ targetPath: targetPath.substring('/hits1'.length), operationKind, dryRun, parameters }, DoNames.hitsServer2, { sql: true });
+            return await rpcClient.adminExecuteDataQuery({ targetPath: targetPath.substring('/hits1'.length), operationKind, dryRun, parameters }, DoNames.hitsServer2);
         }
 
         throw new Error(`Unsupported hits query`);

@@ -31,4 +31,6 @@ export class DoNames {
     
     static readonly isHlsInstance = (name: string) => name.startsWith('hls-instance-');
 
+    static readonly isSqlInstance = (name: string) => DoNames.isHlsInstance(name) || [ DoNames.hlsServer, DoNames.hitsServer2 ].includes(name);
+
 }

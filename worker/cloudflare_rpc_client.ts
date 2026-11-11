@@ -29,7 +29,7 @@ export class CloudflareRpcClient implements RpcClient {
     }
 
     async logRawRedirects(request: Unkinded<LogRawRedirectsRequest>, target: string): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, DoNames.isHlsInstance(target), computeLocationHint(target)));
+        return await sendRpc<OkResponse>({ kind: 'log-raw-redirects', ...request }, 'ok', this.computeOpts(target, undefined, computeLocationHint(target)));
     }
 
     async logRawRedirectsBatch(request: Unkinded<LogRawRedirectsBatchRequest>, target: string): Promise<LogRawRedirectsBatchResponse> {
@@ -80,18 +80,18 @@ export class CloudflareRpcClient implements RpcClient {
         return await sendRpc<OkResponse>({ kind: 'external-notification', ...request }, 'ok', this.computeOpts(target));
     }
 
-    async sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<OkResponse> {
-        return await sendRpc<OkResponse>({ kind: 'send-packed-records', ...request }, 'ok', this.computeOpts(target, undefined, sql));
+    async sendPackedRecords(request: Unkinded<SendPackedRecordsRequest>, target: string): Promise<OkResponse> {
+        return await sendRpc<OkResponse>({ kind: 'send-packed-records', ...request }, 'ok', this.computeOpts(target));
     }
 
     async executeSql(request: Unkinded<ExecuteSqlRequest>, target: string): Promise<ExecuteSqlResponse> {
-        return await sendRpc<ExecuteSqlResponse>({ kind: 'execute-sql', ...request }, 'execute-sql', this.computeOpts(target, undefined, true /* sql */));
+        return await sendRpc<ExecuteSqlResponse>({ kind: 'execute-sql', ...request }, 'execute-sql', this.computeOpts(target));
     }
 
     //
 
-    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string, { sql }: { sql?: boolean } = {}): Promise<AdminDataResponse> {
-        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters, sql, computeLocationHint(target)));
+    async adminExecuteDataQuery(request: Unkinded<AdminDataRequest>, target: string): Promise<AdminDataResponse> {
+        return await sendRpc<AdminDataResponse>({ kind: 'admin-data', ...request }, 'admin-data', this.computeOpts(target, request.parameters, computeLocationHint(target)));
     }
 
     async adminRebuildIndex(request: Unkinded<AdminRebuildIndexRequest>, target: string): Promise<AdminRebuildIndexResponse> {
@@ -104,10 +104,10 @@ export class CloudflareRpcClient implements RpcClient {
 
     //
 
-    private computeOpts(target: string, parameters?: Record<string, string>, sql?: boolean, locationHint?: LocationHint): RpcOpts {
+    private computeOpts(target: string, parameters?: Record<string, string>, locationHint?: LocationHint): RpcOpts {
         const { backendNamespace, backendSqlNamespace } = this;
         const maxRetries = tryParseInt(parameters?.maxRetries) ?? this.maxRetries;
-        const backendOrSqlNamespace = sql ? backendSqlNamespace : backendNamespace;
+        const backendOrSqlNamespace = DoNames.isSqlInstance(target) ? backendSqlNamespace : backendNamespace;
         return { doName: target, backendOrSqlNamespace, maxRetries, locationHint };
     }
 
