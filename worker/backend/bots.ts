@@ -189,6 +189,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PodcastDownloader/1.5 (PowerShell)',
     'PodcastHarvester/1.0 (training data collection)',
     'podcastindex-downloader/1.0 (+https://podcastindex.org)',
+    'PodcastPileNativeArchive/1.0',
     'PodcastPipeline',
     'PodcastResearchArchive/1.0 (public RSS enclosures)',
     'PodcastTopicResearch/1.0 (SURF Research Cloud)',
@@ -230,6 +231,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'taddy-assets/0.1',
     'terondo-sonde/1.0',
     'TopSurf-AudioPreflight/1.0',
+    'TrackP-research/0.1',
     'umia-indexing-feed-sample/1 (+https://github.com/umia-core/indexing-module)',
     'varostream-qos/1.0',
     'voiceai-harvest/0.2 (jeremy@hi-desk.de)',
@@ -2193,4 +2195,13 @@ const botIpHashes = new Set([
     'da7b963704f54d9f9af365f2a6a87e57852bcf4e', // 2026-11-10 for 2026-11-09 21928  tmobile    Overcast
     'e0445ff60779e50c41aeb467fc8e8373cf9c15d9', // 2026-11-10 for 2026-11-09 32990  eastcentral BibleStudy/1.0 (+https://biblestudy.hive-project.com)
     'e9632518508ce3d83771371bb9f542a24c5fe8f1', // 2026-11-10 for 2026-11-09 396982 google     Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), AppleCoreMedia
+    '02b3316d15492ef79bcf5e75401fa325b8914f96', // 2026-11-12 for 2026-11-11 16276  ovh        PodcastPileNativeArchive/1.0
+    '15369231da1f27151a574050eac4480f946bd544', // 2026-11-12 for 2026-11-11 396982 google     AppleCoreMedia
+    '22f70c3ce3307afc0d72a87c67cd8fa151d3e2b1', // 2026-11-12 for 2026-11-11 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '3d908e09c072b4ba31a1ad26ecfa6215b0c12483', // 2026-11-12 for 2026-11-11 8528   renault    TrackP-research/0.1
+    '4c89ba0e9215c924b166ad51b9c1238979e35441', // 2026-11-12 for 2026-11-11 399252 cvecfiber  Overcast
+    '4d7bdd14a3654c58538d54bbf7c0c1935f3dc772', // 2026-11-12 for 2026-11-11 24940  hetzner    PodcastPileNativeArchive/1.0
+    '5427f6f2eff015d2d939fb9ebb70e42e593c7ff6', // 2026-11-12 for 2026-11-11 202321 institut   Chrome
+    'c0f28170327fa9410030ee71d05b535ecb5c771e', // 2026-11-12 for 2026-11-11 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'c4652dbb128446fc70faaf9247e77781237d2528', // 2026-11-12 for 2026-11-11 24940  hetzner    PodcastPileNativeArchive/1.0
 ]);
