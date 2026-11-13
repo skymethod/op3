@@ -2204,4 +2204,22 @@ const botIpHashes = new Set([
     '5427f6f2eff015d2d939fb9ebb70e42e593c7ff6', // 2026-11-12 for 2026-11-11 202321 institut   Chrome
     'c0f28170327fa9410030ee71d05b535ecb5c771e', // 2026-11-12 for 2026-11-11 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
     'c4652dbb128446fc70faaf9247e77781237d2528', // 2026-11-12 for 2026-11-11 24940  hetzner    PodcastPileNativeArchive/1.0
+    '10a4edf798a0194f50b50bd199ee2b4c8b8a3f37', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '220b7d16c7d29e05a502943301786ef71fd95e58', // 2026-11-13 for 2026-11-12 701    verizon    AppleCoreMedia
+    '319638a4e86e269c48cd9f8e09e4c9f56030a736', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '436278510a4f017351499410c2054e8cf889a5c1', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '4c203cbb3e4b97e8d701b2cc8f7974e8f9d83282', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '55b46ec236453abeb416b7d166e547edc8e85f6a', // 2026-11-13 for 2026-11-12 3303   swisscom   Overcast
+    '5a23b474a799fb9cf7d7794e7d24bb207cc8c432', // 2026-11-13 for 2026-11-12 1136   kpn        Apple Podcasts, AppleCoreMedia
+    '64762765f13115d8815fed4b435dd9465e1a5c88', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '7872181655f958d5b4729b44e1f2099b2bd206e5', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '8168a0f9a07dcb75740e7c8289dd6014bcb19b99', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '8c539e5c09aa1515b29e2474c0b2de3ce6bc81bb', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '933a30c2f98604c10bd7365eca46701d5a4c470b', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    '9b2dad0744e576d48d074620e8f4fa19bd7ca3f0', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'a94b86f20558faf2abcaa6658bd9c18778bc6671', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'c9239c4a2b829c0990c6b126fd2be3cd4717be8e', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'de52108bc0fcee28fdf70ac6ace00fb21b5180b1', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'e059d0403adac2d4c0e3f46e5bfd52d9bb0d76a6', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
+    'eddbdd28b932a877c07ac0f64e0f7e89d81a8611', // 2026-11-13 for 2026-11-12 48602  connect    Chrome
 ]);
