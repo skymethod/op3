@@ -127,8 +127,10 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (signalmusic podcast-dl)',
     'Mozilla/5.0 (Sofia podcast downloader)',
     'Mozilla/5.0 (studio-dx media guard)',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) NoAgendaArchiver/2.2',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) PodcastCorpus/1.0',
     'Mozilla/5.0 (X11; Linux x86_64) AeVox-research/0.1',
+    'Mozilla/5.0 (X11; Linux x86_64) BibleStudy/1.0',
     'Mozilla/5.0 (X11; Linux x86_64) dsc-offline-archive (personal offline copy)',
     'Mozilla/5.0 Gabble-feed-sample/1.0',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
@@ -2222,4 +2224,12 @@ const botIpHashes = new Set([
     'de52108bc0fcee28fdf70ac6ace00fb21b5180b1', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
     'e059d0403adac2d4c0e3f46e5bfd52d9bb0d76a6', // 2026-11-13 for 2026-11-12 3356   level3     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0), Apple Podcasts, Chrome
     'eddbdd28b932a877c07ac0f64e0f7e89d81a8611', // 2026-11-13 for 2026-11-12 48602  connect    Chrome
+    '19c05628e8f6cd47396024430d3edb0f4ad49e4e', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    '262ad50979d9220c321868d3293efb4c543e7241', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    '4b60e4edc67291011fd70ee090d68d7f2fe30888', // 2026-11-14 for 2026-11-13 201838 community  Firefox, gPodder
+    '4dec85a3c84b916c8f3b9d7450506ceff4f2edd1', // 2026-11-14 for 2026-11-13 51396  pfcloud    Chrome, Firefox, Safari
+    '9e462b70885ed3793eeff9c2c857d909b4434632', // 2026-11-14 for 2026-11-13 7488   cnserver   Mozilla/5.0 (X11; Linux x86_64) BibleStudy/1.0
+    'a8870ae1fd1e4a2ac652c52ba18717df2d2abfc8', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    'c5683310815f468a1600d98bd2181e657f894152', // 2026-11-14 for 2026-11-13 7922   comcast    Mozilla/5.0 (Windows NT 10.0; Win64; x64) NoAgendaArchiver/2.2, Windows PowerShell
+    'efa154c54857934c62186ef14c00c7e34f144ea4', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
 ]);
