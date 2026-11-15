@@ -2232,4 +2232,6 @@ const botIpHashes = new Set([
     'a8870ae1fd1e4a2ac652c52ba18717df2d2abfc8', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
     'c5683310815f468a1600d98bd2181e657f894152', // 2026-11-14 for 2026-11-13 7922   comcast    Mozilla/5.0 (Windows NT 10.0; Win64; x64) NoAgendaArchiver/2.2, Windows PowerShell
     'efa154c54857934c62186ef14c00c7e34f144ea4', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
+    '314090fc2bb80ce715b975acad8efbc68bfa7df6', // 2026-11-15 for 2026-11-14 402687 falai      Safari
+    '5996de140296e6e850bf931c442acdca2c6b7cba', // 2026-11-15 for 2026-11-14 402687 falai      Safari
 ]);
