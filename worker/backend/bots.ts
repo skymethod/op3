@@ -2242,4 +2242,6 @@ const botIpHashes = new Set([
     'efa154c54857934c62186ef14c00c7e34f144ea4', // 2026-11-14 for 2026-11-13 396982 google     AppleCoreMedia, Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)
     '314090fc2bb80ce715b975acad8efbc68bfa7df6', // 2026-11-15 for 2026-11-14 402687 falai      Safari
     '5996de140296e6e850bf931c442acdca2c6b7cba', // 2026-11-15 for 2026-11-14 402687 falai      Safari
+    'a07a88712fd54429de678ad026bf5eb6966e526d', // 2026-11-16 for 2026-11-15 7922   comcast    Overcast
+    'a23a45032030c46eca7b81002c8a785eaa1fb11d', // 2026-11-16 for 2026-11-15 3303   swisscom   Overcast
 ]);
