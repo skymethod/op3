@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@7af2c8efb5df5ff429ad48a328effe3ac6aa34d2 (2026-11-09T17:57:11Z)
+// from user-agents-v2@4ce2412a21d37402eae9e9127a94385603071c79 (2026-11-16T23:51:29Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -119,6 +119,7 @@ const botTests = {
     'Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)': { type: 'bot', name: `DotBot` },
     'Mozilla/5.0 (compatible; DotBot/1.2; https://opensiteexplorer.org/dotbot; help@moz.com)': { type: 'bot', name: `DotBot` },
     'downcast feed consumer/0.0.175; (mode=dev; id=u2NgjBSPM6; downcast.fm)': { type: 'bot', name: `Downcast Bot` },
+    'DreamerieBot/1.0 (+https://dreamerie.app)': { type: 'bot', name: `DreamerieBot` },
     'Mozilla/5.0 (compatible; DuckDuckBot-Https/1.1; https://duckduckgo.com/duckduckbot)': { type: 'bot', name: `DuckDuckBot` },
     'DutchPodcastScraper/1.0 (research; episode audio collection)': { type: 'bot', name: `DutchPodcastScraper` },
     'Riddler (http://riddler.io/about)': { type: 'bot', name: `F-Secure Riddler` },
@@ -505,6 +506,9 @@ const appTests = {
     '%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D1%82%D0%B0%D1%80/4022.510.4 CFNetwork/1406.0.4 Darwin/22.4.0': { type: 'app', name: `Apple Podcasts` },
     '%E0%A4%AA%E0%A5%89%E0%A4%A1%E0%A4%95%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%9F/4022.300.6 CFNetwork/1402.0.8 Darwin/22.2.0': { type: 'app', name: `Apple Podcasts` },
     'Recordatorios/2466 CFNetwork/1329 Darwin/21.3.0': { type: 'app', name: `Apple Reminders` },
+    'TV/1.7.3 (Macintosh; OS X 27.3; 26C5047e) AppleWebKit/2626.1.17 AMS/1 (dt:1)': { type: 'app', name: `Apple TV` },
+    'com.apple.tv/1.0 iOS/27.3 model/iPhone18,4 hwp/t8150 build/24C5049d (6; dt:362) AMS/1': { type: 'app', name: `Apple TV` },
+    'TVWatchList/1.0 iOS/27.3 AppleTV/27.3 model/AppleTV14,1 hwp/t8110 build/24K5298d (3; dt:276) AMS/1': { type: 'app', name: `Apple TV` },
     'Arabian%20Business/21687 CFNetwork/1568.200.51 Darwin/24.1.0': { type: 'app', name: `Arabian Business` },
     'ARD Audiothek/2.15.1 (Google Play) Dalvik/2.1.0 (Linux; U; Android 13; FP4 Build/TKQ1.230127.002)/2.15.1 (Linux;Android 13) AndroidXMedia3/1.2.1': { type: 'app', name: `ARD Audiothek` },
     'ARD%20Audiothek/93 CFNetwork/1494.0.7 Darwin/23.4.0': { type: 'app', name: `ARD Audiothek` },
@@ -679,6 +683,7 @@ const appTests = {
     'Downloads/20375 CFNetwork/1098.7 Darwin/19.0.0': { type: 'app', name: `Downloads` },
     'DownMan/3.0.1 CFNetwork/609 Darwin/13.0.0': { type: 'app', name: `DownMan` },
     'DowntonAppy/1382280772 CFNetwork/548.0.4 Darwin/11.0.0': { type: 'app', name: `DowntonAppy` },
+    'Dreamerie/1.1.0 (iOS 27.2)': { type: 'app', name: `Dreamerie` },
     'DriveCast/2.9 CFNetwork/609.1.4 Darwin/13.0.0': { type: 'app', name: `DriveCast` },
     'DRN1; iPhone; iOS 17.4.1': { type: 'app', name: `DRN1` },
     'DRN1; Android; Samsung 17.4.1': { type: 'app', name: `DRN1` },
@@ -1501,6 +1506,7 @@ const deviceTests = {
     'AirPodcasts/4022.700.8 CFNetwork/1410.0.3 Darwin/22.6.0': { type: 'device', name: `Apple HomePod` },
     'apple;apple_tv;33ddb95064d1479ab37179579af23b77;;tpapi;3.200.405': { type: 'device', name: `Apple TV` },
     'AppleCoreMedia/1.0.0.20K71 (Apple TV; U; CPU OS 16_1 like Mac OS X; en_au)': { type: 'device', name: `Apple TV` },
+    'TVWatchList/1.0 iOS/27.3 AppleTV/27.3 model/AppleTV14,1 hwp/t8110 build/24K5298d (3; dt:276) AMS/1': { type: 'device', name: `Apple TV` },
     'Fountain/0.5.3 ios https://www.fountain.fm': { type: 'device', name: `Apple iPhone` },
     'Anytime/1.1 b64 (phone;ios Version 15.6.1 (Build 19G82)) https://github.com/amugofjava/anytime_podcast_player': { type: 'device', name: `Apple iPhone` },
     'Watch/1140 CFNetwork/3860.200.71 Darwin/25.1.0': { type: 'device', name: `Apple Watch` },

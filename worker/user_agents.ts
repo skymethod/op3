@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@7af2c8efb5df5ff429ad48a328effe3ac6aa34d2 (2026-11-09T17:57:11Z)
+// from user-agents-v2@4ce2412a21d37402eae9e9127a94385603071c79 (2026-11-16T23:51:29Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -103,6 +103,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/support@dorada\.co\.uk/.test(userAgent)) return { name: `dorada`, type: 'bot' };
     if (/DotBot/.test(userAgent)) return { name: `DotBot`, type: 'bot' };
     if (/downcast feed consumer\//.test(userAgent)) return { name: `Downcast Bot`, type: 'bot' };
+    if (/^DreamerieBot\//.test(userAgent)) return { name: `DreamerieBot`, type: 'bot' };
     if (/DuckDuckBot/.test(userAgent)) return { name: `DuckDuckBot`, type: 'bot' };
     if (/^DutchPodcastScraper\//.test(userAgent)) return { name: `DutchPodcastScraper`, type: 'bot' };
     if (/^Riddler /.test(userAgent)) return { name: `F-Secure Riddler`, type: 'bot' };
@@ -382,6 +383,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/AppleNews\//.test(userAgent)) return { name: `Apple News`, type: 'app' };
     if (/^Podcasts\/.*|^Balados\/|^Podcasti\/|^Podcastit\/|^Podcasturi\/|^Podcasty\/|^Podcast’ler\/|^Podcast%E2%80%99ler\/|^Podkaster\/|^Podcaster\/.*\(.*\)|^Podcastok\/|^Подкасти\/|^Подкасты\/|^פודקאסטים\/|^البودكاست\/|^पॉडकास्ट\/|^พ็อดคาสท์\/|^播客\/|^팟캐스트\/|ポッドキャスト\/|^%D8%A7%D9%84%D8%A8%D9%88%D8%AF%D9%83%D8%A7%D8%B3%D8%AA\/|^%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D1%8B\/|^%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D0%B8\/|^Podcastok\/|^%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98%D7%99%D7%9D\/|^%ED%8C%9F%EC%BA%90%EC%8A%A4%ED%8A%B8\/|^%D8%A7%D9%95%D8%B3%D9%85%D8%B9%D9%84%D9%8A\/|^Podcaster\/\d|^%E6%92%AD%E5%AE%A2\/|^%E3%83%9D%E3%83%83%E3%83%89%E3%82%AD%E3%83%A3%E3%82%B9%E3%83%88\/|^Podcast\/|^%E0%B8%9E%E0%B9%87%E0%B8%AD%E0%B8%94%E0%B8%84%E0%B8%B2%E0%B8%AA%E0%B8%97%E0%B9%8C\/\d|%D0%9F%D0%BE%D0%B4%D0%BA%D0%B0%D1%81%D1%82%D1%82%D0%B0%D1%80\/\d|^%E0%A4%AA%E0%A5%89%E0%A4%A1%E0%A4%95%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%9F\/\d/.test(userAgent)) return { name: `Apple Podcasts`, type: 'app' };
     if (/^Recordatorios\//.test(userAgent)) return { name: `Apple Reminders`, type: 'app' };
+    if (/^(TV|com.apple.tv|TVWatchList)\/\d.*AMS\//.test(userAgent)) return { name: `Apple TV`, type: 'app' };
     if (/^Arabian%20Business\/\d/.test(userAgent)) return { name: `Arabian Business`, type: 'app' };
     if (/^ARD Audiothek|^ARD%20Audiothek\/|^ARD-Audiothek/.test(userAgent)) return { name: `ARD Audiothek`, type: 'app' };
     if (/^ARD Sounds|^ARD%20Sounds|^ARD-Sounds/.test(userAgent)) return { name: `ARD Sounds`, type: 'app' };
@@ -514,6 +516,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^Downloads\//.test(userAgent)) return { name: `Downloads`, type: 'app' };
     if (/^DownMan\//.test(userAgent)) return { name: `DownMan`, type: 'app' };
     if (/^DowntonAppy\//.test(userAgent)) return { name: `DowntonAppy`, type: 'app' };
+    if (/^Dreamerie\//.test(userAgent)) return { name: `Dreamerie`, type: 'app' };
     if (/^DriveCast\//.test(userAgent)) return { name: `DriveCast`, type: 'app' };
     if (/^DRN1;/.test(userAgent)) return { name: `DRN1`, type: 'app' };
     if (/^DroolRadio\//.test(userAgent)) return { name: `DroolRadio`, type: 'app' };
