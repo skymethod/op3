@@ -24,7 +24,7 @@ Deno.test({
 
 // GENERATED
 
-// from user-agents-v2@4ce2412a21d37402eae9e9127a94385603071c79 (2026-11-16T23:51:29Z)
+// from user-agents-v2@449d9e2b91300a341d977747cf8f67d8774dc43d (2026-11-17T16:41:51Z)
 
 const botTests = {
     '7Siters/1.1 (+https://7ooo.ru/siters/)': { type: 'bot', name: `7Siters Crawler` },
@@ -1103,6 +1103,7 @@ const appTests = {
     'PodCruncher/3.7.1 CFNetwork/978.0.7 Darwin/18.7.0': { type: 'app', name: `PodCruncher` },
     'Podeo/4.2.3 (Linux;Android 12) ExoPlayerLib/2.11.7': { type: 'app', name: `Podeo` },
     'Podfriend/1.0 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) PodFriend/0.7.11 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36': { type: 'app', name: `Podfriend` },
+    'PodGod/1.0': { type: 'app', name: `POD GOD` },
     'Podgrab - docker': { type: 'app', name: `Podgrab` },
     'PodHaven/0.1': { type: 'app', name: `Podhaven` },
     'PodHaven/588 CFNetwork/3896.100.1.2.1 Darwin/27.0.0': { type: 'app', name: `Podhaven` },
@@ -1338,6 +1339,7 @@ const appTests = {
     'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) ; iPhone/13.6 XING/8.15.2 ttt_webview_iosm': { type: 'app', name: `XING` },
     'Yandex.Music/2019-11-01.trunk.5885661': { type: 'app', name: `Yandex Music` },
     'Ya.Music/2022-10-06.trunk.10125214': { type: 'app', name: `Yandex Music` },
+    'Yarn/1.0 (podcast downloads)': { type: 'app', name: `Yarn` },
     'Yoto/14665 CFNetwork/1.0 Darwin/18.5.0': { type: 'app', name: `Yoto` },
     'Yoto/15035 CFNetwork/1335.0.3.4 Darwin/15.8.4': { type: 'app', name: `Yoto` },
     'Yoto v2 FW; version v2.23.2': { type: 'app', name: `Yoto` },
@@ -1512,6 +1514,7 @@ const deviceTests = {
     'Watch/1140 CFNetwork/3860.200.71 Darwin/25.1.0': { type: 'device', name: `Apple Watch` },
     'net/http-easy (macosx; racket[CS] 8.15.0.7; 0.8.2)': { type: 'device', name: `Apple Computer` },
     'Mimir-macOS/1.8.1': { type: 'device', name: `Apple Computer` },
+    'AppleCoreMedia/1.0.0.24V526 (HomeView; U; CPU OS 27_2 like Mac OS X; en_us)': { type: 'device', name: `Apple HomeView` },
     'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.225 Safari/537.36 CrKey/1.56.500000 DeviceType/SmartSpeaker': { type: 'device', name: `Google Home` },
     'ZTE;Xview;756a522d9f1648b89e76e80be654456a;;tpapi;3.200.454': { type: 'device', name: `Android Tablet` },
     'Spotify/4.4.1.0 Rivian/30 (Rivian)': { type: 'device', name: `Smart Car` },
@@ -1779,4 +1782,7 @@ const referrerTests = {
     'https://tunein.com/': { type: 'referrer', name: `TuneIn` },
     'https://podcasts.wixapps.net/': { type: 'referrer', name: `Wix` },
     'https://wnyc.org/': { type: 'referrer', name: `WNYC` },
+    'https://wolfpawtv.com/': { type: 'referrer', name: `Wolf Paw TV` },
+    'https://wolfpawradionetwork.com/': { type: 'referrer', name: `Wolf Paw TV` },
+    'https://www.wolfpawradionetwork.com/': { type: 'referrer', name: `Wolf Paw TV` },
 };

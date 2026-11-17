@@ -19,7 +19,7 @@ export type EntityResult = Entity & { device?: Entity, referrer?: Entity };
 
 // GENERATED
 
-// from user-agents-v2@4ce2412a21d37402eae9e9127a94385603071c79 (2026-11-16T23:51:29Z)
+// from user-agents-v2@449d9e2b91300a341d977747cf8f67d8774dc43d (2026-11-17T16:41:51Z)
 
 export function findUserAgentEntity(userAgent: string): Entity | undefined {
 
@@ -757,6 +757,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/^PodCruncher\/.* CFNetwork\//.test(userAgent)) return { name: `PodCruncher`, type: 'app' };
     if (/^Podeo\//.test(userAgent)) return { name: `Podeo`, type: 'app' };
     if (/^Podfriend/.test(userAgent)) return { name: `Podfriend`, type: 'app' };
+    if (/^PodGod\//.test(userAgent)) return { name: `POD GOD`, type: 'app' };
     if (/^Podgrab /.test(userAgent)) return { name: `Podgrab`, type: 'app' };
     if (/^PodHaven\//.test(userAgent)) return { name: `Podhaven`, type: 'app' };
     if (/^Podhero|^Swoot[\/ ]/.test(userAgent)) return { name: `Podhero`, type: 'app' };
@@ -897,6 +898,7 @@ export function findUserAgentEntity(userAgent: string): Entity | undefined {
     if (/iPhone.*XING/.test(userAgent)) return { name: `XING`, type: 'app' };
     if (/^Ya(ndex)?\.Music\//.test(userAgent)) return { name: `Yandex Music`, type: 'app' };
     if (/^yapa\//.test(userAgent)) return { name: `Yapa`, type: 'app' };
+    if (/^Yarn\/\d/.test(userAgent)) return { name: `Yarn`, type: 'app' };
     if (/^Yoto\/|^Yoto v2 FW;/.test(userAgent)) return { name: `Yoto`, type: 'app' };
     if (/^com\.google\.android\.apps\.youtube\.music\/|^YouTubeMusic\/\d|^com\.google\.ios\.youtubemusic\/|^YouTube Music\/\d/.test(userAgent)) return { name: `YouTube Music`, type: 'app' };
     if (/^app\.revanced\.android\.apps\.youtube\.music\//.test(userAgent)) return { name: `YouTube Music (ReVanced)`, type: 'app' };
@@ -993,6 +995,7 @@ export function findUserAgentDeviceEntity(userAgent: string): Entity | undefined
     if (/iphone|iOS|iPhone| ios |phone;ios/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
     if (/watch|Watch OS|^Watch\/\d+ CFNetwork\//.test(userAgent)) return { name: `Apple Watch`, type: 'device', category: 'watch' };
     if (/iPod|IPOD/.test(userAgent)) return { name: `Apple iPod`, type: 'device', category: 'mobile' };
+    if (/\(HomeView;/.test(userAgent)) return { name: `Apple HomeView`, type: 'device', category: 'smart_speaker' };
     if (/OS X|OSX|Macintosh|Macbook|macosx|macOS/.test(userAgent)) return { name: `Apple Computer`, type: 'device', category: 'computer' };
     if (/CFNetwork/.test(userAgent)) return { name: `Apple iPhone`, type: 'device', category: 'mobile' };
     if (/GoogleChirp|Google-Speech-Actions|CrKey.*DeviceType\/SmartSpeaker/.test(userAgent)) return { name: `Google Home`, type: 'device', category: 'smart_speaker' };
@@ -1081,4 +1084,5 @@ export function findUserAgentReferrerEntity(referer: string): Entity | undefined
     if (/^https:\/\/tunein\.com\//.test(referer)) return { name: `TuneIn`, type: 'referrer', category: 'app' };
     if (/^https:\/\/podcasts\.wixapps\.net/.test(referer)) return { name: `Wix`, type: 'referrer', category: 'host' };
     if (/^https:\/\/wnyc\.org/.test(referer)) return { name: `WNYC`, type: 'referrer', category: 'app' };
+    if (/^https:\/\/(www\.)?(wolfpawtv|wolfpawradionetwork)\.com\//.test(referer)) return { name: `Wolf Paw TV`, type: 'referrer', category: 'app' };
 }
