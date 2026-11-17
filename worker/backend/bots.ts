@@ -66,6 +66,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'DuplexIO/0.1 (podcast conversation pipeline evaluation)',
     'DuplexPipeline/2.0',
     'edgewise-podcast-harvest/0.1',
+    'EnglishPodcastRSSCrawler/1.0 (+RSS metadata collection)',
     'EngramPodcastHarvester/0.1 (+https://github.com/)',
     'EntropyVoiceDownloader/0.1',
     'fedcom-capture/1.0',
@@ -91,6 +92,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'LocalPodcastArchive/2.0 (personal offline player)',
     'Lumina/1.4.5 personal RSS reader',
     'luna-podcatcher/0.1 (+downloader)',
+    'Melo/1.0 (+https://themelo.in)',
     'MEM personal transcripts research pipeline (mem10121@nyu.edu)',
     'Mimia/1.0 (+https://github.com/clairemcwhite/mimia)',
     'Miso-S2S-RSS-Collector/2.0',
@@ -2244,4 +2246,9 @@ const botIpHashes = new Set([
     '5996de140296e6e850bf931c442acdca2c6b7cba', // 2026-11-15 for 2026-11-14 402687 falai      Safari
     'a07a88712fd54429de678ad026bf5eb6966e526d', // 2026-11-16 for 2026-11-15 7922   comcast    Overcast
     'a23a45032030c46eca7b81002c8a785eaa1fb11d', // 2026-11-16 for 2026-11-15 3303   swisscom   Overcast
+    '15c73bae745ba4a20a2ddfb83472a07f6c1990bc', // 2026-11-17 for 2026-11-16 8151   uninet     Overcast, Pocket Casts
+    '755ebd3cda0947e2c9b190e27d73faf521ed1997', // 2026-11-17 for 2026-11-16 5650   frontier   Overcast
+    '793437f8b374382c1a828d1622ec5b8b1b95a8ee', // 2026-11-17 for 2026-11-16 4812   chinatelecom EnglishPodcastRSSCrawler/1.0 (+RSS metadata collection), Safari, Chrome, Google Podcasts, Edge, Firefox, Opera
+    'cf331e0a054496f734ea49c00b63dc86a0de0a27', // 2026-11-17 for 2026-11-16 17465  asianet    Melo/1.0 (+https://themelo.in)
+    'd2ab463388ac583911249bd20e88aa67838ae293', // 2026-11-17 for 2026-11-16 6167   verizon    Overcast
 ]);
