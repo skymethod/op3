@@ -2264,4 +2264,6 @@ const botIpHashes = new Set([
     '793437f8b374382c1a828d1622ec5b8b1b95a8ee', // 2026-11-17 for 2026-11-16 4812   chinatelecom EnglishPodcastRSSCrawler/1.0 (+RSS metadata collection), Safari, Chrome, Google Podcasts, Edge, Firefox, Opera
     'cf331e0a054496f734ea49c00b63dc86a0de0a27', // 2026-11-17 for 2026-11-16 17465  asianet    Melo/1.0 (+https://themelo.in)
     'd2ab463388ac583911249bd20e88aa67838ae293', // 2026-11-17 for 2026-11-16 6167   verizon    Overcast
+    '59a010044a36b2d646fbbf6dc45a234b6e979dcf', // 2026-11-18 for 2026-11-17 400238 pieg       Chrome
+    'f9c03c8cce8f633bbb41c1e14ac6e4990d252a0b', // 2026-11-18 for 2026-11-17 212238 datacamp   Dalvik, AppleCoreMedia, Apple Podcasts
 ]);
