@@ -7,7 +7,7 @@ export function parseApplePodcastsUserAgent(userAgent: string): ApplePodcastsUse
     if (/ model\/.*?hwp\//.test(userAgent)) return undefined; // Podcasts/3.9 iOS/17.2.1 model/iPhone12,3 hwp/t8030 build/21C66 (6; dt:205) AMS/1
     if (/^Podcasts\/\d.*iOS.*Scale\/\d/.test(userAgent)) return undefined; // Podcasts/1530.3 (iPad; iOS 17.4; Scale/1.00)
     if (/^Podcast\/\d+\.\d+\.\d+ linux /.test(userAgent)) return undefined; // Podcast/0.1.0 linux Linux 6.8.0-110-generic ...
-    if (/^Podcaster\/\d+\.\d+ \(Android.*?\)/.test(userAgent)) return undefined; // Podcaster/1.0 (Android), Podcaster/1.0 (Android; com.podcaster.app)
+    if (/^Podcaster\/\d+\.\d+( \(Android.*?\))?/.test(userAgent)) return undefined; // Podcaster/1.0 (Android), Podcaster/1.0 (Android; com.podcaster.app)
     const m = /^([^/\s]+)\/(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))? CFNetwork\/(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))?(\.(\d+))? Darwin\/(\d+)\.(\d+)\.(\d+)( (\(x86_64\)( [0-9A-Za-z]{6})?|Opendium|(?:\(x86_64\) )?\[client-ip-hash:.*?\]|[^\s]+))?$/.exec(userAgent);
     if (!m) throw new Error(`Unsupported Apple Podcasts user-agent: ${userAgent}`);
     const [ _, appName, 
