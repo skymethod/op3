@@ -2266,4 +2266,5 @@ const botIpHashes = new Set([
     'd2ab463388ac583911249bd20e88aa67838ae293', // 2026-11-17 for 2026-11-16 6167   verizon    Overcast
     '59a010044a36b2d646fbbf6dc45a234b6e979dcf', // 2026-11-18 for 2026-11-17 400238 pieg       Chrome
     'f9c03c8cce8f633bbb41c1e14ac6e4990d252a0b', // 2026-11-18 for 2026-11-17 212238 datacamp   Dalvik, AppleCoreMedia, Apple Podcasts
+    'b3559a0b42b43f5185fb254f7d87791a045bf876', // 2026-11-19 for 2026-11-18 31615  odido      Apple Podcasts, AppleCoreMedia
 ]);
