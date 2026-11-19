@@ -154,6 +154,7 @@ export function isRetryableErrorFromR2(e: Error): boolean {
     if (error.includes('(10054)')) return true; // Error: get: Client Disconnect (10054)
     if (error.includes('error (0)')) return true; // Error: put: Unspecified error (0)
     if (error.includes('(os error 54)')) return true; // (local) TypeError: error sending request for url (https://asdf.r2.cloudflarestorage.com/asdf): connection error: Connection reset by peer (os error 54)
+    if (error.includes('(10043)')) return true; // Error: put: Please look at https://www.cloudflarestatus.com for issues or contact customer support. (10043)
     return false;
 }
 
