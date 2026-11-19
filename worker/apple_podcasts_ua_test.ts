@@ -46,6 +46,7 @@ Deno.test({
             'Podcasts/1.0 (iPhone; iOS)',
             'Podcast/0.1 (io.zats.podcast; iOS)',
             'Podcaster/1.0',
+            'Podcasts/0.1.40 (Android; personal app)',
         ];
         for (const userAgent of bad) {
             assertEquals(parseApplePodcastsUserAgent(userAgent), undefined);
