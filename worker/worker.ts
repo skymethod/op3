@@ -164,7 +164,7 @@ const hmacKeys = new Map<string, CryptoKey>();
 function isRawRedirectAbusive(rawRedirect: RawRedirect): boolean { // abusive requests that gum up the system
     const asnStr = rawRedirect.other ? rawRedirect.other.asn : undefined;
     const country = rawRedirect.other ? rawRedirect.other.country : undefined;
-    if (asnStr === '45102' /* alibaba */ && country === 'SG' && rawRedirect.url && rawRedirect.url.includes('media.chatmosa.com')) return true; // found 2026-11-20 as far back as 2026-11-09
+    if (asnStr === '45102' /* alibaba */ && country === 'SG' && rawRedirect.url && (rawRedirect.url.includes('media.chatmosa.com') || rawRedirect.url.includes('pub-5dd16e3eb0704b99bc1fe4ce304e9555.r2.dev'))) return true; // found 2026-11-20 as far back as 2026-11-09
     return false;
 }
 
