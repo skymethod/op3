@@ -161,6 +161,13 @@ const pendingRawRedirects: RawRedirect[] = [];
 let banlist: Banlist | undefined;
 const hmacKeys = new Map<string, CryptoKey>();
 
+function isRawRedirectAbusive(rawRedirect: RawRedirect): boolean { // abusive requests that gum up the system
+    const asnStr = rawRedirect.other ? rawRedirect.other.asn : undefined;
+    const country = rawRedirect.other ? rawRedirect.other.country : undefined;
+    if (asnStr === '45102' /* alibaba */ && country === 'SG' && rawRedirect.url && rawRedirect.url.includes('media.chatmosa.com')) return true; // found 2026-11-20 as far back as 2026-11-09
+    return false;
+}
+
 async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerEnv, context: ModuleWorkerContext, requestTime: number, cache: CfCache }): Promise<Response | undefined> {
     // must never throw!
     const redirectRequest = tryParseRedirectRequest(request.url);
@@ -203,7 +210,7 @@ async function tryComputeRedirectResponse(request: Request, opts: { env: WorkerE
                 if (secret) await addHlsOther({ other, hlsResult, prefixArgs, secret, targetUrl });
                 const rawRedirect = computeRawRedirect(request, { time: requestTime, method, rawIpAddress, other });
                 console.log(`rawRedirect: ${JSON.stringify({ ...rawRedirect, rawIpAddress: '<hidden>' }, undefined, 2)}`);
-                if (other.subrequest !== 'hls') { // all "top-level" redirect requests, including master hls
+                if (other.subrequest !== 'hls' && !isRawRedirectAbusive(rawRedirect)) { // all "top-level" redirect requests, including master hls
                     rawRedirects.push(rawRedirect);
                     validRawRedirect = rawRedirect;
                 }
