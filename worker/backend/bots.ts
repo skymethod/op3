@@ -41,6 +41,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'AudioAgiPodcastStereoProbe/0.1 (personal speech research)',
     'AudioCorpusPipeline/1.0',
     'audioscrape-backfill-feeder/1.0',
+    'AudioXL-MediaRecovery/1.0',
     'BargoTranscribeWorker/1.0',
     'BelgianFrenchUsage/2.0 public-RSS research archive',
     'BibleStudy/1.0 (+https://biblestudy.hive-project.com)',
@@ -130,6 +131,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; Thinkbot/0.5.8; +In_the_test_phase,_if_the_Thinkbot_brings_you_trouble,_please_block_its_IP_address._Thank_you.)',
     'Mozilla/5.0 (compatible; TrackPodcasts/1.0; +https://trackpodcasts.com)',
     'Mozilla/5.0 (compatible; TrimBrain/1.0; +https://trimbrain.ai)',
+    'Mozilla/5.0 (ListinUpPodcastArchive/1.0)',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) podcast-research/1.0',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) podcast-research-local',
     'Mozilla/5.0 (Macintosh) personal-archive',
@@ -2267,4 +2269,8 @@ const botIpHashes = new Set([
     '59a010044a36b2d646fbbf6dc45a234b6e979dcf', // 2026-11-18 for 2026-11-17 400238 pieg       Chrome
     'f9c03c8cce8f633bbb41c1e14ac6e4990d252a0b', // 2026-11-18 for 2026-11-17 212238 datacamp   Dalvik, AppleCoreMedia, Apple Podcasts
     'b3559a0b42b43f5185fb254f7d87791a045bf876', // 2026-11-19 for 2026-11-18 31615  odido      Apple Podcasts, AppleCoreMedia
+    '76de25e6de8c3d6f73942073578d6d3c9e38b44b', // 2026-11-20 for 2026-11-19 8412   tmobile    Apple Podcasts automated checks, audiobookshelf
+    '7f37a45a0afde0f5bf70523e521026ef5948832d', // 2026-11-20 for 2026-11-19 132203 tencent    Mozilla/5.0 (ListinUpPodcastArchive/1.0), AppleCoreMedia, AudioXL-MediaRecovery/1.0
+    'afbea7d098065b50d40d85594aa1098706ec19e6', // 2026-11-20 for 2026-11-19 3320   telekom    gPodder
+    'd5f2b6892102a5370d77916d0dd063ba258ec9d1', // 2026-11-20 for 2026-11-19 19413  roanoke    Overcast
 ]);
