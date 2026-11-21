@@ -2273,4 +2273,6 @@ const botIpHashes = new Set([
     '7f37a45a0afde0f5bf70523e521026ef5948832d', // 2026-11-20 for 2026-11-19 132203 tencent    Mozilla/5.0 (ListinUpPodcastArchive/1.0), AppleCoreMedia, AudioXL-MediaRecovery/1.0
     'afbea7d098065b50d40d85594aa1098706ec19e6', // 2026-11-20 for 2026-11-19 3320   telekom    gPodder
     'd5f2b6892102a5370d77916d0dd063ba258ec9d1', // 2026-11-20 for 2026-11-19 19413  roanoke    Overcast
+    '14854d354d79596606f954ae768d1380b9f8a6d2', // 2026-11-21 for 2026-11-20 1136   kpn        Apple Podcasts, AppleCoreMedia
+    'c064c61bde28cbb495afadfb1fb086637d7b664e', // 2026-11-21 for 2026-11-20 22773  cox        Overcast
 ]);
