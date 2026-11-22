@@ -2275,4 +2275,6 @@ const botIpHashes = new Set([
     'd5f2b6892102a5370d77916d0dd063ba258ec9d1', // 2026-11-20 for 2026-11-19 19413  roanoke    Overcast
     '14854d354d79596606f954ae768d1380b9f8a6d2', // 2026-11-21 for 2026-11-20 1136   kpn        Apple Podcasts, AppleCoreMedia
     'c064c61bde28cbb495afadfb1fb086637d7b664e', // 2026-11-21 for 2026-11-20 22773  cox        Overcast
+    '356826dd5ea7ee6a9c08b1f5e4a5bf77615e9449', // 2026-11-22 for 2026-11-21 34977  procono    Apple Podcasts, stagefright, Podcast Addict
+    '4cab5fcbde1c85a31cd78530a6be8c5f76797bd1', // 2026-11-22 for 2026-11-21 1136   kpn        Apple Podcasts, AppleCoreMedia
 ]);
