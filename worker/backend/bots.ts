@@ -141,6 +141,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (podcast-downloader)',
     'Mozilla/5.0 (podcast-fetcher)',
     'Mozilla/5.0 (podcast-harvest; research)',
+    'Mozilla/5.0 (podcast-player-check)',
     'Mozilla/5.0 (PrettyData Industry Watch)',
     'Mozilla/5.0 (research)',
     'Mozilla/5.0 (signalmusic podcast-dl)',
@@ -227,6 +228,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'podradio2-audio-reachability/0.2 (+aiohttp from SE)',
     'Podscud/1.0 (Enclosure Liveness; +https://podscud.com)',
     'Podscud/1.0 (Feed Fetcher; +https://podscud.com)',
+    'PodSync/1.1 (Raspberry Pi podcast downloader)',
     'Podzone/1.0 (+https://podzone.fm; podcast indexing)',
     'PoliticalOS/0.1 (podcast archive; research)',
     'PopfilterPodcastIndexer/1.0',
@@ -2277,4 +2279,10 @@ const botIpHashes = new Set([
     'c064c61bde28cbb495afadfb1fb086637d7b664e', // 2026-11-21 for 2026-11-20 22773  cox        Overcast
     '356826dd5ea7ee6a9c08b1f5e4a5bf77615e9449', // 2026-11-22 for 2026-11-21 34977  procono    Apple Podcasts, stagefright, Podcast Addict
     '4cab5fcbde1c85a31cd78530a6be8c5f76797bd1', // 2026-11-22 for 2026-11-21 1136   kpn        Apple Podcasts, AppleCoreMedia
+    '06ff7e57537185af48326a5bc05afb670ebf1328', // 2026-11-23 for 2026-11-22 9506   singapore  Safari, Apple Podcasts
+    '08662472f7cb5ef3a8b068bce2b1091fca8486d3', // 2026-11-23 for 2026-11-22 209    centurylink Safari, AppleCoreMedia, ExoPlayer (Android), ffmpeg, Puppeteer, Chrome, Mozilla Bot, Mozilla/5.0 (podcast-player-check), curl
+    '117ea7cba7edbab33a0c733e5d00a82b49a632cf', // 2026-11-23 for 2026-11-22 212238 datacamp   Chrome, Apple Podcasts automated checks, audiobookshelf, Mozilla Bot, curl, AntennaPod
+    '34afe7fd5ddac573c6bf46ba9d7e16fecc3f8118', // 2026-11-23 for 2026-11-22 1136   kpn        Apple Podcasts, AppleCoreMedia
+    '6999f6dfc78a40ae3ac413c480e50ea623bb10a9', // 2026-11-23 for 2026-11-22 7922   comcast    Overcast
+    'ec5b63d800cd9a8f124f791813acf445e57cc001', // 2026-11-23 for 2026-11-22 20055  wholesail  PodSync/1.1 (Raspberry Pi podcast downloader)
 ]);
