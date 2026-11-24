@@ -2285,4 +2285,6 @@ const botIpHashes = new Set([
     '34afe7fd5ddac573c6bf46ba9d7e16fecc3f8118', // 2026-11-23 for 2026-11-22 1136   kpn        Apple Podcasts, AppleCoreMedia
     '6999f6dfc78a40ae3ac413c480e50ea623bb10a9', // 2026-11-23 for 2026-11-22 7922   comcast    Overcast
     'ec5b63d800cd9a8f124f791813acf445e57cc001', // 2026-11-23 for 2026-11-22 20055  wholesail  PodSync/1.1 (Raspberry Pi podcast downloader)
+    '00abe2b2882838fa0ed2d60e5cc5bcda839cd427', // 2026-11-24 for 2026-11-23 7922   comcast    Overcast
+    '1eaa528b00b5a24d1d957ed8b89f38ad68ffebbe', // 2026-11-24 for 2026-11-23 3356   level3     Apple Podcasts, Apple Podcasts (Watch)
 ]);
