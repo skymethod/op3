@@ -207,6 +207,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'PodcastArchive/1.0',
     'PodcastArchiver/1.0',
     'PodcastAudioArchive/1.0',
+    'PodcastAudioResearch/1.0 (+RSS enclosure downloader',
     'PodcastCorpusBot/1.0 (+research dataset; contact zhangling@gmail.com)',
     'PodcastDataEnricher/2.0 (audio-research; admin@podcasthawk.com)',
     'PodcastDownloader/1.0 (+https://github.com/)',
@@ -2288,4 +2289,6 @@ const botIpHashes = new Set([
     '00abe2b2882838fa0ed2d60e5cc5bcda839cd427', // 2026-11-24 for 2026-11-23 7922   comcast    Overcast
     '1eaa528b00b5a24d1d957ed8b89f38ad68ffebbe', // 2026-11-24 for 2026-11-23 3356   level3     Apple Podcasts, Apple Podcasts (Watch)
     'e5e91d1a3364d9b6dd5804098c59996478b51ffa', // 2026-11-25 for 2026-11-24 7922   comcast    Overcast
+    '73f60a7c943e5a050c7f09ed3128f43b3a47ae07', // 2026-11-26 for 2026-11-25 680    verein     PodcastAudioResearch/1.0 (+RSS enclosure downloader
+    'd5c100f8c43ec161d66de3b54007ef87fd088d50', // 2026-11-26 for 2026-11-25 7922   comcast    Overcast
 ]);
