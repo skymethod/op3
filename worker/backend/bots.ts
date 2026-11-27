@@ -123,6 +123,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (compatible; podcast-transcriber/1.0)',
     'Mozilla/5.0 (compatible; PodcastAudioDownloader/1.0)',
     'Mozilla/5.0 (compatible; PodcastDataBench/1.0; +https://example.invalid/asr-prep)',
+    'Mozilla/5.0 (compatible; PodcastFeedReader/1.0)',
     'Mozilla/5.0 (compatible; PodcastUrlChecker/1.0)',
     'Mozilla/5.0 (compatible; PodricBot/1.0; +http://podric.com)',
     'Mozilla/5.0 (compatible; SputnikTranscribe/1.0; +https://sputnikintelligence.com)',
@@ -154,6 +155,7 @@ export const EXTRA_BOT_USER_AGENTS = [
     'Mozilla/5.0 (X11; Linux x86_64) BibleStudy/1.0',
     'Mozilla/5.0 (X11; Linux x86_64) dsc-offline-archive (personal offline copy)',
     'Mozilla/5.0 (X11; Linux x86_64) podcast-dl/1.0',
+    'Mozilla/5.0 (X11; Linux x86_64) podmirror/1.1 (personal podcast client)',
     'Mozilla/5.0 Gabble-feed-sample/1.0',
     'Mozilla/5.0 podcast-archive-downloader/1.0',
     'Mozilla/5.0 stereo-conversation-research/1.0',
@@ -2291,4 +2293,27 @@ const botIpHashes = new Set([
     'e5e91d1a3364d9b6dd5804098c59996478b51ffa', // 2026-11-25 for 2026-11-24 7922   comcast    Overcast
     '73f60a7c943e5a050c7f09ed3128f43b3a47ae07', // 2026-11-26 for 2026-11-25 680    verein     PodcastAudioResearch/1.0 (+RSS enclosure downloader
     'd5c100f8c43ec161d66de3b54007ef87fd088d50', // 2026-11-26 for 2026-11-25 7922   comcast    Overcast
+    '0e0a58e1aaf253f12f363e54d3088569c021beea', // 2026-11-27 for 2026-11-26 212238 datacamp   Mozilla/5.0 (compatible; PodcastFeedReader/1.0)
+    '2070d146d7779b36f9e957a3c9a7fd8b751c1a7f', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '20903919d8e66c5bd643cd77f8eb484165c04b78', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '246d782fc75861a389c5aea53123e8ea80357fd8', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '2c5400474e9651f936218b2fd4f07bf84c70e6cc', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '31f8a455eee15bd6f813bfada2a6f351520d5aaf', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '53c8934841a6e45b480d8b799b6daaf3b6cc6a2a', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '6f00d98e7dde445c77e2847f9695fc52b9bd6538', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '8004a3a839bb00400921f4c8f4f735396e5a50dd', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '80ea254dbcacd0e5ec442008224461313eb3903f', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '80fab305b54a8f18b2b53ae56f531bead4aa0a81', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '83cbacca64d18e2ea93d2f6972f7c260e9b9bc06', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '8a435f9699740c16d6f8c7d2b1df58479659d523', // 2026-11-27 for 2026-11-26 7922   comcast    Overcast
+    '8d96d9eed9f0a7e9bfb7b763ff600fccda87427e', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    '9c151c87ec64d2e7faedb85ad4bc88d541758d76', // 2026-11-27 for 2026-11-26 212238 datacamp   Mozilla/5.0 (compatible; PodcastFeedReader/1.0)
+    'a0cbacc835e3195b4fbbed0c0bec02ea407f915b', // 2026-11-27 for 2026-11-26 11878  tzulo      Mozilla/5.0 (X11; Linux x86_64) podmirror/1.1 (personal podcast client)
+    'a6d83847c510d8a9e391b9c8bc26ece35fed8d36', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    'abb917223133342b04ef6cb9f15d9e107e0da824', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    'bceef8e4b4c5e1695f8b17f8ce7d5956d480de4a', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    'be63c093f00094005927159e630ce083c8d90f3b', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    'c03e5f8d7c1e5095e8639f25776eeb33af532bf1', // 2026-11-27 for 2026-11-26 20473  constant   Chrome, Safari, Firefox, Edge
+    'd251957d5df3df9473ee3d35f91e56714920be03', // 2026-11-27 for 2026-11-26 3352   telefonica AppleCoreMedia, PrestoCast
+    'ee7aba236a5b516b30a070dcc6fdeb19620d82b1', // 2026-11-27 for 2026-11-26 11427  charter    Overcast
 ]);
